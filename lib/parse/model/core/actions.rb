@@ -158,33 +158,33 @@ module Parse
     end
 
     def op_add!(field,objects)
-      operate_field field, { __op: :Add, objects: objects }
+      operate_field! field, { __op: :Add, objects: objects }
     end
 
     def op_add_unique!(field,objects)
-      operate_field field, { __op: :AddUnique, objects: objects }
+      operate_field! field, { __op: :AddUnique, objects: objects }
     end
 
     def op_remove!(field, objects)
-      operate_field field, { __op: :Remove, objects: objects }
+      operate_field! field, { __op: :Remove, objects: objects }
     end
 
     def op_destroy!(field)
-      operate_field field, { __op: :Delete }
+      operate_field! field, { __op: :Delete }
     end
 
     def op_add_relation!(field, objects = [])
       objects = [objects] unless objects.is_a?(Array)
       return false if objects.empty?
       relation_action = Parse::RelationAction.new(field, polarity: true, objects: objects)
-      operate_field field, relation_action
+      operate_field! field, relation_action
     end
 
     def op_remove_relation!(field, objects = [])
       objects = [objects] unless objects.is_a?(Array)
       return false if objects.empty?
       relation_action = Parse::RelationAction.new(field, polarity: false, objects: objects)
-      operate_field field, relation_action
+      operate_field! field, relation_action
     end
 
     # This creates a destroy_request for the current object.
