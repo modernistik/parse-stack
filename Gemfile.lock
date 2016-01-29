@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parse-stack (1.0.0)
+    parse-stack (1.0.1)
       active_model_serializers (>= 0.9, < 1)
       activemodel (>= 4, < 5)
       activesupport (>= 4, < 5)
@@ -39,7 +39,7 @@ GEM
     json (1.8.3)
     method_source (0.8.2)
     minitest (5.8.4)
-    moneta (0.7.20)
+    moneta (0.8.0)
     multipart-post (2.0.0)
     parallel (1.6.1)
     pry (0.10.3)
