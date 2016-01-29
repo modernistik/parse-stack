@@ -9,10 +9,10 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Anthony Persaud"]
   spec.email         = ["persaud@modernistik.com"]
 
-  spec.summary       = %q{Ruby Parse SDK Client and Object Relational Mapping stack}
+  spec.summary       = %q{Parse Ruby Client SDK and Object Relational Mapping stack}
   spec.description   = %q{A Parse Ruby Client, ORM, and Query engine to manage larger scale Parse applications}
   spec.homepage      = "https://github.com/modernistik/parse-stack"
-  spec.license       = "Nonstandard"
+  spec.license       = "MIT"
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
   # delete this section to allow pushing this gem to any host.
   # if spec.respond_to?(:metadata)
@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   #   raise "RubyGems 2.0 or newer is required to protect against public gem pushes."
   # end
 
-  spec.files         = Dir.glob("**/*").reject { |f| f.match(%r{^(test|spec|features)/} ) || f.match(%r{\.gem$}) } # `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
+  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
