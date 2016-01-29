@@ -1,0 +1,92 @@
+require_relative "properties"
+# This class adds methods to Parse::Objects in order to create a JSON Parse schema
+# in order to support table creation and table alterations.
+module Parse
+  module Schema
+
+    def self.included(base)
+      base.extend(ClassMethods)
+    end
+
+    module ClassMethods
+
+      # returns the schema of the defined class in the Parse JSON format.
+      def schema
+        sch = { className: parse_class, fields: {} }
+        #first go through all the attributes
+        attributes.each do |k,v|
+          # don't include the base Parse fields
+          next if Parse::Properties::BASE.include?(k)
+          next if v.nil?
+          result = { type: v.to_s.camelize }
+          # if it is a basic column property, find the right datatype
+          case v
+          when :integer, :float
+            result[:type] = "Number".freeze
+          when :geopoint, :geo_point
+            result[:type] = "GeoPoint".freeze
+          when :pointer
+            result = { type: "Pointer".freeze, targetClass: references[k] }
+          when :acl
+            result[:type] = "ACL".freeze
+          else
+            result[:type] = v.to_s.camelize
+          end
+
+          sch[:fields][k] = result
+
+        end
+        #then add all the relational column attributes
+        relations.each do |k,v|
+          sch[:fields][k] = { type: "Relation".freeze, targetClass: relations[k] }
+        end
+        sch
+      end
+
+      # updates the remote schema using Parse::Client
+      def update_schema(schema_updates = nil)
+        schema_updates ||= schema
+        client.update_schema parse_class, schema_updates
+      end
+
+      def create_schema
+        client.create_schema parse_class, schema
+      end
+
+      # fetches the current schema of this table.
+      def fetch_schema
+        client.schema parse_class
+      end
+
+      # A class method for non-destructive auto upgrading a remote schema based on the properties
+      # and relations you have defined. If the table doesn't exist, we create the schema
+      # from scratch - otherwise we fetched the current schema, calculate the differences
+      # and add the missing columns. WE DO NOT REMOVE any columns.
+      def auto_upgrade!
+        response = fetch_schema
+        if response.success?
+          #let's figure out the diff fields
+          remote_fields = response.result["fields"]
+          current_schema = schema
+          current_schema[:fields] = current_schema[:fields].reduce({}) do |h,(k,v)|
+            #if the field does not exist in Parse, then add it to the update list
+            h[k] = v if remote_fields[k.to_s].nil?
+            h
+          end
+          return if current_schema[:fields].empty?
+          return update_schema( current_schema )
+        else
+          return create_schema
+        end
+        #fetch_schema.success? ? update_schema : create_schema
+      end
+    #def diff(h2);self.dup.delete_if { |k, v| h2[k] == v }.merge(h2.dup.delete_if { |k, v| self.has_key?(k) }); end;
+
+    end
+
+    def schema
+      self.class.schema
+    end
+
+  end
+end

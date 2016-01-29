@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+
+require "bundler/setup"
+require "parse/stack"
+
+require "rack"
+require "rack/server"
+require "puma"
+Rack::Handler::WEBrick = Rack::Handler.get(:puma)
+Rack::Server.start :app => Parse::Webhooks
