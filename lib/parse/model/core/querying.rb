@@ -68,6 +68,7 @@ module Parse
       def find(*parse_ids, type: :parallel, compact: true)
         # flatten the list of Object ids.
         parse_ids.flatten!
+        parse_ids.compact!
         # determines if the result back to the call site is an array or a single result
         as_array = parse_ids.count > 1
         results = []
@@ -81,6 +82,7 @@ module Parse
           # which is better than Query request (table scan). This in turn allows for caching of
           # individual objects.
           results = parse_ids.threaded_map do |parse_id|
+            next nil unless parse_id.present?
             response = client.fetch_object(parse_class, parse_id)
             next nil if response.error?
             Parse::Object.build response.result, parse_class
