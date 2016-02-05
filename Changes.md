@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.0.4
+-----------
+- Fixes minor issue when storing and retrieving objects from the cache.
+
 1.0.3
 -----------
 - Fixes minor issue when passing `nil` to the class `find` method.
