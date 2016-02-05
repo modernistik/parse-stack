@@ -64,7 +64,8 @@ module Parse
           if method == :get && url.present? && @store.key?(url)
             puts("[Parse::Cache] >>> #{url}") if self.class.logging.present?
             response = Faraday::Response.new
-            body = @store[url].body
+            res_env = @store[url] # previous cached response
+            body = res_env.respond_to?(:body) ? res_env.body : nil
             if body.present?
               response.finish({status: 200, response_headers: {}, body: body })
               return response
