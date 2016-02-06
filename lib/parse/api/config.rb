@@ -8,7 +8,7 @@ module Parse
 
       def config
         if @config.nil?
-          response = request :get, "/1/config".freeze
+          response = request :get, "config"
           unless response.error?
             @config = response.result["params"]
           end

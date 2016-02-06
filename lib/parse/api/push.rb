@@ -6,7 +6,7 @@ module Parse
     module Push
 
       def push(payload = {})
-        request :post, "/1/push".freeze, body: payload.as_json
+        request :post, "push".freeze, body: payload.as_json
       end
 
     end

@@ -6,7 +6,7 @@ module Parse
 
   module API
     module Hooks
-      HOOKS_PREFIX = "/1/hooks/".freeze
+      HOOKS_PREFIX = "hooks/".freeze
       TRIGGER_NAMES = [:beforeSave, :afterSave, :beforeDelete, :afterDelete].freeze
       def _verify_trigger(triggerName)
         triggerName = triggerName.to_s.camelize(:lower).to_sym

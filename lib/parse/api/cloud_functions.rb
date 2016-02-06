@@ -5,11 +5,11 @@ module Parse
     module CloudFunctions
 
       def call_function(name, body = {})
-        request :post, "/1/functions/#{name}", body: body
+        request :post, "functions/#{name}", body: body
       end
 
       def trigger_job(name, body = {})
-        request :post, "/1/jobs/#{name}", body: body
+        request :post, "jobs/#{name}", body: body
       end
 
     end

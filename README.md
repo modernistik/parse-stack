@@ -86,6 +86,7 @@ Parse::Stack is a full stack framework that utilizes several ideas behind [DataM
 require 'parse/stack'
 
 Parse.setup application_id: APP_ID, api_key: REST_API_KEY
+# you may pass `server_url` as an option. Defaults to `https://api.parse.com/1/`
 
 # Object Mapper
 class Song < Parse::Object
@@ -98,9 +99,6 @@ class Song < Parse::Object
   # `like` is a Parse Relation to User class
   has_many :likes, as: :user, through: :relation
 end
-
-# Optional schema updates (requires master key)
-Song.auto_upgrade!
 
 artist = Artist.first(:name.like => /Sinatra/, :genres.in => ['swing'])
 

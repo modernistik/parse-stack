@@ -26,7 +26,7 @@ module Parse
     include Parse::API::Schema
 
     attr_accessor :session, :cache
-    attr_reader :application_id, :api_key, :master_key, :version, :host
+    attr_reader :application_id, :api_key, :master_key, :server_url
     # The client can support multiple sessions. The first session created, will be placed
     # under the default session tag. The :default session will be the default client to be used
     # by the other classes including Parse::Query and Parse::Objects
@@ -59,10 +59,9 @@ module Parse
     # :cache - Moneta::Transformer - if set, it should be a Moneta store instance
     # :expires - Integer - if set, it should be a Moneta store instance
     # :adapter - the HTTP adapter to use with Faraday, defaults to Faraday.default_adapter
-    # :host - defaults to Parse::Protocol::Host (api.parse.com)
+    # :host - defaults to Parse::Protocol::SERVER_URL (https://api.parse.com/1/)
     def initialize(opts = {})
-      @host           = Parse::Protocol::HOST
-      @version        = 1
+      @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
       @application_id = opts[:application_id] || ENV["PARSE_APP_ID"]
       @api_key        = opts[:api_key] || ENV["PARSE_API_KEY"]
       @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"]
@@ -71,9 +70,11 @@ module Parse
       if @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
         raise "Please call Parse.setup(application_id:, api_key:) to setup a session"
       end
-      @version_prefix = "/1/".freeze
+      @server_url += '/' unless @server_url.ends_with?('/')
       #Configure Faraday
-      @session = Faraday.new("https://#{@host}", opts[:faraday]) do |conn|
+      opts[:faraday] ||= {}
+      opts[:faraday].merge!(:url => @server_url)
+      @session = Faraday.new(opts[:faraday]) do |conn|
         #conn.request :json
 
         conn.response :logger if opts[:logging]
@@ -138,11 +139,10 @@ module Parse
       # http method
       method = method.downcase.to_sym
       # set the User-Agent
-      headers["User-Agent".freeze] = "Parse-Ruby-Mapper v#{Parse::Stack::VERSION}".freeze
+      headers["User-Agent"] = "Parse-Ruby-Client v#{Parse::Stack::VERSION}"
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
-      uri.replace(@version_prefix + uri) unless uri.start_with?(@version_prefix)
       # actually send the request and return the body
       @session.send(method, uri, params, headers).body
     rescue Faraday::Error::ClientError => e

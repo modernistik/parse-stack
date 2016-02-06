@@ -5,7 +5,7 @@ module Parse
   module API
     #object fetch methods
     module Schema
-      SCHEMA_PREFIX = "/1/schemas/".freeze
+      SCHEMA_PREFIX = "schemas/".freeze
       def schema(className)
         request :get, "#{SCHEMA_PREFIX}#{className}"
       end

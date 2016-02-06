@@ -6,7 +6,7 @@ module Parse
     module Users
       # Note that Parse::Objects mainly use the objects.rb API since we can
       # detect class names to proper URI handlers
-      USER_PATH_PREFIX = "/1/users".freeze
+      USER_PATH_PREFIX = "users".freeze
       USER_CLASS = "_User".freeze
       def fetch_user(id)
         request :get, "#{USER_PATH_PREFIX}/#{id}"

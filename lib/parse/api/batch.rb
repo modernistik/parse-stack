@@ -139,7 +139,7 @@ module Parse
         unless batch_operations.is_a?(Parse::BatchOperation)
           batch_operations = Parse::BatchOperation.new batch_operations
         end
-        response = request(:post, "/1/batch", body: batch_operations.as_json)
+        response = request(:post, "batch", body: batch_operations.as_json)
         response.success? && response.batch? ? response.batch_responses : response
       end
 

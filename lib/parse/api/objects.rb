@@ -5,7 +5,7 @@ module Parse
     #object fetch methods
     module Objects
 
-      CLASS_PATH_PREFIX = "/1/classes/".freeze
+      CLASS_PATH_PREFIX = "classes/".freeze
       PREFIX_MAP = { installation: "installations", _installation: "installations",
         user: "users", _user: "users",
         role: "roles", _role: "roles",
@@ -25,7 +25,7 @@ module Parse
           uri = "#{CLASS_PATH_PREFIX}#{className}"
           class_prefix = className.downcase.to_sym
           if PREFIX_MAP.has_key?(class_prefix)
-            uri = "/1/#{PREFIX_MAP[class_prefix]}/"
+            uri = "#{PREFIX_MAP[class_prefix]}/"
           end
           id.present? ? "#{uri}/#{id}" : uri
         end
