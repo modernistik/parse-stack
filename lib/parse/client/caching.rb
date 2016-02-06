@@ -78,12 +78,12 @@ module Parse
             # request for the same '/1/classes/Artist/<objectId>' where objectId are equivalent
             @store.delete url
           end
-        rescue Redis::CannotConnectError => e
+        rescue Errno::EINVAL, Redis::CannotConnectError => e
           # if the cache store fails to connect, catch the exception but proceed
           # with the regular request, but turn off caching for this request. It is possible
           # that the cache connection resumes at a later point, so this is temporary.
           cache_enabled = false
-          warn "[Parse::Cache Error] Cache store connection failed. #{e}"
+          warn "[Parse::Cache Error] #{e}"
         end
 
 

@@ -3,7 +3,9 @@
 1.0.4
 -----------
 - Fixes minor issue when storing and retrieving objects from the cache.
-
+- Support for providing :server_url as a connection option for those migrating hosting
+  their own parse-server.
+  
 1.0.3
 -----------
 - Fixes minor issue when passing `nil` to the class `find` method.
