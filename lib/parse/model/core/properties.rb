@@ -164,6 +164,7 @@ module Parse
              value = default_value.is_a?(Proc) ? default_value.call : default_value
             # lets set the variable with the updated value
              instance_variable_set ivar, value
+             send "#{key}_will_change!"
           end
 
           # if the value is a String (like an iso8601 date) and the data type of
@@ -171,6 +172,7 @@ module Parse
           if value.is_a?(String) && data_type == :date
             value = Parse::Date.parse value
             instance_variable_set ivar, value
+            send "#{key}_will_change!"
           end
           # finally return the value
           symbolize_value && value.respond_to?(:to_sym) ? value.to_sym : value
