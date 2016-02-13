@@ -61,6 +61,10 @@ module Parse
         @attributes ||= BASE.dup
       end
 
+      def defaults_list
+        @defaults_list ||= []
+      end
+
       # property :songs, :array
       # property :my_date, :date, field: "myRemoteCOLUMNName"
       # property :my_int, :integer, required: true, default: ->{ rand(10) }
@@ -126,9 +130,8 @@ module Parse
           validates_presence_of key
         end
 
-        # get the default value if provided (or Proc)
-        default_value = opts[:default]
         symbolize_value = opts[:symbolize]
+
         #only support symbolization of string data types
         if symbolize_value && data_type != :string
           raise 'Symbolization is only supported on :string data types.'
@@ -137,6 +140,18 @@ module Parse
         # Here is the where the 'magic' begins. For each property defined, we will
         # generate special setters and getters that will take advantage of ActiveModel
         # helpers.
+        # get the default value if provided (or Proc)
+        default_value = opts[:default]
+        if default_value.present?
+          defaults_list.push(key) if default_value.present?
+
+          define_method("#{key}_default") do
+            # If the default object provided is a Proc, then run the proc, otherwise
+            # we'll assume it's just a plain literal value
+            default_value.is_a?(Proc) ? default_value.call(self) : default_value
+          end
+          
+        end
 
         # We define a getter with the key
         define_method(key) do
@@ -158,10 +173,9 @@ module Parse
 
           # if value is nil (even after fetching), then lets see if the developer
           # set a default value for this attribute.
-          if value.nil? && default_value.present?
-            # If the default object provided is a Proc, then run the proc, otherwise
-            # we'll assume it's just a plain literal value
-             value = default_value.is_a?(Proc) ? default_value.call : default_value
+          if value.nil? && respond_to?("#{key}_default")
+
+             value = send("#{key}_default")
             # lets set the variable with the updated value
              instance_variable_set ivar, value
              send "#{key}_will_change!"

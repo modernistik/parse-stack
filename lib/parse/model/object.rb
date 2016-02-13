@@ -142,7 +142,14 @@ module Parse
         self.acl = self.class.acl({}, owner: self) || Parse::ACL.new(owner: self)
       end
       clear_changes! if @id.present? #then it was an import
+      apply_defaults!
       # do not call super since it is Pointer subclass
+    end
+
+    def apply_defaults!
+      self.class.defaults_list.each do |key|
+        send(key) # should call set default proc/values if nil
+      end
     end
 
     def self.pointer(id)
