@@ -1,5 +1,10 @@
 # Parse-Stack Changes
 
+1.0.5
+-----------
+- Defaults are applied on object instantiation.
+- When applying default values, dirty tracking is called.
+
 1.0.4
 -----------
 - Fixes minor issue when storing and retrieving objects from the cache.
