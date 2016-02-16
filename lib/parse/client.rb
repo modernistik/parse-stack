@@ -111,6 +111,10 @@ module Parse
       self
     end
 
+    def url_prefix
+      @session.url_prefix
+    end
+
     def clear_cache!
       self.cache.clear if self.cache.present?
     end

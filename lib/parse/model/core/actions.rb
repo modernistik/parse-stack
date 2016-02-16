@@ -190,12 +190,15 @@ module Parse
     # This creates a destroy_request for the current object.
     def destroy_request
       return nil unless @id.present?
-      uri = Client.uri_path(self)
+      uri = self.uri_path
       r = Request.new( :delete, uri )
       r.tag = object_id
       r
     end
 
+    def uri_path
+      self.client.url_prefix.path + Client.uri_path(self)
+    end
     # Creates an array of all possible PUT operations that need to be performed
     # on this local object. The reason it is a list is because attribute operations,
     # relational add operations and relational remove operations are treated as separate
@@ -203,7 +206,7 @@ module Parse
     def change_requests(force = false)
       requests = []
       # get the URI path for this object.
-      uri = Client.uri_path(self)
+      uri = self.uri_path
 
       # generate the request to update the object (PUT)
       if attribute_changes? || force
