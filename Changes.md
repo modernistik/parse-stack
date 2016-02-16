@@ -3,6 +3,7 @@
 1.0.6
 -----------
 - Fixes issue when making batch requests with special prefix url.
+- Adds Parse::ConnectionError custom exception type.
 
 1.0.5
 -----------

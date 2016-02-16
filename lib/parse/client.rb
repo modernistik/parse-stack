@@ -8,6 +8,10 @@ require_relative "client/caching"
 require_relative "api/all"
 
 module Parse
+
+  # This is an exception that is thrown if there is a client connectivity issue
+  class ConnectionError < Exception; end;
+
   # Main class for the client. The client class is based on a Faraday stack.
   # The Faraday stack is similar to a Rack-style application in which you can define middlewares
   # that will be called for each request going out and coming back in. We use this in order to setup
