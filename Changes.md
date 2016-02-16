@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.0.6
+-----------
+- Fixes issue when making batch requests with special prefix url.
+
 1.0.5
 -----------
 - Defaults are applied on object instantiation.
@@ -10,7 +14,7 @@
 - Fixes minor issue when storing and retrieving objects from the cache.
 - Support for providing :server_url as a connection option for those migrating hosting
   their own parse-server.
-  
+
 1.0.3
 -----------
 - Fixes minor issue when passing `nil` to the class `find` method.
