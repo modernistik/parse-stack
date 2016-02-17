@@ -121,6 +121,13 @@ module Parse
         #puts "Webhook: #{type} -> #{className}..."
       end
 
+      def run_function(name, params)
+        payload = Payload.new
+        payload.function_name = name
+        payload.params = params
+        call_route(:function, name, payload)
+      end
+
       def call_route(type, className, payload = nil)
         type = type.to_s.underscore.to_sym #support camelcase
         className = className.parse_class if className.respond_to?(:parse_class)
