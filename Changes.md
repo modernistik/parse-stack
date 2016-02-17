@@ -4,6 +4,9 @@
 -----------
 - Fixes issue when making batch requests with special prefix url.
 - Adds Parse::ConnectionError custom exception type.
+- You can call locally registered cloud functions with
+Parse::Webhooks.run_function(:functionName, params) without going through the
+entire Parse API network stack.
 
 1.0.5
 -----------
