@@ -439,7 +439,7 @@ module Parse
     def autofetch!(key)
       key = key.to_sym
       @fetch_lock ||= false
-      if @fetch_lock != true && pointer? && Parse::Properties::BASE_KEYS.include?(key) == false && respond_to?(:fetch)
+      if @fetch_lock != true && pointer? && key != :acl && Parse::Properties::BASE_KEYS.include?(key) == false && respond_to?(:fetch)
         @fetch_lock = true
         send :fetch
         @fetch_lock = false
