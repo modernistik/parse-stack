@@ -133,8 +133,8 @@ module Parse
         symbolize_value = opts[:symbolize]
 
         #only support symbolization of string data types
-        if symbolize_value && data_type != :string
-          raise 'Symbolization is only supported on :string data types.'
+        if symbolize_value && (data_type == :string || data_type == :array) == false
+          raise 'Symbolization is only supported on :string or :array data types.'
         end
 
         # Here is the where the 'magic' begins. For each property defined, we will
@@ -189,7 +189,16 @@ module Parse
             send "#{key}_will_change!"
           end
           # finally return the value
-          symbolize_value && value.respond_to?(:to_sym) ? value.to_sym : value
+          if symbolize_value
+              if data_type == :string
+                return value.respond_to?(:to_sym) ? value.to_sym : value
+              elsif data_type == :array && value.is_a?(Array)
+                # value.map(&:to_sym)
+                return value.compact.map { |m| m.respond_to?(:to_sym) ? m.to_sym : m }
+              end
+          end
+
+          value
         end
 
         # The second method to be defined is a setter method. This is done by
@@ -215,9 +224,15 @@ module Parse
           if track == true
             send :"#{key}_will_change!" unless val == instance_variable_get( :"@#{key}" )
           end
-          if symbolize_value && data_type == :string
-            val = nil if val.blank?
-            val = val.to_sym if val.respond_to?(:to_sym)
+
+          if symbolize_value
+            if data_type == :string
+              val = nil if val.blank?
+              val = val.to_sym if val.respond_to?(:to_sym)
+            elsif val.is_a?(Parse::CollectionProxy)
+              items = val.collection.map { |m| m.respond_to?(:to_sym) ? m.to_sym : m }
+              val.set_collection! items
+            end
           end
           # now set the instance value
           instance_variable_set :"@#{key}", val

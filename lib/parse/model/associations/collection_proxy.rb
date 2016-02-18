@@ -76,6 +76,10 @@ module Parse
         collection.to_a
       end; alias_method :to_a, :to_ary
 
+      def set_collection!(list)
+        @collection = list
+      end
+
       # lazy loading of a collection. If empty and not loaded, then forward _fetch!
       # to the delegate
       def collection

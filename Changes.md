@@ -7,7 +7,8 @@
 - You can call locally registered cloud functions with
 Parse::Webhooks.run_function(:functionName, params) without going through the
 entire Parse API network stack.
-
+- `:symbolize => true` now works for `:array` data types. All items in the collection
+will be symbolized - useful for array of strings.
 1.0.5
 -----------
 - Defaults are applied on object instantiation.
