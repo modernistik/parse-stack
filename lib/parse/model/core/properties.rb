@@ -142,7 +142,7 @@ module Parse
         # helpers.
         # get the default value if provided (or Proc)
         default_value = opts[:default]
-        if default_value.present?
+        unless default_value.nil?
           defaults_list.push(key) if default_value.present?
 
           define_method("#{key}_default") do

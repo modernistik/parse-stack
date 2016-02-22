@@ -10,6 +10,7 @@ entire Parse API network stack.
 - `:symbolize => true` now works for `:array` data types. All items in the collection
 will be symbolized - useful for array of strings.
 - Prevent ACLs from causing an autofetch.
+- Empty strings, arrays and `false` are now working with `:default` option in properties.
 
 1.0.5
 -----------
