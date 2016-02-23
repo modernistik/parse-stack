@@ -104,7 +104,7 @@ module Parse
         end
         @collection
       end; alias_method :push, :add
-      
+
       # Remove items from the collection
       def remove(*items)
         notify_will_change! if items.count > 0
@@ -113,25 +113,25 @@ module Parse
         end
         @collection
       end; alias_method :delete, :remove
-      
+
       def add!(*items)
         return false unless @delegate.respond_to?(:op_add!)
-        @delegate.send :op_add!, @key, items
+        @delegate.send :op_add!, @key, items.flatten
         reset!
       end
-      
+
       def add_unique!(*items)
         return false unless @delegate.respond_to?(:op_add_unique!)
-        @delegate.send :op_add_unique!, @key, items
+        @delegate.send :op_add_unique!, @key, items.flatten
         reset!
       end
-      
+
       def remove!(*items)
         return false unless @delegate.respond_to?(:op_remove!)
-        @delegate.send :op_remove!, @key, items
+        @delegate.send :op_remove!, @key, items.flatten
         reset!
       end
-      
+
       def destroy!
         return false unless @delegate.respond_to?(:op_destroy!)
         @delegate.send :op_destroy!, @key
