@@ -144,6 +144,8 @@ module Parse
     end # ClassMethods
 
     def operate_field!(field, op_hash)
+      field = field.to_sym
+      field = self.field_map[field] || field
       if op_hash.is_a?(Parse::RelationAction)
         op_hash = op_hash.as_json
       else
