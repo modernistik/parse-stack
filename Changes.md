@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.0.7
+-----------
+- Fixes issues when copying dates.
+
 1.0.6
 -----------
 - Fixes issue when making batch requests with special prefix url.

@@ -38,13 +38,13 @@ end
 # Time and DateTime objects to Parse::Date objects
 class Time
   def parse_date
-    Parse::Date.parse self.to_s
+    Parse::Date.parse iso8601(3)
   end
 
 end
 
 class DateTime
   def parse_date
-    Parse::Date.parse self.to_s
+    Parse::Date.parse iso8601(3)
   end
 end

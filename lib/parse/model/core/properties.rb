@@ -382,7 +382,7 @@ module Parse
           val = ACL.typecast(val, self)
       when :date
         # if it respond to parse_date, then use that as the conversion.
-        if val.respond_to?(:parse_date)
+        if val.respond_to?(:parse_date) && val.is_a?(Parse::Date) == false
           val = val.parse_date
           # if the value is a hash, then it may be the Parse hash format for an iso date.
         elsif val.is_a?(Hash) # val.respond_to?(:iso8601)
