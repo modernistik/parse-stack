@@ -361,7 +361,7 @@ module Parse
       when :array
         # All "array" types use a collection proxy
         val = [val] unless val.is_a?(Array) #all objects must be in array form
-        val = val.to_a unless val.is_a?(Parse::CollectionProxy) #all objects must be in array form
+        val = val.to_a if val.is_a?(Parse::CollectionProxy) #all objects must be in array form
         val.compact! #remove any nil
         val = Parse::CollectionProxy.new val, delegate: self, key: key
       when :geopoint
