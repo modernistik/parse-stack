@@ -3,6 +3,8 @@
 1.0.7
 -----------
 - Fixes issues when copying dates.
+- Fixes issues with double-arrays.
+- Fixes issues with mapping columns to atomic operations.
 
 1.0.6
 -----------
