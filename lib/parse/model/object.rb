@@ -242,11 +242,9 @@ module Parse
       klass = Parse::Model.find_class className
       o = nil
       if klass.present?
-        o = klass.new
         # when creating objects from Parse JSON data, don't use dirty tracking since
         # we are considering these objects as "pristine"
-        o.apply_attributes!(json, dirty_track: false)
-        o.clear_changes!
+        o = klass.new(json)
       else
         o = Parse::Pointer.new className, (json["objectId"] || json[:objectId])
       end
