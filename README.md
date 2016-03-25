@@ -100,6 +100,9 @@ class Song < Parse::Object
   has_many :likes, as: :user, through: :relation
 end
 
+# create tables or add new columns (non-destructive)
+Song.auto_upgrade!
+
 artist = Artist.first(:name.like => /Sinatra/, :genres.in => ['swing'])
 
 song = Song.new name: "Fly Me to the Moon"

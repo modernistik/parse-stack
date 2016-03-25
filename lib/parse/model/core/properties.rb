@@ -176,6 +176,7 @@ module Parse
           if value.nil? && respond_to?("#{key}_default")
 
              value = send("#{key}_default")
+             value = format_value(key, value, data_type)
             # lets set the variable with the updated value
              instance_variable_set ivar, value
              send "#{key}_will_change!"
@@ -184,7 +185,7 @@ module Parse
           # if the value is a String (like an iso8601 date) and the data type of
           # this object is :date, then let's be nice and create a parse date for it.
           if value.is_a?(String) && data_type == :date
-            value = Parse::Date.parse value
+            value = format_value(key, value, data_type)
             instance_variable_set ivar, value
             send "#{key}_will_change!"
           end

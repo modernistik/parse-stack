@@ -3,6 +3,7 @@
 1.0.8
 -----------
 - Fixes issues when setting a collection proxy property with a collection proxy.
+- Default array values are now properly casted as collection proxies.
 
 1.0.7
 -----------

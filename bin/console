@@ -2,15 +2,12 @@
 
 require "bundler/setup"
 require "parse/stack"
-
+require 'dotenv'
+Dotenv.load
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
 
 # (If you use this, don't forget to add pry to your Gemfile!)
-ENV["PARSE_APP_ID"] ||= "vesNFfsUUjbiWtbFljEV41RwXVJ2vw7HPFwLdisL".freeze
-ENV["PARSE_API_KEY"] ||=  "FndxgK7oGnjsRznFbMs8r7TG5WHwFSOmgWQr6Qui".freeze
-ENV["PARSE_MASTER_KEY"] ||= "oZs3AlBMKg6JDe82XVm7NJpO5GmvibiXbpMtwEHi".freeze
-
 require "pry"
 Pry.start
 
