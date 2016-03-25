@@ -4,6 +4,7 @@
 -----------
 - Fixes issues when setting a collection proxy property with a collection proxy.
 - Default array values are now properly casted as collection proxies.
+- Default booleans values of `false` are now properly set.
 
 1.0.7
 -----------

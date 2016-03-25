@@ -143,7 +143,7 @@ module Parse
         # get the default value if provided (or Proc)
         default_value = opts[:default]
         unless default_value.nil?
-          defaults_list.push(key) if default_value.present?
+          defaults_list.push(key) unless default_value.nil?
 
           define_method("#{key}_default") do
             # If the default object provided is a Proc, then run the proc, otherwise
