@@ -1,8 +1,9 @@
 # Parse-Stack Changes
 
-1.0.9
+1.0.10
 -----------
 - Fixes issues with setting default values as dirty when using the builder or before_save hook.
+- Fixes issues with autofetching pointers when default values are set.
 
 1.0.8
 -----------
