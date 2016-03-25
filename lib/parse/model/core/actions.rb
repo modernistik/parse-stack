@@ -442,6 +442,7 @@ module Parse
       key = key.to_sym
       @fetch_lock ||= false
       if @fetch_lock != true && pointer? && key != :acl && Parse::Properties::BASE_KEYS.include?(key) == false && respond_to?(:fetch)
+        #puts "AutoFetching Triggerd by: #{self.class}.#{key} (#{id})"
         @fetch_lock = true
         send :fetch
         @fetch_lock = false

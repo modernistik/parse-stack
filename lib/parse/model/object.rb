@@ -142,7 +142,10 @@ module Parse
         self.acl = self.class.acl({}, owner: self) || Parse::ACL.new(owner: self)
       end
       clear_changes! if @id.present? #then it was an import
-      apply_defaults!
+
+      # do not apply defaults on a pointer because it will stop it from being
+      # a pointer and will cause its field to be autofetched (for sync)
+      apply_defaults! unless pointer?
       # do not call super since it is Pointer subclass
     end
 
