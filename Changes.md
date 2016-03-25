@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.0.9
+-----------
+- Fixes issues with setting default values as dirty when using the builder or before_save hook.
+
 1.0.8
 -----------
 - Fixes issues when setting a collection proxy property with a collection proxy.
