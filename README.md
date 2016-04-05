@@ -302,7 +302,11 @@ class Post < Parse::Object
 	property :comment_count, :integer, default: 0
 
 	# the published date. Maps to "publishDate"
-	property :publish_date, :date, ->{ DateTime.now }
+	property :publish_date, :date, default: ->{ DateTime.now }
+
+  # use lambda to access the instance object.
+  # Set draft_date to the created_at date if empty.
+  property :draft_date, :date, default: lambda { |x| x.created_at }
 
 	# maybe whether it is currently visible
 	property :visible, :boolean
@@ -823,11 +827,11 @@ If you only need to know the result count for a query, provide count a non-zero 
 
 ```ruby
  # get number of songs with a play_count > 10
- Song.count(:play_count.gt => 10)
+ Song.count :play_count.gt => 10
 
  # same
  query = Parse::Query.new("Song")
- query.where play_count.gt => 10
+ query.where :play_count.gt => 10
  query.count
 
 ```
@@ -862,7 +866,6 @@ When a query API is made, the results are cached in the query object in case you
 
 ```
 
-
 ### Expressions
 The set of supported expressions based on what is available through the Parse REST API. _For those who don't prefer the DataMapper style syntax, we have provided method accessors for each of the expressions._
 
@@ -871,11 +874,11 @@ Specify a field to sort by.
 
 ```ruby
  # order updated_at ascending order
- Song.all( :order => :updated_at )
+ Song.all :order => :updated_at
 
  # first order by highest like_count, then by ascending name.
  # Note that ascending is the default if not specified (ex. `:name.asc`)
- Song.all( :order => [:like_count.desc, :name])
+ Song.all :order => [:like_count.desc, :name]
 ```
 
 ##### :keys
@@ -883,10 +886,10 @@ Restrict the fields returned by the query. This is useful for larger query resul
 
 ```ruby
  # results only contain :name field
- Song.all(:keys => :name)
+ Song.all :keys => :name
 
  # multiple keys
- Song.all(:keys => [:name,:artist])
+ Song.all :keys => [:name,:artist]
 ```
 
 ##### :includes
@@ -900,7 +903,7 @@ Use on Pointer columns to return the full object. You may chain multiple columns
  Song.all(:includes => :artist)
 
  # Chaining
- Song.all(:includes => [:artist, 'artist.manager'])
+ Song.all :includes => [:artist, 'artist.manager']
 
 ```
 
@@ -908,9 +911,9 @@ Use on Pointer columns to return the full object. You may chain multiple columns
 Limit the number of objects returned by the query. The default is 100, with Parse allowing a maximum of 1000. The framework also allows a value of `:max`. Utilizing this will have the framework continually intelligently utilize `:skip` to continue to paginate through results until an empty result set is received or the `:skip` limit is reached (10,000). When utilizing `all()`, `:max` is the default option for `:limit`.
 
 ```ruby
- Song.all(:limit => 1) # same as Song.first
- Song.all(:limit => 1000) # maximum allowed by Parse
- Song.all(:limit => :max) # up to 11,000 records (theoretical).
+ Song.all :limit => 1 # same as Song.first
+ Song.all :limit => 1000 # maximum allowed by Parse
+ Song.all :limit => :max # up to 11,000 records (theoretical).
 ```
 
 ##### :skip
@@ -918,7 +921,7 @@ Use with limit to paginate through results. Default is 0 with maximum value bein
 
 ```ruby
  # get the next 3 songs after the first 10
- Song.all(:limit => 3, :skip => 10)
+ Song.all :limit => 3, :skip => 10
 ```
 
 ##### :where
