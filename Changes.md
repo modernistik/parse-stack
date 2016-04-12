@@ -1,5 +1,13 @@
 # Parse-Stack Changes
 
+1.1
+-----------
+- In Query `join` has been renamed to `matches`.
+- Not In Query `exclude` has been renamed to `excludes` for consistency.
+- Parse::Query now has a `:key` operation to be usd when passing sub-queries to `select` and `matches`
+- Improves query supporting `select`, `matches`, `matches` and `excludes`.
+- Regular expression queries for `like` now send regex options
+
 1.0.10
 -----------
 - Fixes issues with setting default values as dirty when using the builder or before_save hook.

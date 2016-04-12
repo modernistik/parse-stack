@@ -109,13 +109,23 @@ module Parse
     #This matches a value for a key in the result of a different query
     contraint_keyword :$select
     register :select
+
+    def build
+      select_key = @value.key.present? ? @value.key : @operation.operand
+      select_query = formatted_value
+      { @operation.operand => { key => { query: select_query, key: select_key } } }
+    end
   end
 
   class RejectionConstraint < Constraint
     #requires that a key's value not match a value for a key in the result of a different query
     contraint_keyword :$dontSelect
     register :reject
-
+    def build
+      reject_key = @value.key.present? ? @value.key : @operation.operand
+      reject_query = formatted_value
+      { @operation.operand => { key => { query: reject_query, key: reject_key } } }
+    end
   end
 
   class RegularExpressionConstraint < Constraint
@@ -140,16 +150,15 @@ module Parse
     end
   end
 
-  class JoinQueryConstraint < Constraint
+  class InQueryConstraint < Constraint
     contraint_keyword :$inQuery
-    register :join
+    register :matches
     register :in_query
-
   end
 
-  class DisjointQueryConstraint < Constraint
+  class NotInQueryConstraint < Constraint
     contraint_keyword :$notInQuery
-    register :exclude
+    register :excludes
     register :not_in_query
 
   end

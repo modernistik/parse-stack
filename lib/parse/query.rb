@@ -23,7 +23,7 @@ module Parse
     # You can modify the default client being used by all Parse::Query objects by setting
     # Parse::Query.client. You can override individual Parse::Query object clients
     # by changing their client variable to a different Parse::Client object.
-    attr_accessor :table, :client
+    attr_accessor :table, :client, :key
 
     # We have a special class method to handle field formatting. This turns
     # the symbol keys in an operand from one key to another. For example, we can
@@ -109,6 +109,8 @@ module Parse
           order value
         elsif expression == :keys
           keys value
+        elsif expression == :key
+          @key = value
         elsif expression == :skip
           skip value
         elsif expression == :limit
@@ -197,6 +199,13 @@ module Parse
       @where ||= []
       constraint = Parse::Constraint.create operator, value
       return unless constraint.is_a?(Parse::Constraint)
+      # to support select queries where you have to pass a `key` parameter for matching
+      # different tables.
+      if constraint.operand == :key || constraint.operand == "key"
+        @key = constraint.value
+        return
+      end
+
       unless opts[:filter] == false
         constraint.operand = Query.format_field(constraint.operand)
       end

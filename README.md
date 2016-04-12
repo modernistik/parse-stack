@@ -978,18 +978,20 @@ Most of the constraints supported by Parse are available to `Parse::Query`. Assu
  q.where :field.like => /ruby_regex/
  q.where :field.regex => /abc/ # alias
 
- # select (TODO: improve API)
- q.where :field.select => query
+ # select
+ q.where :field.select => query #with key
+ # ex. q.where :city.select => Artist.where(:total_plays.gt => 50, :key => "city")
 
- # don't select (TODO: improve API)
+ # don't select
  q.where :field.reject => query
 
- # matches inQuery (TODO: improve API)
- q.where :field.join => query
+ # matches inQuery
+ q.where :field.matches => query
  q.where :field.in_query => query # alias
 
  # notInQuery (inverse of `join`)
  q.where :field.excludes => query
+ q.where :field.not_in_query => query # alias
 
  # near GeoPoint
  q.where :field.near => geopoint
@@ -1005,6 +1007,23 @@ Most of the constraints supported by Parse are available to `Parse::Query`. Assu
 
  # OR query
  or_query = query1 | query2 | query3 ...
+```
+
+## Select and Matching Queries
+Parse-Stack supports sub-select queries. These are referred to in Parse as `$select` and `$dontSelect` for columns that contain values. These are mapped to `select` and `reject` respectively in Parse-Stack. For creating sub-queries where the column field is an object or a pointer, Parse provides `$inQuery` and `$notInQuery`. These are mapped to `matches` and `excludes` respectively in Parse-Stack. To perform these types of sub-query constraints, you pass a different `Parse::Query` instance to the value of the query constraint. Using the example for `$select` from the Parse documentation where you have a class containing sports teams and you store a user's hometown in the user class, you can issue one query to find the list of users whose hometown teams have winning records as follows:
+
+```ruby
+# assume Team class with column of `city`
+users = Parse::User.all :hometown.select => Team.where(:win_pct.gt => 0.5, :key => :city )
+# where={"hometown":{"$select":{"query":{"className":"Team", "limit":100, "where":{"winPct":{"$gt":0.5}}},"key":"city"}}}
+# for https://api.parse.com/1/classes/_User
+```
+
+Using the `matches` and `excludes`, is similar, but are used when the field is a pointer or object. If you wanted to find all `Song` objects where the song's artist has a `city` of `San Diego` and is `approved`, you could use a `matches` query as follows:
+
+```ruby
+songs = Song.all :artist.matches => Artist.where(approved: true, city: "San Diego", limit: 1000)
+# where={"artist": {"$inQuery": {"className":"Team", "limit":1000, "where": {"winPct": {"$gt" :0.5 }}}}}
 ```
 
 ## Hooks and Callbacks
