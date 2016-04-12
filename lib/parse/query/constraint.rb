@@ -118,8 +118,8 @@ module Parse
       d = @value
       d = { __type: "Date", iso: d.iso8601(3) } if d.respond_to?(:iso8601)
       d = d.pointer if d.respond_to?(:pointer) #simplified query object
+      d = d.to_s if d.is_a?(Regexp)
       #d = d.pointer if d.is_a?(Parse::Object) #simplified query object
-      d = d.source if d.is_a?(Regexp)
       #  d = d.compile
       if d.is_a?(Parse::Query)
         compiled = d.compile(false)
