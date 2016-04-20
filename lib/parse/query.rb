@@ -270,7 +270,7 @@ module Parse
     def first(limit = 1)
       @results = nil
       @limit = limit
-      results.first(limit)
+      limit == 1 ? results.first : results.first(limit)
     end
 
     def max_results(raw: false)

@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.1.1
+-----------
+- Fixes issues with first_or_create.
+
 1.1
 -----------
 - In Query `join` has been renamed to `matches`.
