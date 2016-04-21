@@ -3,6 +3,7 @@
 1.1.1
 -----------
 - Fixes issues with first_or_create.
+- Fixes issue when singularizing :belongs_to and :has_many property names.
 
 1.1
 -----------

@@ -62,7 +62,7 @@ module Parse
                   required: false,
                   as: key}.merge(opts)
 
-          klassName = opts[:as].to_parse_class
+          klassName = opts[:as].to_parse_class singularize: true
           parse_field = opts[:field].to_sym
           access_type = opts[:through].to_sym
           # verify that the user did not duplicate properties or defined different properties with the same name
