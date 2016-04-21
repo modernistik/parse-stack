@@ -30,10 +30,10 @@ module Parse
         # These items are added as attributes with the special data type of :pointer
         def belongs_to(key, opts = {})
           opts = {as: key, field: key.to_s.camelize(:lower), required: false}.merge(opts)
-          className = opts[:as].to_parse_class
+          klassName = opts[:as].to_parse_class
           parse_field = opts[:field].to_sym
           if self.fields[key].present? && Parse::Properties::BASE_FIELD_MAP[key].nil?
-            raise Parse::Properties::DefinitionError, "Belongs relation #{self}##{key} already defined with type #{className}"
+            raise Parse::Properties::DefinitionError, "Belongs relation #{self}##{key} already defined with type #{klassName}"
           end
           if self.fields[parse_field].present?
             raise Parse::Properties::DefinitionError, "Alias belongs_to #{self}##{parse_field} conflicts with previously defined property."
@@ -42,7 +42,7 @@ module Parse
           # we know the type is pointer.
           self.attributes.merge!( parse_field => :pointer )
           # Add them to our list of pointer references
-          self.references.merge!( parse_field => className )
+          self.references.merge!( parse_field => klassName )
           # Add them to the list of fields in our class model
           self.fields.merge!( key => :pointer, parse_field => :pointer )
           # Mapping between local attribute name and the remote column name
@@ -69,7 +69,7 @@ module Parse
             # hash, lets try to buid a Pointer of that type.
 
             if val.is_a?(Hash) && ( val["__type"].freeze == "Pointer".freeze ||  val["__type"].freeze == "Object".freeze )
-              val = Parse::Object.build val, ( val["className"] || className )
+              val = Parse::Object.build val, ( val["className"] || klassName )
               instance_variable_set ivar, val
             end
             val
@@ -87,7 +87,7 @@ module Parse
           # We only support pointers, either by object or by transforming a hash.
           define_method("#{key}_set_attribute!") do |val, track = true|
             if val.is_a?(Hash) && ( val["__type"].freeze == "Pointer".freeze ||  val["__type"].freeze == "Object".freeze )
-              val = Parse::Object.build val, ( val["className"] || className )
+              val = Parse::Object.build val, ( val["className"] || klassName )
             end
             if track == true
               send :"#{key}_will_change!" unless val == instance_variable_get( :"@#{key}" )
