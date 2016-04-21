@@ -91,8 +91,8 @@ class String
    end;
 
   #users for properties: ex. :users -> "_User" or :songs -> Song
-  def to_parse_class
-    final_class = self.singularize.camelize
+  def to_parse_class(singularize: false)
+    final_class = singularize ? self.singularize.camelize : self.camelize
     klass = Parse::Model.find_class(final_class) || Parse::Model.find_class(self)
     #handles the case that a class has a custom parse table
     final_class = klass.parse_class if klass.present?
@@ -114,7 +114,7 @@ class Symbol
     to_s.camelize
   end
 
-  def to_parse_class
-    to_s.to_parse_class
+  def to_parse_class(singularize: false)
+    to_s.to_parse_class(singularize: singularize)
   end
 end
