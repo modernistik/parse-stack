@@ -27,7 +27,7 @@ module Parse
       @object = hash[:object]
       @trigger_name = hash[:trigger_name]
       @original = hash[:original]
-      @update = hash[:update] #it comes as an update hash
+      @update = hash[:update] || {} #it comes as an update hash
     end
 
     def function?
@@ -93,6 +93,10 @@ module Parse
         if @original.present? && @original.is_a?(Hash)
           o = Parse::Object.build @original
           o.apply_attributes! @object, dirty_track: true
+
+          if o.is_a?(Parse::User) && @update.present? && @update["authData"].present?
+            o.auth_data = @update["authData"]
+          end
           return o
         else #else the object must be new
           klass = Parse::Object.find_class parse_class
