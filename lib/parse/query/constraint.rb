@@ -116,6 +116,7 @@ module Parse
     # This method formats the value based on some specific data types.
     def formatted_value
       d = @value
+      d = { __type: "Date", iso: d.utc.iso8601(3) } if d.respond_to?(:utc)
       d = { __type: "Date", iso: d.iso8601(3) } if d.respond_to?(:iso8601)
       d = d.pointer if d.respond_to?(:pointer) #simplified query object
       d = d.to_s if d.is_a?(Regexp)
