@@ -1,11 +1,12 @@
 # Parse-Stack Changes
 
-1.1.1
+1.2
 -----------
 - Fixes issues with first_or_create.
 - Fixes issue when singularizing :belongs_to and :has_many property names.
 - Makes sure time is sent as UTC in queries.
 - Allows for authData to be applied as an update to a before_save for a Parse::User.
+- Webhooks allow for returning empty data sets and `false` from webhook functions.
 
 1.1
 -----------
