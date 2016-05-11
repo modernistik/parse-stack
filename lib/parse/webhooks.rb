@@ -209,7 +209,7 @@ module Parse
             puts "[ParseWebhooks] --> Could not find mapping route for #{payload}"
           end
 
-          result = true if result.blank?
+          result = true if result.nil?
           if self.logging.present?
             puts "[ParseWebhooks Response] ----------------------------"
             puts success(result)
