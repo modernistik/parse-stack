@@ -26,8 +26,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "activemodel", [">= 4", "< 5"]
-  spec.add_runtime_dependency "activesupport", [">= 4", "< 5"]
+  spec.add_runtime_dependency "activemodel", [">= 4.2.1", "< 5"]
+  spec.add_runtime_dependency "activesupport", [">= 4.2.1", "< 5"]
   spec.add_runtime_dependency "active_model_serializers", [">= 0.9", "< 1"]
   spec.add_runtime_dependency "parallel", [">= 1.6", "< 2"]
   spec.add_runtime_dependency "faraday", [">= 0.8", "< 1"]

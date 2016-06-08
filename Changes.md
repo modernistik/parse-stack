@@ -7,6 +7,7 @@
 - Makes sure time is sent as UTC in queries.
 - Allows for authData to be applied as an update to a before_save for a Parse::User.
 - Webhooks allow for returning empty data sets and `false` from webhook functions.
+- Minimum version for ActiveModel and ActiveSupport is now 4.2.1
 
 1.1
 -----------
