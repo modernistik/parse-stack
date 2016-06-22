@@ -1,5 +1,12 @@
 # Parse-Stack Changes
 
+1.2.1
+-----------
+- Add active support string dependencies.
+- Support for handling the `Delete` operation on belongs_to
+  and has_many relationships.
+- Documentation changes for supported Parse atomic operations.
+
 1.2
 -----------
 - Fixes issues with first_or_create.

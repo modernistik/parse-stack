@@ -123,7 +123,12 @@ module Parse
           define_method("#{key}_set_attribute!") do |val, track = true|
             # If it is a hash, with a __type of Relation, createa a new RelationCollectionProxy, regardless
             # of what is defined because we must have gotten this from Parse.
-            val = [] if val.nil?
+
+            # if val is nil or it is the delete operation, then set to empty array.
+            # this will create a new proxyKlass later on
+            if val.nil? || val == Parse::Properties::DELETE_OP
+              val = []
+            end
 
             if val.is_a?(Hash) && val["__type"] == "Relation"
               relation_objects = val["objects"] || []

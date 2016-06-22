@@ -30,6 +30,8 @@ module Parse
     # Default hash map of local attribute name to remote column name
     BASE_FIELD_MAP = {id: :objectId, created_at: :createdAt, updated_at: :updatedAt, acl: :ACL}.freeze
 
+    DELETE_OP = {"__op"=>"Delete"}.freeze
+
     def self.included(base)
       base.extend(ClassMethods)
     end

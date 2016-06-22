@@ -86,12 +86,16 @@ module Parse
 
           # We only support pointers, either by object or by transforming a hash.
           define_method("#{key}_set_attribute!") do |val, track = true|
-            if val.is_a?(Hash) && ( val["__type"].freeze == "Pointer".freeze ||  val["__type"].freeze == "Object".freeze )
+            if val == Parse::Properties::DELETE_OP
+              val = nil
+            elsif val.is_a?(Hash) && ( val["__type"].freeze == "Pointer".freeze ||  val["__type"].freeze == "Object".freeze )
               val = Parse::Object.build val, ( val["className"] || klassName )
             end
+
             if track == true
               send :"#{key}_will_change!" unless val == instance_variable_get( :"@#{key}" )
             end
+
             # Never set an object that is not a Parse::Pointer
             if val.nil? || val.is_a?(Parse::Pointer)
               instance_variable_set(:"@#{key}", val)

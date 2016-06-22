@@ -1,5 +1,6 @@
 require 'faraday'
 require 'faraday_middleware'
+require 'active_support/core_ext/string'
 require_relative "client/request"
 require_relative "client/response"
 require_relative "client/body_builder"

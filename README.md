@@ -301,12 +301,11 @@ class Post < Parse::Object
 	# maybe a count of comments.
 	property :comment_count, :integer, default: 0
 
-	# the published date. Maps to "publishDate"
-	property :publish_date, :date, default: ->{ DateTime.now }
-
   # use lambda to access the instance object.
   # Set draft_date to the created_at date if empty.
   property :draft_date, :date, default: lambda { |x| x.created_at }
+  # the published date. Maps to "publishDate"
+	property :publish_date, :date, default: lambda { |x| DateTime.now }
 
 	# maybe whether it is currently visible
 	property :visible, :boolean
@@ -378,7 +377,7 @@ class SomeClass < Parse::Object
 	# default value
 	property :category, default: "myValue"
 	# default value Proc style
-	property :date, default: ->{ DateTime.now }
+	property :date, default: lambda { |x| DateTime.now }
 end
 ```
 ###### `:alias => (true|false)`
@@ -486,8 +485,9 @@ class Band < Parse::Object
   property :category, :integer, default: 1
 	# assume any band as < 100 members
 	has_many :artists # assumes `through: :array`
-	# bands can have millions of fans, we use relations instead
-	has_many :fans, through: :relation 
+	# bands can have millions of fans (Parse::User objects),
+  # we use relations instead
+	has_many :fans, as: :user, through: :relation 
 end
 
  # Find all bands which have a category in this array.
@@ -501,9 +501,38 @@ band = bands.first
  # the number of fans in the relation
 band.fans.count
 
+# get the first object in relation
+fan = bands.fans.first
+
+# use `add` or `remove` to modify relations
+band.fans.add Parse::User.first
+# updates the relation as well as changes to `band`
+band.fans.save
+
  # Find 50 fans who are near San Diego, CA
 downtown = Parse::GeoPoint.new(32.82, -117.23)
 fans = band.fans.all(:location.near => downtown, :limit => 50)
+
+```
+
+You can perform atomic additions and removals of objects from `has_many` relations. Parse allows this by providing a specific atomic operation request. You can use the methods below to perform these types of atomic operations. __Note: The operation is performed directly on Parse server and not on your local object.__
+
+```ruby
+
+# atomically add/remove
+band.artists.add! objects  # { __op: :AddUnique }
+band.artists.remove! objects  # { __op: :AddUnique }
+
+# atomically add unique Artist
+band.artists.add_unique! objects  # { __op: :AddUnique }
+
+# atomically add/remove relations
+band.fans.add! users # { __op: :Add }
+band.fans.remove! users # { __op: :Remove }
+
+# atomically perform a delete operation on this field name
+# this should set it as `undefined`.
+band.op_destroy!("category") # { __op: :Delete }
 
 ```
 
