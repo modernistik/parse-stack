@@ -1185,8 +1185,13 @@ class Artist < Parse::Object
     artist = payload.parse_object # Artist
     # artist object will have dirty tracking information
 
+    artist.new? # true if this is a new object
+
     # default San Diego
     artist.location ||= Parse::GeoPoint.new(32.82, -117.23)
+
+    # raise to fail the save
+    raise "Name cannot be empty" if artist.name.blank?
 
     if artist.name_changed?
       # .. do something if `name` has changed
