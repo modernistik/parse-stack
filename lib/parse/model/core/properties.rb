@@ -374,9 +374,17 @@ module Parse
       when :bytes
         val = Parse::Bytes.new(val) unless val.blank?
       when :integer
-        val = val.to_i unless val.blank?
+        if val.nil? || val.respond_to?(:to_i) == false
+          val = nil
+        else
+          val = val.to_i
+        end
       when :boolean
-        val = val ? true : false
+        if val.nil?
+          val = nil
+        else
+          val = val ? true : false
+        end
       when :string
         val = val.to_s unless val.blank?
       when :float

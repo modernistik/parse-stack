@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.2.2
+-----------
+- `nil` and Delete operations for :integers and :booleans are no longer typecast.
+
 1.2.1
 -----------
 - Add active support string dependencies.
