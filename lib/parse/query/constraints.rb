@@ -24,21 +24,25 @@ module Parse
   class LessOrEqualConstraint < Constraint
     contraint_keyword :$lte
     register :lte
+    register :on_or_before
   end
 
   class LessThanConstraint < Constraint
     contraint_keyword :$lt
     register :lt
+    register :before
   end
 
   class GreaterThanConstraint < Constraint
     contraint_keyword :$gt
     register :gt
+    register :after
   end
 
   class GreaterOrEqualConstraint < Constraint
     contraint_keyword :$gte
     register :gte
+    register :on_or_after
   end
 
   class NotEqualConstraint < Constraint
