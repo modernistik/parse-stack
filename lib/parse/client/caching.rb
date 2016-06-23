@@ -88,10 +88,14 @@ module Parse
 
 
         @app.call(env).on_complete do |response_env|
-          # Only cache GET requests with valid HTTP status codes.
-          if cache_enabled && method == :get && CACHEABLE_HTTP_CODES.include?(response_env.status) && response_env.present?
-            @store.store(url, response_env, expires: @expires) # ||= response_env.body
-          end
+          # Only cache GET requests with valid HTTP status codes whose content-length
+          # is greater than 20. Otherwise they could be errors, successes and empty result sets.
+          if cache_enabled && method == :get &&  CACHEABLE_HTTP_CODES.include?(response_env.status) &&
+             response_env.present? && response_env.response_headers["content-length".freeze].to_i > 20
+
+                @store.store(url, response_env, expires: @expires) # ||= response_env.body
+
+          end # if
           # do something with the response
           # response_env[:response_headers].merge!(...)
         end
