@@ -73,7 +73,7 @@ module Parse
             h[k] = v if remote_fields[k.to_s].nil?
             h
           end
-          return if current_schema[:fields].empty?
+          return true if current_schema[:fields].empty?
           return update_schema( current_schema )
         else
           return create_schema
