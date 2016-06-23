@@ -180,6 +180,12 @@ module Parse
         raise Parse::ServerError, body
       end
 
+      # Parse connection and server errors.
+      if body.error? && body.code <= 100
+        puts "[ParseError] #{body.code} - #{body.error}"
+        raise Parse::ServerError
+      end
+
       body
     rescue Faraday::Error::ClientError => e
       raise Parse::ConnectionError, e.message
