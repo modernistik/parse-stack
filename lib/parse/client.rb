@@ -179,13 +179,15 @@ module Parse
       when 500
         raise Parse::ServerError, body
       end
-
-      # Parse connection and server errors.
-      if body.error? && body.code <= 100
-        puts "[ParseError] #{body.code} - #{body.error}"
+      if body.error?
+        if body.code <= 100
+          puts "[ParseError] #{body.code} - #{body.error}"
+        elsif body.code == 155
+          puts "[ParseError] #{body.code} - RequestLimitExceeded"
+        end
         raise Parse::ServerError
       end
-
+      
       body
     rescue Faraday::Error::ClientError => e
       raise Parse::ConnectionError, e.message
