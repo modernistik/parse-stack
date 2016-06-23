@@ -3,13 +3,14 @@ require 'active_support/json'
 # be a set of responses (from a Batch response).
 module Parse
 
+
   class Response
     include Enumerable
 
     ERROR_INTERNAL = 1
     ERROR_TIMEOUT = 124
     ERROR_EXCEEDED_BURST_LIMIT = 155
-    ERROR_OBJECT_NOT_FOUND_FOR_GET = 101
+    ERROR_OBJECT_NOT_FOUND = 101
 
     ERROR = "error".freeze
     CODE = "code".freeze
@@ -93,6 +94,10 @@ module Parse
 
     def error?
       ! success?
+    end
+
+    def object_not_found?
+      @code == ERROR_OBJECT_NOT_FOUND
     end
 
     # returns the result data from the response. Always returns an array.

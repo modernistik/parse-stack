@@ -12,6 +12,11 @@ module Parse
 
   # This is an exception that is thrown if there is a client connectivity issue
   class ConnectionError < Exception; end;
+  class TimeoutError < Exception; end;
+  class ProtocolError < Exception; end;
+  class ServerError < Exception; end;
+  class AuthenticationError < Exception; end;
+
 
   # Main class for the client. The client class is based on a Faraday stack.
   # The Faraday stack is similar to a Rack-style application in which you can define middlewares
@@ -153,7 +158,29 @@ module Parse
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
       # actually send the request and return the body
-      @session.send(method, uri, params, headers).body
+      response = @session.send(method, uri, params, headers)
+      body = response.body
+
+      case response.status
+      when 401, 403
+        raise Parse::AuthenticationError, body
+      when 400, 408
+        if body.error? && body.code == 143 #"net/http: timeout awaiting response headers"
+          raise Parse::TimeoutError, body
+        else
+          raise Parse::ProtocolError, body
+        end
+      when 404
+        unless body.object_not_found?
+          raise Parse::ConnectionError, body
+        end
+      when 405, 406
+        raise Parse::ProtocolError, body
+      when 500
+        raise Parse::ServerError, body
+      end
+
+      body
     rescue Faraday::Error::ClientError => e
       raise Parse::ConnectionError, e.message
     end
