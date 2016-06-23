@@ -13,9 +13,9 @@ module Parse
          # * 300 - 'Multiple Choices'
          # * 301 - 'Moved Permanently'
          # * 302 - 'Found'
-         # * 404 - 'Not Found'
-         # * 410 - 'Gone'
-      CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302, 404, 410].freeze
+         # * 404 - 'Not Found' - removed
+         # * 410 - 'Gone' - removed
+      CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302].freeze
 
       class << self
         attr_accessor :enabled, :logging
