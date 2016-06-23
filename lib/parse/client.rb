@@ -163,8 +163,10 @@ module Parse
 
       case response.status
       when 401, 403
+        puts "[ParseError] #{body.code} - #{body.error}"
         raise Parse::AuthenticationError, body
       when 400, 408
+        puts "[ParseError] #{body.code} - #{body.error}"
         if body.error? && body.code == 143 #"net/http: timeout awaiting response headers"
           raise Parse::TimeoutError, body
         else
@@ -172,22 +174,24 @@ module Parse
         end
       when 404
         unless body.object_not_found?
+          puts "[ParseError] #{body.code} - #{body.error}"
           raise Parse::ConnectionError, body
         end
       when 405, 406
+        puts "[ParseError] #{body.code} - #{body.error}"
         raise Parse::ProtocolError, body
       when 500
+        puts "[ParseError] #{body.code} - #{body.error}"
         raise Parse::ServerError, body
       end
+
       if body.error?
-        if body.code <= 100
+        if body.code <= 100 || body.code == 155
           puts "[ParseError] #{body.code} - #{body.error}"
-        elsif body.code == 155
-          puts "[ParseError] #{body.code} - RequestLimitExceeded"
+          raise Parse::ServerError
         end
-        raise Parse::ServerError
       end
-      
+
       body
     rescue Faraday::Error::ClientError => e
       raise Parse::ConnectionError, e.message
