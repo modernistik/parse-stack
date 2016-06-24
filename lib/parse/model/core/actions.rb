@@ -280,7 +280,8 @@ module Parse
     # saves the object. If the object has not changed, it is a noop. If it is new,
     # we will create the object. If the object has an id, we will update the record.
     # You can define before and after :save callbacks
-    def save
+    # autoraise: set to true will automatically raise an exception if the save fails
+    def save(autoraise: false)
       return true unless changed?
       success = false
       run_callbacks :save do
@@ -298,18 +299,23 @@ module Parse
             success = update_relations
             if success
               changes_applied!
-            elsif self.class.raise_on_save_failure
+            elsif self.class.raise_on_save_failure || raise_on_failure.present?
               raise Parse::SaveFailureError.new(self), "Failed updating relations. #{self.parse_class} partially saved."
             end
           else
             changes_applied!
           end
-        elsif self.class.raise_on_save_failure
+        elsif self.class.raise_on_save_failure || raise_on_failure.present?
           raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
         end
 
       end #callbacks
       success
+    end
+
+    # shortcut for raising an exception of saving this object failed.
+    def save!
+      save(autoraise: true)
     end
 
     # only destroy the object if it has an id. You can setup before and after
