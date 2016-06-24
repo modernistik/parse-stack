@@ -167,10 +167,8 @@ module Parse
         raise Parse::AuthenticationError, body
       when 400, 408
         puts "[ParseError] #{body.code} - #{body.error}"
-        if body.error? && body.code == 143 #"net/http: timeout awaiting response headers"
+        if body.code == 124 || body.code == 143 #"net/http: timeout awaiting response headers"
           raise Parse::TimeoutError, body
-        else
-          raise Parse::ProtocolError, body
         end
       when 404
         unless body.object_not_found?
