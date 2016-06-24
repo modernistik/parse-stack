@@ -299,13 +299,13 @@ module Parse
             success = update_relations
             if success
               changes_applied!
-            elsif self.class.raise_on_save_failure || raise_on_failure.present?
+            elsif self.class.raise_on_save_failure || autoraise.present?
               raise Parse::SaveFailureError.new(self), "Failed updating relations. #{self.parse_class} partially saved."
             end
           else
             changes_applied!
           end
-        elsif self.class.raise_on_save_failure || raise_on_failure.present?
+        elsif self.class.raise_on_save_failure || autoraise.present?
           raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
         end
 
