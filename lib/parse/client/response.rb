@@ -117,5 +117,18 @@ module Parse
       self
     end
 
+    def inspect
+      if error?
+        "#<#{self.class} @code=#{code} @error='#{error}'>"
+      else
+        "#<#{self.class} @result='#{@result}'>"
+      end
+    end
+
+    def to_s
+      return "E-#{@code}: #{@error}" if error?
+      @result
+    end
+
   end
 end

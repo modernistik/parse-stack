@@ -160,35 +160,36 @@ module Parse
       # actually send the request and return the body
       response = @session.send(method, uri, params, headers)
       body = response.body
+      valid_error = false
 
       case response.status
       when 401, 403
-        puts "[ParseError] #{body.code} - #{body.error}"
+        puts "[ParseError] #{body}"
         raise Parse::AuthenticationError, body
       when 400, 408
-        puts "[ParseError] #{body.code} - #{body.error}"
+          puts "[ParseError] #{body}"
         if body.code == 124 || body.code == 143 #"net/http: timeout awaiting response headers"
           raise Parse::TimeoutError, body
         end
       when 404
         unless body.object_not_found?
-          puts "[ParseError] #{body.code} - #{body.error}"
+          puts "[ParseError] #{body}"
           raise Parse::ConnectionError, body
         end
       when 405, 406
-        puts "[ParseError] #{body.code} - #{body.error}"
+        puts "[ParseError] #{body}"
         raise Parse::ProtocolError, body
       when 500
-        puts "[ParseError] #{body.code} - #{body.error}"
+        puts "[ParseError] #{body}"
         raise Parse::ServerError, body
       end
 
       if body.error?
         if body.code <= 100
-          puts "[ParseError] #{body.code} - #{body.error}"
+          puts "[ParseError] #{body}"
           raise Parse::ServerError
         elsif body.code == 155
-          puts "[ParseError] #{body.code} - #{body.error}"
+          puts "[ParseError] #{body}"
           raise Parse::RequestLimitExceededError
         end
       end
