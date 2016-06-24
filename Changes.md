@@ -1,8 +1,18 @@
 # Parse-Stack Changes
 
-1.2.2
+1.3.0
 -----------
-- `nil` and Delete operations for :integers and :booleans are no longer typecast.
+- `nil` and Delete operations for `:integers` and `:booleans` are no longer typecast.
+- Added aliases `before`, `on_or_before`, `after` and `on_or_after` to help with
+comparing non-integer fields such as dates. These map to `lt`,`lte`, `gt` and `gte`.
+- Schema API return true is no changes were made to the table on `auto_upgrade!` (success)
+- Parse::Middleware::Caching no longer caches 404 and 410 responses; and responses
+with content lengths less than 20 bytes.
+- Fixes Parse::Payload when applying auth_data in Webhooks. This fixes handing Facebook
+login with Android devices.
+- New method `save!` to raise an exception if the save fails.
+- Parse-Stack will throw new exceptions depending on the error code returned by Parse. These
+are of type AuthenticationError, TimeoutError, ProtocolError, ServerError, ConnectionError and RequestLimitExceededError.
 
 1.2.1
 -----------

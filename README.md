@@ -116,7 +116,7 @@ song.likes.add Parse::User.first(username: "persaud")
 song.save
 
 # find songs
-songs = Song.all(artist: artist, :plays.gt => 100, :released.lte => 10.years.ago)
+songs = Song.all(artist: artist, :plays.gt => 100, :released.on_or_after => 30.days.ago)
 
 songs.each { |s| s.tags.add "awesome" }
 # batch saves
@@ -565,11 +565,14 @@ end
 ```
 
 #### Raising an exception when save fails
-By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis.
+By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::SaveFailureError`.
 
 ```ruby
 	Parse::Model.raise_on_save_failure = true # globally across all models
 	Song.raise_on_save_failure = true          # per-model
+
+  # or per-instance raise on failure
+  song.save!
 
 ```
 
@@ -579,7 +582,7 @@ When enabled, if an error is returned by Parse due to saving or destroying a rec
 To create a new object you can call `#new` while passing a hash of attributes you want to set. You can then use the property accessors to also modify individual properties. As you modify properties, you can access dirty tracking state and data using the generated [`ActiveModel::Dirty`](http://api.rubyonrails.org/classes/ActiveModel/Dirty.html) features. When you are ready to commit the new object to Parse, you can call `#save`.
 
 ```ruby
-song = Song.new(name: "My Old Song")
+song = Song.new name: "My Old Song"
 song.new? # true
 song.id # nil
 song.released = DateTime.now
@@ -744,7 +747,7 @@ You can destroy a Parse record, just call the `#destroy` method. It will return 
  song.destroy
 
  # or in a batch
- songs = Song.all(:limit => 10)
+ songs = Song.all :limit => 10
  songs.destroy # uses batch operation
 ```
 
@@ -973,15 +976,23 @@ Most of the constraints supported by Parse are available to `Parse::Query`. Assu
 
  # less than
  q.where :field.lt => value
+ # alias to `lt`; useful when dealing with dates
+ q.where :field.before => value
 
  # less than or equal to
  q.where :field.lte => value
+ # alias to `lte`; useful when dealing with dates
+ q.where :field.on_or_before => value
 
  # greater than
  q.where :field.gt => value
+ # alias to `gt`; useful when dealing with dates
+ q.where :field.after => value
 
  # greater than or equal to
  q.where :field.gte => value
+ # alias to `gte`; useful when dealing with dates
+ q.where :field.on_or_after => value
 
  # Not equal to
  q.where :field.not => value
