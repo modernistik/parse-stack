@@ -16,7 +16,7 @@ module Parse
   class ProtocolError < Exception; end;
   class ServerError < Exception; end;
   class AuthenticationError < Exception; end;
-
+  class RequestLimitExceededError < Exception; end;
 
   # Main class for the client. The client class is based on a Faraday stack.
   # The Faraday stack is similar to a Rack-style application in which you can define middlewares
@@ -186,9 +186,12 @@ module Parse
       end
 
       if body.error?
-        if body.code <= 100 || body.code == 155
+        if body.code <= 100
           puts "[ParseError] #{body.code} - #{body.error}"
           raise Parse::ServerError
+        elsif body.code == 155
+          puts "[ParseError] #{body.code} - #{body.error}"
+          raise Parse::RequestLimitExceededError
         end
       end
 
