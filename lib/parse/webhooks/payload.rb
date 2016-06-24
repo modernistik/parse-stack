@@ -102,9 +102,16 @@ module Parse
           klass = Parse::Object.find_class parse_class
           # if we have a class, return that with updated changes, otherwise
           # default to regular object
-          return klass.new(@object || {}) if klass.present?
-        end
-      end
+          if klass.present?
+            o = klass.new(@object || {})
+            if o.is_a?(Parse::User) && @update.present? && @update["authData"].present?
+              o.auth_data = @update["authData"]
+            end
+            return o
+          end # if klass.present?
+        end # if we have original
+
+      end # if before_trigger?
       Parse::Object.build(@object)
     end
 
