@@ -125,9 +125,6 @@ songs.save
 # Call Cloud Code functions
 result = Parse.call_function :myFunctionName, {param: value}
 
-# Trigger a Parse Job
-Parse.trigger_job :myBackgroundJob, {param: value}
-
 ```
 
 ## Main Features
@@ -138,7 +135,7 @@ While there are many additional features of the framework, these are the main po
 - Queries support with caching middleware. (Reduces API usage)
 - Support for all Parse data types.
 - One-to-One, One-to-Many and Many-to-Many relations.
-- Inegration with Parse Cloud Code Webhooks.
+- Integration with Parse Cloud Code Webhooks.
 - Send Push notifications with advanced targeting.
 - Schema upgrades and migrations.
 
@@ -1334,7 +1331,7 @@ same_user = Parse::User.first # cached result
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'parse-stack'
+gem 'parse-stack', require: 'parse/stack'
 ```
 
 or install it locally

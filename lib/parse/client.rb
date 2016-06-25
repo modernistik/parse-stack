@@ -160,8 +160,7 @@ module Parse
       # actually send the request and return the body
       response = @session.send(method, uri, params, headers)
       body = response.body
-      valid_error = false
-
+      
       case response.status
       when 401, 403
         puts "[ParseError] #{body}"

@@ -80,7 +80,15 @@ module Parse
 
   end
 
+  class Payload
+    def error!(msg = "")
+      raise WebhookErrorResponse, msg
+    end
+  end
+
+  class WebhookErrorResponse < Exception; end;
   class Webhooks
+
 
     include Client::Connectable
     extend Webhook::Registration
@@ -88,10 +96,10 @@ module Parse
     HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY".freeze
     HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID".freeze
     CONTENT_TYPE = "application/json".freeze
-
     attr_accessor :key
     class << self
       attr_accessor :logging
+
       def routes
         @routes ||= OpenStruct.new( {
           before_save: {}, after_save: {},
@@ -136,13 +144,10 @@ module Parse
         return unless routes[type].present? && routes[type][className].present?
         registry = routes[type][className]
 
-        if registry.is_a?(Array)
-          results = registry.map { |hook| hook.call(payload) }
-          return results.last
-        else
-          return registry.call(payload)
-        end
-        nil
+        return payload.instance_exec(payload, &registry) unless registry.is_a?(Array)
+        results = registry.map { |hook| payload.instance_exec(payload, &hook) }
+        return results.last
+
       end
 
       def success(data = true)
