@@ -2,9 +2,9 @@
 
 1.3.0
 -----------
-- ** IMPORTANT ** Raising an error no longer sends an error response back to
+- **IMPORTANT**: __Raising an error no longer sends an error response back to
 the client in a Webhook trigger. You must now call `error!('...')` instead of
-calling `raise '...'`. The webhook block is now binded to the Parse::Payload
+calling `raise '...'`.__ The webhook block is now binded to the Parse::Payload
 instance, removing the need to pass `payload` object; use the instance methods directly.
 See updated README.md for more details.
 - `nil` and Delete operations for `:integers` and `:booleans` are no longer typecast.
