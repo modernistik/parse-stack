@@ -2,6 +2,11 @@
 
 1.3.0
 -----------
+- ** IMPORTANT ** Raising an error no longer sends an error response back to
+the client in a Webhook trigger. You must now call `error!('...')` instead of
+calling `raise '...'`. The webhook block is now binded to the Parse::Payload
+instance, removing the need to pass `payload` object; use the instance methods directly.
+See updated README.md for more details.
 - `nil` and Delete operations for `:integers` and `:booleans` are no longer typecast.
 - Added aliases `before`, `on_or_before`, `after` and `on_or_after` to help with
 comparing non-integer fields such as dates. These map to `lt`,`lte`, `gt` and `gte`.

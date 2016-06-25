@@ -42,5 +42,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry", "< 1"
   spec.add_development_dependency 'pry-stack_explorer', "< 1"
   spec.add_development_dependency 'pry-nav', "< 1"
+  spec.post_install_message = <<UPGRADE
 
+** IMPORTANT **
+ Parse::Webhook exception handling has changed in 1.3.0. Please review Changes.md
+ and README.md for changes in webhooks functions and triggers.
+
+UPGRADE
 end

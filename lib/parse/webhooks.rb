@@ -222,9 +222,12 @@ module Parse
           end
           response.write success(result)
           return response.finish
-        rescue Exception => e
-          puts "[ParseWebhooks Error] >> #{e}"
-          puts e.backtrace
+        rescue Parse::WebhookErrorResponse => e
+          if payload.trigger?
+            puts "[Webhook ResponseError] >> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}: #{e}"
+          elsif payload.function?
+            puts "[Webhook ResponseError] >> #{payload.function_name}: #{e}"
+          end
           response.write error( e.to_s )
           return response.finish
         end

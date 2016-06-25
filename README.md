@@ -1123,13 +1123,13 @@ If a function block returns any value that is true for `blank?`, we will automat
 
 ```ruby
 # Register handling the 'helloWorld' function.
-Parse::Webhooks.route(:function, :helloWorld) do |payload|
-  #  use the Parse::Payload payload object
-  params = payload.params #function params
+Parse::Webhooks.route(:function, :helloWorld) do
+  #  use the Parse::Payload instance methods in this block
+  incoming_params = params #function params
   name = params['name'].to_s
 
   # will return proper error response
-  raise "Missing argument 'name'." unless name.present?
+  error!("Missing argument 'name'.") unless name.present?
   # return early
   "Hello #{name}!"
 end
@@ -1143,9 +1143,9 @@ If you are creating `Parse::Object` subclasses, you may also register them there
 ```ruby
 class Song < Parse::Object
 
-  webhook :function, :mySongFunction do |payload|
-    user = payload.user
-    params = payload.params
+  webhook :function, :mySongFunction do
+    the_user = user # available if a Parse user made the call
+    params = params
     # ... do stuff ...
     true
   end
@@ -1155,7 +1155,7 @@ end
 ```
 
 ### Setup Cloud Code Triggers
-You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete` and `:after_delete`. While you can use `Parse::Webhooks.route` to register the trigger, we recommend keeping the code inside you model. The `payload` object, which is an instance of `Parse::Payload`
+You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete` and `:after_delete`. The `payload` object, which is an instance of `Parse::Payload`, contains several properties that represent the payload. One of the most important ones is `parse_object`, which will provide you with the instance of your specific Parse object. In `:before_save` triggers, this object already contains dirty tracking information of what has been changed.
 
 ```ruby
   # recommended way
@@ -1163,23 +1163,25 @@ You can register webhooks to handle the different object triggers: `:before_save
     # ... properties ...
 
     # setup after save for Artist
-    webhook :after_save do |payload|
-      user = payload.user # Parse::User
-      artist = payload.parse_object # Artist
+    webhook :after_save do
+      puts "User: #{user.username}" if user.present? # Parse::User
+      artist = parse_object # Artist
+      # no need for return in after save
     end
 
   end
 
   # or the explicit way
-  Parse::Webhooks.route :after_save, "Artist" do |payload|
-    user = payload.user # Parse::User
-    artist = payload.parse_object # Artist
+  Parse::Webhooks.route :after_save, "Artist" do
+    puts "User: #{user.username}" if user.present? # Parse::User
+    artist = parse_object # Artist
+    # no need for return in after save
   end
 ```
 
 For any `after_*` hook, return values are not needed since Parse does not utilize them. You may also register as many `after_save` or `after_delete` handlers as you prefer, all of them will be called.
 
-`before_save` and `before_delete` hooks have special functionality. When an exception is thrown inside the provided block, the framework will return the correct error response to Parse with value provided to raise. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved for the object. For more details, see [Cloud Code BeforeSave Webhooks](https://parse.com/docs/cloudcode/guide#cloud-code-advanced-beforesave-webhooks)
+`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved for the object. For this, we recommend using the `payload_update` method. For more details, see [Cloud Code BeforeSave Webhooks](https://parse.com/docs/cloudcode/guide#cloud-code-advanced-beforesave-webhooks)
 
 ```ruby
 # recommended way
@@ -1188,9 +1190,9 @@ class Artist < Parse::Object
   property :location, :geopoint
 
   # setup after save for Artist
-  webhook :before_save do |payload|
-    user = payload.user # Parse::User
-    artist = payload.parse_object # Artist
+  webhook :before_save do
+    the_user = user # Parse::User
+    artist = parse_object # Artist
     # artist object will have dirty tracking information
 
     artist.new? # true if this is a new object
@@ -1199,19 +1201,19 @@ class Artist < Parse::Object
     artist.location ||= Parse::GeoPoint.new(32.82, -117.23)
 
     # raise to fail the save
-    raise "Name cannot be empty" if artist.name.blank?
+    error!("Name cannot be empty") if artist.name.blank?
 
     if artist.name_changed?
       # .. do something if `name` has changed
     end
 
-    # return a special hash of changed values
+    # *important* returns a special hash of changed values
     artist.payload_update
   end
 
-  webhook :before_delete do |payload|
+  webhook :before_delete do
     # prevent deleting Artist records
-    raise "You can't delete an Artist"
+    error!("You can't delete an Artist")
   end
 
 end
