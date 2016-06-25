@@ -1117,9 +1117,7 @@ Push notifications are implemented through the `Parse::Push` class. To send push
 Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks.
 
 ### Setup Cloud Code functions
-You can use the `route()` method to register handler blocks.
-
-If a function block returns any value that is true for `blank?`, we will automatically return `true` as part of the response to the webhook. If an exception is raised inside the block, we will return the correct Parse error response with the value you provided.
+You can use the `route()` method to register handler blocks. The last value returned by the block will be returned back to the client in a success response. If `error!(value)` is called inside the block, we will return the correct Parse error response with the value you provided.
 
 ```ruby
 # Register handling the 'helloWorld' function.
