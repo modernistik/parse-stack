@@ -18,6 +18,7 @@ login with Android devices.
 - New method `save!` to raise an exception if the save fails.
 - Parse-Stack will throw new exceptions depending on the error code returned by Parse. These
 are of type AuthenticationError, TimeoutError, ProtocolError, ServerError, ConnectionError and RequestLimitExceededError.
+- Verify Content-Type header field is present for webhooks before checking its value.
 
 1.2.1
 -----------
