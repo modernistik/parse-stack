@@ -172,7 +172,7 @@ module Parse
           return response.finish
         end
 
-        unless request.content_type.include?(CONTENT_TYPE)
+        unless request.content_type.present? && request.content_type.include?(CONTENT_TYPE)
           response.write error("Invalid content-type format. Should be application/json.")
           return response.finish
         end
