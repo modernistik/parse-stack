@@ -89,6 +89,9 @@ module Parse
   class WebhookErrorResponse < Exception; end;
   class Webhooks
 
+    def self.reload!(args = {})
+      
+    end
 
     include Client::Connectable
     extend Webhook::Registration
