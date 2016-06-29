@@ -7,6 +7,8 @@ the client in a Webhook trigger. You must now call `error!('...')` instead of
 calling `raise '...'`.__ The webhook block is now binded to the Parse::Payload
 instance, removing the need to pass `payload` object; use the instance methods directly.
 See updated README.md for more details.
+- **Parse-Stack will throw new exceptions** depending on the error code returned by Parse. These
+are of type AuthenticationError, TimeoutError, ProtocolError, ServerError, ConnectionError and RequestLimitExceededError.
 - `nil` and Delete operations for `:integers` and `:booleans` are no longer typecast.
 - Added aliases `before`, `on_or_before`, `after` and `on_or_after` to help with
 comparing non-integer fields such as dates. These map to `lt`,`lte`, `gt` and `gte`.
@@ -16,9 +18,8 @@ with content lengths less than 20 bytes.
 - Fixes Parse::Payload when applying auth_data in Webhooks. This fixes handing Facebook
 login with Android devices.
 - New method `save!` to raise an exception if the save fails.
-- Parse-Stack will throw new exceptions depending on the error code returned by Parse. These
-are of type AuthenticationError, TimeoutError, ProtocolError, ServerError, ConnectionError and RequestLimitExceededError.
-- Verify Content-Type header field is present for webhooks before checking its value.
+- FIX: Verify Content-Type header field is present for webhooks before checking its value.
+- FIX: Support `reload!` when using it Padrino.
 
 1.2.1
 -----------
