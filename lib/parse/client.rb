@@ -186,10 +186,10 @@ module Parse
       if body.error?
         if body.code <= 100
           puts "[ParseError] #{body}"
-          raise Parse::ServerError
+          raise Parse::ServerError, body
         elsif body.code == 155
           puts "[ParseError] #{body}"
-          raise Parse::RequestLimitExceededError
+          raise Parse::RequestLimitExceededError, body
         end
       end
 
