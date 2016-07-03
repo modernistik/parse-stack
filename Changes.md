@@ -15,7 +15,7 @@ comparing non-integer fields such as dates. These map to `lt`,`lte`, `gt` and `g
 - Schema API return true is no changes were made to the table on `auto_upgrade!` (success)
 - Parse::Middleware::Caching no longer caches 404 and 410 responses; and responses
 with content lengths less than 20 bytes.
-- Fixes Parse::Payload when applying auth_data in Webhooks. This fixes handing Facebook
+- FIX: Parse::Payload when applying auth_data in Webhooks. This fixes handing Facebook
 login with Android devices.
 - New method `save!` to raise an exception if the save fails.
 - FIX: Verify Content-Type header field is present for webhooks before checking its value.
