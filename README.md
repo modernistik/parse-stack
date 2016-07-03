@@ -1,4 +1,4 @@
-# Parse::Stack
+# Parse::Stack - A Parse SDK Ruby Client and Data Mapper
 Parse::Stack is an opinionated framework for larger scale ruby applications that utilize the [Parse Platform](http://www.parse.com). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ## Table Of Contents
