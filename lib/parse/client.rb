@@ -154,6 +154,18 @@ module Parse
       method = method.downcase.to_sym
       # set the User-Agent
       headers["User-Agent".freeze] = "Parse-Stack Ruby Client v#{Parse::Stack::VERSION}".freeze
+
+      if opts[:cache] == false
+        headers[Parse::Middleware::Caching::CACHE_CONTROL] = "no-cache"
+      elsif opts[:cache].is_a?(Numeric)
+        # future feature
+        # headers[Parse::Middleware::Caching::CACHE_CONTROL] = "max-age: #{opts[:cache].to_i}"
+      end
+
+      if opts[:use_master_key] == false
+        headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
+      end
+      
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
