@@ -160,7 +160,7 @@ module Parse
       # actually send the request and return the body
       response = @session.send(method, uri, params, headers)
       body = response.body
-      
+
       case response.status
       when 401, 403
         puts "[ParseError] #{body}"
@@ -194,7 +194,7 @@ module Parse
       end
 
       body
-    rescue Faraday::Error::ClientError => e
+    rescue Faraday::Error::ClientError, Net::OpenTimeout => e
       raise Parse::ConnectionError, e.message
     end
 
