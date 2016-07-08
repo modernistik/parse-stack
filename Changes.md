@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.3.1
+-----------
+- Parse::Query now supports `:cache` and `:use_master_key` option.
+
 1.3.0
 -----------
 - **IMPORTANT**: __Raising an error no longer sends an error response back to
