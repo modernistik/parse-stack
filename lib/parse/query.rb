@@ -23,7 +23,7 @@ module Parse
     # You can modify the default client being used by all Parse::Query objects by setting
     # Parse::Query.client. You can override individual Parse::Query object clients
     # by changing their client variable to a different Parse::Client object.
-    attr_accessor :table, :client, :key
+    attr_accessor :table, :client, :key, :cache, :use_master_key
 
     # We have a special class method to handle field formatting. This turns
     # the symbol keys in an operand from one key to another. For example, we can
@@ -99,6 +99,8 @@ module Parse
       @limit = 100
       @skip = 0
       @table = table
+      @cache = true
+      @use_master_key = true
       conditions constraints
       self # chaining
     end # initialize
@@ -117,6 +119,10 @@ module Parse
           limit value
         elsif expression == :include || expression == :includes
           includes(value)
+        elsif expression == :cache
+          self.cache = value
+        elsif expression == :use_master_key
+          self.cache = value
         else
           add_constraint(expression, value)
         end
@@ -305,7 +311,10 @@ module Parse
     end
 
     def fetch!(compiled_query)
-      response = client.find_objects(@table, compiled_query.as_json )
+      opts = {}
+      opts[:cache] = false unless self.cache
+      opts[:use_mster_key] = self.use_master_key
+      response = client.find_objects(@table, compiled_query.as_json, opts )
       if response.error?
         puts "[ParseQuery] #{response.error}"
       end

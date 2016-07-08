@@ -51,15 +51,15 @@ module Parse
       end
 
       # /1/classes/<className>/<objectId>	GET	Retrieving Objects
-      def fetch_object(className, id)
-        response = request :get, uri_path(className, id)
+      def fetch_object(className, id, opts = {})
+        response = request :get, uri_path(className, id), opts: opts
         response.parse_class = className if response.present?
         response
       end
 
       # /1/classes/<className>	GET	Queries
-      def find_objects(className, query = {})
-        response = request :get, uri_path(className), query: query
+      def find_objects(className, query = {}, opts = {})
+        response = request :get, uri_path(className), query: query, opts: opts
         response.parse_class = className if response.present?
         response
       end

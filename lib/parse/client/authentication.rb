@@ -10,6 +10,7 @@ module Parse
 
     class Authentication < Faraday::Middleware
       include Parse::Protocol
+      DISABLE_MASTER_KEY = "X-Disable-Parse-Master-Key"
       attr_accessor :application_id
       attr_accessor :api_key
       attr_accessor :master_key
@@ -32,11 +33,11 @@ module Parse
           headers = {}
           raise "No Parse Application Id specified for authentication." unless @application_id.present?
           headers[APP_ID] = @application_id
-
-          # Set a user agent
-          headers["User-Agent".freeze] = "Parse-Stack v0.0.1".freeze
           headers[API_KEY] = @api_key unless @api_key.blank?
-          headers[MASTER_KEY] = @master_key unless @master_key.blank?
+
+          unless @master_key.blank? || env[:request_headers][DISABLE_MASTER_KEY].present?
+            headers[MASTER_KEY] = @master_key
+          end
           # merge the headers with the current provided headers
           env[:request_headers].merge! headers
           # set the content type of the request if it was not provided already.

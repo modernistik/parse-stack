@@ -7,6 +7,7 @@ module Parse
   module Middleware
     class Caching < Faraday::Middleware
       include Parse::Protocol
+      # Cache-Control: no-cache
       # Internal: List of status codes that can be cached:
          # * 200 - 'OK'
          # * 203 - 'Non-Authoritative Information'
@@ -16,6 +17,7 @@ module Parse
          # * 404 - 'Not Found' - removed
          # * 410 - 'Gone' - removed
       CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302].freeze
+      CACHE_CONTROL = 'Cache-Control'.freeze
 
       class << self
         attr_accessor :enabled, :logging
@@ -58,21 +60,25 @@ module Parse
 
         cache_enabled = true
 
+        if env[:request_headers][CACHE_CONTROL] == "no-cache".freeze
+          cache_enabled = false
+        end
+
         url = env.url
         method = env.method
         begin
-          if method == :get && url.present? && @store.key?(url)
+          if cache_enabled && method == :get && url.present? && @store.key?(url)
             puts("[Parse::Cache] >>> #{url}") if self.class.logging.present?
             response = Faraday::Response.new
             res_env = @store[url] # previous cached response
             body = res_env.respond_to?(:body) ? res_env.body : nil
             if body.present?
-              response.finish({status: 200, response_headers: {}, body: body })
+              response.finish({status: 200, response_headers: { "X-Cache-Response" => true }, body: body })
               return response
             else
               @store.delete url
             end
-          elsif url.present?
+          elsif cache_enabled && url.present?
             #non GET requets should clear the cache for that same resource path.
             #ex. a POST to /1/classes/Artist/<objectId> should delete the cache for a GET
             # request for the same '/1/classes/Artist/<objectId>' where objectId are equivalent
