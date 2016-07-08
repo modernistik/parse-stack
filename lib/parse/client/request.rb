@@ -5,9 +5,9 @@ module Parse
  #This class is mainly to create a potential request - mainly for the batching API.
 
   class Request
-      attr_accessor :method, :path, :body, :headers
+      attr_accessor :method, :path, :body, :headers, :opts, :cache
       attr_accessor :tag #for tracking in bulk requests
-      def initialize(method, uri, body: nil, headers: nil)
+      def initialize(method, uri, body: nil, headers: nil, opts: {})
         @tag = 0
         method = method.downcase.to_sym
         raise "Invalid Method type #{method} " unless [:get,:put,:delete,:post].include?(method)
@@ -15,6 +15,7 @@ module Parse
         self.path = uri
         self.body = body
         self.headers = headers || {}
+        self.opts = opts || {}
       end
 
 

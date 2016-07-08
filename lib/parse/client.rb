@@ -138,7 +138,7 @@ module Parse
     # If you need to override or add additional headers to a specific request (ex. when uploading a Parse File), you can do so
     # with the header: paramter (also a hash).
     # This method also takes in a Parse::Request object instead of the arguments listed above.
-    def request(method, uri = nil, body: nil, query: nil, headers: nil)
+    def request(method, uri = nil, body: nil, query: nil, headers: nil, opts: {})
       headers ||= {}
       # if the first argument is a Parse::Request object, then construct it
       if method.is_a?(Request)
@@ -153,7 +153,7 @@ module Parse
       # http method
       method = method.downcase.to_sym
       # set the User-Agent
-      headers["User-Agent"] = "Parse-Ruby-Client v#{Parse::Stack::VERSION}"
+      headers["User-Agent".freeze] = "Parse-Stack Ruby Client v#{Parse::Stack::VERSION}".freeze
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
