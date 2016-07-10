@@ -2,7 +2,9 @@
 
 1.3.1
 -----------
-- Parse::Query now supports `:cache` and `:use_master_key` option.
+- Parse::Query now supports `:cache` and `:use_master_key` option. (experimental)
+- Minimum ruby version set to 1.9.3 (same as ActiveModel 4.2.1)
+- Support for Rails 5.0+ and Rack 2.0+
 
 1.3.0
 -----------
