@@ -1,5 +1,6 @@
 require 'faraday'
 require 'faraday_middleware'
+
 require_relative 'protocol'
 # All Parse requests require authentication with specific header values.
 # This middleware takes all outgoing requests and adds the proper header values

@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_support/inflector'
 
 # The base operation class used in generating queries.

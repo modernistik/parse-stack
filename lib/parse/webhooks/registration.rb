@@ -1,3 +1,7 @@
+require 'active_support'
+require 'active_support/inflector'
+require 'active_support/core_ext/object'
+require 'active_support/core_ext/string'
 
 module Parse
 

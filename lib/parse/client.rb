@@ -1,6 +1,13 @@
 require 'faraday'
 require 'faraday_middleware'
+require 'active_support'
+require 'active_support/json'
+require 'active_support/inflector'
+require 'active_support/core_ext/object'
 require 'active_support/core_ext/string'
+require 'active_support/core_ext/date/calculations'
+require 'active_support/core_ext/date_time/calculations'
+require 'active_support/core_ext/time/calculations'
 require_relative "client/request"
 require_relative "client/response"
 require_relative "client/body_builder"

@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_support/inflector'
 require 'active_support/core_ext/object'
 require_relative 'pointer_collection_proxy'

@@ -1,3 +1,4 @@
+require 'active_support'
 require 'active_support/json'
 # This is the model that represents a response from Parse. A Response can also
 # be a set of responses (from a Batch response).
