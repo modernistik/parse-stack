@@ -1304,6 +1304,18 @@ end
 
 ```
 
+If you are already have setup a client that is being used by your defined models, you can access the current client with the following API:
+
+```ruby
+  # current Parse::Client used by this model
+  client = Song.client
+
+  # you can also have multiple clients
+  client = Parse::Client.session #default client session
+  client = Parse::Client.session(:other_session)
+  
+```
+
 ##### Options
 - **application_id**: Your Parse application identifier.
 - **api_key**: Your REST API key corresponding to the provided `application_id`.
