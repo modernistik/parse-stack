@@ -213,6 +213,9 @@ module Parse
         elsif body.code == 155
           puts "[ParseError] #{body}"
           raise Parse::RequestLimitExceededError, body
+        elsif body.code == 209 #Error 209: invalid session token
+          puts "[ParseError] #{body}"
+          raise Parse::InvalidSessionTokenError, body
         end
       end
 
