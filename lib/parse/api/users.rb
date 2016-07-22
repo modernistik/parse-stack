@@ -7,7 +7,11 @@ module Parse
       # Note that Parse::Objects mainly use the objects.rb API since we can
       # detect class names to proper URI handlers
       USER_PATH_PREFIX = "users".freeze
+      USER_LOGIN_PATH_PREFIX = "login".freeze
+      USER_LOGOUT_PATH_PREFIX = "logout".freeze
       USER_CLASS = "_User".freeze
+      USERNAME_PARAM = "username".freeze
+      PASSWORD_PARAM = "password".freeze
       def fetch_user(id)
         request :get, "#{USER_PATH_PREFIX}/#{id}"
       end
@@ -34,8 +38,24 @@ module Parse
         request :delete, "#{USER_PATH_PREFIX}/#{id}"
       end
 
+      def login_user(username, password)
+        params = {"#{USERNAME_PARAM}": username, "#{PASSWORD_PARAM}": password}
+        response = request :get, "#{USER_LOGIN_PATH_PREFIX}", query: params, opts: {use_master_key: false, cache: false}
+        response.parse_class = USER_CLASS
+        response
+      end
 
+      def signup_user(username, password, email = nil)
+        body = {"#{USERNAME_PARAM}": username, "#{PASSWORD_PARAM}": password}
+        body[:email] = email if email.present?
+        response = request :post, "#{USER_PATH_PREFIX}", body: body, opts: {use_master_key: false, cache: false}
+        response.parse_class = USER_CLASS
+        response
+      end
 
+      def logout_user(session_token)
+        request :post, "#{USER_LOGOUT_PATH_PREFIX}", opts: {session_token: session_token}
+      end
     end # Users
 
   end #API

@@ -291,10 +291,47 @@ module Parse
   # add mixings to this class to add the app specific properties
   class User < Parse::Object
     parse_class "_User".freeze
+    attr_accessor :session_token
     property :auth_data, :object
     property :email
     property :password
     property :username
+
+    def signup
+      return nil if existed?
+      rsp = self.class.signup(username, password, email)
+      if rsp.error?
+        puts "Error signing up #{self.parse_class}: #{rsp.error}"
+      else
+        result = rsp.result
+        @id = result["objectId"] || @id
+        @created_at = result["createdAt"] || @created_at
+        #if the object is created, updatedAt == createdAt
+        @updated_at = result["updatedAt"] || result["createdAt"] || @updated_at
+        @session_token = result["sessionToken"]
+        # Because beforeSave hooks can change the fields we are saving, any items that were
+        # changed, are returned to us and we should apply those locally to be in sync.
+        set_attributes!(result)
+      end
+      rsp
+    end
+
+    def logout
+      return false unless session_token.present?
+      self.class.logout(session_token)
+    end
+
+    def self.login(username, password)
+      client.login_user(username, password)
+    end
+
+    def self.signup(username, password, email = nil)
+      client.signup_user(username, password, email)
+    end
+
+    def self.logout(session_token)
+      client.logout_user(session_token)
+    end
   end
 
   class Installation < Parse::Object
