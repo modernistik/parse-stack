@@ -24,7 +24,7 @@ module Parse
   class ServerError < Exception; end;
   class AuthenticationError < Exception; end;
   class RequestLimitExceededError < Exception; end;
-
+  class InvalidSessionTokenError < Exception; end;
   # Main class for the client. The client class is based on a Faraday stack.
   # The Faraday stack is similar to a Rack-style application in which you can define middlewares
   # that will be called for each request going out and coming back in. We use this in order to setup
@@ -111,6 +111,10 @@ module Parse
         # We place it after the Authentication middleware in case we need to use then
         # authentication information when building request and responses.
         conn.use Parse::Middleware::BodyBuilder
+        if opts[:logging].present? && opts[:logging] == :debug
+          Parse::Middleware::BodyBuilder.logging = true
+        end
+
         if opts[:cache].present? && opts[:expires].to_i > 0
           unless opts[:cache].is_a?(Moneta::Transformer)
             raise "Parse::Client option :cache needs to be a type of Moneta::Transformer store."
@@ -172,7 +176,7 @@ module Parse
       if opts[:use_master_key] == false
         headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
       end
-      
+
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
