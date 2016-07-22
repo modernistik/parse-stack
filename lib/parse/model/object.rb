@@ -294,6 +294,14 @@ module Parse
     property :email
     property :password
     property :username
+
+    def self.login(username, password)
+      client.login_user(username, password)
+    end
+
+    def self.signup(username, password, email = nil, phone = nil)
+      client.signup_user(username, password, email, phone)
+    end
   end
 
   class Installation < Parse::Object
