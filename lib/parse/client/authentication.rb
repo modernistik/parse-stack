@@ -39,6 +39,13 @@ module Parse
           unless @master_key.blank? || env[:request_headers][DISABLE_MASTER_KEY].present?
             headers[MASTER_KEY] = @master_key
           end
+
+          env[:request_headers].delete(DISABLE_MASTER_KEY)
+
+          # delete the use of master key if we are using session token.
+          if env[:request_headers].key?(Parse::Protocol::SESSION_TOKEN)
+            headers.delete(MASTER_KEY)
+          end
           # merge the headers with the current provided headers
           env[:request_headers].merge! headers
           # set the content type of the request if it was not provided already.

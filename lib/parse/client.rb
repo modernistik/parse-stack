@@ -177,6 +177,11 @@ module Parse
         headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
       end
 
+      if opts[:session_token].present?
+        headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
+        headers[Parse::Protocol::SESSION_TOKEN] = opts[:session_token]
+      end
+
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
