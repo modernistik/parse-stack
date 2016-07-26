@@ -1,3 +1,4 @@
+require 'json'
 require 'faraday'
 require 'faraday_middleware'
 require 'active_support'

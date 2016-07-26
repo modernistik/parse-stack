@@ -2,6 +2,7 @@ require 'faraday'
 require 'faraday_middleware'
 require_relative 'response'
 require_relative 'protocol'
+require 'json'
 # This middleware takes an incoming response (after an outgoing request)
 # and creates a Parse::Response object.
 module Parse

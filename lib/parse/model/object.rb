@@ -78,7 +78,7 @@ module Parse
   def self.registered_classes
       Parse::Object.descendants.map { |m| m.parse_class }.uniq
   end
-  
+
   # Find a corresponding class for this string or symbol
   def self.classify(className)
     Parse::Model.find_class className.to_parse_class

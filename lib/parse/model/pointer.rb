@@ -2,6 +2,7 @@ require 'active_model'
 require 'active_support/inflector'
 require 'active_model_serializers'
 require_relative 'model'
+require 'json'
 module Parse
 
     # A Parse Pointer is the superclass of Parse::Object types. A pointer can be considered

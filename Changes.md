@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.3.2
+-----------
+- Support for passing a `:session_token` as part of a Parse::Query.
+
 1.3.1
 -----------
 - Parse::Query now supports `:cache` and `:use_master_key` option. (experimental)

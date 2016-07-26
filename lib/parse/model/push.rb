@@ -1,6 +1,6 @@
 require_relative '../query.rb'
 require_relative '../client.rb'
-
+require 'json'
 module Parse
 
   class Push
@@ -10,7 +10,7 @@ module Parse
 
     alias_method :message, :alert
     alias_method :message=, :alert=
-    
+
     def self.send(payload)
       client.push payload.as_json
     end

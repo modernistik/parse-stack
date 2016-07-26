@@ -1,10 +1,10 @@
-
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
 require 'active_support/core_ext/object'
 require 'active_model_serializers'
 require 'rack'
+require 'json'
 require_relative 'client'
 require_relative 'stack'
 require_relative 'model/object'
@@ -90,7 +90,7 @@ module Parse
   class Webhooks
 
     def self.reload!(args = {})
-      
+
     end
 
     include Client::Connectable
