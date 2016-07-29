@@ -319,6 +319,11 @@ module Parse
       opts[:cache] = false unless self.cache
       opts[:use_mster_key] = self.use_master_key
       opts[:session_token] = self.session_token
+      # for now, don't cache requests where we disable master_key or provide session token
+      if opts[:use_mster_key] == false || opts[:session_token].present?
+        opts[:cache] = false
+      end
+
       response = client.find_objects(@table, compiled_query.as_json, opts )
       if response.error?
         puts "[ParseQuery] #{response.error}"
