@@ -20,14 +20,21 @@ module Parse
       alias_method :__type, :parse_class
       FIELD_NAME = "name".freeze
       FIELD_URL = "url".freeze
+      class << self
+        attr_accessor :default_mime_type
 
+        def default_mime_type
+          @default_mime_type ||= "image/jpeg"
+        end
+      end
       # The initializer to create a new file supports different inputs.
       # If the first paramter is a string which starts with 'http', we then download
       # the content of the file (and use the detected mime-type) to set the content and mime_type fields.
       # If the first parameter is a hash, we assume it might be the Parse File hash format which contains url and name fields only.
       # If the first paramter is a Parse::File, then we copy fields over
       # Otherwise, creating a new file requires a name, the actual contents (usually from a File.open("local.jpg").read ) and the mime-type
-      def initialize(name, contents = nil, mime_type = "application/octet-stream".freeze)
+      def initialize(name, contents = nil, mime_type = nil)
+        mime_type ||= Parse::File.default_mime_type
 
         if name.is_a?(String) && name.start_with?("http".freeze) #could be url string
           file = open( name )
@@ -39,7 +46,7 @@ module Parse
         elsif name.is_a?(::File)
           @contents =  contents || name.read
           @name = File.basename name.to_path
-        elsif name.is_a?(File)
+        elsif name.is_a?(Parse::File)
           @name = name.name
           @url = name.url
         else

@@ -85,8 +85,9 @@ Parse::Stack is a full stack framework that utilizes several ideas behind [DataM
 
 require 'parse/stack'
 
-Parse.setup application_id: APP_ID, api_key: REST_API_KEY
-# you may pass `server_url` as an option. Defaults to `https://api.parse.com/1/`
+Parse.setup app_id: APP_ID,
+            api_key: REST_API_KEY,
+            server_url: 'https://api.parse.com/1/'
 
 # Object Mapper
 class Song < Parse::Object
@@ -154,6 +155,60 @@ This component is main class for all object relational mapping subclasses for yo
 #### Parse::Webhooks
 Parse provides a feature called [Cloud Code Webhooks](http://blog.parse.com/announcements/introducing-cloud-code-webhooks/). For most applications, save/delete triggers and cloud functions tend to be implemented by Parse's own hosted Javascript solution called Cloud Code. However, Parse provides the ability to have these hooks utilize your hosted solution instead of their own, since their environment is limited in terms of resources and tools.
 
+## Connection Setup
+To connect to a Parse server, you will need a minimum of an `application_id`, an `api_key` and a `server_url`. To connect to the server endpoint, you use the `Parse.setup()` method below.
+
+```ruby
+  Parse.setup app_id: "YOUR_APP_ID",
+              api_key: "YOUR_API_KEY",
+              server_url: 'https://api.parse.com/1/' #default
+```
+
+If you wish to add additional connection middleware to the stack, you may do so by utilizing passing a block to the setup method.
+
+```ruby
+  Parse.setup( ... ) do |conn|
+    # conn is a Faraday connection object
+    conn.use Your::Middleware
+    conn.response :logger
+    # ....
+  end
+```
+
+Calling `setup` will create the default `Parse::Client` session object that will be used for all models and requests in the stack. You may retrive this client by calling the class `session()` method. It is possible to create different client connections and have different models point to different Parse applications and endpoints at the same time.
+
+```ruby
+  default_client = Parse::Client.session(:default)
+  # or just Parse::Client.session
+```
+
+#### Connection Options
+There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
+
+##### :app_id
+The Parse application id.
+
+##### :api_key
+The Parse REST API Key.
+
+##### :master_key _(optional)_
+The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models.
+
+##### :logging
+Provides you additional logg
+
+##### :adapter #Faraday.default_adapter
+The connection adapter. By default it uses the `Faraday.default_adapter`.
+
+##### :cache
+A caching adapter of type `Moneta::Transformer`. Caching queries and object fetches can help improve the performance of your application, even if it is for a few seconds. Only successful `GET` object fetches and queries (non-empty) will be cached. You may set the default expiration time with the `expires` option. See related: [Moneta](https://github.com/minad/moneta). At any point in time you may clear the cache by calling the `clear_cache!` method on the client connection.
+
+##### :expires
+If you are using caching, this sets the default expiration time (in seconds) for successful non-empty `GET` requests. By default, results are cached for 3 seconds.
+
+##### :faraday
+You may pass a hash of options that will be passed to the `Faraday` constructor.
+
 ## Modeling
 For the general case, your Parse classes should inherit from `Parse::Object`. `Parse::Object` utilizes features from `ActiveModel` to add several features to each instance of your subclass. These include `Dirty`, `Conversion`, `Callbacks`, `Naming` and `Serializers::JSON`.
 
@@ -212,7 +267,8 @@ This class represents a Parse file pointer. `Parse::File` has helper methods to 
   file = song.audio_file # Parse::File
   file.url # URL in the Parse file storage system
 
-  contents = File.open("file_path.jpg").read
+  file = File.open("file_path.jpg")
+  contents = file.read
   file = Parse::File.new("myimage.jpg", contents , "image/jpeg")
   file.saved? # false. Hasn't been uploaded to Parse
   file.save # uploads to Parse.
@@ -224,6 +280,24 @@ This class represents a Parse file pointer. `Parse::File` has helper methods to 
   song.file = file
   song.save
 
+```
+
+The default MIME type for all files is `iamge/jpeg`. This can be default can be changed by setting a value to `Parse::File.default_mime_type`. Other ways of creating a `Parse::File` are provided below. The created Parse::File is not uploaded until you call `save`.
+
+```ruby
+  # urls
+  file = Parse::File.new "http://example.com/image.jpg"
+  file.name # image.jpg
+
+  # file objects
+  file = Parse::File.new File.open("myimage.jpg")
+
+  # non-image files work too
+  file = Parse::File.new "http://www.example.com/something.pdf"
+  file.mime_type = "application/octet-stream" #set the mime-type!
+
+  # or another Parse::File object
+  file = Parse::File.new parse_file
 ```
 
 #### Parse::Date
@@ -953,6 +1027,30 @@ Use with limit to paginate through results. Default is 0 with maximum value bein
  Song.all :limit => 3, :skip => 10
 ```
 
+##### :cache
+A true/false value. If you are using the built-in caching middleware, `Parse::Middleware::Caching`, it will prevent it from using a previously cached result if available. The default value is `true`.
+
+```ruby
+# don't use a cached result if available
+Song.all limit: 3, cache: false
+```
+
+##### :use_master_key
+A true/false value. If you provided a master key as part of `Parse.setup()`, it will be sent on every request. However, if you wish to disable sending the master key on a particular request in order for the record ACLs to be enforced, you may pass `false`. If `false` is passed, caching will be disabled for this request.
+
+```ruby
+# disable sending the master key in the request if configured
+Song.all limit: 3, use_master_key: false
+```
+
+##### :session_token
+A Parse session token string. If you would like to perform a query as a particular user, you may pass their session token in the query. This will make sure that the query is performed on behalf (and with the priviledges) of that user which will cause record ACLs to be enforced. If a session token is provided, caching will be disabled for this request.
+
+```ruby
+# disable sending the master key in the request if configured
+Song.all limit: 3, session_token: "<session_token>"
+```
+
 ##### :where
 The `where` clause is based on utilizing a set of constraints on the defined column names in your Parse classes. The constraints are implemented as method operators on field names that are tied to a value. Any symbol/string that is not one of the main expression keywords described here will be considered as a type of query constraint for the `where` clause in the query. See the section `Where Constraints` for examples of available query constraints.
 
@@ -1017,7 +1115,7 @@ Most of the constraints supported by Parse are available to `Parse::Query`. Assu
 
  # select
  q.where :field.select => query #with key
- # ex. q.where :city.select => Artist.where(:total_plays.gt => 50, :key => "city")
+ # ex. q.where :city.select => Artist.where(:total_plays.gt => 50, :keys => "city")
 
  # don't select
  q.where :field.reject => query
@@ -1051,7 +1149,7 @@ Parse-Stack supports sub-select queries. These are referred to in Parse as `$sel
 
 ```ruby
 # assume Team class with column of `city`
-users = Parse::User.all :hometown.select => Team.where(:win_pct.gt => 0.5, :key => :city )
+users = Parse::User.all :hometown.select => Team.where(:win_pct.gt => 0.5, :keys => :city )
 # where={"hometown":{"$select":{"query":{"className":"Team", "limit":100, "where":{"winPct":{"$gt":0.5}}},"key":"city"}}}
 # for https://api.parse.com/1/classes/_User
 ```
@@ -1313,11 +1411,11 @@ If you are already have setup a client that is being used by your defined models
   # you can also have multiple clients
   client = Parse::Client.session #default client session
   client = Parse::Client.session(:other_session)
-  
+
 ```
 
 ##### Options
-- **application_id**: Your Parse application identifier.
+- **app_id**: Your Parse application identifier.
 - **api_key**: Your REST API key corresponding to the provided `application_id`.
 - **master_key**: The master secret key for the application. If this is provided, `api_key` may be unnecessary.
 - **logging**: A boolean value to add additional logging messages.
@@ -1326,7 +1424,7 @@ If you are already have setup a client that is being used by your defined models
 - **adapter**: The connection adapter to use. Defaults to `Faraday.default_adapter`.
 
 ### Request Caching
-For high traffic applications that may be performing several server tasks on similar objects, you may utilize request caching. Caching is provided by a the `Parse::Middleware::Caching` class which utilizes a [Moneta store](https://github.com/minad/moneta) object to cache GET url requests that have allowable status codes (ex. HTTP 200, 410, 301, etc). The cache entry for the url will be removed when it is either considered expired (based on the `expires` option) or if a non-GET request is made with the same url. Using this feature appropriately can dramatically reduce your API request usage.
+For high traffic applications that may be performing several server tasks on similar objects, you may utilize request caching. Caching is provided by a the `Parse::Middleware::Caching` class which utilizes a [Moneta store](https://github.com/minad/moneta) object to cache GET url requests that have allowable status codes (ex. HTTP 200, etc). The cache entry for the url will be removed when it is either considered expired (based on the `expires` option) or if a non-GET request is made with the same url. Using this feature appropriately can dramatically reduce your API request usage.
 
 ```ruby
 store = Moneta.new :Redis, url: 'redis://localhost:6379'
@@ -1335,6 +1433,13 @@ Parse.setup(cache: store, expires: 10, ...)
 
 user = Parse::User.first # request made
 same_user = Parse::User.first # cached result
+
+# you may clear the cache at any time
+# clear the cache for the default session
+Parse::Client.session.clear_cache!
+
+# or through the client accessor of a model
+Song.client.clear_cache!
 
 ```
 

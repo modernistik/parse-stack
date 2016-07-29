@@ -3,6 +3,9 @@
 1.3.2
 -----------
 - Support for passing a `:session_token` as part of a Parse::Query.
+- Default mime-type for Parse::File instances is `image/jpeg`. You can override the default by setting
+`Parse::File.default_mime_type`.
+- Added `Parse.config` for easy access to `Parse::Client.session(:default).config`
 
 1.3.1
 -----------
@@ -51,7 +54,7 @@ login with Android devices.
 -----------
 - In Query `join` has been renamed to `matches`.
 - Not In Query `exclude` has been renamed to `excludes` for consistency.
-- Parse::Query now has a `:key` operation to be usd when passing sub-queries to `select` and `matches`
+- Parse::Query now has a `:keys` operation to be usd when passing sub-queries to `select` and `matches`
 - Improves query supporting `select`, `matches`, `matches` and `excludes`.
 - Regular expression queries for `like` now send regex options
 
