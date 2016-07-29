@@ -2,6 +2,15 @@ require_relative "properties"
 # This class adds methods to Parse::Objects in order to create a JSON Parse schema
 # in order to support table creation and table alterations.
 module Parse
+
+  def self.auto_upgrade!
+    klassModels = Parse::Object.descendants - [Parse::User, Parse::Installation, Parse::Role, Parse::Session]
+    klassModels.sort_by { |c| c.parse_class }.each do |klass|
+      puts "[Upgrading Schema] #{klass}..."
+      klass.auto_upgrade!
+    end
+  end
+
   module Schema
 
     def self.included(base)

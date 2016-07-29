@@ -6,6 +6,7 @@
 - Default mime-type for Parse::File instances is `image/jpeg`. You can override the default by setting
 `Parse::File.default_mime_type`.
 - Added `Parse.config` for easy access to `Parse::Client.session(:default).config`
+- Support for `Parse.auto_upgrade!` to easily upgrade all schemas.
 
 1.3.1
 -----------

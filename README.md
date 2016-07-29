@@ -1,5 +1,5 @@
-# Parse::Stack - A Parse SDK Ruby Client and Data Mapper
-Parse::Stack is an opinionated framework for larger scale ruby applications that utilize the [Parse Platform](http://www.parse.com). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
+# Parse-Stack - A Parse-Server Ruby Client and ORM
+Parse Stack is an opinionated framework for ruby applications that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ## Table Of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -1194,6 +1194,18 @@ song = Song.new name: "my title"
 puts song.name # 'my title'
 song.save
 puts song.name # 'My Title'
+
+```
+
+## Schema Upgrades and Migrations
+You may change your local Parse ruby classes by adding new properties. To easily propagate the changes to your Parse application (MongoDB), you can call `auto_upgrade!` on the class to perform an non-destructive additive schema change. This will create the new columns in Parse for the properties you have defined in your models. Parse Stack will calculate the changes and only modify the tables which need new columns to be added. *It will not destroy columns or data*
+
+```ruby
+  # upgrade the a class individually
+  Song.auto_upgrade!
+
+  # upgrade all classes for the default client connection.
+  Parse.auto_upgrade!
 
 ```
 
