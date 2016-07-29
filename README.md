@@ -197,31 +197,31 @@ Calling `setup` will create the default `Parse::Client` session object that will
   # or just Parse::Client.session
 ```
 
-#### Connection Options
+### Connection Options
 There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
 
-##### :app_id
+##### `:app_id`
 The Parse application id.
 
-##### :api_key
+##### `:api_key`
 The Parse REST API Key.
 
-##### :master_key _(optional)_
+##### `:master_key` _(optional)_
 The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models.
 
-##### :logging
+##### `:logging`
 Provides you additional logg
 
-##### :adapter #Faraday.default_adapter
+##### `:adapter`
 The connection adapter. By default it uses the `Faraday.default_adapter`.
 
-##### :cache
+##### `:cache`
 A caching adapter of type `Moneta::Transformer`. Caching queries and object fetches can help improve the performance of your application, even if it is for a few seconds. Only successful `GET` object fetches and queries (non-empty) will be cached. You may set the default expiration time with the `expires` option. See related: [Moneta](https://github.com/minad/moneta). At any point in time you may clear the cache by calling the `clear_cache!` method on the client connection.
 
-##### :expires
+##### `:expires`
 If you are using caching, this sets the default expiration time (in seconds) for successful non-empty `GET` requests. By default, results are cached for 3 seconds.
 
-##### :faraday
+##### `:faraday`
 You may pass a hash of options that will be passed to the `Faraday` constructor.
 
 ## Modeling
