@@ -76,6 +76,7 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
   - [Where Query Constraints](#where-query-constraints)
 - [Select and Matching Queries](#select-and-matching-queries)
 - [Hooks and Callbacks](#hooks-and-callbacks)
+- [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
 - [Push Notifications](#push-notifications)
 - [Webhooks](#webhooks)
   - [Setup Cloud Code functions](#setup-cloud-code-functions)
