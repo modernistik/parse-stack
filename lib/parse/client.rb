@@ -26,6 +26,12 @@ module Parse
   class AuthenticationError < Exception; end;
   class RequestLimitExceededError < Exception; end;
   class InvalidSessionTokenError < Exception; end;
+
+  # helper method to get the config variables.
+  def self.config(s = :default)
+    Parse::Client.session(s).config
+  end
+
   # Main class for the client. The client class is based on a Faraday stack.
   # The Faraday stack is similar to a Rack-style application in which you can define middlewares
   # that will be called for each request going out and coming back in. We use this in order to setup
