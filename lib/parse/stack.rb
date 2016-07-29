@@ -6,6 +6,7 @@ require_relative 'webhooks'
 
 module Parse
   module Stack
+
     # Your code goes here...
   end
 end

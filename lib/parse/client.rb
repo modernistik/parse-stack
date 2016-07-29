@@ -56,6 +56,9 @@ module Parse
     # by the other classes including Parse::Query and Parse::Objects
     @@sessions = { default: nil }
 
+    def self.session?(v = :default)
+        @@sessions[v].present?
+    end
     # get a session for a given tag. This will also create a new one for the tag if not specified.
     def self.session(connection = :default)
       #warn "Please call Parse::Client.setup() to initialize your parse session" if @@sessions.empty? || @@sessions[:default].nil?

@@ -14,21 +14,21 @@ module Parse
 
       def remove_all_functions!
 
-          client.functions.results.each do |f|
+          client.functions.results.sort_by { |f| f['functionName'] }.each do |f|
             next unless f["url"].present?
             client.delete_function f['functionName']
-            puts "[Webhook] Removed function - #{f['functionName']}"
+            yield(f['functionName']) if block_given?
           end
       end
 
       def remove_all_triggers!
 
-        client.triggers.results.each do |f|
+        client.triggers.results.sort_by { |f| [f['triggerName'],f['className']] }.each do |f|
           next unless f["url"].present?
           triggerName = f["triggerName"]
           className = f["className"]
           client.delete_trigger triggerName, className
-          puts "[Webhook] Removed #{f['triggerName']} - #{f['className']}"
+          yield(f['triggerName'], f['className']) if block_given?
         end
 
       end
@@ -45,7 +45,7 @@ module Parse
           functionsMap[ f['functionName'] ] = f["url"]
         end
 
-        routes.function.keys.each do |functionName|
+        routes.function.keys.sort.each do |functionName|
           url = endpoint + functionName
           if functionsMap[functionName].present? #you may need to update
             next if functionsMap[functionName] == url
@@ -53,7 +53,7 @@ module Parse
           else
             client.create_function(functionName, url)
           end
-          puts "[Webhook] Registered function - #{functionName}"
+          yield(functionName) if block_given?
         end
 
       end
@@ -74,12 +74,12 @@ module Parse
 
         client.triggers.each do |t|
           next unless t["url"].present?
-          trigger_name = t["triggerName".freeze].underscore.to_sym
+          trigger_name = t["triggerName"].underscore.to_sym
           current_triggers[trigger_name] ||= {}
           current_triggers[trigger_name][ t["className"] ] = t["url"]
         end
 
-        [:after_save,  :after_delete, :before_delete, :before_save].each do |trigger|
+        [:after_delete, :after_save, :before_delete, :before_save].each do |trigger|
           classNames = routes[trigger].keys.dup
           if include_wildcard && classNames.include?('*') #then create the list for all classes
             classNames.delete '*' #delete the wildcard before we expand it
@@ -87,7 +87,7 @@ module Parse
             classNames.uniq!
           end
 
-          classNames.each do |className|
+          classNames.sort.each do |className|
             next if className == '*'.freeze
             url = endpoint + "#{trigger}/#{className}"
             if current_triggers[trigger][className].present? #then you may need to update
@@ -96,7 +96,7 @@ module Parse
             else
               client.create_trigger(trigger, className, url)
             end
-            puts "[Webhook] Registered #{trigger} - #{className}"
+            yield(trigger.columnize,className) if block_given?
           end
 
         end
