@@ -479,7 +479,7 @@ class Array
     # a parameter symbol can be passed indicating the lookup methodology. Default
     # is parallel which fetches all objects in parallel HTTP requests.
     # If nil is passed in, then all the fetching happens sequentially.
-    def fetch!(lookup = :parallel)
+    def fetch_objects!(lookup = :parallel)
       # this gets all valid parse objects from the array
       items = valid_parse_objects
 
@@ -497,7 +497,7 @@ class Array
     # fetches all pointer objects in the array. You can pass a symbol argument
     # that provides the lookup methodology, default is :parallel. Objects that have
     # already been fetched (not in a pointer state) are skipped.
-    def fetch(lookup = :parallel)
+    def fetch_objects(lookup = :parallel)
       items = valid_parse_objects
       if lookup == :parallel
         items.threaded_each { |o| o.fetch }

@@ -54,11 +54,11 @@ module Parse
     # them in parallel.
 
     def fetch!
-      collection.fetch!
+      collection.fetch_objects!
     end
 
     def fetch
-      collection.fetch
+      collection.fetch_objects
     end
     # Even though we may have full Parse Objects in the collection, when updating
     # or storing them in Parse, we actually just want Parse::Pointer objects.
