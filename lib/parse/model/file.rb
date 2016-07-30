@@ -116,6 +116,14 @@ module Parse
         saved?
       end
 
+      def inspect
+        "<Parse::File @name='#{@name}' @mime_type='#{@mime_type}' @contents=#{@contents.nil?} @url='#{@url}'>"
+      end
+
+      def to_s
+        @url
+      end
+
     end
 
 end
