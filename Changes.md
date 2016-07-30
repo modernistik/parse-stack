@@ -7,6 +7,7 @@
 `Parse::File.default_mime_type`.
 - Added `Parse.config` for easy access to `Parse::Client.session(:default).config`
 - Support for `Parse.auto_upgrade!` to easily upgrade all schemas.
+- You can import useful rake tasks by requiring `parse/stack/tasks` in your rake file.
 
 1.3.1
 -----------
