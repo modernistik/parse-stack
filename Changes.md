@@ -2,6 +2,7 @@
 
 1.3.2
 -----------
+- `limit` no longer defaults to 100 in `Parse::Query`. This will allow Parse-Server to determine default limit, if any.
 - Support for passing a `:session_token` as part of a Parse::Query.
 - Default mime-type for Parse::File instances is `image/jpeg`. You can override the default by setting
 `Parse::File.default_mime_type`.

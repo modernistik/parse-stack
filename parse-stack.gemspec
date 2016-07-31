@@ -39,9 +39,9 @@ Gem::Specification.new do |spec|
   spec.post_install_message = <<UPGRADE
 
 ** IMPORTANT **
- Parse::Webhook exception handling has changed in 1.3.0+. Please review Changes.md
- and README.md for changes in webhooks functions and triggers.
+ The limit field in a Parse::Query no longer defaults to 100, it must be explicitly set.
 
+ Parse::Webhook exception handling has changed in 1.3.0 and later.
  See guide: https://github.com/modernistik/parse-stack/wiki/Webhook-Migration-1.2.x-to-1.3.0
 
 UPGRADE

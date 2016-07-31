@@ -1237,17 +1237,29 @@ Equivalent to the `$select` Parse query operation. This matches a value for a ke
 
 ```ruby
 q.where :field.select => { key: "field", query: query }
-# value = { key: 'city', query: Artist.where(:fan_count.gt => 50) }
-# q.where :hometown.select => value
+
+# example
+value = { key: 'city', query: Artist.where(:fan_count.gt => 50) }
+q.where :hometown.select => value
+
+# if the local field is the same name as the foreign table field, you can omit hash
+# assumes key: 'city'
+q.where :city.select => Artist.where(:fan_count.gt => 50)
 ```
 
 #### Reject
 Equivalent to the `$dontSelect` Parse query operation. Requires that a field's value not match a value for a key in the result of a different query.
 
 ```ruby
-q.where :field.reject => { key: "field", query: query }
-# value = { key: 'city', query: Artist.where(:fan_count.gt => 50) }
-# q.where :hometown.reject => value
+q.where :field.reject => { key: :other_field, query: query }
+
+# example
+value = { key: 'city', query: Artist.where(:fan_count.gt => 50) }
+q.where :hometown.reject => value
+
+# if the local field is the same name as the foreign table field, you can omit hash
+# assumes key: 'city'
+q.where :city.reject => Artist.where(:fan_count.gt => 50)
 ```
 
 #### Matches Query

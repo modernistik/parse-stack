@@ -96,7 +96,7 @@ module Parse
       @order = []
       @keys = []
       @includes = []
-      @limit = 100
+      @limit = nil
       @skip = 0
       @table = table
       @cache = true
@@ -180,6 +180,8 @@ module Parse
         @limit = 11_000
       elsif count.is_a?(Numeric)
         @limit = [ 0, count.to_i, 11_000].sort[1]
+      else
+        @limit = nil
       end
 
       @results = nil
