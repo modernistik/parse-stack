@@ -1,10 +1,5 @@
 language: ruby
 rvm:
-  - 1.9.3
-  - 2.2.0
+  - 2.2.2
   - 2.3.0
-env:
-  - PARSE_SERVER_URL=
-  - PARSE_APP_ID=
-  - PARSE_API_KEY=
-# before_install: gem install bundler -v 1.10.6
+before_install: gem install bundler -v 1.12.5
