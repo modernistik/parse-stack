@@ -121,7 +121,7 @@ module Parse
     register :select
 
     def build
-      res = @value formatted_value
+
       # if it's a hash, then it should be {:key=>"objectId", :query=>[]}
       remote_field_name = @operation.operand
       query = nil
@@ -133,11 +133,11 @@ module Parse
           raise "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
         end
         query = query.compile(encode: false, includeClassName: true)
-      else @value.is_a?(Parse::Query)
+      elsif @value.is_a?(Parse::Query)
         # if its a query, then assume dontSelect key is the same name as operand.
         query = @value.compile(encode: false, includeClassName: true)
       else
-        raise "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'field', query: '<Parse::Query>' }"
+        raise "Invalid `:select` query constraint. It should follow the format: :field.select => { key: 'key', query: '<Parse::Query>' }"
       end
       { @operation.operand => { :$select => { key: remote_field_name, query: query } } }
     end
@@ -149,7 +149,7 @@ module Parse
     register :dont_select
     register :reject
     def build
-      res = @value formatted_value
+
       # if it's a hash, then it should be {:key=>"objectId", :query=>[]}
       remote_field_name = @operation.operand
       query = nil
@@ -161,11 +161,11 @@ module Parse
           raise "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
         end
         query = query.compile(encode: false, includeClassName: true)
-      else @value.is_a?(Parse::Query)
+      elsif @value.is_a?(Parse::Query)
         # if its a query, then assume dontSelect key is the same name as operand.
         query = @value.compile(encode: false, includeClassName: true)
       else
-        raise "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'field', query: '<Parse::Query>' }"
+        raise "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'key', query: '<Parse::Query>' }"
       end
       { @operation.operand => { :$dontSelect => { key: remote_field_name, query: query } } }
     end
@@ -221,6 +221,23 @@ module Parse
         return { @operation.operand => { key => point, :$maxDistanceInMiles => max_miles.to_f } }
       end
       { @operation.operand => { key => point } }
+    end
+
+  end
+
+  class WithinGeoBoxQueryConstraint < Constraint
+    contraint_keyword :$within
+    register :within_box
+
+    def build
+      geopoint_values = formatted_value
+      unless geopoint_values.is_a?(Array) && geopoint_values.count == 2 &&
+        geopoint_values.first.is_a?(Parse::GeoPoint) && geopoint_values.last.is_a?(Parse::GeoPoint)
+        raise( '[Parse::Query] Invalid query value parameter passed to `within_box` constraint. ' +
+                'Values in array must be `Parse::GeoPoint` objects and ' +
+                'it should be in an array format: [southwestPoint, northeastPoint]' )
+      end
+      { @operation.operand => { :$within => { :$box => geopoint_values } } }
     end
 
   end

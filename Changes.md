@@ -8,6 +8,12 @@
 - Added `Parse.config` for easy access to `Parse::Client.session(:default).config`
 - Support for `Parse.auto_upgrade!` to easily upgrade all schemas.
 - You can import useful rake tasks by requiring `parse/stack/tasks` in your rake file.
+- Changes the format in `select` and `reject` queries (see documentation).
+- Latitude and longitude values are now validated with warnings. Will raise exceptions in the future.
+- Additional alias methods for queries.
+- Added `$within` => `$box` GeoPoint query. (see documentation)
+- Improves support when using Parse-Server.
+- Major documentation updates.
 
 1.3.1
 -----------

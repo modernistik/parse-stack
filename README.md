@@ -31,7 +31,7 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
       - [Parse::File](#parsefile)
       - [Parse::Date](#parsedate)
       - [Parse::GeoPoint](#parsegeopoint)
-        - [Calculating Distances (Haversine)](#calculating-distances-haversine)
+        - [Calculating Distances between locations](#calculating-distances-between-locations)
 - [Haversine calculations](#haversine-calculations)
       - [Parse::Bytes](#parsebytes)
     - [Properties](#properties)
@@ -95,7 +95,7 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
       - [Excludes Query](#excludes-query)
       - [Geo Queries](#geo-queries)
         - [Max Distance Constraint](#max-distance-constraint)
-          - [Bounding Box Constraint (TODO)](#bounding-box-constraint-todo)
+          - [Bounding Box Constraint](#bounding-box-constraint)
           - [Relational Queries](#relational-queries)
           - [Compound Queries](#compound-queries)
   - [Hooks and Callbacks](#hooks-and-callbacks)
@@ -369,7 +369,7 @@ This class manages the GeoPoint data type that Parse provides to support geo-que
   place.save
 ```
 
-##### Calculating Distances (Haversine)
+##### Calculating Distances between locations
 We include helper methods to calculate distances between GeoPoints: `distance_in_miles` and `distance_in_km`.
 
 ```ruby
@@ -1290,12 +1290,19 @@ PlaceObject.all :location.near => geopoint.max_miles(10)
 
 We will support `$maxDistanceInKilometers` (for kms) and `$maxDistanceInRadians` (for radian angle) in the future.
 
-###### Bounding Box Constraint (TODO)
-__Coming soon__!. Equivalent to the `$within` Parse query operation and `$box` geopoint constraint.
+###### Bounding Box Constraint
+Equivalent to the `$within` Parse query operation and `$box` geopoint constraint. The rectangular bounding box is defined by a southwest point as the first parameter, followed by the a northeast point. Please note that Geo box queries that cross the international date lines are not currently supported by Parse.
 
 ```ruby
-# relational query ($relatedTo)
-q.where :field.within => [soutwestGeopoint, northwestGeoPoint]
+# GeoPoint bounding box
+q.where :field.within_box => [soutwestGeoPoint, northeastGeoPoint]
+
+# example
+sw = Parse::GeoPoint.new 32.82, -117.23 # San Diego
+ne = Parse::GeoPoint.new 36.12, -115.31 # Las Vegas
+
+# get all PlaceObjects inside this bounding box
+PlaceObject.all :location.within_box => [sw,ne]
 ```
 
 ###### Relational Queries
