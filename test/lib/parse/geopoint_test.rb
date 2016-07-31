@@ -60,6 +60,11 @@ class TestGeoPoint < Minitest::Test
     assert_equal loc2.lat, loc.latitude
     assert_equal loc2.lng,  loc.longitude
 
+    # zero on non-numeric
+    loc = Parse::GeoPoint.new "false",  true
+    assert_equal loc.latitude, 0
+    assert_equal loc.longitude, 0
+    
   end
 
   def test_equality
