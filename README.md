@@ -221,10 +221,10 @@ Calling `setup` will create the default `Parse::Client` session object that will
 ```
 
 ### Connection Options
-There are additional connection options that you may pass the setup method when creating a `Parse::Client`. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
+There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
 
 ##### `:server_url`
-The server url of your Parse-Server if you are not using the hosted Parse.com service.
+The server url of your Parse-Server if you are not using the hosted Parse.com service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
 
 ##### `:app_id`
 The Parse application id. By default it will use `PARSE_APP_ID` environment variable if not specified.
