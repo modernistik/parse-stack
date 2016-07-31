@@ -62,6 +62,7 @@ module Parse
     end
 
     def max_miles(m)
+      m = 0 if m.nil?
       [@latitude,@longitude,m]
     end
 
