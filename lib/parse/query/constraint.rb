@@ -123,8 +123,8 @@ module Parse
       #d = d.pointer if d.is_a?(Parse::Object) #simplified query object
       #  d = d.compile
       if d.is_a?(Parse::Query)
-        compiled = d.compile(false)
-        compiled["className"] = d.table
+        compiled = d.compile(encode: false, includeClassName: true)
+        # compiled["className"] = d.table
         d = compiled
       end
       d

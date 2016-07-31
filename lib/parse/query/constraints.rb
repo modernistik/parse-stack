@@ -24,29 +24,34 @@ module Parse
   class LessOrEqualConstraint < Constraint
     contraint_keyword :$lte
     register :lte
+    register :less_than_or_equal
     register :on_or_before
   end
 
   class LessThanConstraint < Constraint
     contraint_keyword :$lt
     register :lt
+    register :less_than
     register :before
   end
 
   class GreaterThanConstraint < Constraint
     contraint_keyword :$gt
     register :gt
+    register :greater_than
     register :after
   end
 
   class GreaterOrEqualConstraint < Constraint
     contraint_keyword :$gte
     register :gte
+    register :greater_than_or_equal
     register :on_or_after
   end
 
   class NotEqualConstraint < Constraint
     contraint_keyword :$ne
+    register :ne
     register :not
   end
 
@@ -98,6 +103,7 @@ module Parse
 
   class NotContainedInConstraint < Constraint
     contraint_keyword :$nin
+    register :nin
     register :not_in
     register :not_contained_in
   end
@@ -115,20 +121,53 @@ module Parse
     register :select
 
     def build
-      select_key = @value.key.present? ? @value.key : @operation.operand
-      select_query = formatted_value
-      { @operation.operand => { key => { query: select_query, key: select_key } } }
+      res = @value formatted_value
+      # if it's a hash, then it should be {:key=>"objectId", :query=>[]}
+      remote_field_name = @operation.operand
+      query = nil
+      if @value.is_a?(Hash)
+        res = @value.symbolize_keys
+        remote_field_name = res[:key] || remote_field_name
+        query = res[:query]
+        unless query.is_a?(Parse::Query)
+          raise "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
+        end
+        query = query.compile(encode: false, includeClassName: true)
+      else @value.is_a?(Parse::Query)
+        # if its a query, then assume dontSelect key is the same name as operand.
+        query = @value.compile(encode: false, includeClassName: true)
+      else
+        raise "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'field', query: '<Parse::Query>' }"
+      end
+      { @operation.operand => { :$select => { key: remote_field_name, query: query } } }
     end
   end
 
   class RejectionConstraint < Constraint
     #requires that a key's value not match a value for a key in the result of a different query
     contraint_keyword :$dontSelect
+    register :dont_select
     register :reject
     def build
-      reject_key = @value.key.present? ? @value.key : @operation.operand
-      reject_query = formatted_value
-      { @operation.operand => { key => { query: reject_query, key: reject_key } } }
+      res = @value formatted_value
+      # if it's a hash, then it should be {:key=>"objectId", :query=>[]}
+      remote_field_name = @operation.operand
+      query = nil
+      if @value.is_a?(Hash)
+        res = @value.symbolize_keys
+        remote_field_name = res[:key] || remote_field_name
+        query = res[:query]
+        unless query.is_a?(Parse::Query)
+          raise "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
+        end
+        query = query.compile(encode: false, includeClassName: true)
+      else @value.is_a?(Parse::Query)
+        # if its a query, then assume dontSelect key is the same name as operand.
+        query = @value.compile(encode: false, includeClassName: true)
+      else
+        raise "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'field', query: '<Parse::Query>' }"
+      end
+      { @operation.operand => { :$dontSelect => { key: remote_field_name, query: query } } }
     end
   end
 

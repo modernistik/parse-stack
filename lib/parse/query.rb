@@ -357,7 +357,7 @@ module Parse
       compile.as_json
     end
 
-    def compile(encode = true)
+    def compile(encode: true, includeClassName: false)
       q = {} #query
       q[:limit] = 11_000 if @limit == :max || @limit == :all
       q[:limit] = @limit if @limit.is_a?(Numeric) && @limit > 0
@@ -375,6 +375,9 @@ module Parse
         # if count is requested
         q[:limit] = 0
         q[:count] = 1
+      end
+      if includeClassName
+        q[:className] = @table
       end
       q
     end

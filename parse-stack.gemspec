@@ -6,8 +6,8 @@ require 'parse/stack/version'
 Gem::Specification.new do |spec|
   spec.name          = "parse-stack"
   spec.version       = Parse::Stack::VERSION
-  spec.authors       = ["Anthony Persaud", "Mark Storch"]
-  spec.email         = ["persaud@modernistik.com", "mark_storch@yahoo.com"]
+  spec.authors       = ["Anthony Persaud"]
+  spec.email         = ["persaud@modernistik.com"]
 
   spec.summary       = %q{Parse-Server Ruby Client and Object Relational Mapping stack}
   spec.description   = %q{Parse-Server Ruby Client, ORM, and Query engine to manage larger scale Parse server applications}

@@ -198,28 +198,31 @@ Calling `setup` will create the default `Parse::Client` session object that will
 ```
 
 ### Connection Options
-There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
+There are additional connection options that you may pass the setup method when creating a `Parse::Client`. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
+
+##### `:server_url`
+The server url of your Parse-Server if you are not using the hosted Parse.com service.
 
 ##### `:app_id`
-The Parse application id.
+The Parse application id. By default it will use `PARSE_APP_ID` environment variable if not specified.
 
 ##### `:api_key`
-The Parse REST API Key.
+The Parse REST API Key. By default it will use `PARSE_API_KEY` environment variable if not specified.
 
 ##### `:master_key` _(optional)_
-The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models.
+The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models. By default it will use `PARSE_MASTER_KEY` environment variable if not specified.
 
 ##### `:logging`
-Provides you additional logg
+A true or false value. It provides you additional logging information of requests and responses. If set to the special symbol of `:debug`, it will provide additional payload data in the log messages.
 
 ##### `:adapter`
-The connection adapter. By default it uses the `Faraday.default_adapter`.
+The connection adapter. By default it uses the `Faraday.default_adapter` which is Net/HTTP.
 
 ##### `:cache`
 A caching adapter of type `Moneta::Transformer`. Caching queries and object fetches can help improve the performance of your application, even if it is for a few seconds. Only successful `GET` object fetches and queries (non-empty) will be cached. You may set the default expiration time with the `expires` option. See related: [Moneta](https://github.com/minad/moneta). At any point in time you may clear the cache by calling the `clear_cache!` method on the client connection.
 
 ##### `:expires`
-If you are using caching, this sets the default expiration time (in seconds) for successful non-empty `GET` requests. By default, results are cached for 3 seconds.
+Sets the default cache expiration time (in seconds) for successful non-empty `GET` requests when using the caching middleware. The default value is 3 seconds. If `:expires` is set to 0, caching will be disabled. You can always clear the current state of the cache using the `clear_cache!` method on your `Parse::Client` instance.
 
 ##### `:faraday`
 You may pass a hash of options that will be passed to the `Faraday` constructor.
@@ -1070,110 +1073,223 @@ Song.all limit: 3, session_token: "<session_token>"
 The `where` clause is based on utilizing a set of constraints on the defined column names in your Parse classes. The constraints are implemented as method operators on field names that are tied to a value. Any symbol/string that is not one of the main expression keywords described here will be considered as a type of query constraint for the `where` clause in the query. See the section `Where Constraints` for examples of available query constraints.
 
 ```ruby
- # parts of a single where constraint
- { :column.constraint => value }
+# parts of a single where constraint
+{ :column.constraint => value }
 ```
 
-### Where Query Constraints
-Most of the constraints supported by Parse are available to `Parse::Query`. Assuming you have a column named `field`, here are some examples. For an explanation of the constraints, please see [Parse Query Constraints documentation](https://parse.com/docs/rest/guide#queries-query-constraints). You can build your own custom query constraints by creating a `Parse::Constraint` subclass.
+### Where Parse Query Constraints
+Most of the constraints supported by Parse are available to `Parse::Query`. Assuming you have a column named `field`, here are some examples. For an explanation of the constraints, please see [Parse Query Constraints documentation](http://parseplatform.github.io/docs/rest/guide/#queries). You can build your own custom query constraints by creating a `Parse::Constraint` subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
+
+#### Equals
+Default query constraint for matching a field to a single value.
 
 ```ruby
- q = Song.query # or Parse::Query.new("Song")
+q.where :field => value
+# (alias) :field.eq => value
+```
 
+#### Less Than
+Equivalent to the `$lt` Parse query operation. The alias `before` is provided for readability.
 
- # equals (default)
- q.where :field => value
+```ruby
+q.where :field.lt => value
+# or alias
+q.where :field.before => value
+# ex. :createdAt.before => DateTime.now
+```
 
- # less than
- q.where :field.lt => value
- # alias to `lt`; useful when dealing with dates
- q.where :field.before => value
+#### Less Than or Equal To
+Equivalent to the `$lte` Parse query operation. The alias `on_or_before` is provided for readability.
 
- # less than or equal to
- q.where :field.lte => value
- # alias to `lte`; useful when dealing with dates
- q.where :field.on_or_before => value
+```ruby
+q.where :field.lte => value
+# or alias
+q.where :field.on_or_before => value
+# ex. :createdAt.on_or_before => DateTime.now
+```
 
- # greater than
- q.where :field.gt => value
- # alias to `gt`; useful when dealing with dates
- q.where :field.after => value
+#### Greater Than
+Equivalent to the `$gt` Parse query operation. The alias `after` is provided for readability.
 
- # greater than or equal to
- q.where :field.gte => value
- # alias to `gte`; useful when dealing with dates
- q.where :field.on_or_after => value
+```ruby
+q.where :field.gt => value
+# or alias
+q.where :field.after => value
+# ex. :createdAt.after => DateTime.now
+```
 
- # Not equal to
- q.where :field.not => value
+#### Greater Than or Equal
+Equivalent to the `$gte` Parse query operation. The alias `on_or_after` is provided for readability.
 
- # is null
- q.where :field.null => true|false
+```ruby
+q.where :field.gte => value
+# or alias
+q.where :field.on_or_after => value
+# ex. :createdAt.on_or_after => DateTime.now
+```
 
- # exists
- q.where :field.exists => true|false
+#### Not Equal To
+Equivalent to the `$ne` Parse query operation. Where a particular field is not equal to value.
 
- # contained in
- q.where :field.in => [item1,item2,...]
- q.where :field.contained_in => [item1,item2,...] # alias
+```ruby
+q.where :field.not => value
+```
 
- # not contained in
- q.where :field.not_in => [item1,item2,...]
+#### Nullability Check
+Provides a mechanism using the equality operator to check for `(undefined)` values.
 
- # contains all
+```ruby
+q.where :field.null => true|false
+```
+
+#### Exists
+Equivalent to the `#exists` Parse query operation. Checks whether a value is set for key. The difference between this operation and the nullability check is when using compound queries with location.
+
+```ruby
+q.where :field.exists => true|false
+```
+
+#### Contained In
+Equivalent to the `$in` Parse query operation. Checks whether the value in the column field is contained in the set of values in the array.
+
+```ruby
+# ex. :score.in => [1,3,5,7,9]
+q.where :field.in => [item1,item2,...]
+# alias
+q.where :field.contained_in => [item1,item2,...]
+```
+
+#### Not Contained In
+Equivalent to the `$nin` Parse query operation. Checks whether the value in the column field is __not__ contained in the set of values in the array.
+
+```ruby
+# ex. :player_name.not_in => ['Jonathan', 'Dario', 'Shawn']
+q.where :field.not_in => [item1,item2,...]
+# alias
+q.where :field.not_contained_in => [item1,item2,...]
+```
+
+#### Contains All
+Equivalent to the `$all` Parse query operation. Checks whether the value in the column field contains all of the given values provided in the array. Note that the `field` column must be of type `Array` in your Parse class.
+
+```ruby
+ # ex. :array_key.all => [2,3,4]
  q.where :field.all => [item1, item2,...]
+ # alias
  q.where :field.contains_all => [item1,item2,...]
+```
 
- # regular expression
- q.where :field.like => /ruby_regex/
- q.where :field.regex => /abc/ # alias
+#### Regex Matching
+Equivalent to the `$regex` Parse query operation. Requires that a field value match a regular expression.
 
- # select
- q.where :field.select => query #with key
- # ex. q.where :city.select => Artist.where(:total_plays.gt => 50, :keys => "city")
+```ruby
+# ex. :name.like => /Bob/i
+q.where :field.like => /ruby_regex/i
+# alias
+q.where :field.regex => /abc/
+```
 
- # don't select
- q.where :field.reject => query
+#### Select
+Equivalent to the `$select` Parse query operation. This matches a value for a key in the result of a different query.
 
- # matches inQuery
- q.where :field.matches => query
- q.where :field.in_query => query # alias
+```ruby
+q.where :field.select => { key: "field", query: query }
+# value = { key: 'city', query: Artist.where(:fan_count.gt => 50) }
+# q.where :hometown.select => value
+```
 
- # notInQuery (inverse of `join`)
- q.where :field.excludes => query
- q.where :field.not_in_query => query # alias
+#### Reject
+Equivalent to the `$dontSelect` Parse query operation. Requires that a field's value not match a value for a key in the result of a different query.
 
- # near GeoPoint
- q.where :field.near => geopoint
+```ruby
+q.where :field.reject => { key: "field", query: query }
+# value = { key: 'city', query: Artist.where(:fan_count.gt => 50) }
+# q.where :hometown.reject => value
+```
 
- # near GeoPoint within max distance (miles)
- q.where :field.near => geopoint.max_miles(5)
- # or provide a triplet includes max miles constraint
- q.where :field.near => [lat,lng,miles]
+#### Matches Query
+Equivalent to the `$inQuery` Parse query operation. Useful if you want to retrieve objects where a field contains an object that matches another query.
 
- # relational query
- q.where :field.related_to => pointer
- q.where :field.rel => pointer # alias
+```ruby
+q.where :field.matches => query
+# ex. :post.matches => Post.where(:image.exists => true )
+q.where :field.in_query => query # alias
+```
 
- # OR query
+#### Excludes Query
+Equivalent to the `$notInQuery` Parse query operation. Useful if you want to retrieve objects where a field contains an object that does not match another query.
+
+```ruby
+q.where :field.excludes => query
+# ex. :post.excludes => Post.where(:image.exists => true
+q.where :field.not_in_query => query # alias
+```
+
+#### Geo Queries
+Equivalent to the `$nearSphere` Parse query operation. This is only applicable if the field is of type `GeoPoint`. This will query Parse and return a list of results ordered by distance with the nearest object being first.
+
+```ruby
+q.where :field.near => geopoint
+
+# example
+geopoint = Parse::GeoPoint.new(30.0, -20.0)
+PlaceObject.all :location.near => geopoint
+```
+
+##### Max Distance Constraint
+If you wish to constrain the geospatial query to a maximum number of __miles__, you can utilize the `max_miles` method on a `Parse::GeoPoint` object. This is equivalent to the `$maxDistanceInMiles` constraint used with `$nearSphere`.
+
+```ruby
+q.where :field.near => geopoint.max_miles(distance)
+# or provide a triplet includes max miles constraint
+q.where :field.near => [lat, lng, miles]
+
+# example
+geopoint = Parse::GeoPoint.new(30.0, -20.0)
+PlaceObject.all :location.near => geopoint.max_miles(10)
+```
+
+We will support `$maxDistanceInKilometers` (for kms) and `$maxDistanceInRadians` (for radian angle) in the future.
+
+###### Bounding Box Constraint (TODO)
+__Coming soon__!. Equivalent to the `$within` Parse query operation and `$box` geopoint constraint.
+
+```ruby
+# relational query ($relatedTo)
+q.where :field.within => [soutwestGeopoint, northwestGeoPoint]
+```
+
+###### Relational Queries
+Equivalent to the `$relatedTo` Parse query operation. If you want to retrieve objects that are members of a `Relation` field in your Parse class.
+
+```ruby
+q.where :field.related_to => pointer
+q.where :field.rel => pointer # alias
+
+# example
+# find all Users who have liked this post object
+post = Post.first
+users = Parse::User.all :likes.rel => post
+```
+
+###### Compound Queries
+Equivalent to the `$or` Parse query operation. This is useful if you want to find objects that match several queries. We overload the `|` operator in order to have a clean syntax for joining these `or` operations.
+
+```ruby
  or_query = query1 | query2 | query3 ...
+
+ # ex.
+ query = Player.where(:wins.gt => 150) | Player.where(:wins.lt => 5)
+ results = query.results
 ```
 
-## Select and Matching Queries
-Parse-Stack supports sub-select queries. These are referred to in Parse as `$select` and `$dontSelect` for columns that contain values. These are mapped to `select` and `reject` respectively in Parse-Stack. For creating sub-queries where the column field is an object or a pointer, Parse provides `$inQuery` and `$notInQuery`. These are mapped to `matches` and `excludes` respectively in Parse-Stack. To perform these types of sub-query constraints, you pass a different `Parse::Query` instance to the value of the query constraint. Using the example for `$select` from the Parse documentation where you have a class containing sports teams and you store a user's hometown in the user class, you can issue one query to find the list of users whose hometown teams have winning records as follows:
+If you do not prefer the syntax you may use the `or_where` method to chain multiple `Parse::Query` instances.
 
 ```ruby
-# assume Team class with column of `city`
-users = Parse::User.all :hometown.select => Team.where(:win_pct.gt => 0.5, :keys => :city )
-# where={"hometown":{"$select":{"query":{"className":"Team", "limit":100, "where":{"winPct":{"$gt":0.5}}},"key":"city"}}}
-# for https://api.parse.com/1/classes/_User
-```
-
-Using the `matches` and `excludes`, is similar, but are used when the field is a pointer or object. If you wanted to find all `Song` objects where the song's artist has a `city` of `San Diego` and is `approved`, you could use a `matches` query as follows:
-
-```ruby
-songs = Song.all :artist.matches => Artist.where(approved: true, city: "San Diego", limit: 1000)
-# where={"artist": {"$inQuery": {"className":"Team", "limit":1000, "where": {"winPct": {"$gt" :0.5 }}}}}
+query = Player.where(:wins.gt => 150)
+query.or_where(:wins.lt => 5)
+# where wins > 150 || wins < 5
+results = query.results
 ```
 
 ## Hooks and Callbacks
