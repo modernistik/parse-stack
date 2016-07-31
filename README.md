@@ -6,90 +6,113 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-- [Overview](#overview)
-- [Main Features](#main-features)
-- [Architecture](#architecture)
-    - [Parse::Client](#parseclient)
-    - [Parse::Query](#parsequery)
-    - [Parse::Object](#parseobject)
-    - [Parse::Webhooks](#parsewebhooks)
-- [Connection Setup](#connection-setup)
+  - [Overview](#overview)
+  - [Main Features](#main-features)
+  - [Architecture](#architecture)
+      - [Parse::Client](#parseclient)
+      - [Parse::Query](#parsequery)
+      - [Parse::Object](#parseobject)
+      - [Parse::Webhooks](#parsewebhooks)
+  - [Connection Setup](#connection-setup)
     - [Connection Options](#connection-options)
-      - [:app_id](#app_id)
-      - [:api_key](#api_key)
-      - [:master_key _(optional)_](#master_key-_optional_)
-      - [:logging](#logging)
-      - [:adapter #Faraday.default_adapter](#adapter-faradaydefault_adapter)
-      - [:cache](#cache)
-      - [:expires](#expires)
-      - [:faraday](#faraday)
-- [Modeling](#modeling)
-  - [Subclassing](#subclassing)
-  - [Other Core Classes](#other-core-classes)
-    - [Parse::Pointer](#parsepointer)
-    - [Parse::File](#parsefile)
-    - [Parse::Date](#parsedate)
-    - [Parse::GeoPoint](#parsegeopoint)
-    - [Parse::Bytes](#parsebytes)
-  - [Properties](#properties)
-        - [Accessor Aliasing](#accessor-aliasing)
-    - [Property Options](#property-options)
-        - [`:required => (true|false)`](#required--truefalse)
-        - [`:field => (string)`](#field--string)
-        - [`:default => (value|proc)`](#default--valueproc)
-        - [`:alias => (true|false)`](#alias--truefalse)
-        - [`:symbolize => (true|false)`](#symbolize--truefalse)
-    - [Overriding Property Accessors](#overriding-property-accessors)
-  - [Associations](#associations)
-    - [Belongs To](#belongs-to)
-      - [Options](#options)
-        - [`:required => (true|false)`](#required--truefalse-1)
-        - [`:as => (string)`](#as--string)
-        - [`:field => (string)`](#field--string-1)
-    - [Has Many (Array or Relation)](#has-many-array-or-relation)
-      - [Options](#options-1)
-        - [`:through => (:array|:relation)`](#through--arrayrelation)
-- [Creating, Saving and Destroying Records](#creating-saving-and-destroying-records)
-    - [Examples](#examples)
-    - [Raising an exception when save fails](#raising-an-exception-when-save-fails)
-    - [Create](#create)
-    - [Save and Update](#save-and-update)
-        - [Modifying Associations](#modifying-associations)
-      - [Magic `save_all`](#magic-save_all)
-    - [Destroy](#destroy)
-- [Fetching, Finding and Counting Records](#fetching-finding-and-counting-records)
-  - [Auto-Fetching Associations](#auto-fetching-associations)
-- [Advanced Querying](#advanced-querying)
-    - [Counting](#counting)
-    - [Compound Queries (or)](#compound-queries-or)
-    - [Results Caching](#results-caching)
-  - [Expressions](#expressions)
-      - [:order](#order)
-      - [:keys](#keys)
-      - [:includes](#includes)
-      - [:limit](#limit)
-      - [:skip](#skip)
-      - [:cache](#cache-1)
-      - [:use_master_key](#use_master_key)
-      - [:session_token](#session_token)
-      - [:where](#where)
-  - [Where Query Constraints](#where-query-constraints)
-- [Select and Matching Queries](#select-and-matching-queries)
-- [Hooks and Callbacks](#hooks-and-callbacks)
-- [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
-- [Push Notifications](#push-notifications)
-- [Webhooks](#webhooks)
-  - [Setup Cloud Code functions](#setup-cloud-code-functions)
-  - [Setup Cloud Code Triggers](#setup-cloud-code-triggers)
-  - [Mounting Webhooks Application](#mounting-webhooks-application)
-  - [Register Webhooks](#register-webhooks)
-- [Cloud Code Functions](#cloud-code-functions)
-- [Cloud Code Background Jobs](#cloud-code-background-jobs)
-- [Parse REST API Client](#parse-rest-api-client)
-      - [Options](#options-2)
-  - [Request Caching](#request-caching)
-- [Installation](#installation)
-- [Development](#development)
+        - [`:server_url`](#server_url)
+        - [`:app_id`](#app_id)
+        - [`:api_key`](#api_key)
+        - [`:master_key` _(optional)_](#master_key-_optional_)
+        - [`:logging`](#logging)
+        - [`:adapter`](#adapter)
+        - [`:cache`](#cache)
+        - [`:expires`](#expires)
+        - [`:faraday`](#faraday)
+  - [Modeling](#modeling)
+    - [Subclassing](#subclassing)
+    - [Other Core Classes](#other-core-classes)
+      - [Parse::Pointer](#parsepointer)
+      - [Parse::File](#parsefile)
+      - [Parse::Date](#parsedate)
+      - [Parse::GeoPoint](#parsegeopoint)
+        - [Calculating Distances (Haversine)](#calculating-distances-haversine)
+- [Haversine calculations](#haversine-calculations)
+      - [Parse::Bytes](#parsebytes)
+    - [Properties](#properties)
+          - [Accessor Aliasing](#accessor-aliasing)
+      - [Property Options](#property-options)
+          - [`:required => (true|false)`](#required--truefalse)
+          - [`:field => (string)`](#field--string)
+          - [`:default => (value|proc)`](#default--valueproc)
+          - [`:alias => (true|false)`](#alias--truefalse)
+          - [`:symbolize => (true|false)`](#symbolize--truefalse)
+      - [Overriding Property Accessors](#overriding-property-accessors)
+    - [Associations](#associations)
+      - [Belongs To](#belongs-to)
+        - [Options](#options)
+          - [`:required => (true|false)`](#required--truefalse-1)
+          - [`:as => (string)`](#as--string)
+          - [`:field => (string)`](#field--string-1)
+      - [Has Many (Array or Relation)](#has-many-array-or-relation)
+        - [Options](#options-1)
+          - [`:through => (:array|:relation)`](#through--arrayrelation)
+  - [Creating, Saving and Destroying Records](#creating-saving-and-destroying-records)
+      - [Examples](#examples)
+      - [Raising an exception when save fails](#raising-an-exception-when-save-fails)
+      - [Create](#create)
+      - [Save and Update](#save-and-update)
+          - [Modifying Associations](#modifying-associations)
+        - [Magic `save_all`](#magic-save_all)
+      - [Destroy](#destroy)
+  - [Fetching, Finding and Counting Records](#fetching-finding-and-counting-records)
+    - [Auto-Fetching Associations](#auto-fetching-associations)
+  - [Advanced Querying](#advanced-querying)
+      - [Counting](#counting)
+      - [Compound Queries (or)](#compound-queries-or)
+      - [Results Caching](#results-caching)
+    - [Expressions](#expressions)
+        - [:order](#order)
+        - [:keys](#keys)
+        - [:includes](#includes)
+        - [:limit](#limit)
+        - [:skip](#skip)
+        - [:cache](#cache)
+        - [:use_master_key](#use_master_key)
+        - [:session_token](#session_token)
+        - [:where](#where)
+    - [Where Parse Query Constraints](#where-parse-query-constraints)
+      - [Equals](#equals)
+      - [Less Than](#less-than)
+      - [Less Than or Equal To](#less-than-or-equal-to)
+      - [Greater Than](#greater-than)
+      - [Greater Than or Equal](#greater-than-or-equal)
+      - [Not Equal To](#not-equal-to)
+      - [Nullability Check](#nullability-check)
+      - [Exists](#exists)
+      - [Contained In](#contained-in)
+      - [Not Contained In](#not-contained-in)
+      - [Contains All](#contains-all)
+      - [Regex Matching](#regex-matching)
+      - [Select](#select)
+      - [Reject](#reject)
+      - [Matches Query](#matches-query)
+      - [Excludes Query](#excludes-query)
+      - [Geo Queries](#geo-queries)
+        - [Max Distance Constraint](#max-distance-constraint)
+          - [Bounding Box Constraint (TODO)](#bounding-box-constraint-todo)
+          - [Relational Queries](#relational-queries)
+          - [Compound Queries](#compound-queries)
+  - [Hooks and Callbacks](#hooks-and-callbacks)
+  - [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
+  - [Push Notifications](#push-notifications)
+  - [Webhooks](#webhooks)
+    - [Setup Cloud Code functions](#setup-cloud-code-functions)
+    - [Setup Cloud Code Triggers](#setup-cloud-code-triggers)
+    - [Mounting Webhooks Application](#mounting-webhooks-application)
+    - [Register Webhooks](#register-webhooks)
+  - [Cloud Code Functions](#cloud-code-functions)
+  - [Cloud Code Background Jobs](#cloud-code-background-jobs)
+  - [Parse REST API Client](#parse-rest-api-client)
+        - [Options](#options-2)
+    - [Request Caching](#request-caching)
+  - [Installation](#installation)
+  - [Development](#development)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -330,10 +353,10 @@ This class manages dates in the special JSON format it requires for properties o
 One important note with dates, is that `created_at` and `updated_at` columns do not follow this convention all the time. Depending on the Cloud Code SDK, they can be the Parse ISO hash date format or the `iso8601` string format. By default, these are serialized as `iso8601` when sent as responses to Parse for backwards compatibility with some clients. To use the Parse ISO hash format for these fields instead, set `Parse::Object.disable_serialized_string_date = true`.
 
 #### Parse::GeoPoint
-This class manages the GeoPoint data type that Parse provides to support geo-queries. To define a GeoPoint property, use the `:geopoint` data type.
+This class manages the GeoPoint data type that Parse provides to support geo-queries. To define a GeoPoint property, use the `:geopoint` data type. Please note that latitudes should not be between -90.0 and 90.0, and longitudes should be between -180.0 and 180.0.
 
 ```ruby
-  class Song < Parse::Object
+  class PlaceObject < Parse::Object
     property :location, :geopoint
   end
 
@@ -341,13 +364,29 @@ This class manages the GeoPoint data type that Parse provides to support geo-que
   los_angeles = Parse::GeoPoint.new [34.0192341, -118.970792]
   san_diego == los_angeles # false
 
-  song.location = san_diego
-
-  # Haversine calculations
-  san_diego.distance_in_miles(los_angeles) # ~112.33 miles
-  san_diego.distance_in_km(los_angeles) # ~180.793 km
-
+  place = PlaceObject.new
+  place.location = san_diego
+  place.save
 ```
+
+##### Calculating Distances (Haversine)
+We include helper methods to calculate distances between GeoPoints: `distance_in_miles` and `distance_in_km`.
+
+```ruby
+san_diego = Parse::GeoPoint.new(32.8233, -117.6542)
+los_angeles = Parse::GeoPoint.new [34.0192341, -118.970792]
+
+# Haversine calculations
+san_diego.distance_in_miles(los_angeles)
+# ~112.33 miles
+
+san_diego.distance_in_km(los_angeles)
+# ~180.793 km
+```
+
+# Haversine calculations
+san_diego.distance_in_miles(los_angeles) # ~112.33 miles
+san_diego.distance_in_km(los_angeles) # ~180.793 km
 
 #### Parse::Bytes
 The `Bytes` data type represents the storage format for binary content in a Parse column. The content is needs to be encoded into a base64 string.

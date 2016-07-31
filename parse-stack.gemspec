@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Anthony Persaud"]
   spec.email         = ["persaud@modernistik.com"]
 
-  spec.summary       = %q{Parse-Server Ruby Client and Object Relational Mapping stack}
-  spec.description   = %q{Parse-Server Ruby Client, ORM, and Query engine to manage larger scale Parse server applications}
+  spec.summary       = %q{Parse-Server Ruby Client and Active Model Object Relational Mapping}
+  spec.description   = %q{Parse-Server Ruby Client, Active Model based Data Mapper, and Query engine to manage larger scale Parse server applications}
   spec.homepage      = "https://github.com/modernistik/parse-stack"
   spec.license       = "MIT"
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
@@ -39,7 +39,7 @@ Gem::Specification.new do |spec|
   spec.post_install_message = <<UPGRADE
 
 ** IMPORTANT **
- Parse::Webhook exception handling has changed in 1.3.0. Please review Changes.md
+ Parse::Webhook exception handling has changed in 1.3.0+. Please review Changes.md
  and README.md for changes in webhooks functions and triggers.
 
  See guide: https://github.com/modernistik/parse-stack/wiki/Webhook-Migration-1.2.x-to-1.3.0
