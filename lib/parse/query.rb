@@ -78,7 +78,7 @@ module Parse
       when :skip
         @skip = 0
       when :limit
-        @limit = 100
+        @limit = nil
       when :count
         @count = 0
       when :keys
@@ -335,7 +335,7 @@ module Parse
 
     def results(raw: false)
       if @results.nil?
-        if @limit <= 1_000
+        if @limit.nil? || @limit.to_i <= 1_000
           response = fetch!( compile )
           return [] if response.error?
           items = raw ? response.results : decode(response.results)
