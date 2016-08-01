@@ -53,14 +53,14 @@ module Parse
           task :register => :verify_env do
             endpoint = ENV['HOOKS_URL']
             puts "Registering Parse Webhooks @ #{endpoint}"
-            Rake::Task['webhooks:register:functions'].invoke
-            Rake::Task['webhooks:register:triggers'].invoke
+            Rake::Task['parse:webhooks:register:functions'].invoke
+            Rake::Task['parse:webhooks:register:triggers'].invoke
           end
 
           desc "Remove all locally registered webhooks from the Parse Application"
           task :remove => :verify_env do
-            Rake::Task['webhooks:remove:functions'].invoke
-            Rake::Task['webhooks:remove:triggers'].invoke
+            Rake::Task['parse:webhooks:remove:functions'].invoke
+            Rake::Task['parse:webhooks:remove:triggers'].invoke
           end
 
           namespace :register do
