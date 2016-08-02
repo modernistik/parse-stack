@@ -37,20 +37,16 @@ module Parse
     class << self
       #field formatter getters and setters.
       attr_accessor :field_formatter
-
-      def field_formatter
-        #default
-        @field_formatter ||= :columnize
-      end
+      @field_formatter = :columnize # default
 
       def format_field(str)
-        res = str.to_s
+        res = str.to_s.strip
         if field_formatter.present?
           formatter = field_formatter.to_sym
           # don't format if object d
           res = res.send(formatter) if res.respond_to?(formatter)
         end
-        res.strip
+        res
       end
 
       # Simple way to create a query.
@@ -357,6 +353,10 @@ module Parse
 
     def as_json(*args)
       compile.as_json
+    end
+
+    def prepared(includeClassName: false)
+      compile(encode: false, includeClassName: includeClassName)
     end
 
     def compile(encode: true, includeClassName: false)

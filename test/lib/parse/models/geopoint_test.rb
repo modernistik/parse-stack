@@ -1,4 +1,4 @@
-require_relative '../../test_helper'
+require_relative '../../../test_helper'
 
 class TestGeoPoint < Minitest::Test
   SD = {lat: 32.8233, lng: -117.6542}
@@ -64,7 +64,7 @@ class TestGeoPoint < Minitest::Test
     loc = Parse::GeoPoint.new "false",  true
     assert_equal loc.latitude, 0
     assert_equal loc.longitude, 0
-    
+
   end
 
   def test_equality

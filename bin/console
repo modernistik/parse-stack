@@ -4,6 +4,11 @@ require "bundler/setup"
 require "parse/stack"
 require 'dotenv'
 Dotenv.load
+
+
+class Song < Parse::Object
+  property :name
+end
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
 
