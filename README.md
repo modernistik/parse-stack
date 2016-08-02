@@ -19,15 +19,6 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
   - [Parse::Webhooks](#parsewebhooks)
 - [Connection Setup](#connection-setup)
   - [Connection Options](#connection-options)
-    - [`:server_url`](#server_url)
-    - [`:app_id`](#app_id)
-    - [`:api_key`](#api_key)
-    - [`:master_key` _(optional)_](#master_key-_optional_)
-    - [`:logging`](#logging)
-    - [`:adapter`](#adapter)
-    - [`:cache`](#cache)
-    - [`:expires`](#expires)
-    - [`:faraday`](#faraday)
 - [Core Classes](#core-classes)
   - [Parse::Pointer](#parsepointer)
   - [Parse::File](#parsefile)
@@ -39,21 +30,9 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
   - [Defining Properties](#defining-properties)
     - [Accessor Aliasing](#accessor-aliasing)
     - [Property Options](#property-options)
-      - [`:required => (true|false)`](#required--truefalse)
-      - [`:field => (string)`](#field--string)
-      - [`:default => (value|proc)`](#default--valueproc)
-      - [`:alias => (true|false)`](#alias--truefalse)
-      - [`:symbolize => (true|false)`](#symbolize--truefalse)
-      - [Overriding Property Accessors](#overriding-property-accessors)
   - [Associations](#associations)
     - [Belongs To](#belongs-to)
-      - [Options](#options)
-        - [`:required => (true|false)`](#required--truefalse-1)
-        - [`:as => (string)`](#as--string)
-        - [`:field => (string)`](#field--string-1)
     - [Has Many (Array or Relation)](#has-many-array-or-relation)
-      - [Options](#options-1)
-        - [`:through => (:array|:relation)`](#through--arrayrelation)
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
   - [Saving](#saving)
@@ -76,7 +55,7 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
     - [:cache](#cache)
     - [:use_master_key](#use_master_key)
     - [:session_token](#session_token)
-      - [:where](#where)
+    - [:where](#where)
 - [Query Constraints](#query-constraints)
     - [Equals](#equals)
     - [Less Than](#less-than)
@@ -99,7 +78,9 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
     - [Bounding Box Constraint](#bounding-box-constraint)
   - [Relational Queries](#relational-queries)
   - [Compound Queries](#compound-queries)
-- [Active Model Hooks and Callbacks](#active-model-hooks-and-callbacks)
+- [Cloud Code Functions](#cloud-code-functions)
+- [Cloud Code Background Jobs](#cloud-code-background-jobs)
+- [Hooks and Callbacks](#hooks-and-callbacks)
 - [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
 - [Push Notifications](#push-notifications)
 - [Cloud Code Webhooks](#cloud-code-webhooks)
@@ -107,8 +88,6 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
   - [Cloud Code Triggers](#cloud-code-triggers)
   - [Mounting Webhooks Application](#mounting-webhooks-application)
   - [Register Webhooks](#register-webhooks)
-- [Calling Cloud Code Functions](#calling-cloud-code-functions)
-- [Calling Cloud Code Background Jobs](#calling-cloud-code-background-jobs)
 - [Parse REST API Client](#parse-rest-api-client)
       - [Options](#options-2)
   - [Request Caching](#request-caching)
@@ -1106,7 +1085,7 @@ A Parse session token string. If you would like to perform a query as a particul
 Song.all limit: 3, session_token: "<session_token>"
 ```
 
-##### :where
+#### :where
 The `where` clause is based on utilizing a set of constraints on the defined column names in your Parse classes. The constraints are implemented as method operators on field names that are tied to a value. Any symbol/string that is not one of the main expression keywords described here will be considered as a type of query constraint for the `where` clause in the query. See the section `Query Constraints` for examples of available query constraints.
 
 ```ruby
@@ -1348,7 +1327,33 @@ query.or_where(:wins.lt => 5)
 results = query.results
 ```
 
-## Active Model Hooks and Callbacks
+## Cloud Code Functions
+You can call on your defined Cloud Code functions using the `call_function()` method. The result will be `nil` in case of errors or the value of the `result` field in the Parse response.
+
+```ruby
+ params = {}
+ # use the explicit name of the function
+ result = Parse.call_function 'functionName', params
+
+ # to get the raw Response object
+ response = Parse.call_function 'functionName', params, raw: true
+ response.result unless response.error?
+```
+
+## Cloud Code Background Jobs
+You can trigger background jobs that you have configured in your Parse application as follows.
+
+```ruby
+ params = {}
+ # use explicit name of the job
+ result = Parse.trigger_job :myJobName, params
+
+ # to get the raw Response object
+ response = Parse.trigger_job :myJobName, params, raw: true
+ response.result unless response.error?
+```
+
+## Hooks and Callbacks
 All `Parse::Object` subclasses extend [`ActiveModel::Callbacks`](http://api.rubyonrails.org/classes/ActiveModel/Callbacks.html) for `#save` and `#destroy` operations. You can setup internal hooks for `before`, `during` and `after`. See
 
 ```ruby
@@ -1569,32 +1574,6 @@ However, we have predefined a few rake tasks you can use in your application. Ju
 ```
 
 Then you can see the tasks available by typing `rake -T`.
-
-## Calling Cloud Code Functions
-You can call on your defined Cloud Code functions using the `call_function()` method. The result will be `nil` in case of errors or the value of the `result` field in the Parse response.
-
-```ruby
- params = {}
- # use the explicit name of the function
- result = Parse.call_function 'functionName', params
-
- # to get the raw Response object
- response = Parse.call_function 'functionName', params, raw: true
- response.result unless response.error?
-```
-
-## Calling Cloud Code Background Jobs
-You can trigger background jobs that you have configured in your Parse application as follows.
-
-```ruby
- params = {}
- # use explicit name of the job
- result = Parse.trigger_job :myJobName, params
-
- # to get the raw Response object
- response = Parse.trigger_job :myJobName, params, raw: true
- response.result unless response.error?
-```
 
 ## Parse REST API Client
 While in most cases you do not have to work with `Parse::Client` directly, you can still utilize it for any raw requests that are not supported by the framework. We provide support for most of the [Parse REST API](https://parse.com/docs/rest/guide#quick-reference) endpoints as helper methods, however you can use the `request()` method to make your own API requests. Parse::Client will handle header authentication, request/response generation and caching.
