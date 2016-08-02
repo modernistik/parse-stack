@@ -10,113 +10,110 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
 
-  - [Overview](#overview)
-  - [Main Features](#main-features)
-  - [Architecture](#architecture)
-      - [Parse::Client](#parseclient)
-      - [Parse::Query](#parsequery)
-      - [Parse::Object](#parseobject)
-      - [Parse::Webhooks](#parsewebhooks)
-  - [Connection Setup](#connection-setup)
-    - [Connection Options](#connection-options)
-        - [`:server_url`](#server_url)
-        - [`:app_id`](#app_id)
-        - [`:api_key`](#api_key)
-        - [`:master_key` _(optional)_](#master_key-_optional_)
-        - [`:logging`](#logging)
-        - [`:adapter`](#adapter)
-        - [`:cache`](#cache)
-        - [`:expires`](#expires)
-        - [`:faraday`](#faraday)
-  - [Modeling](#modeling)
-    - [Subclassing](#subclassing)
-    - [Other Core Classes](#other-core-classes)
-      - [Parse::Pointer](#parsepointer)
-      - [Parse::File](#parsefile)
-      - [Parse::Date](#parsedate)
-      - [Parse::GeoPoint](#parsegeopoint)
-        - [Calculating Distances between locations](#calculating-distances-between-locations)
-- [Haversine calculations](#haversine-calculations)
-      - [Parse::Bytes](#parsebytes)
-    - [Properties](#properties)
-          - [Accessor Aliasing](#accessor-aliasing)
-      - [Property Options](#property-options)
-          - [`:required => (true|false)`](#required--truefalse)
-          - [`:field => (string)`](#field--string)
-          - [`:default => (value|proc)`](#default--valueproc)
-          - [`:alias => (true|false)`](#alias--truefalse)
-          - [`:symbolize => (true|false)`](#symbolize--truefalse)
+- [Overview](#overview)
+- [Main Features](#main-features)
+- [Architecture](#architecture)
+  - [Parse::Client](#parseclient)
+  - [Parse::Query](#parsequery)
+  - [Parse::Object](#parseobject)
+  - [Parse::Webhooks](#parsewebhooks)
+- [Connection Setup](#connection-setup)
+  - [Connection Options](#connection-options)
+    - [`:server_url`](#server_url)
+    - [`:app_id`](#app_id)
+    - [`:api_key`](#api_key)
+    - [`:master_key` _(optional)_](#master_key-_optional_)
+    - [`:logging`](#logging)
+    - [`:adapter`](#adapter)
+    - [`:cache`](#cache)
+    - [`:expires`](#expires)
+    - [`:faraday`](#faraday)
+- [Core Classes](#core-classes)
+  - [Parse::Pointer](#parsepointer)
+  - [Parse::File](#parsefile)
+  - [Parse::Date](#parsedate)
+  - [Parse::GeoPoint](#parsegeopoint)
+    - [Calculating Distances between locations](#calculating-distances-between-locations)
+  - [Parse::Bytes](#parsebytes)
+- [Modeling and Subclassing](#modeling-and-subclassing)
+  - [Defining Properties](#defining-properties)
+    - [Accessor Aliasing](#accessor-aliasing)
+    - [Property Options](#property-options)
+      - [`:required => (true|false)`](#required--truefalse)
+      - [`:field => (string)`](#field--string)
+      - [`:default => (value|proc)`](#default--valueproc)
+      - [`:alias => (true|false)`](#alias--truefalse)
+      - [`:symbolize => (true|false)`](#symbolize--truefalse)
       - [Overriding Property Accessors](#overriding-property-accessors)
-    - [Associations](#associations)
-      - [Belongs To](#belongs-to)
-        - [Options](#options)
-          - [`:required => (true|false)`](#required--truefalse-1)
-          - [`:as => (string)`](#as--string)
-          - [`:field => (string)`](#field--string-1)
-      - [Has Many (Array or Relation)](#has-many-array-or-relation)
-        - [Options](#options-1)
-          - [`:through => (:array|:relation)`](#through--arrayrelation)
-  - [Creating, Saving and Destroying Records](#creating-saving-and-destroying-records)
-      - [Examples](#examples)
-      - [Raising an exception when save fails](#raising-an-exception-when-save-fails)
-      - [Create](#create)
-      - [Save and Update](#save-and-update)
-          - [Modifying Associations](#modifying-associations)
-        - [Magic `save_all`](#magic-save_all)
-      - [Destroy](#destroy)
-  - [Fetching, Finding and Counting Records](#fetching-finding-and-counting-records)
-    - [Auto-Fetching Associations](#auto-fetching-associations)
-  - [Advanced Querying](#advanced-querying)
-      - [Counting](#counting)
-      - [Compound Queries (or)](#compound-queries-or)
-      - [Results Caching](#results-caching)
-    - [Expressions](#expressions)
-        - [:order](#order)
-        - [:keys](#keys)
-        - [:includes](#includes)
-        - [:limit](#limit)
-        - [:skip](#skip)
-        - [:cache](#cache)
-        - [:use_master_key](#use_master_key)
-        - [:session_token](#session_token)
-        - [:where](#where)
-    - [Where Parse Query Constraints](#where-parse-query-constraints)
-      - [Equals](#equals)
-      - [Less Than](#less-than)
-      - [Less Than or Equal To](#less-than-or-equal-to)
-      - [Greater Than](#greater-than)
-      - [Greater Than or Equal](#greater-than-or-equal)
-      - [Not Equal To](#not-equal-to)
-      - [Nullability Check](#nullability-check)
-      - [Exists](#exists)
-      - [Contained In](#contained-in)
-      - [Not Contained In](#not-contained-in)
-      - [Contains All](#contains-all)
-      - [Regex Matching](#regex-matching)
-      - [Select](#select)
-      - [Reject](#reject)
-      - [Matches Query](#matches-query)
-      - [Excludes Query](#excludes-query)
-      - [Geo Queries](#geo-queries)
-        - [Max Distance Constraint](#max-distance-constraint)
-          - [Bounding Box Constraint](#bounding-box-constraint)
-          - [Relational Queries](#relational-queries)
-          - [Compound Queries](#compound-queries)
-  - [Hooks and Callbacks](#hooks-and-callbacks)
-  - [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
-  - [Push Notifications](#push-notifications)
-  - [Webhooks](#webhooks)
-    - [Setup Cloud Code functions](#setup-cloud-code-functions)
-    - [Setup Cloud Code Triggers](#setup-cloud-code-triggers)
-    - [Mounting Webhooks Application](#mounting-webhooks-application)
-    - [Register Webhooks](#register-webhooks)
-  - [Cloud Code Functions](#cloud-code-functions)
-  - [Cloud Code Background Jobs](#cloud-code-background-jobs)
-  - [Parse REST API Client](#parse-rest-api-client)
-        - [Options](#options-2)
-    - [Request Caching](#request-caching)
-  - [Installation](#installation)
-  - [Development](#development)
+  - [Associations](#associations)
+    - [Belongs To](#belongs-to)
+      - [Options](#options)
+        - [`:required => (true|false)`](#required--truefalse-1)
+        - [`:as => (string)`](#as--string)
+        - [`:field => (string)`](#field--string-1)
+    - [Has Many (Array or Relation)](#has-many-array-or-relation)
+      - [Options](#options-1)
+        - [`:through => (:array|:relation)`](#through--arrayrelation)
+- [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
+  - [Create](#create)
+  - [Saving](#saving)
+    - [Raising an exception when save fails](#raising-an-exception-when-save-fails)
+  - [Modifying Associations](#modifying-associations)
+  - [Batch Save Requests](#batch-save-requests)
+  - [Magic `save_all`](#magic-save_all)
+  - [Deleting](#deleting)
+- [Fetching, Finding and Counting Records](#fetching-finding-and-counting-records)
+  - [Auto-Fetching Associations](#auto-fetching-associations)
+- [Advanced Querying](#advanced-querying)
+  - [Results Caching](#results-caching)
+  - [Counting](#counting)
+  - [Query Expressions](#query-expressions)
+    - [:order](#order)
+    - [:keys](#keys)
+    - [:includes](#includes)
+    - [:limit](#limit)
+    - [:skip](#skip)
+    - [:cache](#cache)
+    - [:use_master_key](#use_master_key)
+    - [:session_token](#session_token)
+      - [:where](#where)
+- [Query Constraints](#query-constraints)
+    - [Equals](#equals)
+    - [Less Than](#less-than)
+    - [Less Than or Equal To](#less-than-or-equal-to)
+    - [Greater Than](#greater-than)
+    - [Greater Than or Equal](#greater-than-or-equal)
+    - [Not Equal To](#not-equal-to)
+    - [Nullability Check](#nullability-check)
+    - [Exists](#exists)
+    - [Contained In](#contained-in)
+    - [Not Contained In](#not-contained-in)
+    - [Contains All](#contains-all)
+    - [Regex Matching](#regex-matching)
+    - [Select](#select)
+    - [Reject](#reject)
+    - [Matches Query](#matches-query)
+    - [Excludes Query](#excludes-query)
+  - [Geo Queries](#geo-queries)
+    - [Max Distance Constraint](#max-distance-constraint)
+    - [Bounding Box Constraint](#bounding-box-constraint)
+  - [Relational Queries](#relational-queries)
+  - [Compound Queries](#compound-queries)
+- [Active Model Hooks and Callbacks](#active-model-hooks-and-callbacks)
+- [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
+- [Push Notifications](#push-notifications)
+- [Cloud Code Webhooks](#cloud-code-webhooks)
+  - [Cloud Code functions](#cloud-code-functions)
+  - [Cloud Code Triggers](#cloud-code-triggers)
+  - [Mounting Webhooks Application](#mounting-webhooks-application)
+  - [Register Webhooks](#register-webhooks)
+- [Calling Cloud Code Functions](#calling-cloud-code-functions)
+- [Calling Cloud Code Background Jobs](#calling-cloud-code-background-jobs)
+- [Parse REST API Client](#parse-rest-api-client)
+      - [Options](#options-2)
+  - [Request Caching](#request-caching)
+- [Installation](#installation)
+- [Development](#development)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -175,26 +172,28 @@ While there are many additional features of the framework, these are the main po
 
 - Object Relational Mapping with dirty tracking.
 - Easy management of Parse GeoPoints, Files and ACLs.
-- Queries support with caching middleware. (Reduces API usage)
+- Parse Queries support with caching middleware. (Reduces API usage)
 - Support for all Parse data types.
 - One-to-One, One-to-Many and Many-to-Many relations.
 - Integration with Parse Cloud Code Webhooks.
 - Send Push notifications with advanced targeting.
 - Schema upgrades and migrations.
+- Rake tasks for webhook registrations.
+- Some special magic with :save_all and :max limit fetch.
 
 ## Architecture
 The architecture of `Parse::Stack` is broken into four main components.
 
-#### Parse::Client
+### Parse::Client
 This class is the core and low level API for the Parse SDK REST interface that is used by the other components. It can manage multiple sessions, which means you can have multiple client instances pointing to different Parse Applications at the same time. It handles sending raw requests as well as providing Request/Response objects for all API handlers. The connection engine is Faraday, which means it is open to add any additional middleware for features you'd like to implement.
 
-#### Parse::Query
+### Parse::Query
 This class implements the [Parse REST Querying](https://parse.com/docs/rest/guide#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
 
-#### Parse::Object
+### Parse::Object
 This component is main class for all object relational mapping subclasses for your application. It provides features in order to map your remote Parse records to a local ruby object. It implements the Active::Model interface to provide a lot of additional features, CRUD operations, querying, including dirty tracking, JSON serialization, save/destroy callbacks and others. While we are overlooking some functionality, for simplicity, you will mainly be working with Parse::Object as your superclass. While not required, it is highly recommended that you define a model (Parse::Object subclass) for all the Parse classes in your application.
 
-#### Parse::Webhooks
+### Parse::Webhooks
 Parse provides a feature called [Cloud Code Webhooks](http://blog.parse.com/announcements/introducing-cloud-code-webhooks/). For most applications, save/delete triggers and cloud functions tend to be implemented by Parse's own hosted Javascript solution called Cloud Code. However, Parse provides the ability to have these hooks utilize your hosted solution instead of their own, since their environment is limited in terms of resources and tools. If you are using the open source [Parse Server](https://github.com/ParsePlatform/parse-server), you must enable this hooks feature by enabling the environment variable `PARSE_EXPERIMENTAL_HOOKS_ENABLED` on your Parse server.
 
 ## Connection Setup
@@ -227,56 +226,38 @@ Calling `setup` will create the default `Parse::Client` session object that will
 ### Connection Options
 There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
 
-##### `:server_url`
+#### `:server_url`
 The server url of your Parse-Server if you are not using the hosted Parse.com service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
 
-##### `:app_id`
+#### `:app_id`
 The Parse application id. By default it will use `PARSE_APP_ID` environment variable if not specified.
 
-##### `:api_key`
+#### `:api_key`
 The Parse REST API Key. By default it will use `PARSE_API_KEY` environment variable if not specified.
 
-##### `:master_key` _(optional)_
+#### `:master_key` _(optional)_
 The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models. By default it will use `PARSE_MASTER_KEY` environment variable if not specified.
 
-##### `:logging`
+#### `:logging`
 A true or false value. It provides you additional logging information of requests and responses. If set to the special symbol of `:debug`, it will provide additional payload data in the log messages.
 
-##### `:adapter`
+#### `:adapter`
 The connection adapter. By default it uses the `Faraday.default_adapter` which is Net/HTTP.
 
-##### `:cache`
+#### `:cache`
 A caching adapter of type `Moneta::Transformer`. Caching queries and object fetches can help improve the performance of your application, even if it is for a few seconds. Only successful `GET` object fetches and queries (non-empty) will be cached. You may set the default expiration time with the `expires` option. See related: [Moneta](https://github.com/minad/moneta). At any point in time you may clear the cache by calling the `clear_cache!` method on the client connection.
 
-##### `:expires`
+#### `:expires`
 Sets the default cache expiration time (in seconds) for successful non-empty `GET` requests when using the caching middleware. The default value is 3 seconds. If `:expires` is set to 0, caching will be disabled. You can always clear the current state of the cache using the `clear_cache!` method on your `Parse::Client` instance.
 
-##### `:faraday`
+#### `:faraday`
 You may pass a hash of options that will be passed to the `Faraday` constructor.
 
-## Modeling
-For the general case, your Parse classes should inherit from `Parse::Object`. `Parse::Object` utilizes features from `ActiveModel` to add several features to each instance of your subclass. These include `Dirty`, `Conversion`, `Callbacks`, `Naming` and `Serializers::JSON`.
 
-To get started use the `property` and `has_many` methods to setup declarations for your fields. Properties define literal values that are columns in your Parse class. These can be any of the base Parse data types. You will not need to define classes for the basic Parse class types - this includes "\_User", "\_Installation", "\_Session" and "\_Role". These are mapped to `Parse::User`, `Parse::Installation`, `Parse::Session` and `Parse::Role` respectively.
-
-### Subclassing
-To get started, you define your classes based on `Parse::Object`. By default, the name of the class is used as the name of the remote Parse class. For a class `Post`, we will assume there is a remote camel-cased Parse table called `Post`. If you need to map the local class name to a different remote class, use the `parse_class` method.
-
-```ruby
-class Post < Parse::Object
-	# assumes Parse class "Post"
-end
-
-class Commentary < Parse::Object
-	# set remote class "Comment"
-	parse_class "Comment"
-end
-```
-
-### Other Core Classes
+## Core Classes
 While some native data types are similar to the ones supported by Ruby natively, other ones are more complex and require their dedicated classes.
 
-#### Parse::Pointer
+### Parse::Pointer
 An important concept is the `Parse::Pointer` class. This is the superclass of `Parse::Object` and represents the pointer type in Parse. A `Parse::Pointer` only contains data about the specific Parse class and the `id` for the object. Therefore, creating an instance of any Parse::Object subclass with only the `:id` field set will be considered in "pointer" state even though its specific class is not `Parse::Pointer` type. The only case that you may have a Parse::Pointer is in the case where an object was received for one of your classes and the framework has no registered class handler for it. Using the example above, assume you have the tables `Post`, `Comment` and `Author` defined in your remote Parse application, but have only defined `Post` and `Commentary` locally.
 
 ```ruby
@@ -304,7 +285,7 @@ comment.author # <Parse::Pointer @parse_class="Author", @id="hZLbW6ofKC">
 
 The effect is that for any unknown classes that the framework encounters, it will generate Parse::Pointer instances until you define those classes with valid properties and associations. While this might be ok for some classes you do not use, we still recommend defining all your Parse classes locally in the framework.
 
-#### Parse::File
+### Parse::File
 This class represents a Parse file pointer. `Parse::File` has helper methods to upload Parse files directly to Parse and manage file associations with your classes. Using our Song class example:
 
 ```ruby
@@ -345,7 +326,7 @@ The default MIME type for all files is `iamge/jpeg`. This can be default can be 
   file = Parse::File.new parse_file
 ```
 
-#### Parse::Date
+### Parse::Date
 This class manages dates in the special JSON format it requires for properties of type `:date`. `Parse::Date` subclasses `DateTime`, which allows you to use any features or methods available to `DateTime` with `Parse::Date`. While the conversion between `Time` and `DateTime` objects to a `Parse::Date` object is done implicitly for you, you can use the added special methods, `DateTime#parse_date` and `Time#parse_date`, for special occasions.
 
 ```ruby
@@ -356,7 +337,7 @@ This class manages dates in the special JSON format it requires for properties o
 
 One important note with dates, is that `created_at` and `updated_at` columns do not follow this convention all the time. Depending on the Cloud Code SDK, they can be the Parse ISO hash date format or the `iso8601` string format. By default, these are serialized as `iso8601` when sent as responses to Parse for backwards compatibility with some clients. To use the Parse ISO hash format for these fields instead, set `Parse::Object.disable_serialized_string_date = true`.
 
-#### Parse::GeoPoint
+### Parse::GeoPoint
 This class manages the GeoPoint data type that Parse provides to support geo-queries. To define a GeoPoint property, use the `:geopoint` data type. Please note that latitudes should not be between -90.0 and 90.0, and longitudes should be between -180.0 and 180.0.
 
 ```ruby
@@ -373,7 +354,7 @@ This class manages the GeoPoint data type that Parse provides to support geo-que
   place.save
 ```
 
-##### Calculating Distances between locations
+#### Calculating Distances between locations
 We include helper methods to calculate distances between GeoPoints: `distance_in_miles` and `distance_in_km`.
 
 ```ruby
@@ -388,11 +369,7 @@ san_diego.distance_in_km(los_angeles)
 # ~180.793 km
 ```
 
-# Haversine calculations
-san_diego.distance_in_miles(los_angeles) # ~112.33 miles
-san_diego.distance_in_km(los_angeles) # ~180.793 km
-
-#### Parse::Bytes
+### Parse::Bytes
 The `Bytes` data type represents the storage format for binary content in a Parse column. The content is needs to be encoded into a base64 string.
 
 ```ruby
@@ -404,7 +381,25 @@ The `Bytes` data type represents the storage format for binary content in a Pars
   decoded = bytes.decoded # same as Base64.decode64
 ```
 
-### Properties
+## Modeling and Subclassing
+For the general case, your Parse classes should inherit from `Parse::Object`. `Parse::Object` utilizes features from `ActiveModel` to add several features to each instance of your subclass. These include `Dirty`, `Conversion`, `Callbacks`, `Naming` and `Serializers::JSON`.
+
+To get started use the `property` and `has_many` methods to setup declarations for your fields. Properties define literal values that are columns in your Parse class. These can be any of the base Parse data types. You will not need to define classes for the basic Parse class types - this includes "\_User", "\_Installation", "\_Session" and "\_Role". These are mapped to `Parse::User`, `Parse::Installation`, `Parse::Session` and `Parse::Role` respectively.
+
+To get started, you define your classes based on `Parse::Object`. By default, the name of the class is used as the name of the remote Parse class. For a class `Post`, we will assume there is a remote camel-cased Parse table called `Post`. If you need to map the local class name to a different remote class, use the `parse_class` method.
+
+```ruby
+class Post < Parse::Object
+	# assumes Parse class "Post"
+end
+
+class Commentary < Parse::Object
+	# set remote class "Comment"
+	parse_class "Comment"
+end
+```
+
+### Defining Properties
 Properties are considered a literal-type of association. This means that a defined local property maps directly to a column name for that remote Parse class which contain the value. **All properties are implicitly formatted to map to a lower-first camelcase version in Parse (remote).** Therefore a local property defined as `like_count`, would be mapped to the remote column of `likeCount` automatically. The only special behavior to this rule is the `:id` property which maps to `objectId` in Parse. This implicit conversion mapping is the default behavior, but can be changed on a per-property basis. All Parse data types are supported and all Parse::Object subclasses already provide definitions for `:id` (objectId), `:created_at` (createdAt), `:updated_at` (updatedAt) and `:acl` (ACL) properties.
 
 - **:string** (_default_) - a generic string.
@@ -479,7 +474,7 @@ post.tags.remove "stuff"
 post.save # commit changes
 ```
 
-###### Accessor Aliasing
+#### Accessor Aliasing
 To enable easy conversion between incoming Parse attributes, which may be different than the locally labeled attribute, we make use of aliasing accessors with their remote field names. As an example, for a `Post` instance and its `publish_date` property, it would have an accessor defined for both `publish_date` and `publishDate` (or whatever value you passed as the `:field` option) that map to the same attribute. We highly discourage turning off this feature, but if you need to, you can pass the value of `false` to the `:alias` option when defining the property.
 
 ```ruby
@@ -495,13 +490,13 @@ post.SEO # the alias method since 'field: "SEO"'
 #### Property Options
 These are the supported options when defining properties. Parse::Objects are backed by `ActiveModel`, which means you can add additional validations and features supported by that library.
 
-###### `:required => (true|false)`
+##### `:required => (true|false)`
 This option provides information to the property builder that it is a required property. The requirement is not strongly enforced for a save, which means even though the value for the property may not be present, saves and updates can be successfully performed. However, the setting `required` to true, it will set some ActiveModel validations on the property to be used when calling `valid?`. By default it will add a `validates_presence_of` for the property key. If the data type of the property is either `:integer` or `:float`, it will also add a `validates_numericality_of` validation. Default `false`.
 
-###### `:field => (string)`
+##### `:field => (string)`
 This option allows you to set the name of the remote column for the Parse table. Using this will explicitly set the remote property name to the value of this option. The value provided for this option will affect the name of the alias method that is generated when `alias` option is used. **By default, the name of the remote column is the lower-first camelcase version of the property name. As an example, for a property with key `:my_property_name`, the framework will implicitly assume that the remote column is `myPropertyName`.**
 
-###### `:default => (value|proc)`
+##### `:default => (value|proc)`
 This option provides you to set a default value for a specific property when the getter accessor method is used and the internal value of the instance object's property is nil. It can either take a literal value or a Proc/lambda.
 
 ```ruby
@@ -512,10 +507,11 @@ class SomeClass < Parse::Object
 	property :date, default: lambda { |x| DateTime.now }
 end
 ```
-###### `:alias => (true|false)`
+
+##### `:alias => (true|false)`
 It is highly recommended that this is set to true, which is the default. This option allows for the generation of the additional accessors with the value of `:field`. By allowing two accessors methods, aliased to each other, allows for easier importing and automatic object instantiation based on Parse object JSON data into the Parse::Object subclass.
 
-###### `:symbolize => (true|false)`
+##### `:symbolize => (true|false)`
 This option is only available for fields with data type of `:string`. This allows you to utilize the values for this property as symbols instead of the literal strings, which is Parse's storage format. This feature is useful if a particular property represents a set of enumerable states described in string form. As an example, if you have a `Post` object which has a set of publish states stored in Parse as "draft","scheduled", and "published" - we can use ruby symbols to make our code easier.
 
 ```ruby
@@ -532,7 +528,7 @@ if post.state == :draft
 end
 ```
 
-#### Overriding Property Accessors
+##### Overriding Property Accessors
 When a `property` is defined, special accessors are created for it. It is not recommended that you override the generated accessors for the properties you have defined.
 
 ### Associations
@@ -674,10 +670,8 @@ Options for `has_many` are the same as the `belongs_to` counterpart with support
 ###### `:through => (:array|:relation)`
 This sets the type of the `has_many` relation. If `:relation` is set, it tells the framework that the column defined is of type Parse Relation. The default value is `:array`, which defines the column in Parse as being an array of Parse pointer objects.
 
-## Creating, Saving and Destroying Records
+## Creating, Saving and Deleting Records
 This section provides some of the basic methods when creating, updating and deleting objects from Parse. To illustrate the various methods available for saving Parse records, we use this example class:
-
-#### Examples
 
 ```ruby
 
@@ -696,21 +690,7 @@ class Song < Parse::Object
 end
 ```
 
-#### Raising an exception when save fails
-By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::SaveFailureError`.
-
-```ruby
-	Parse::Model.raise_on_save_failure = true # globally across all models
-	Song.raise_on_save_failure = true          # per-model
-
-  # or per-instance raise on failure
-  song.save!
-
-```
-
-When enabled, if an error is returned by Parse due to saving or destroying a record, due to your `before_save` or `before_delete` validation cloud code triggers, `Parse::Object` will return the a `Parse::SaveFailureError` exception type. This exception has an instance method of `#object` which contains the object that failed to save.
-
-#### Create
+### Create
 To create a new object you can call `#new` while passing a hash of attributes you want to set. You can then use the property accessors to also modify individual properties. As you modify properties, you can access dirty tracking state and data using the generated [`ActiveModel::Dirty`](http://api.rubyonrails.org/classes/ActiveModel/Dirty.html) features. When you are ready to commit the new object to Parse, you can call `#save`.
 
 ```ruby
@@ -766,7 +746,7 @@ The above will search for a Song with name 'Long Way Home'. If it does not find 
 
 In the above case, if a Song is not found with name 'Long Way Home', the new instance will be created with `name` set to 'Other Way Home' and `released` set to `DateTime.now`.
 
-#### Save and Update
+### Saving
 To commit a new record or changes to an existing record to Parse, use the `#save` method. The method will automatically detect whether it is a new object or an existing one and call the appropriate workflow. The use of ActiveModel dirty tracking allows us to send only the changes that were made to the object when saving. **Saving a record will take care of both saving all the changed properties, and associations. However, any modified linked objects (ex. belongs_to) need to be saved independently.**
 
 ```ruby
@@ -795,7 +775,21 @@ To commit a new record or changes to an existing record to Parse, use the `#save
 
 The save operation can handle both creating and updating existing objects. If you do not want to update the association data of a changed object, you may use the `#update` method to only save the changed property values. In the case where you want to force update an object even though it has not changed, to possibly trigger your `before_save` hooks, you can use the `#update!` method.
 
-###### Modifying Associations
+#### Raising an exception when save fails
+By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::SaveFailureError`.
+
+```ruby
+	Parse::Model.raise_on_save_failure = true # globally across all models
+	Song.raise_on_save_failure = true          # per-model
+
+  # or per-instance raise on failure
+  song.save!
+
+```
+
+When enabled, if an error is returned by Parse due to saving or destroying a record, due to your `before_save` or `before_delete` validation cloud code triggers, `Parse::Object` will return the a `Parse::SaveFailureError` exception type. This exception has an instance method of `#object` which contains the object that failed to save.
+
+### Modifying Associations
 Similar to `:array` types of properties, a `has_many` association is backed by a collection proxy class and requires the use of `#add` and `#remove` to modify the contents of the association in order for it to correctly manage changes and updates with Parse. Using `has_many` for associations has the additional functionality that we will only add items to the association if they are of a `Parse::Pointer` or `Parse::Object` type. By default, these associations are fetched with only pointer data. To fetch all the objects in the association, you can call `#fetch` or `#fetch!` on the collection. Note that because the framework supports chaining, it is better to only request the objects you need by utilizing their accessors.
 
 ```ruby
@@ -856,7 +850,20 @@ The `has_many` Parse Relation associations are handled similarly as in the array
 
 ```
 
-##### Magic `save_all`
+### Batch Save Requests
+Batch requests are supported implicitly and intelligently through an extension of array. When an array of `Parse::Object` subclasses is saved, Parse-Stack will batch all possible save operations for the objects in the array that have changed. It will also batch save 50 at a time until all items in the array are saved. *Note: Parse does not allow batch saving Parse::User objects.*
+
+```ruby
+songs = Songs.first 1000 #first 1000 songs
+songs.each do |song|
+  .... modify them ...
+end
+
+# will batch save 50 items at a time until all are saved.
+songs.save
+```
+
+### Magic `save_all`
 By default, all Parse queries have a maximum fetch limit of 1000. While using the `:max` option, `Parse::Stack` can increase this up to 11,000. In the cases where you need to update a large number of objects, you can utilize the `Parse::Object#save_all` method
 to fetch, modify and save objects.
 
@@ -871,7 +878,7 @@ This methodology works by continually fetching and saving older records related 
   end
 ```
 
-#### Destroy
+### Deleting
 You can destroy a Parse record, just call the `#destroy` method. It will return a boolean value whether it was successful.
 
 ```ruby
@@ -986,34 +993,7 @@ For large results set where you may want to operate on objects and may not need 
 
 ```
 
-#### Counting
-If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead. As a reminder, there are a few [caveats to counting records as detailed by Parse](https://parse.com/docs/rest/guide#queries-counting-objects).
-
-```ruby
- # get number of songs with a play_count > 10
- Song.count :play_count.gt => 10
-
- # same
- query = Parse::Query.new("Song")
- query.where :play_count.gt => 10
- query.count
-
-```
-
-#### Compound Queries (or)
-If you want to find objects that are from one of several queries, you can combine them in an "or" clause using the `|` operator.
-
-```ruby
- # use | for combining queries
- or_query = query1 | query2 | query3.....
-
- # Find songs whose like count is < 10 OR greater than 100
- or_query = Song.query(:like_count.gt < 10) | Song.query(:like_count.gt > 100)
- results = or_query.results
-
-```
-
-#### Results Caching
+### Results Caching
 When a query API is made, the results are cached in the query object in case you need access to the results multiple times. This is only true as long as no modifications to the query parameters are made. You can force clear the locally stored results by calling `clear()` on the query instance.
 
 ```ruby
@@ -1030,10 +1010,24 @@ When a query API is made, the results are cached in the query object in case you
 
 ```
 
-### Expressions
+### Counting
+If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead. As a reminder, there are a few [caveats to counting records as detailed by Parse](https://parse.com/docs/rest/guide#queries-counting-objects).
+
+```ruby
+ # get number of songs with a play_count > 10
+ Song.count :play_count.gt => 10
+
+ # same
+ query = Parse::Query.new("Song")
+ query.where :play_count.gt => 10
+ query.count
+
+```
+
+### Query Expressions
 The set of supported expressions based on what is available through the Parse REST API. _For those who don't prefer the DataMapper style syntax, we have provided method accessors for each of the expressions._
 
-##### :order
+#### :order
 Specify a field to sort by.
 
 ```ruby
@@ -1045,7 +1039,7 @@ Specify a field to sort by.
  Song.all :order => [:like_count.desc, :name]
 ```
 
-##### :keys
+#### :keys
 Restrict the fields returned by the query. This is useful for larger query results set where some of the data will not be used, which reduces network traffic and deserialization performance. _Use this feature with caution when working with the results, as values for the fields not specified in the query will be omitted in the resulting object._
 
 ```ruby
@@ -1056,7 +1050,7 @@ Restrict the fields returned by the query. This is useful for larger query resul
  Song.all :keys => [:name,:artist]
 ```
 
-##### :includes
+#### :includes
 Use on Pointer columns to return the full object. You may chain multiple columns with the `.` operator.
 
 ```ruby
@@ -1071,7 +1065,7 @@ Use on Pointer columns to return the full object. You may chain multiple columns
 
 ```
 
-##### :limit
+#### :limit
 Limit the number of objects returned by the query. The default is 100, with Parse allowing a maximum of 1000. The framework also allows a value of `:max`. Utilizing this will have the framework continually intelligently utilize `:skip` to continue to paginate through results until an empty result set is received or the `:skip` limit is reached (10,000). When utilizing `all()`, `:max` is the default option for `:limit`.
 
 ```ruby
@@ -1080,7 +1074,7 @@ Limit the number of objects returned by the query. The default is 100, with Pars
  Song.all :limit => :max # up to 11,000 records (theoretical).
 ```
 
-##### :skip
+#### :skip
 Use with limit to paginate through results. Default is 0 with maximum value being 10,000.
 
 ```ruby
@@ -1088,7 +1082,7 @@ Use with limit to paginate through results. Default is 0 with maximum value bein
  Song.all :limit => 3, :skip => 10
 ```
 
-##### :cache
+#### :cache
 A true/false value. If you are using the built-in caching middleware, `Parse::Middleware::Caching`, it will prevent it from using a previously cached result if available. The default value is `true`.
 
 ```ruby
@@ -1096,7 +1090,7 @@ A true/false value. If you are using the built-in caching middleware, `Parse::Mi
 Song.all limit: 3, cache: false
 ```
 
-##### :use_master_key
+#### :use_master_key
 A true/false value. If you provided a master key as part of `Parse.setup()`, it will be sent on every request. However, if you wish to disable sending the master key on a particular request in order for the record ACLs to be enforced, you may pass `false`. If `false` is passed, caching will be disabled for this request.
 
 ```ruby
@@ -1104,7 +1098,7 @@ A true/false value. If you provided a master key as part of `Parse.setup()`, it 
 Song.all limit: 3, use_master_key: false
 ```
 
-##### :session_token
+#### :session_token
 A Parse session token string. If you would like to perform a query as a particular user, you may pass their session token in the query. This will make sure that the query is performed on behalf (and with the priviledges) of that user which will cause record ACLs to be enforced. If a session token is provided, caching will be disabled for this request.
 
 ```ruby
@@ -1113,14 +1107,14 @@ Song.all limit: 3, session_token: "<session_token>"
 ```
 
 ##### :where
-The `where` clause is based on utilizing a set of constraints on the defined column names in your Parse classes. The constraints are implemented as method operators on field names that are tied to a value. Any symbol/string that is not one of the main expression keywords described here will be considered as a type of query constraint for the `where` clause in the query. See the section `Where Constraints` for examples of available query constraints.
+The `where` clause is based on utilizing a set of constraints on the defined column names in your Parse classes. The constraints are implemented as method operators on field names that are tied to a value. Any symbol/string that is not one of the main expression keywords described here will be considered as a type of query constraint for the `where` clause in the query. See the section `Query Constraints` for examples of available query constraints.
 
 ```ruby
 # parts of a single where constraint
 { :column.constraint => value }
 ```
 
-### Where Parse Query Constraints
+## Query Constraints
 Most of the constraints supported by Parse are available to `Parse::Query`. Assuming you have a column named `field`, here are some examples. For an explanation of the constraints, please see [Parse Query Constraints documentation](http://parseplatform.github.io/docs/rest/guide/#queries). You can build your own custom query constraints by creating a `Parse::Constraint` subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
 
 #### Equals
@@ -1280,7 +1274,7 @@ q.where :field.excludes => query
 q.where :field.not_in_query => query # alias
 ```
 
-#### Geo Queries
+### Geo Queries
 Equivalent to the `$nearSphere` Parse query operation. This is only applicable if the field is of type `GeoPoint`. This will query Parse and return a list of results ordered by distance with the nearest object being first.
 
 ```ruby
@@ -1291,7 +1285,7 @@ geopoint = Parse::GeoPoint.new(30.0, -20.0)
 PlaceObject.all :location.near => geopoint
 ```
 
-##### Max Distance Constraint
+#### Max Distance Constraint
 If you wish to constrain the geospatial query to a maximum number of __miles__, you can utilize the `max_miles` method on a `Parse::GeoPoint` object. This is equivalent to the `$maxDistanceInMiles` constraint used with `$nearSphere`.
 
 ```ruby
@@ -1306,7 +1300,7 @@ PlaceObject.all :location.near => geopoint.max_miles(10)
 
 We will support `$maxDistanceInKilometers` (for kms) and `$maxDistanceInRadians` (for radian angle) in the future.
 
-###### Bounding Box Constraint
+#### Bounding Box Constraint
 Equivalent to the `$within` Parse query operation and `$box` geopoint constraint. The rectangular bounding box is defined by a southwest point as the first parameter, followed by the a northeast point. Please note that Geo box queries that cross the international date lines are not currently supported by Parse.
 
 ```ruby
@@ -1321,7 +1315,7 @@ ne = Parse::GeoPoint.new 36.12, -115.31 # Las Vegas
 PlaceObject.all :location.within_box => [sw,ne]
 ```
 
-###### Relational Queries
+### Relational Queries
 Equivalent to the `$relatedTo` Parse query operation. If you want to retrieve objects that are members of a `Relation` field in your Parse class.
 
 ```ruby
@@ -1334,15 +1328,15 @@ post = Post.first
 users = Parse::User.all :likes.rel => post
 ```
 
-###### Compound Queries
+### Compound Queries
 Equivalent to the `$or` Parse query operation. This is useful if you want to find objects that match several queries. We overload the `|` operator in order to have a clean syntax for joining these `or` operations.
 
 ```ruby
- or_query = query1 | query2 | query3 ...
+or_query = query1 | query2 | query3 ...
 
- # ex.
- query = Player.where(:wins.gt => 150) | Player.where(:wins.lt => 5)
- results = query.results
+# ex. where wins > 150 || wins < 5
+query = Player.where(:wins.gt => 150) | Player.where(:wins.lt => 5)
+results = query.results
 ```
 
 If you do not prefer the syntax you may use the `or_where` method to chain multiple `Parse::Query` instances.
@@ -1354,7 +1348,7 @@ query.or_where(:wins.lt => 5)
 results = query.results
 ```
 
-## Hooks and Callbacks
+## Active Model Hooks and Callbacks
 All `Parse::Object` subclasses extend [`ActiveModel::Callbacks`](http://api.rubyonrails.org/classes/ActiveModel/Callbacks.html) for `#save` and `#destroy` operations. You can setup internal hooks for `before`, `during` and `after`. See
 
 ```ruby
@@ -1416,10 +1410,10 @@ Push notifications are implemented through the `Parse::Push` class. To send push
 
 ```
 
-## Webhooks
+## Cloud Code Webhooks
 Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks. If you are using the open source [Parse Server](https://github.com/ParsePlatform/parse-server), you must enable this hooks feature by enabling the environment variable `PARSE_EXPERIMENTAL_HOOKS_ENABLED` on your Parse server.
 
-### Setup Cloud Code functions
+### Cloud Code functions
 You can use the `route()` method to register handler blocks. The last value returned by the block will be returned back to the client in a success response. If `error!(value)` is called inside the block, we will return the correct Parse error response with the value you provided.
 
 ```ruby
@@ -1455,7 +1449,7 @@ end
 
 ```
 
-### Setup Cloud Code Triggers
+### Cloud Code Triggers
 You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete` and `:after_delete`. The `payload` object, which is an instance of `Parse::Payload`, contains several properties that represent the payload. One of the most important ones is `parse_object`, which will provide you with the instance of your specific Parse object. In `:before_save` triggers, this object already contains dirty tracking information of what has been changed.
 
 ```ruby
@@ -1576,7 +1570,7 @@ However, we have predefined a few rake tasks you can use in your application. Ju
 
 Then you can see the tasks available by typing `rake -T`.
 
-## Cloud Code Functions
+## Calling Cloud Code Functions
 You can call on your defined Cloud Code functions using the `call_function()` method. The result will be `nil` in case of errors or the value of the `result` field in the Parse response.
 
 ```ruby
@@ -1589,7 +1583,7 @@ You can call on your defined Cloud Code functions using the `call_function()` me
  response.result unless response.error?
 ```
 
-## Cloud Code Background Jobs
+## Calling Cloud Code Background Jobs
 You can trigger background jobs that you have configured in your Parse application as follows.
 
 ```ruby
