@@ -384,7 +384,7 @@ Properties are considered a literal-type of association. This means that a defin
 - **:string** (_default_) - a generic string.
 - **:integer** - basic number.
 - **:float** - a floating numeric value.
-- **:boolean** - true/false value.
+- **:boolean** - true/false value. (_alias: `:bool`_).
 - **:date** - a Parse date type. Maps to `Parse::Date`.
 - **:array** - a collection of heterogeneous items. Maps to `Parse::CollectionProxy`.
 - **:file** - a Parse file type. Maps to `Parse::File`.

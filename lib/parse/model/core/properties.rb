@@ -99,6 +99,9 @@ module Parse
           opts.merge!(data_type)
           data_type = :string
         end
+
+        # allow :bool for :boolean
+        data_type = :boolean if data_type == :bool
         # set defaults
         opts = { required: false,
                  alias: true,
