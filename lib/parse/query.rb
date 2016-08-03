@@ -34,21 +34,19 @@ module Parse
     # in lower case). You can specify a different method to call by setting the Parse::Query.field_formatter
     # variable with the symbol name of the method to call on the object. You can set this to nil
     # if you do not want any field formatting to be performed.
-
+    @field_formatter = :columnize
     class << self
       #field formatter getters and setters.
       attr_accessor :field_formatter
+      #
+      # def field_formatter
+      #   @field_formatter ||= :columnize # default
+      # end
 
-      def field_formatter
-        @field_formatter ||= :columnize # default
-      end
-      
       def format_field(str)
         res = str.to_s.strip
-        if field_formatter.present?
-          formatter = field_formatter.to_sym
-          # don't format if object d
-          res = res.send(formatter) if res.respond_to?(formatter)
+        if field_formatter.present? && res.respond_to?(field_formatter)
+          res = res.send(field_formatter)
         end
         res
       end
