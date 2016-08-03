@@ -8,7 +8,7 @@ class CommentObject < Parse::Object; end;
 
 class TestParseQuery < Minitest::Test
   extend Minitest::Spec::DSL
-  
+
   def setup
     Parse::Query.field_formatter = :columnize
     @query = Parse::Query.new("Song")
@@ -30,11 +30,11 @@ class TestParseQuery < Minitest::Test
     @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
     clause = {"fanCount"=>0, "playCount"=>0, "shareCount"=>0, "testName" => 1}
     assert_equal clause, @query.compile_where
-    Parse::Query.field_formatter = nil
-    @query.clear :where
-    @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
-    clause = {"fan_count"=>0, "playCount"=>0, "ShareCount"=>0, "test_name" => 1}
-    assert_equal clause, @query.compile_where
+    # Parse::Query.field_formatter = nil
+    # @query.clear :where
+    # @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
+    # clause = {"fan_count"=>0, "playCount"=>0, "ShareCount"=>0, "test_name" => 1}
+    # assert_equal clause, @query.compile_where
     Parse::Query.field_formatter = :camelize
     @query.clear :where
     @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
