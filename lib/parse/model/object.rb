@@ -332,6 +332,11 @@ module Parse
     def self.logout(session_token)
       client.logout_user(session_token)
     end
+
+    def self.facebook_auth(fb_id, access_token, expiration_date)
+      auth_data = {:facebook => {:id => fb_id, :access_token => access_token, :expiration_date => expiration_date}}
+      client.auth_user(auth_data)
+    end
   end
 
   class Installation < Parse::Object

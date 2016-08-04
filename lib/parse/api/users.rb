@@ -12,6 +12,8 @@ module Parse
       USER_CLASS = "_User".freeze
       USERNAME_PARAM = "username".freeze
       PASSWORD_PARAM = "password".freeze
+      AUTHDATA_PARAM = "authData".freeze
+      
       def fetch_user(id)
         request :get, "#{USER_PATH_PREFIX}/#{id}"
       end
@@ -55,6 +57,13 @@ module Parse
 
       def logout_user(session_token)
         request :post, "#{USER_LOGOUT_PATH_PREFIX}", opts: {session_token: session_token}
+      end
+
+      def auth_user(auth_data)
+        body = {"#{AUTHDATA_PARAM}": auth_data}
+        response = request :post, "#{USER_PATH_PREFIX}", body: body, opts: {use_master_key: false, cache: false}
+        response.parse_class = USER_CLASS
+        response
       end
     end # Users
 
