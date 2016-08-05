@@ -1,5 +1,5 @@
 module Parse
   module Stack
-    VERSION = "1.3.4"
+    VERSION = "1.3.5"
   end
 end

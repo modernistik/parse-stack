@@ -175,6 +175,27 @@ This component is main class for all object relational mapping subclasses for yo
 ### Parse::Webhooks
 Parse provides a feature called [Cloud Code Webhooks](http://blog.parse.com/announcements/introducing-cloud-code-webhooks/). For most applications, save/delete triggers and cloud functions tend to be implemented by Parse's own hosted Javascript solution called Cloud Code. However, Parse provides the ability to have these hooks utilize your hosted solution instead of their own, since their environment is limited in terms of resources and tools. If you are using the open source [Parse Server](https://github.com/ParsePlatform/parse-server), you must enable this hooks feature by enabling the environment variable `PARSE_EXPERIMENTAL_HOOKS_ENABLED` on your Parse server.
 
+## Field Naming Conventions
+By convention in Ruby (see [Style Guide](https://github.com/bbatsov/ruby-style-guide#snake-case-symbols-methods-vars)), symbols and variables are expressed in lower_snake_case form. Parse, however, prefers column names in **lower-first camel case** (ex. `objectId`, `createdAt` and `updatedAt`). To keep in line with the style guides between the languages, we do the automatic conversion of the field names when compiling the query. As an additional exception to this rule, the field key of `id` will automatically be converted to the `objectId` field when used. If you do not want this to happen, you can turn off or change the value `Parse::Query.field_formatter` as shown below. Though we recommend leaving the default `:columnize` if possible.
+
+```ruby
+# default uses :columnize
+query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+query.compile_where # {"fieldOne"=>1, "fieldTwo"=>2, "fieldThree"=>3}
+
+# turn off
+Parse::Query.field_formatter = nil
+query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+query.compile_where # {"field_one"=>1, "FieldTwo"=>2, "Field_Three"=>3}
+
+# force everything camel case
+Parse::Query.field_formatter = :camelize
+query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+query.compile_where # {"FieldOne"=>1, "FieldTwo"=>2, "FieldThree"=>3}
+
+```
+
+
 ## Connection Setup
 To connect to a Parse server, you will need a minimum of an `application_id`, an `api_key` and a `server_url`. To connect to the server endpoint, you use the `Parse.setup()` method below.
 
@@ -933,14 +954,20 @@ This also works for all associations types.
 The `Parse::Query` class provides the lower-level querying interface for your Parse tables using the default `Parse::Client` session created when `setup()` was called. This component can be used on its own without defining your models as all results are provided in hash form. By convention in Ruby (see [Style Guide](https://github.com/bbatsov/ruby-style-guide#snake-case-symbols-methods-vars)), symbols and variables are expressed in lower_snake_case form. Parse, however, prefers column names in **lower-first camel case** (ex. `objectId`, `createdAt` and `updatedAt`). To keep in line with the style guides between the languages, we do the automatic conversion of the field names when compiling the query. As an additional exception to this rule, the field key of `id` will automatically be converted to the `objectId` field when used. This feature can be overridden by changing the value of `Parse::Query.field_formatter`.
 
 ```ruby
-  # default
-  Parse::Query.field_formatter = :columnize
+# default uses :columnize
+query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+query.compile_where # {"fieldOne"=>1, "fieldTwo"=>2, "fieldThree"=>3}
 
-  # turn off
-  Parse::Query.field_formatter = nil
+# turn off
+Parse::Query.field_formatter = nil
+query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+query.compile_where # {"field_one"=>1, "FieldTwo"=>2, "Field_Three"=>3}
 
-  # force everything camel case
-  Parse::Query.field_formatter = :camelize
+# force everything camel case
+Parse::Query.field_formatter = :camelize
+query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+query.compile_where # {"FieldOne"=>1, "FieldTwo"=>2, "FieldThree"=>3}
+
 ```
 
 Simplest way to perform query, is to pass the Parse class as the first parameter and the set of expressions.
@@ -950,7 +977,10 @@ Simplest way to perform query, is to pass the Parse class as the first parameter
  # or with Object classes
  query = Song.query({ .. expressions ..})
 
- # Examples
+ # Print the prepared query
+ query.prepared
+
+ # Get results
  query.results # get results as Parse::Object(s)
  query.results(raw: true) # get the raw hash results
 

@@ -38,10 +38,6 @@ module Parse
     class << self
       #field formatter getters and setters.
       attr_accessor :field_formatter
-      #
-      # def field_formatter
-      #   @field_formatter ||= :columnize # default
-      # end
 
       def format_field(str)
         res = str.to_s.strip

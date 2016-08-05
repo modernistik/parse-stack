@@ -10,8 +10,7 @@ class TestParseQuery < Minitest::Test
   extend Minitest::Spec::DSL
 
   def setup
-    Parse::Query.field_formatter = :columnize
-    @query = Parse::Query.new("Song")
+   @query = Parse::Query.new("Song")
   end
 
   def test_columnize

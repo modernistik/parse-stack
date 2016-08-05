@@ -1,8 +1,7 @@
 # Parse-Stack Changes
 
-1.3.2
+1.3.5
 -----------
-- `limit` no longer defaults to 100 in `Parse::Query`. This will allow Parse-Server to determine default limit, if any.
 - Support for passing a `:session_token` as part of a Parse::Query.
 - Default mime-type for Parse::File instances is `image/jpeg`. You can override the default by setting
 `Parse::File.default_mime_type`.
@@ -15,6 +14,10 @@
 - Added `$within` => `$box` GeoPoint query. (see documentation)
 - Improves support when using Parse-Server.
 - Major documentation updates.
+- `limit` no longer defaults to 100 in `Parse::Query`. This will allow Parse-Server to determine default limit, if any. (1.3.4)
+- `:bool` property type has been added as an alias to `:boolean`. (1.3.5)
+- You can turn off formatting field names with `Parse::Query.field_formatter = nil`. (1.3.5)
+
 
 1.3.1
 -----------
