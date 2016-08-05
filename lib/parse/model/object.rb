@@ -321,6 +321,17 @@ module Parse
       self.class.logout(session_token)
     end
 
+    def link_facebook(fb_id, access_token, expiration_date)
+      return if new?
+      auth_data = {:facebook => {:id => fb_id, :access_token => access_token, :expiration_date => expiration_date}}
+      client.link_user(@id, auth_data)
+    end
+
+    def unlink_facebook
+      return if new?
+      client.unlink_user(@id, "facebook", session_token)
+    end
+
     def self.login(username, password)
       client.login_user(username, password)
     end

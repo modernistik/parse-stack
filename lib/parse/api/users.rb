@@ -13,7 +13,7 @@ module Parse
       USERNAME_PARAM = "username".freeze
       PASSWORD_PARAM = "password".freeze
       AUTHDATA_PARAM = "authData".freeze
-      
+
       def fetch_user(id)
         request :get, "#{USER_PATH_PREFIX}/#{id}"
       end
@@ -56,7 +56,7 @@ module Parse
       end
 
       def logout_user(session_token)
-        request :post, "#{USER_LOGOUT_PATH_PREFIX}", opts: {session_token: session_token}
+        request :post, "#{USER_LOGOUT_PATH_PREFIX}", opts: {use_master_key: false, cache: false, session_token: session_token}
       end
 
       def auth_user(auth_data)
@@ -64,6 +64,16 @@ module Parse
         response = request :post, "#{USER_PATH_PREFIX}", body: body, opts: {use_master_key: false, cache: false}
         response.parse_class = USER_CLASS
         response
+      end
+
+      def link_user(id, auth_data)
+        body = {"#{AUTHDATA_PARAM}": auth_data}
+        request :put, "#{USER_PATH_PREFIX}/#{id}", body: body, opts: {use_master_key: false, cache: false}
+      end
+
+      def unlink_user(id, service_name, session_token)
+        body = {"#{AUTHDATA_PARAM}": {"#{service_name}": nil}}
+        request :put, "#{USER_PATH_PREFIX}/#{id}", body: body, opts: {use_master_key: false, cache: false, session_token: session_token}
       end
     end # Users
 
