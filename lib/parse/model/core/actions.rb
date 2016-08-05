@@ -95,11 +95,11 @@ module Parse
         # updated_comparison_block = Proc.new { |x| x.updated_at }
 
         anchor_date = Parse::Date.now
-        constraints.merge! :updated_at.lte => anchor_date
+        constraints.merge! :updated_at.on_or_before => anchor_date
         # oldest first, so we create a reduction-cycle
         constraints.merge! order: :updated_at.asc, limit: 100
         update_query = query(constraints)
-        puts "Setting Anchor Date: #{anchor_date}"
+        #puts "Setting Anchor Date: #{anchor_date}"
         cursor = nil
         has_errors = false
         loop do
@@ -109,7 +109,7 @@ module Parse
 
           # verify we didn't get duplicates fetches
           if cursor.is_a?(Parse::Object) && results.any? { |x| x.id == cursor.id }
-            warn "Unbounded update detected - stopping."
+            warn "[Parse::SaveAll] Unbounded update detected with id #{cursor.id}."
             has_errors = true
             break cursor
           end
@@ -124,13 +124,13 @@ module Parse
           cursor = results.last
           # slower version, but more accurate
           # cursor_item = results.max_by(&updated_comparison_block).updated_at
-          puts "Updated #{results.count} records updated <= #{cursor.updated_at}"
+          # puts "[Parse::SaveAll] Updated #{results.count} records updated <= #{cursor.updated_at}"
 
           if cursor.is_a?(Parse::Object)
             update_query.where :updated_at.gte => cursor.updated_at
 
             if cursor.updated_at.present? && cursor.updated_at > anchor_date
-              warn "Reached anchor date limit - stopping."
+              warn "[Parse::SaveAll] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
               break cursor
             end
 
