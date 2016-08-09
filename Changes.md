@@ -1,8 +1,9 @@
 # Parse-Stack Changes
 
-1.3.6
+1.3.7
 -----------
 - Fixes json_api loading issue between ruby json and active_model_serializers.
+- Fixes loading active_support core extensions.
 
 1.3.5
 -----------
