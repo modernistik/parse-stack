@@ -4,9 +4,6 @@
 -----------
 - Fixes json_api loading issue between ruby json and active_model_serializers.
 - Fixes loading active_support core extensions.
-
-1.3.5
------------
 - Support for passing a `:session_token` as part of a Parse::Query.
 - Default mime-type for Parse::File instances is `image/jpeg`. You can override the default by setting
 `Parse::File.default_mime_type`.
@@ -19,9 +16,9 @@
 - Added `$within` => `$box` GeoPoint query. (see documentation)
 - Improves support when using Parse-Server.
 - Major documentation updates.
-- `limit` no longer defaults to 100 in `Parse::Query`. This will allow Parse-Server to determine default limit, if any. (1.3.4)
-- `:bool` property type has been added as an alias to `:boolean`. (1.3.5)
-- You can turn off formatting field names with `Parse::Query.field_formatter = nil`. (1.3.5)
+- `limit` no longer defaults to 100 in `Parse::Query`. This will allow Parse-Server to determine default limit, if any.
+- `:bool` property type has been added as an alias to `:boolean`.
+- You can turn off formatting field names with `Parse::Query.field_formatter = nil`.
 
 
 1.3.1
