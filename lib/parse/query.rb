@@ -3,6 +3,9 @@ require_relative "query/operation"
 require_relative "query/constraints"
 require_relative "query/ordering"
 require 'active_model_serializers'
+require 'active_support'
+require 'active_support/inflector'
+require 'active_support/core_ext'
 
 module Parse
   # This is the main engine behind making Parse queries on tables. It takes

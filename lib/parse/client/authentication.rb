@@ -1,5 +1,7 @@
 require 'faraday'
 require 'faraday_middleware'
+require 'active_support'
+require 'active_support/core_ext'
 
 require_relative 'protocol'
 # All Parse requests require authentication with specific header values.
