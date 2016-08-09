@@ -28,8 +28,8 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 2.2.2'
 
   spec.add_runtime_dependency "activemodel", [">= 4.2.1", "< 6"]
-  spec.add_runtime_dependency "activesupport", [">= 4.2.1", "< 6"]
   spec.add_runtime_dependency "active_model_serializers", [">= 0.9", "< 1"]
+  spec.add_runtime_dependency "activesupport", [">= 4.2.1", "< 6"]
   spec.add_runtime_dependency "parallel", [">= 1.6", "< 2"]
   spec.add_runtime_dependency "faraday", [">= 0.8", "< 1"]
   spec.add_runtime_dependency "faraday_middleware", [">= 0.9", "< 1"]

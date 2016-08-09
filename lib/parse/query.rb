@@ -2,7 +2,7 @@ require_relative "client"
 require_relative "query/operation"
 require_relative "query/constraints"
 require_relative "query/ordering"
-require 'json'
+require 'active_model_serializers'
 
 module Parse
   # This is the main engine behind making Parse queries on tables. It takes

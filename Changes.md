@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.3.6
+-----------
+- Fixes json_api loading issue between ruby json and active_model_serializers.
+
 1.3.5
 -----------
 - Support for passing a `:session_token` as part of a Parse::Query.

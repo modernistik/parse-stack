@@ -1,6 +1,6 @@
 require_relative '../query.rb'
 require_relative '../client.rb'
-require 'json'
+require 'active_model_serializers'
 module Parse
 
   class Push
