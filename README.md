@@ -1196,7 +1196,7 @@ q.where :field.exists => true|false
 ```
 
 #### Contained In
-Equivalent to the `$in` Parse query operation. Checks whether the value in the column field is contained in the set of values in the array.
+Equivalent to the `$in` Parse query operation. Checks whether the value in the column field is contained in the set of values in the target array. If the field is an array data type, it checks whether at least one value in the field array is contained in the set of values in the target array.
 
 ```ruby
 # ex. :score.in => [1,3,5,7,9]
@@ -1206,7 +1206,7 @@ q.where :field.contained_in => [item1,item2,...]
 ```
 
 #### Not Contained In
-Equivalent to the `$nin` Parse query operation. Checks whether the value in the column field is __not__ contained in the set of values in the array.
+Equivalent to the `$nin` Parse query operation. Checks whether the value in the column field is __not__ contained in the set of values in the target array. If the field is an array data type, it checks whether at least one value in the field array is __not__ contained in the set of values in the target array.
 
 ```ruby
 # ex. :player_name.not_in => ['Jonathan', 'Dario', 'Shawn']
@@ -1216,7 +1216,7 @@ q.where :field.not_contained_in => [item1,item2,...]
 ```
 
 #### Contains All
-Equivalent to the `$all` Parse query operation. Checks whether the value in the column field contains all of the given values provided in the array. Note that the `field` column must be of type `Array` in your Parse class.
+Equivalent to the `$all` Parse query operation. Checks whether the value in the column field contains all of the given values provided in the array. Note that the `field` column should be of type `Array` in your Parse class.
 
 ```ruby
  # ex. :array_key.all => [2,3,4]

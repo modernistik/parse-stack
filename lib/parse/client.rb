@@ -89,9 +89,9 @@ module Parse
     # :host - defaults to Parse::Protocol::SERVER_URL (https://api.parse.com/1/)
     def initialize(opts = {})
       @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
-      @application_id = opts[:app_id] || opts[:application_id] || ENV["PARSE_APP_ID"]
+      @application_id = opts[:app_id] || opts[:application_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_SERVER_APPLICATION_ID']
       @api_key        = opts[:api_key] || ENV["PARSE_API_KEY"]
-      @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"]
+      @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"] || ENV['PARSE_SERVER_MASTER_KEY']
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
       if @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
