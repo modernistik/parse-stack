@@ -5,6 +5,11 @@ module Parse
     #object fetch methods
     module Config
       attr_accessor :config
+      
+      def config!
+        @config = nil
+        self.config
+      end
 
       def config
         if @config.nil?

@@ -214,7 +214,7 @@ module Parse
             generic_result = Parse::Webhooks.call_route(payload.trigger_name, "*", payload)
             result = generic_result if generic_result.present? && result.nil?
           else
-            puts "[ParseWebhooks] --> Could not find mapping route for #{payload}"
+            puts "[ParseWebhooks] --> Could not find mapping route for #{payload.to_json}"
           end
 
           result = true if result.nil?

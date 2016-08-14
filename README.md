@@ -253,6 +253,19 @@ Sets the default cache expiration time (in seconds) for successful non-empty `GE
 #### `:faraday`
 You may pass a hash of options that will be passed to the `Faraday` constructor.
 
+## Parse Config
+Getting your configuration variables once you have a default client setup can be done with `Parse.config`. The first time this method is called, Parse-Stack will get the configuration from Parse-Server, and cache it. To force a reload of the config, use `config!`.
+
+```ruby
+  Parse.setup( ... )
+
+  val = Parse.config["myKey"]
+  val = Parse.config["myKey"] # cached
+
+  # Force fetch of config!
+  val = Parse.config!["myKey"]
+
+```
 
 ## Core Classes
 While some native data types are similar to the ones supported by Ruby natively, other ones are more complex and require their dedicated classes.
