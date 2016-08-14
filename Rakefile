@@ -11,3 +11,8 @@ Rake::TestTask.new do |t|
 end
 
 task :default => :test
+
+task :console do
+  exec("./bin/console")
+end
+task :c => :console

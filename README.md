@@ -1,5 +1,5 @@
 # Parse-Stack - A Parse-Server Ruby Client and ORM
-Parse Stack is an opinionated framework for ruby applications that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
+Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) REST API Client and ORM framework for ruby. It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ### Code Status
 [![Gem Version](https://badge.fury.io/rb/parse-stack.svg)](https://badge.fury.io/rb/parse-stack)
@@ -17,8 +17,10 @@ Parse Stack is an opinionated framework for ruby applications that utilize the [
   - [Parse::Query](#parsequery)
   - [Parse::Object](#parseobject)
   - [Parse::Webhooks](#parsewebhooks)
+- [Field Naming Conventions](#field-naming-conventions)
 - [Connection Setup](#connection-setup)
   - [Connection Options](#connection-options)
+- [Parse Config](#parse-config)
 - [Core Classes](#core-classes)
   - [Parse::Pointer](#parsepointer)
   - [Parse::File](#parsefile)
@@ -149,6 +151,7 @@ result = Parse.call_function :myFunctionName, {param: value}
 ## Main Features
 While there are many additional features of the framework, these are the main points.
 
+- Support for all Parse Query constraints.
 - Object Relational Mapping with dirty tracking.
 - Easy management of Parse GeoPoints, Files and ACLs.
 - Parse Queries support with caching middleware. (Reduces API usage)
