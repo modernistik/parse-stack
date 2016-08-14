@@ -10,8 +10,10 @@ module Parse
       def initialize(method, uri, body: nil, headers: nil, opts: {})
         @tag = 0
         method = method.downcase.to_sym
-        raise "Invalid Method type #{method} " unless [:get,:put,:delete,:post].include?(method)
-        self.method = method.downcase
+        unless method == :get || method == :put || method == :post || method == :delete
+          raise "Invalid method #{method} for request : '#{uri}'"
+        end
+        self.method = method
         self.path = uri
         self.body = body
         self.headers = headers || {}
@@ -37,6 +39,14 @@ module Parse
       # This also helps us serialize a request data into a hash.
       def signature
         {method: @method.upcase, path: @path, body: @body}
+      end
+
+      def inspect
+          "#<#{self.class} @method=#{@method} @path='#{@path}'>"
+      end
+
+      def to_s
+        "#{@method.to_s.upcase} #{@path}"
       end
 
   end

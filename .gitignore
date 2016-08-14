@@ -37,3 +37,4 @@ build/
 .rvmrc
 bin/.env
 /.byebug_history
+/.env

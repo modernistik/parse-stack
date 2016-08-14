@@ -49,7 +49,7 @@ module Parse
           # of the env
           # TODO: CHECK FOR HTTP STATUS CODES
           if self.class.logging
-            puts "[[Response ]] --------------------------------------"
+            puts "[[Response #{response_env[:status]}]] ----------------------------------"
             puts response_env.body
             puts "[[Response]] --------------------------------------\n"
           end
@@ -59,9 +59,9 @@ module Parse
           rescue Exception => e
             r = Parse::Response.new
             r.code = response_env.status
-            r.error = "Invalid Parse Response: #{e}"
+            r.error = "Invalid response for #{env[:method]} #{env[:url]}: #{e}"
           end
-
+          r.http_status = response_env[:status]
           r.code ||= response_env[:status] if r.error.present?
           response_env[:body] = r
         end

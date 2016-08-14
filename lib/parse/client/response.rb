@@ -18,12 +18,14 @@ module Parse
     RESULTS = "results".freeze
     COUNT = "count".freeze
     # A response has a result or (a code and an error)
-    attr_accessor :parse_class, :code, :error, :result
+    attr_accessor :parse_class, :code, :error, :result, :http_status
+    attr_accessor :request # capture request that created result
     # You can query Parse for counting objects, which may not actually have
     # results.
     attr_reader :count
 
     def initialize(res = {})
+      @http_status = 0
       @count = 0
       @batch_response = false # by default, not a batch response
       @result = nil
@@ -127,8 +129,8 @@ module Parse
     end
 
     def to_s
-      return "E-#{@code}: #{@error}" if error?
-      @result
+      return "[E-#{@code}] #{@request} : #{@error} " if error?
+      @result.to_json
     end
 
   end

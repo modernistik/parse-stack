@@ -3,6 +3,9 @@
 1.3.8
 -----------
 - Support for reloading the Parse config data with `Parse.config!`.
+- The Parse::Request object is now provided in the Parse::Response instance.
+- The HTTP status code is provided in `http_status` accessor for a Parse::Response.
+- Raised errors now provide info on the request that failed.
 
 1.3.7
 -----------

@@ -166,13 +166,16 @@ module Parse
     def request(method, uri = nil, body: nil, query: nil, headers: nil, opts: {})
       headers ||= {}
       # if the first argument is a Parse::Request object, then construct it
+      _request = nil
       if method.is_a?(Request)
-        request = method
-        method = request.method
-        uri ||= request.path
-        query ||= request.query
-        body ||= request.body
-        headers.merge! request.headers
+        _request     = method
+        method       = _request.method
+        uri        ||= _request.path
+        query      ||= _request.query
+        body       ||= _request.body
+        headers.merge! _request.headers
+      else
+        _request = Parse::Request.new(method, uri, body: body, headers: headers, opts: opts)
       end
 
       # http method
@@ -200,45 +203,46 @@ module Parse
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
       # actually send the request and return the body
-      response = @session.send(method, uri, params, headers)
-      body = response.body
+      response_env = @session.send(method, uri, params, headers)
+      response = response_env.body
+      response.request = _request
 
-      case response.status
+      case response.http_status
       when 401, 403
-        puts "[ParseError] #{body}"
-        raise Parse::AuthenticationError, body
+        puts "[ParseError] #{response}"
+        raise Parse::AuthenticationError, response
       when 400, 408
-          puts "[ParseError] #{body}"
-        if body.code == 124 || body.code == 143 #"net/http: timeout awaiting response headers"
-          raise Parse::TimeoutError, body
+          puts "[ParseError] #{response}"
+        if response.code == 124 || response.code == 143 #"net/http: timeout awaiting response headers"
+          raise Parse::TimeoutError, response
         end
       when 404
-        unless body.object_not_found?
-          puts "[ParseError] #{body}"
-          raise Parse::ConnectionError, body
+        unless response.object_not_found?
+          puts "[ParseError] #{response}"
+          raise Parse::ConnectionError, response
         end
       when 405, 406
-        puts "[ParseError] #{body}"
-        raise Parse::ProtocolError, body
+        puts "[ParseError] #{response}"
+        raise Parse::ProtocolError, response
       when 500
-        puts "[ParseError] #{body}"
-        raise Parse::ServerError, body
+        puts "[ParseError] #{response}"
+        raise Parse::ServerError, response
       end
 
-      if body.error?
-        if body.code <= 100
-          puts "[ParseError] #{body}"
-          raise Parse::ServerError, body
-        elsif body.code == 155
-          puts "[ParseError] #{body}"
-          raise Parse::RequestLimitExceededError, body
-        elsif body.code == 209 #Error 209: invalid session token
-          puts "[ParseError] #{body}"
-          raise Parse::InvalidSessionTokenError, body
+      if response.error?
+        if response.code <= 100
+          puts "[ParseError] #{response}"
+          raise Parse::ServerError, response
+        elsif response.code == 155
+          puts "[ParseError] #{response}"
+          raise Parse::RequestLimitExceededError, response
+        elsif response.code == 209 #Error 209: invalid session token
+          puts "[ParseError] #{response}"
+          raise Parse::InvalidSessionTokenError, response
         end
       end
 
-      body
+      response
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
       raise Parse::ConnectionError, e.message
     end

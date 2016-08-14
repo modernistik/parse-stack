@@ -3,8 +3,11 @@
 require "bundler/setup"
 require "parse/stack"
 require 'dotenv'
+require 'byebug'
 Dotenv.load
 
+
+Parse.setup
 
 class Song < Parse::Object
   property :name
