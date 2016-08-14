@@ -36,13 +36,11 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "moneta", [">= 0.7", "< 1"]
   spec.add_runtime_dependency "rack", "< 3"
 
-  spec.post_install_message = <<UPGRADE
-
-** IMPORTANT **
- The limit field in a Parse::Query no longer defaults to 100, it must be explicitly set.
-
- Parse::Webhook exception handling has changed in 1.3.0 and later.
- See guide: https://github.com/modernistik/parse-stack/wiki/Webhook-Migration-1.2.x-to-1.3.0
-
-UPGRADE
+#   spec.post_install_message = <<UPGRADE
+#
+# ** IMPORTANT **
+#  Parse::Webhook exception handling has changed in 1.3.0 and later.
+#  See guide: https://github.com/modernistik/parse-stack/wiki/Webhook-Migration-1.2.x-to-1.3.0
+#
+# UPGRADE
 end

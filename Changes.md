@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.3.8
+-----------
+- Support for reloading the Parse config data with `Parse.config!`.
+
 1.3.7
 -----------
 - Fixes json_api loading issue between ruby json and active_model_serializers.
