@@ -53,8 +53,8 @@ module Parse
     include Parse::API::Batch
     include Parse::API::Push
     include Parse::API::Schema
-    RETRY_COUNT = 1
-    RETRY_DELAY = 2
+    RETRY_COUNT = 2
+    RETRY_DELAY = 3 #seconds
 
     attr_accessor :session, :cache
     attr_reader :application_id, :api_key, :master_key, :server_url
@@ -96,8 +96,8 @@ module Parse
     # :host - defaults to Parse::Protocol::SERVER_URL (https://api.parse.com/1/)
     def initialize(opts = {})
       @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
-      @application_id = opts[:app_id] || opts[:application_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_SERVER_APPLICATION_ID']
-      @api_key        = opts[:api_key] || ENV["PARSE_API_KEY"]
+      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_SERVER_APPLICATION_ID']
+      @api_key        = opts[:api_key] || opts[:rest_api_key]  || ENV["PARSE_API_KEY"] || ENV["PARSE_REST_API_KEY"]
       @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"] || ENV['PARSE_SERVER_MASTER_KEY']
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
@@ -147,6 +147,10 @@ module Parse
       end
       @@sessions[:default] ||= self
       self
+    end
+
+    def app_id
+      @application_id
     end
 
     def url_prefix
@@ -213,38 +217,41 @@ module Parse
 
       case response.http_status
       when 401, 403
-        puts "[ParseError] #{response}"
+        puts "[Parse:AuthenticationError] #{response}"
         raise Parse::AuthenticationError, response
       when 400, 408
-          puts "[ParseError] #{response}"
         if response.code == Parse::Response::ERROR_TIMEOUT || response.code == 143 #"net/http: timeout awaiting response headers"
+          puts "[Parse:TimeoutError] #{response}"
           raise Parse::TimeoutError, response
         end
       when 404
         unless response.object_not_found?
-          puts "[ParseError] #{response}"
+          puts "[Parse:ConnectionError] #{response}"
           raise Parse::ConnectionError, response
         end
       when 405, 406
-        puts "[ParseError] #{response}"
+        puts "[Parse:ProtocolError] #{response}"
         raise Parse::ProtocolError, response
-      when 500, 503
-        puts "[ParseError] #{response}"
+      when 500
+        puts "[Parse:ServiceUnavailableError] #{response}"
+        raise Parse::ServiceUnavailableError, response
+      when 503
+        puts "[Parse:ServiceUnavailableError] #{response}"
         raise Parse::ServiceUnavailableError, response
       end
 
       if response.error?
         if response.code <= Parse::Response::ERROR_SERVICE_UNAVAILALBE
-          puts "[ParseError] #{response}"
+          puts "[Parse:ServiceUnavailableError] #{response}"
           raise Parse::ServiceUnavailableError, response
         elsif response.code <= 100
-          puts "[ParseError] #{response}"
+          puts "[Parse:ServerError] #{response}"
           raise Parse::ServerError, response
         elsif response.code == Parse::Response::ERROR_EXCEEDED_BURST_LIMIT
-          puts "[ParseError] #{response}"
+          puts "[Parse:RequestLimitExceededError] #{response}"
           raise Parse::RequestLimitExceededError, response
         elsif response.code == 209 #Error 209: invalid session token
-          puts "[ParseError] #{response}"
+          puts "[Parse:InvalidSessionTokenError] #{response}"
           raise Parse::InvalidSessionTokenError, response
         end
       end
@@ -252,13 +259,14 @@ module Parse
       response
     rescue Parse::ServiceUnavailableError => e
       if retry_count > 0
-        puts "[Parse::ServiceUnavailableError] Retrying #{response.request}"
+        puts "[Parse:ServiceUnavailableError] Retries remaining #{retry_count} : #{response.request}"
         sleep RETRY_DELAY
         retry_count -= 1
         retry
       end
       raise e
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
+      puts "[Parse:ConnectionError] Faraday/Net:OpenTimeout : #{e.message}"
       raise Parse::ConnectionError, e.message
     end
 
