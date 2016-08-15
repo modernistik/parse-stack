@@ -6,6 +6,8 @@
 - The Parse::Request object is now provided in the Parse::Response instance.
 - The HTTP status code is provided in `http_status` accessor for a Parse::Response.
 - Raised errors now provide info on the request that failed.
+- Added new `ServiceUnavailableError` exception for Parse error code 2 and HTTP 503 errors.
+- Upon a `ServiceUnavailableError`, we will retry the request one more time after 2 seconds.
 
 1.3.7
 -----------
