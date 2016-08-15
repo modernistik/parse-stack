@@ -53,6 +53,8 @@ module Parse
     include Parse::API::Batch
     include Parse::API::Push
     include Parse::API::Schema
+    RETRY_COUNT = 1
+    RETRY_DELAY = 2
 
     attr_accessor :session, :cache
     attr_reader :application_id, :api_key, :master_key, :server_url
@@ -165,7 +167,7 @@ module Parse
     # with the header: paramter (also a hash).
     # This method also takes in a Parse::Request object instead of the arguments listed above.
     def request(method, uri = nil, body: nil, query: nil, headers: nil, opts: {})
-      retry_count ||= 1
+      retry_count ||= RETRY_COUNT
       headers ||= {}
       # if the first argument is a Parse::Request object, then construct it
       _request = nil
@@ -251,7 +253,7 @@ module Parse
     rescue Parse::ServiceUnavailableError => e
       if retry_count > 0
         puts "[Parse::ServiceUnavailableError] Retrying #{response.request}"
-        sleep 2
+        sleep RETRY_DELAY
         retry_count -= 1
         retry
       end
