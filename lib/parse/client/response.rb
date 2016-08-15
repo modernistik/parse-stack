@@ -9,6 +9,7 @@ module Parse
     include Enumerable
 
     ERROR_INTERNAL = 1
+    ERROR_SERVICE_UNAVAILALBE = 2
     ERROR_TIMEOUT = 124
     ERROR_EXCEEDED_BURST_LIMIT = 155
     ERROR_OBJECT_NOT_FOUND = 101
@@ -129,7 +130,7 @@ module Parse
     end
 
     def to_s
-      return "[E-#{@code}] #{@request} : #{@error} " if error?
+      return "[E-#{@code}] #{@request} : #{@error} (#{@http_status})" if error?
       @result.to_json
     end
 
