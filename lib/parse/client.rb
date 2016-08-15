@@ -23,6 +23,7 @@ module Parse
   class TimeoutError < Exception; end;
   class ProtocolError < Exception; end;
   class ServerError < Exception; end;
+  class ServiceUnavailableError < Exception; end;
   class AuthenticationError < Exception; end;
   class RequestLimitExceededError < Exception; end;
   class InvalidSessionTokenError < Exception; end;
@@ -164,6 +165,7 @@ module Parse
     # with the header: paramter (also a hash).
     # This method also takes in a Parse::Request object instead of the arguments listed above.
     def request(method, uri = nil, body: nil, query: nil, headers: nil, opts: {})
+      retry_count ||= 1
       headers ||= {}
       # if the first argument is a Parse::Request object, then construct it
       _request = nil
@@ -213,7 +215,7 @@ module Parse
         raise Parse::AuthenticationError, response
       when 400, 408
           puts "[ParseError] #{response}"
-        if response.code == 124 || response.code == 143 #"net/http: timeout awaiting response headers"
+        if response.code == Parse::Response::ERROR_TIMEOUT || response.code == 143 #"net/http: timeout awaiting response headers"
           raise Parse::TimeoutError, response
         end
       when 404
@@ -224,16 +226,19 @@ module Parse
       when 405, 406
         puts "[ParseError] #{response}"
         raise Parse::ProtocolError, response
-      when 500
+      when 500, 503
         puts "[ParseError] #{response}"
-        raise Parse::ServerError, response
+        raise Parse::ServiceUnavailableError, response
       end
 
       if response.error?
-        if response.code <= 100
+        if response.code <= Parse::Response::ERROR_SERVICE_UNAVAILALBE
+          puts "[ParseError] #{response}"
+          raise Parse::ServiceUnavailableError, response
+        elsif response.code <= 100
           puts "[ParseError] #{response}"
           raise Parse::ServerError, response
-        elsif response.code == 155
+        elsif response.code == Parse::Response::ERROR_EXCEEDED_BURST_LIMIT
           puts "[ParseError] #{response}"
           raise Parse::RequestLimitExceededError, response
         elsif response.code == 209 #Error 209: invalid session token
@@ -243,6 +248,14 @@ module Parse
       end
 
       response
+    rescue Parse::ServiceUnavailableError => e
+      if retry_count > 0
+        puts "[Parse::ServiceUnavailableError] Retrying #{response.request}"
+        sleep 2
+        retry_count -= 1
+        retry
+      end
+      raise e
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
       raise Parse::ConnectionError, e.message
     end
