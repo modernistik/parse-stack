@@ -55,20 +55,6 @@ module Parse
     register :ne
   end
 
-  # Mapps all items contained in the array
-  class ContainedInConstraint < Constraint
-    contraint_keyword :$in
-    register :in
-    register :contained_in
-
-    def build
-      val = formatted_value
-      val = [val].compact unless val.is_a?(Array)
-      { @operation.operand => { key => val } }
-    end
-
-  end
-
   # Nullabiliity constraint maps $exist Parse clause a bit differently
   # Parse currently has a bug that if you select items near a location
   # and want to make sure a different column has a value, you need to
@@ -97,8 +83,23 @@ module Parse
     register :exists
     def build
       # if nullability is equal true, then $exists should be set to false
-      return { @operation.operand => { key => formatted_value } }
+      value = formatted_value.present? ? true : false
+      return { @operation.operand => { key => value } }
     end
+  end
+
+  # Mapps all items contained in the array
+  class ContainedInConstraint < Constraint
+    contraint_keyword :$in
+    register :in
+    register :contained_in
+
+    def build
+      val = formatted_value
+      val = [val].compact unless val.is_a?(Array)
+      { @operation.operand => { key => val } }
+    end
+
   end
 
   class NotContainedInConstraint < Constraint

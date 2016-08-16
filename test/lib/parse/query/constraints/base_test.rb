@@ -56,4 +56,25 @@ class TestConstraintEquality < Minitest::Test
   end
 
 
+  def test_build
+    constraint = Parse::Constraint.new(:field,1)
+    assert_nil constraint.key
+    expected = { :field => 1 }
+    assert_equal expected, constraint.build
+
+    # if we set a key when calling the base version of build
+    # then we get a different format.
+    Parse::Constraint.key = :$test
+    constraint = Parse::Constraint.new(:field,1)
+    assert_equal :eq, constraint.operator
+    constraint.operator = :test
+    assert_equal :test, constraint.operator
+    assert_equal :$test, constraint.key
+    expected = { :field => { :$test => 1 } }
+    assert_equal expected, constraint.build
+    Parse::Constraint.key = nil
+
+  end
+
+
 end

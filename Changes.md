@@ -8,6 +8,8 @@
 - Raised errors now provide info on the request that failed.
 - Added new `ServiceUnavailableError` exception for Parse error code 2 and HTTP 503 errors.
 - Upon a `ServiceUnavailableError`, we will retry the request one more time after 2 seconds.
+- :not_in and :contains_all queries will format scalar values into an array.
+- Values passed to :exists constraint that are not boolean, will be turned to true/false based on `.present?`.
 
 1.3.7
 -----------
