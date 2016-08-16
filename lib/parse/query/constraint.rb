@@ -22,21 +22,12 @@ module Parse
       # it most likely is just the field name, so let's assume they want
       # the default equality operation.
       if operation.is_a?(Operation) == false && operation.respond_to?(:to_sym)
-          operation = Operation.new(operation.to_sym, :eq)
+          operation = Operation.new(operation.to_sym, self.class.operand)
       end
       @operation = operation
       @value = value
       yield(self) if block_given?
 
-    end
-
-    # Creates a new constraint given an operation and value.
-    def self.create(operation, value)
-      #default to a generic equality constraint if not passed an operation
-      unless operation.is_a?(Parse::Operation) && operation.valid?
-        return self.new(operation, value)
-      end
-      operation.constraint(value)
     end
 
     class << self
@@ -49,6 +40,18 @@ module Parse
       # The higher the more priority it will receive.
       attr_accessor :precedence
 
+      # Class access to store the default symbol operand action
+      attr_accessor :operand
+
+      # Creates a new constraint given an operation and value.
+      def create(operation, value)
+        #default to a generic equality constraint if not passed an operation
+        unless operation.is_a?(Parse::Operation) && operation.valid?
+          return self.new(operation, value)
+        end
+        operation.constraint(value)
+      end
+
       # method to set the keyword for this Constaint (subclasses)
       def contraint_keyword(k)
         @key = k
@@ -60,6 +63,29 @@ module Parse
         @precedence
       end
 
+      # All subclasses should register their operation and themselves
+      # as the handler.
+      def register(op, klass = self)
+        self.operand ||= op
+        Operation.register op, klass
+      end
+
+      def formatted_value(value)
+        d = value
+        d = { __type: "Date", iso: d.utc.iso8601(3) } if d.respond_to?(:utc)
+        d = { __type: "Date", iso: d.iso8601(3) } if d.respond_to?(:iso8601)
+        d = d.pointer if d.respond_to?(:pointer) #simplified query object
+        d = d.to_s if d.is_a?(Regexp)
+        #d = d.pointer if d.is_a?(Parse::Object) #simplified query object
+        #  d = d.compile
+        if d.is_a?(Parse::Query)
+          compiled = d.compile(encode: false, includeClassName: true)
+          # compiled["className"] = d.table
+          d = compiled
+        end
+        d
+      end
+
     end
 
     def precedence
@@ -68,12 +94,6 @@ module Parse
 
     def key
       self.class.key
-    end
-
-    # All subclasses should register their operation and themselves
-    # as the handler.
-    def self.register(op, klass = self)
-      Operation.register op, klass
     end
 
     def operand
@@ -115,23 +135,10 @@ module Parse
 
     # This method formats the value based on some specific data types.
     def formatted_value
-      d = @value
-      d = { __type: "Date", iso: d.utc.iso8601(3) } if d.respond_to?(:utc)
-      d = { __type: "Date", iso: d.iso8601(3) } if d.respond_to?(:iso8601)
-      d = d.pointer if d.respond_to?(:pointer) #simplified query object
-      d = d.to_s if d.is_a?(Regexp)
-      #d = d.pointer if d.is_a?(Parse::Object) #simplified query object
-      #  d = d.compile
-      if d.is_a?(Parse::Query)
-        compiled = d.compile(encode: false, includeClassName: true)
-        # compiled["className"] = d.table
-        d = compiled
-      end
-      d
+      self.class.formatted_value(@value)
     end
 
     register :eq, Constraint
-    register :eql, Constraint
     precedence 100
   end
 end

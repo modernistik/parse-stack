@@ -21,7 +21,7 @@ module Parse
 
   end
 
-  class LessOrEqualConstraint < Constraint
+  class LessThanOrEqualConstraint < Constraint
     contraint_keyword :$lte
     register :lte
     register :less_than_or_equal
@@ -42,7 +42,7 @@ module Parse
     register :after
   end
 
-  class GreaterOrEqualConstraint < Constraint
+  class GreaterThanOrEqualConstraint < Constraint
     contraint_keyword :$gte
     register :gte
     register :greater_than_or_equal
@@ -51,8 +51,8 @@ module Parse
 
   class NotEqualConstraint < Constraint
     contraint_keyword :$ne
-    register :ne
     register :not
+    register :ne
   end
 
   # Mapps all items contained in the array
@@ -103,9 +103,16 @@ module Parse
 
   class NotContainedInConstraint < Constraint
     contraint_keyword :$nin
-    register :nin
     register :not_in
+    register :nin
     register :not_contained_in
+
+    def build
+      val = formatted_value
+      val = [val].compact unless val.is_a?(Array)
+      { @operation.operand => { key => val } }
+    end
+
   end
 
   # All Things must be contained
@@ -113,6 +120,12 @@ module Parse
     contraint_keyword :$all
     register :all
     register :contains_all
+
+    def build
+      val = formatted_value
+      val = [val].compact unless val.is_a?(Array)
+      { @operation.operand => { key => val } }
+    end
   end
 
   class SelectionConstraint < Constraint
