@@ -28,6 +28,10 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
   - [Parse::GeoPoint](#parsegeopoint)
     - [Calculating Distances between locations](#calculating-distances-between-locations)
   - [Parse::Bytes](#parsebytes)
+  - [Parse::User](#parseuser)
+  - [Parse::Installation](#parseinstallation)
+  - [Parse::Session](#parsesession)
+  - [Parse::Role](#parserole)
 - [Modeling and Subclassing](#modeling-and-subclassing)
   - [Defining Properties](#defining-properties)
     - [Accessor Aliasing](#accessor-aliasing)
@@ -75,6 +79,7 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
     - [Reject](#reject)
     - [Matches Query](#matches-query)
     - [Excludes Query](#excludes-query)
+    - [Matches Object Id](#matches-object-id)
   - [Geo Queries](#geo-queries)
     - [Max Distance Constraint](#max-distance-constraint)
     - [Bounding Box Constraint](#bounding-box-constraint)
@@ -407,6 +412,63 @@ The `Bytes` data type represents the storage format for binary content in a Pars
 
   decoded = bytes.decoded # same as Base64.decode64
 ```
+
+### Parse::User
+This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. It is defined as follows:
+
+```ruby
+class Parse::User < Parse::Object
+  property :auth_data, :object
+  property :email
+  property :password
+  property :username
+end
+```
+
+### Parse::Installation
+This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. It is defined as follows:
+
+```ruby
+class Parse::Installation < Parse::Object
+  property :channels, :array
+  property :gcm_sender_id, :string, field: :GCMSenderId
+  property :badge, :integer
+  property :installation_id
+  property :device_token
+  property :device_type
+  property :locale_identifier
+  property :push_type
+  property :time_zone
+end
+```
+
+### Parse::Session
+This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. It is defined as follows:
+
+```ruby
+class Parse::Session < Parse::Object
+  property :created_with, :object
+  property :expires_at, :date
+  property :installation_id
+  property :restricted, :boolean
+  property :session_token
+
+  belongs_to :user
+end
+```
+
+### Parse::Role
+This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. It is defined as follows:
+
+```ruby
+class Parse::Role < Parse::Object
+  property :name
+
+  has_many :roles, through: :relation
+  has_many :users, through: :relation
+end
+```
+
 
 ## Modeling and Subclassing
 For the general case, your Parse classes should inherit from `Parse::Object`. `Parse::Object` utilizes features from `ActiveModel` to add several features to each instance of your subclass. These include `Dirty`, `Conversion`, `Callbacks`, `Naming` and `Serializers::JSON`.
@@ -1161,6 +1223,17 @@ q.where :field => value
 # (alias) :field.eq => value
 ```
 
+If you want to see if a particular field contains a specific Parse::Object (pointer), you can use the following:
+
+```ruby
+# find rows where the `field` contains a Parse "_User" pointer with the specified objectId.
+q.where :field => Parse::Pointer.new("_User", "anObjectId")
+# alias using subclass helper
+q.where :field => Parse::User.pointer("anObjectId")
+# alias using `:id` constraint. We will infer :user maps to class "_User" (Parse::User)
+q.where :user.id => "anObjectId"
+```
+
 #### Less Than
 Equivalent to the `$lt` Parse query operation. The alias `before` is provided for readability.
 
@@ -1308,6 +1381,48 @@ Equivalent to the `$notInQuery` Parse query operation. Useful if you want to ret
 q.where :field.excludes => query
 # ex. :post.excludes => Post.where(:image.exists => true
 q.where :field.not_in_query => query # alias
+```
+
+#### Matches Object Id
+Sometimes you want to find rows where a particular Parse object exists. You can do so by passing a the Parse::Object subclass, a Parse::Pointer. You can also use the `id` constraint. This will assume that the name of the field matches a particular Parse class you have defined. Assume the following:
+
+```ruby
+# where this Parse object equals the object in the column `field`.
+q.where :field => Parse::Pointer("Field", "someObjectId")
+# alias, shorthand when we infer `:field` maps to `Field` parse class.
+q.where :field.id => "someObjectId"
+# "field":{"__type":"Pointer","className":"Field","objectId":"someObjectId"}}
+
+```
+
+##### Additional Examples
+
+```ruby
+
+class Artist < Parse::Object
+  # as described before
+end
+
+class Song < Parse::Object
+  belongs_to :artist
+end
+
+artist = Artist.first # get any artist
+artist_id = artist.id # ex. artist.id
+
+# find all songs for this artist object
+Song.all :artist => artist
+```
+
+In some cases, you do not have the Parse object, but you have its `objectId`. You can use the objectId in the query as follows:
+
+```ruby
+# shorthand if you are using convention. Will infer class `Artist`
+Song.all :artist.id => artist_id
+
+# other approaches, same result
+Song.all :artist => Artist.pointer(artist_id)
+Song.all :artist => Parse::Pointer.new("Artist", artist_id)
 ```
 
 ### Geo Queries
@@ -1473,7 +1588,7 @@ Push notifications are implemented through the `Parse::Push` class. To send push
 ```
 
 ## Cloud Code Webhooks
-Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks. If you are using the open source [Parse Server](https://github.com/ParsePlatform/parse-server), you must enable this hooks feature by enabling the environment variable `PARSE_EXPERIMENTAL_HOOKS_ENABLED` on your Parse server.
+Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks.
 
 ### Cloud Code functions
 You can use the `route()` method to register handler blocks. The last value returned by the block will be returned back to the client in a success response. If `error!(value)` is called inside the block, we will return the correct Parse error response with the value you provided.

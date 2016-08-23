@@ -10,7 +10,34 @@ require_relative 'constraint'
 class ParseConstraintError < Exception; end;
 module Parse
 
+  class ObjectIdConstraint < Constraint
+    register :id
 
+
+    def build
+      className = operand.to_parse_class
+      value = formatted_value
+      begin
+        klass = className.constantize
+      rescue NameError => e
+        klass = Parse::Model.find_class className
+      end
+
+      unless klass.present? && klass.is_a?(Parse::Object) == false
+        raise ParseConstraintError, "#{self.class}: No Parse class defined for #{operand} as '#{className}'"
+      end
+
+      # allow symbols
+      value = value.to_s if value.is_a?(Symbol)
+
+      unless value.is_a?(String) && value.strip.present?
+        raise ParseConstraintError, "#{self.class}: value must be of string type representing a Parse object id."
+      end
+      value.strip!
+      return { @operation.operand  => klass.pointer(value) }
+    end
+
+  end
 
   class CompoundQueryConstraint < Constraint
     contraint_keyword :$or
@@ -72,7 +99,7 @@ module Parse
 
       value = formatted_value
       unless value == true || value == false
-        raise ParseConstraintError, "Non-Boolean value passed to NullabilityConstraint."
+        raise ParseConstraintError, "#{self.class}: Non-Boolean value passed, it must be either `true` or `false`"
       end
 
       if value == true
@@ -94,7 +121,7 @@ module Parse
       value = formatted_value
 
       unless value == true || value == false
-        raise ParseConstraintError, "Non-Boolean value passed to ExistsConstraint."
+        raise ParseConstraintError, "#{self.class}: Non-Boolean value passed, it must be either `true` or `false`"
       end
 
       return { @operation.operand => { key => value } }
@@ -185,14 +212,14 @@ module Parse
         remote_field_name = res[:key] || remote_field_name
         query = res[:query]
         unless query.is_a?(Parse::Query)
-          raise "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
+          raise ParseConstraintError, "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
         end
         query = query.compile(encode: false, includeClassName: true)
       elsif @value.is_a?(Parse::Query)
         # if its a query, then assume dontSelect key is the same name as operand.
         query = @value.compile(encode: false, includeClassName: true)
       else
-        raise "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'key', query: '<Parse::Query>' }"
+        raise ParseConstraintError, "Invalid `:reject` query constraint. It should follow the format: :field.reject => { key: 'key', query: '<Parse::Query>' }"
       end
       { @operation.operand => { :$dontSelect => { key: remote_field_name, query: query } } }
     end
@@ -260,7 +287,7 @@ module Parse
       geopoint_values = formatted_value
       unless geopoint_values.is_a?(Array) && geopoint_values.count == 2 &&
         geopoint_values.first.is_a?(Parse::GeoPoint) && geopoint_values.last.is_a?(Parse::GeoPoint)
-        raise( '[Parse::Query] Invalid query value parameter passed to `within_box` constraint. ' +
+        raise(ParseConstraintError, '[Parse::Query] Invalid query value parameter passed to `within_box` constraint. ' +
                 'Values in array must be `Parse::GeoPoint` objects and ' +
                 'it should be in an array format: [southwestPoint, northeastPoint]' )
       end

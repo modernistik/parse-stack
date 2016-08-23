@@ -10,6 +10,7 @@
 - Upon a `ServiceUnavailableError`, we will retry the request one more time after 2 seconds.
 - `:not_in` and `:contains_all` queries will format scalar values into an array.
 - `:exists` and `:null` will raise `ParseConstraintError` if non-boolean values are passed.
+- NEW: `:id` constraint to allow passing an objectId to a query where we will infer the class.
 
 1.3.7
 -----------

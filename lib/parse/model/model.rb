@@ -68,7 +68,7 @@ module Parse
       return Parse::Date if str == TYPE_DATE.freeze
       # return Parse::User if str == "User".freeze
       # return Parse::Installation if str == "Installation".freeze
-
+      
       str = str.to_s
       # Basically go through all Parse::Object subclasses and see who is has a parse_class
       # set to this string. We will cache the results for future use.

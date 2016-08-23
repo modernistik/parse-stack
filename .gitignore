@@ -38,3 +38,4 @@ build/
 bin/.env
 /.byebug_history
 /.env
+/node_modules

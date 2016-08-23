@@ -27,13 +27,9 @@ class TestExistsConstraint < Minitest::Test
 
   ["true", 1, nil].each do |value|
     constraint = @klass.new(:field, value)
-
     assert_raises(ParseConstraintError) do
-      expected = build(value).as_json
       constraint.build.as_json
     end
-
-
   end
 
 end
