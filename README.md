@@ -121,16 +121,27 @@ class Song < Parse::Object
   has_many :likes, as: :user, through: :relation
 end
 
-# create tables or add new columns (non-destructive)
-Song.auto_upgrade!
+class Artist < Parse::Object
+  property :name
+  property :genres, :array
+end
 
+# updates schemas for your Parse app based on your models (non-destructive)
+Parse.auto_upgrade!
+
+artist = Artist.new(name: "Frank Sinatra", genres: ["swing", "jazz"])
+artist.save
+
+# Query
 artist = Artist.first(:name.like => /Sinatra/, :genres.in => ['swing'])
 
+# more examples
 song = Song.new name: "Fly Me to the Moon"
 song.artist = artist
-# Parse files
+# Parse files - upload a file and attach to object
 song.audio_file = Parse::File.create("http://path_to.mp3")
-# relations
+
+# relations - find a User matching username and add it to relation.
 song.likes.add Parse::User.first(username: "persaud")
 
 # saves both attributes and relations

@@ -8,8 +8,8 @@
 - Raised errors now provide info on the request that failed.
 - Added new `ServiceUnavailableError` exception for Parse error code 2 and HTTP 503 errors.
 - Upon a `ServiceUnavailableError`, we will retry the request one more time after 2 seconds.
-- :not_in and :contains_all queries will format scalar values into an array.
-- Values passed to :exists constraint that are not boolean, will be turned to true/false based on `.present?`.
+- `:not_in` and `:contains_all` queries will format scalar values into an array.
+- `:exists` and `:null` will raise `ParseConstraintError` if non-boolean values are passed.
 
 1.3.7
 -----------
@@ -30,7 +30,6 @@
 - `limit` no longer defaults to 100 in `Parse::Query`. This will allow Parse-Server to determine default limit, if any.
 - `:bool` property type has been added as an alias to `:boolean`.
 - You can turn off formatting field names with `Parse::Query.field_formatter = nil`.
-
 
 1.3.1
 -----------

@@ -7,7 +7,10 @@ require_relative 'constraint'
 # For more information: https://parse.com/docs/rest/guide#queries
 # For more information about the query design pattern from DataMapper
 # that inspired this, see http://datamapper.org/docs/find.html
+class ParseConstraintError < Exception; end;
 module Parse
+
+
 
   class CompoundQueryConstraint < Constraint
     contraint_keyword :$or
@@ -67,7 +70,12 @@ module Parse
     def build
       # if nullability is equal true, then $exists should be set to false
 
-      if formatted_value == true
+      value = formatted_value
+      unless value == true || value == false
+        raise ParseConstraintError, "Non-Boolean value passed to NullabilityConstraint."
+      end
+
+      if value == true
         return { @operation.operand => { key => false} }
       else
         #current bug in parse where if you want exists => true with geo queries
@@ -83,7 +91,12 @@ module Parse
     register :exists
     def build
       # if nullability is equal true, then $exists should be set to false
-      value = formatted_value.present? ? true : false
+      value = formatted_value
+
+      unless value == true || value == false
+        raise ParseConstraintError, "Non-Boolean value passed to ExistsConstraint."
+      end
+
       return { @operation.operand => { key => value } }
     end
   end
