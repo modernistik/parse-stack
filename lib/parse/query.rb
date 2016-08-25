@@ -119,7 +119,7 @@ module Parse
         elsif expression == :cache
           self.cache = value
         elsif expression == :use_master_key
-          self.cache = value
+          self.use_master_key = value
         elsif expression == :session
           # you can pass a session token or a Parse::Session
           value = value.is_a?(Parse::Session) ? value.session_token : value
@@ -316,10 +316,10 @@ module Parse
     def fetch!(compiled_query)
       opts = {}
       opts[:cache] = false unless self.cache
-      opts[:use_mster_key] = self.use_master_key
+      opts[:use_master_key] = self.use_master_key
       opts[:session_token] = self.session_token
       # for now, don't cache requests where we disable master_key or provide session token
-      if opts[:use_mster_key] == false || opts[:session_token].present?
+      if opts[:use_master_key] == false || opts[:session_token].present?
         opts[:cache] = false
       end
 
