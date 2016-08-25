@@ -68,16 +68,6 @@ module Parse
 
     end
 
-    def update_payload
-      h = attribute_updates
-      if relation_changes?
-        r =  relation_change_operations.select { |s| s.present? }.first
-        h.merge!(r) if r.present?
-      end
-      h.merge!(className: parse_class) unless h.empty?
-      h.as_json
-    end
-
   end
 
   class Payload
@@ -147,10 +137,26 @@ module Parse
         return unless routes[type].present? && routes[type][className].present?
         registry = routes[type][className]
 
-        return payload.instance_exec(payload, &registry) unless registry.is_a?(Array)
-        results = registry.map { |hook| payload.instance_exec(payload, &hook) }
-        return results.last
+        unless registry.is_a?(Array)
+          result = payload.instance_exec(payload, &registry)
+        else
+          result = registry.map { |hook| payload.instance_exec(payload, &hook) }.last
+        end
 
+        if result.is_a?(Parse::Object)
+          # if it is a Parse::Object, we will call the registered ActiveModel callbacks
+          # and then send the proper changes payload
+          if type == :before_save
+            # returning false from the callback block only runs the before_* callback
+            result.run_callbacks(:save) { false }
+            result = result.changes_payload
+          else type == :before_delete
+            result.run_callbacks(:destroy) { false }
+            result = true
+          end
+        end
+
+        result
       end
 
       def success(data = true)

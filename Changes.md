@@ -1,5 +1,9 @@
 # Parse-Stack Changes
 
+1.4.0
+-----------
+- Support for calling `before_save` and `before_destroy` callbacks in your model when a Parse::Object is returned by your `before_save` or `before_delete` webhook respectively.
+
 1.3.8
 -----------
 - Support for reloading the Parse config data with `Parse.config!`.

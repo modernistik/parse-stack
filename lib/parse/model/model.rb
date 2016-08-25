@@ -66,9 +66,10 @@ module Parse
       return Parse::File if str == TYPE_FILE.freeze
       return Parse::GeoPoint if str == TYPE_GEOPOINT.freeze
       return Parse::Date if str == TYPE_DATE.freeze
+      return Parse::Bytes if str == TYPE_BYTES.freeze
       # return Parse::User if str == "User".freeze
       # return Parse::Installation if str == "Installation".freeze
-      
+
       str = str.to_s
       # Basically go through all Parse::Object subclasses and see who is has a parse_class
       # set to this string. We will cache the results for future use.
@@ -86,7 +87,7 @@ end
 class String
   # short helper method to provide lower-first-camelcase
   def columnize
-     return "objectId" if self == "id"
+     return "objectId".freeze if self == "id".freeze
      camelize(:lower)
    end;
 

@@ -337,6 +337,18 @@ module Parse
       success
     end
 
+    def changes_payload
+      h = attribute_updates
+      if relation_changes?
+        r =  relation_change_operations.select { |s| s.present? }.first
+        h.merge!(r) if r.present?
+      end
+      h.merge!(className: parse_class) unless h.empty?
+      h.as_json
+    end
+
+    alias_method :update_payload, :changes_payload
+
     # this method is useful to generate an array of additions and removals to a relational
     # column.
     def relation_change_operations
