@@ -81,7 +81,7 @@ module Parse
         method = env.method
         begin
           if method == :get && url.present? && @store.key?(url)
-            puts("[Parse::Cache] >>> #{url}") if self.class.logging.present?
+            puts("[Parse::Cache::Hit] >> #{url}") if self.class.logging.present?
             response = Faraday::Response.new
             res_env = @store[url] # previous cached response
             body = res_env.respond_to?(:body) ? res_env.body : nil
@@ -105,7 +105,7 @@ module Parse
           puts "[Parse::Cache] Error: #{e}"
         end
 
-
+        puts("[Parse::Cache::Miss] !! #{url}") if self.class.logging.present?
         @app.call(env).on_complete do |response_env|
           # Only cache GET requests with valid HTTP status codes whose content-length
           # is greater than 20. Otherwise they could be errors, successes and empty result sets.
