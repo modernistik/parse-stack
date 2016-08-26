@@ -3,6 +3,8 @@
 1.4.0
 -----------
 - Support for calling `before_save` and `before_destroy` callbacks in your model when a Parse::Object is returned by your `before_save` or `before_delete` webhook respectively.
+- Parse::Query `:cache` expression now allows integer values to define the specific cache duration for this specific query request. If `false` is passed, will ignore the cache and make the request regardless if a cache response is available. If `true` is passed (default), it will use the value configured when setting up when calling `Parse.setup`.
+- Fixes the use of `:use_master_key` in Parse::Query.
 
 1.3.8
 -----------

@@ -315,7 +315,7 @@ module Parse
 
     def fetch!(compiled_query)
       opts = {}
-      opts[:cache] = false unless self.cache
+      opts[:cache] = self.cache || false
       opts[:use_master_key] = self.use_master_key
       opts[:session_token] = self.session_token
       # for now, don't cache requests where we disable master_key or provide session token

@@ -1181,11 +1181,14 @@ Use with limit to paginate through results. Default is 0 with maximum value bein
 ```
 
 #### :cache
-A true/false value. If you are using the built-in caching middleware, `Parse::Middleware::Caching`, it will prevent it from using a previously cached result if available. The default value is `true`.
+A `true`, `false` or integer value. If you are using the built-in caching middleware, `Parse::Middleware::Caching`, setting this to `false` will prevent it from using a previously cached result if available. You may pass an integer value, which will allow this request to be cached for the specified number of seconds. The default value is `true`, which uses the [`:expires`](#expires) value that was passed when [configuring the client](#connection-setup).
 
 ```ruby
 # don't use a cached result if available
-Song.all limit: 3, cache: false
+Song.all limit: 500, cache: false
+
+# cache this particular request for 60 seconds
+Song.all limit: 500, cache: 1.minute
 ```
 
 #### :use_master_key
@@ -1201,6 +1204,7 @@ A Parse session token string. If you would like to perform a query as a particul
 
 ```ruby
 # disable sending the master key in the request if configured
+# and perform this request as a Parse user represented by this token
 Song.all limit: 3, session_token: "<session_token>"
 ```
 
@@ -1542,7 +1546,7 @@ end
 
 song = Song.new name: "my title"
 puts song.name # 'my title'
-song.save
+song.save # runs :save callbacks
 puts song.name # 'My Title'
 
 ```
