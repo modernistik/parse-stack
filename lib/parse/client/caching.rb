@@ -55,23 +55,23 @@ module Parse
       end
 
       def call!(env)
-        request_headers =  env[:request_headers]
+        @request_headers =  env[:request_headers]
 
         # get default caching state
         @enabled = self.class.enabled
         # disable cache for this request if "no-cache" was passed
-        if request_headers[CACHE_CONTROL] == "no-cache".freeze
+        if @request_headers[CACHE_CONTROL] == "no-cache".freeze
           @enabled = false
         end
 
         # get the expires information from header (per-request) or instance default
-        if request_headers[CACHE_EXPIRES_DURATION].to_i > 0
-          @expires = request_headers[CACHE_EXPIRES_DURATION].to_i
+        if @request_headers[CACHE_EXPIRES_DURATION].to_i > 0
+          @expires = @request_headers[CACHE_EXPIRES_DURATION].to_i
         end
 
         # cleanup
-        request_headers.delete(CACHE_CONTROL)
-        request_headers.delete(CACHE_EXPIRES_DURATION)
+        @request_headers.delete(CACHE_CONTROL)
+        @request_headers.delete(CACHE_EXPIRES_DURATION)
 
         # if caching is enabled and we have a valid cache duration, use cache
         # otherwise work as a passthrough.
@@ -79,23 +79,24 @@ module Parse
 
         url = env.url
         method = env.method
+        @cache_key = url.to_s
         begin
-          if method == :get && url.present? && @store.key?(url)
+          if method == :get && @cache_key.present? && @store.key?(@cache_key)
             puts("[Parse::Cache::Hit] >> #{url}") if self.class.logging.present?
             response = Faraday::Response.new
-            res_env = @store[url] # previous cached response
+            res_env = @store[@cache_key] # previous cached response
             body = res_env.respond_to?(:body) ? res_env.body : nil
             if body.present?
               response.finish({status: 200, response_headers: { "X-Cache-Response" => true }, body: body })
               return response
             else
-              @store.delete url
+              @store.delete @cache_key
             end
-          elsif url.present?
+          elsif @cache_key.present?
             #non GET requets should clear the cache for that same resource path.
             #ex. a POST to /1/classes/Artist/<objectId> should delete the cache for a GET
             # request for the same '/1/classes/Artist/<objectId>' where objectId are equivalent
-            @store.delete url
+            @store.delete @cache_key
           end
         rescue Errno::EINVAL, Redis::CannotConnectError => e
           # if the cache store fails to connect, catch the exception but proceed
@@ -111,7 +112,7 @@ module Parse
           # is greater than 20. Otherwise they could be errors, successes and empty result sets.
           if @enabled && method == :get &&  CACHEABLE_HTTP_CODES.include?(response_env.status) &&
              response_env.present? && response_env.response_headers["content-length".freeze].to_i > 20
-                @store.store(url, response_env, expires: @expires) # ||= response_env.body
+                @store.store(@cache_key, response_env, expires: @expires) # ||= response_env.body
           end # if
           # do something with the response
           # response_env[:response_headers].merge!(...)
