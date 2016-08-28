@@ -143,14 +143,14 @@ module Parse
           result = registry.map { |hook| payload.instance_exec(payload, &hook) }.last
         end
 
-        if result.is_a?(Parse::Object)
+        if type != :function && result.is_a?(Parse::Object)
           # if it is a Parse::Object, we will call the registered ActiveModel callbacks
           # and then send the proper changes payload
           if type == :before_save
             # returning false from the callback block only runs the before_* callback
             result.run_callbacks(:save) { false }
             result = result.changes_payload
-          else type == :before_delete
+          elsif type == :before_delete
             result.run_callbacks(:destroy) { false }
             result = true
           end
