@@ -295,6 +295,15 @@ module Parse
     property :email
     property :password
     property :username
+
+    before_save do
+      # You cannot specify user ACLs.
+      self.clear_attribute_change!(:acl)
+    end
+
+    def anonymous?
+      auth_data.present? && auth_data["anonymous"].present?
+    end
   end
 
   class Installation < Parse::Object

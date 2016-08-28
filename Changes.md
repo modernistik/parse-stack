@@ -7,6 +7,8 @@
 - Parse::Query `:cache` expression now allows integer values to define the specific cache duration for this specific query request. If `false` is passed, will ignore the cache and make the request regardless if a cache response is available. If `true` is passed (default), it will use the value configured when setting up when calling `Parse.setup`.
 - Fixes the use of `:use_master_key` in Parse::Query.
 - Fixes to the cache key used in middleware.
+- Parse::User before_save callback clears the record ACLs.
+- Added `anonymous?` instance method to `Parse::User` class.
 
 1.3.8
 -----------
