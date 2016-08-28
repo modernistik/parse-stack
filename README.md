@@ -19,12 +19,12 @@ Or install it yourself as:
 
     $ gem install parse-stack
 
-## Rails Generators and Tasks
+### Rails
 Parse-Stack comes with support for Rails by adding additional rake tasks and generators. After adding `parse-stack` as a gem dependency in your Gemfile and running `bundle`, you should run the install script:
 
     $ rails g parse_stack:install
 
-This will create a configuration file and a set of sample models for you to get started. Modify the `parse.rb` file in your `config/initializers` directory. You can then generate models with the `parse_stack:model` generator.
+This will create a configuration file (`config/initializers/parse.rb`) and a set of sample models and hooks under `app/models` directory. Modify `config/initializers/parse.rb` file with your Parse-Server API keys. You can then generate models with the `parse_stack:model` generator.
 
     $ rails g parse_stack:model Song name:string released:date genres:array
 
@@ -1749,16 +1749,16 @@ end
 The app can be mounted like any regular Rack-based application.
 
 ```ruby
-  # Rack in config.ru
+  # Rack (add this to config.ru)
   map "/webhooks" do
     run Parse::Webhooks
   end
 
-  # Padrino (in apps.rb)
+  # or in Padrino (add this to apps.rb)
   Padrino.mount('Parse::Webhooks', :cascade => true).to('/webhooks')
 
-  # Rails
-  RailsApp::Application.routes.draw do
+  # or in Rails (add this in routes.rb)
+  Rails.application.routes.draw do
     mount Parse::Webhooks, :at => '/webhooks'
   end
 ```

@@ -5,9 +5,9 @@ require 'parse/stack'
 
 Parse.setup app_id: ENV['PARSE_APP_ID'],
            api_key: ENV['PARSE_API_KEY'],
-        server_url: 'https://api.parse.com/1/',
-          # optional
         master_key: ENV['PARSE_MASTER_KEY'],
-           logging: false,
-             cache: Moneta.new(:File, dir: 'tmp/cache'),
-           expires: 5 # cache ttl 3 seconds
+        server_url: 'https://api.parse.com/1/'
+        # optional
+        #    logging: false,
+        #      cache: Moneta.new(:File, dir: 'tmp/cache'),
+        #    expires: 1 # cache ttl 1 second
