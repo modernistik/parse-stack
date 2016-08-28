@@ -54,7 +54,7 @@ module Parse
     include Parse::API::Push
     include Parse::API::Schema
     RETRY_COUNT = 2
-    RETRY_DELAY = 3 #seconds
+    RETRY_DELAY = 2 #seconds
 
     attr_accessor :session, :cache
     attr_reader :application_id, :api_key, :master_key, :server_url
@@ -266,14 +266,13 @@ module Parse
       end
       raise e
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
-      # puts "[Parse:ConnectionError] #{e.class} : #{response.request} #{e.message}"
       if retry_count > 0
-        puts "[Parse:Retry] Retries remaining #{retry_count} : #{response.request}"
+        puts "[Parse:Retry] Retries remaining #{retry_count} : #{_request}"
         sleep RETRY_DELAY
         retry_count -= 1
         retry
       end
-      raise Parse::ConnectionError, "#{response.request} : #{e.class} - #{e.message}"
+      raise Parse::ConnectionError, "#{_request} : #{e.class} - #{e.message}"
     end
 
     # shorthand for request(:get, uri, query: {})
