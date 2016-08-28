@@ -10,3 +10,5 @@ module Parse
     # Your code goes here...
   end
 end
+
+require_relative 'stack/railtie' if defined?(::Rails)

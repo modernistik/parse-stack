@@ -1,0 +1,52 @@
+
+class <%= class_name %> < Parse::Object
+  # See: https://github.com/modernistik/parse-stack#defining-properties
+
+  # You can change the inferred Parse table/collection name below
+  # parse_class "<%= class_name.to_s.to_parse_class %>"
+<% attributes.each do |attr|
+  parse_type = attr.type.to_s.downcase.to_sym
+  unless @allowed_types.include?(parse_type)
+    puts "\n[Warning] Skipping property `#{attr.name}` with type `#{parse_type}`. Type should be one of #{@allowed_types}."
+    next
+  end
+%>
+  property :<%= attr.name %>, :<%= parse_type -%>
+<% end %>
+
+  # See: https://github.com/modernistik/parse-stack#cloud-code-webhooks
+  # define a before save webhook for <%= class_name %>
+  webhook :before_save do
+    <%= class_name.to_s.underscore %> = parse_object
+    # perform any validations with <%= class_name.to_s.underscore %>
+    # use `error!(msg)` to fail the save
+    # ...
+    <%= class_name.to_s.underscore %>
+  end
+
+  ## define an after save webhook for <%= class_name %>
+  #
+  # webhook :after_save do
+  #   <%= class_name.to_s.underscore %> = parse_object
+  #
+  # end
+
+  ## define a before delete webhook for <%= class_name %>
+  # webhook :before_delete do
+  #   <%= class_name.to_s.underscore %> = parse_object
+  #   # use `error!(msg)` to fail the delete
+  #   true # allow the deletion
+  # end
+
+  ## define an after delete webhook for <%= class_name %>
+  # webhook :after_delete do
+  #   <%= class_name.to_s.underscore %> = parse_object
+  # end
+
+  ## Example of a CloudCode Webhook function
+  ## define a `helloWorld` Parse CloudCode function
+  # webhook :function, :helloWorld do
+  #   "Hello!"
+  # end
+
+end

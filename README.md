@@ -5,6 +5,33 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
 [![Gem Version](https://badge.fury.io/rb/parse-stack.svg)](https://badge.fury.io/rb/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
 
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'parse-stack'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install parse-stack
+
+## Rails Generators and Tasks
+Parse-Stack comes with support for Rails by adding additional rake tasks and generators. After adding `parse-stack` as a gem dependency in your Gemfile and running `bundle`, you should run the install script:
+
+    $ rails g parse_stack:install
+
+This will create a configuration file and a set of sample models for you to get started. Modify the `parse.rb` file in your `config/initializers` directory. You can then generate models with the `parse_stack:model` generator.
+
+    $ rails g parse_stack:model Song name:string released:date genres:array
+
+This would create a `song.rb` file in `app/models` with the provided properties. Once you are ready to update your schema, you can run the `parse:upgrade` task to upgrade the remote Parse-Server schema to match your new models.
+
+    $ rails parse:upgrade
+
 ## Table Of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -20,6 +47,15 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
 - [Field Naming Conventions](#field-naming-conventions)
 - [Connection Setup](#connection-setup)
   - [Connection Options](#connection-options)
+    - [`:server_url`](#server_url)
+    - [`:app_id`](#app_id)
+    - [`:api_key`](#api_key)
+    - [`:master_key` _(optional)_](#master_key-_optional_)
+    - [`:logging`](#logging)
+    - [`:adapter`](#adapter)
+    - [`:cache`](#cache)
+    - [`:expires`](#expires)
+    - [`:faraday`](#faraday)
 - [Parse Config](#parse-config)
 - [Core Classes](#core-classes)
   - [Parse::Pointer](#parsepointer)
@@ -36,9 +72,21 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
   - [Defining Properties](#defining-properties)
     - [Accessor Aliasing](#accessor-aliasing)
     - [Property Options](#property-options)
+      - [`:required => (true|false)`](#required--truefalse)
+      - [`:field => (string)`](#field--string)
+      - [`:default => (value|proc)`](#default--valueproc)
+      - [`:alias => (true|false)`](#alias--truefalse)
+      - [`:symbolize => (true|false)`](#symbolize--truefalse)
+      - [Overriding Property Accessors](#overriding-property-accessors)
   - [Associations](#associations)
     - [Belongs To](#belongs-to)
+      - [Options](#options)
+        - [`:required => (true|false)`](#required--truefalse-1)
+        - [`:as => (string)`](#as--string)
+        - [`:field => (string)`](#field--string-1)
     - [Has Many (Array or Relation)](#has-many-array-or-relation)
+      - [Options](#options-1)
+        - [`:through => (:array|:relation)`](#through--arrayrelation)
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
   - [Saving](#saving)
@@ -80,6 +128,7 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
     - [Matches Query](#matches-query)
     - [Excludes Query](#excludes-query)
     - [Matches Object Id](#matches-object-id)
+      - [Additional Examples](#additional-examples)
   - [Geo Queries](#geo-queries)
     - [Max Distance Constraint](#max-distance-constraint)
     - [Bounding Box Constraint](#bounding-box-constraint)
@@ -104,7 +153,7 @@ Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) R
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
-Parse::Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the Parse Platform. If you are familiar with these technologies, the framework should feel familiar to you.
+Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the Parse Platform. If you are familiar with these technologies, the framework should feel familiar to you.
 
 ```ruby
 
@@ -508,39 +557,39 @@ Using the example above, we can add the base properties to our classes.
 
 ```ruby
 class Post < Parse::Object
-	property :title
-	property :content, :string # explicit
+  property :title
+  property :content, :string # explicit
 
-	# treat the values of this field as symbols instead of strings.
-	property :category, :string, symbolize: true
+  # treat the values of this field as symbols instead of strings.
+  property :category, :string, symbolize: true
 
-	# maybe a count of comments.
-	property :comment_count, :integer, default: 0
+  # maybe a count of comments.
+  property :comment_count, :integer, default: 0
 
   # use lambda to access the instance object.
   # Set draft_date to the created_at date if empty.
   property :draft_date, :date, default: lambda { |x| x.created_at }
   # the published date. Maps to "publishDate"
-	property :publish_date, :date, default: lambda { |x| DateTime.now }
+  property :publish_date, :date, default: lambda { |x| DateTime.now }
 
-	# maybe whether it is currently visible
-	property :visible, :boolean
+  # maybe whether it is currently visible
+  property :visible, :boolean
 
-	# a list using
-	property :tags, :array
+  # a list using
+  property :tags, :array
 
-	# Maps to "featuredImage" column representing a File.
-	property :featured_image, :file
+  # Maps to "featuredImage" column representing a File.
+  property :featured_image, :file
 
-	property :location, :geopoint
+  property :location, :geopoint
 
   # Support bytes
   property :data, :bytes
 
-	# store SEO information. Make sure we map it to the column
-	# "SEO", otherwise it would have implicitly used "seo"
-	# as the remote column name
-	property :seo, :object, field: "SEO"
+  # store SEO information. Make sure we map it to the column
+  # "SEO", otherwise it would have implicitly used "seo"
+  # as the remote column name
+  property :seo, :object, field: "SEO"
 end
 ```
 
@@ -953,7 +1002,7 @@ songs.save
 ```
 
 ### Magic `save_all`
-By default, all Parse queries have a maximum fetch limit of 1000. While using the `:max` option, `Parse::Stack` can increase this up to 11,000. In the cases where you need to update a large number of objects, you can utilize the `Parse::Object#save_all` method
+By default, all Parse queries have a maximum fetch limit of 1000. While using the `:max` option, Parse-Stack can increase this up to 11,000. In the cases where you need to update a large number of objects, you can utilize the `Parse::Object#save_all` method
 to fetch, modify and save objects.
 
 This methodology works by continually fetching and saving older records related to the time you begin a `save_all` request (called an "anchor date"), until there are no records left to update. To enable this to work, you must have confidence that any modifications you make to the records will successfully save through you validations that may be present in your `before_save`. This is important, as saving a record will set its `updated_at` date to one newer than the "anchor date" of when the `save_all` started. This `save_all` process will stop whenever no more records match the provided constraints that are older than the "anchor date", or when an object that was previously updated, is seen again in a future fetch (_which means the object failed to save_). Note that `save_all` will automatically manage the correct `updated_at` constraints in the query, so it is recommended that you do not use it as part of the initial constraints.
@@ -1004,7 +1053,7 @@ You can destroy a Parse record, just call the `#destroy` method. It will return 
 ```
 
 ### Auto-Fetching Associations
-All associations in `Parse::Stack` are fetched lazily by default. If you wish to include objects as part of your query results you can use the `:includes` expression.
+All associations in are fetched lazily by default. If you wish to include objects as part of your query results you can use the `:includes` expression.
 
 ```ruby
   song = Song.first
@@ -1016,7 +1065,7 @@ All associations in `Parse::Stack` are fetched lazily by default. If you wish to
 
 ```
 
-However, `Parse::Stack` performs automatic fetching of associations when the associated classes and their properties are locally defined. Using our Artist and Song examples. In this example, the Song object fetched only has a pointer object in its `#artist` field. However, because the framework knows there is a `Artist#name` property, calling `#name` on the artist pointer will automatically go to Parse to fetch the associated object and provide you with the value.
+However, Parse-Stack performs automatic fetching of associations when the associated classes and their properties are locally defined. Using our Artist and Song examples. In this example, the Song object fetched only has a pointer object in its `#artist` field. However, because the framework knows there is a `Artist#name` property, calling `#name` on the artist pointer will automatically go to Parse to fetch the associated object and provide you with the value.
 
 ```ruby
   song = Song.first

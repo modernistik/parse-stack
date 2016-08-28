@@ -137,13 +137,13 @@ module Parse
         return unless routes[type].present? && routes[type][className].present?
         registry = routes[type][className]
 
-        unless registry.is_a?(Array)
-          result = payload.instance_exec(payload, &registry)
-        else
+        if registry.is_a?(Array)
           result = registry.map { |hook| payload.instance_exec(payload, &hook) }.last
+        else
+          result = payload.instance_exec(payload, &registry)
         end
 
-        if type != :function && result.is_a?(Parse::Object)
+        if result.is_a?(Parse::Object)
           # if it is a Parse::Object, we will call the registered ActiveModel callbacks
           # and then send the proper changes payload
           if type == :before_save
