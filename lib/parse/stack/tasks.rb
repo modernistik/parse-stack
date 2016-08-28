@@ -18,6 +18,17 @@ module Parse
 
       def install_tasks
 
+        if defined?(::Rails)
+          unless Rake::Task.task_defined?('db:seed')
+            namespace :db do
+              desc "Seeds your database with by loading db/seeds.rb"
+              task :seed => 'parse:env' do
+                load Rails.root.join("db","seeds.rb")
+              end
+            end
+          end
+        end
+
         namespace :parse do
 
           task :env do
@@ -32,7 +43,7 @@ module Parse
               raise "Please make sure you have setup the Parse.setup configuration before invoking task. Usually done in the :environment task."
             end
 
-            endpoint = ENV['HOOKS_URL']
+            endpoint = ENV['HOOKS_URL'] || ''
             unless endpoint.empty? || endpoint.starts_with?('https://')
               raise "The ENV variable HOOKS_URL must be a <https> url : '#{endpoint}'. Ex. https://12345678.ngrok.io/webhooks"
             end
