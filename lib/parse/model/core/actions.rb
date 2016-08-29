@@ -337,6 +337,10 @@ module Parse
       success
     end
 
+    def prepare_save!
+      run_callbacks(:save) { false }
+    end
+
     def changes_payload
       h = attribute_updates
       if relation_changes?

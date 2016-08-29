@@ -148,7 +148,7 @@ module Parse
           # and then send the proper changes payload
           if type == :before_save
             # returning false from the callback block only runs the before_* callback
-            result.run_callbacks(:save) { false }
+            result.prepare_save!
             result = result.changes_payload
           elsif type == :before_delete
             result.run_callbacks(:destroy) { false }
