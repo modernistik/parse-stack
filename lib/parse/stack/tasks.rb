@@ -32,8 +32,13 @@ module Parse
         namespace :parse do
 
           task :env do
+
             if Rake::Task.task_defined?('environment')
               Rake::Task['environment'].invoke
+              if defined?(::Rails)
+                Rails.application.eager_load!
+              end
+
             end
           end
 

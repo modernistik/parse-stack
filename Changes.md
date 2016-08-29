@@ -1,6 +1,6 @@
 # Parse-Stack Changes
 
-1.4.0
+1.4.1
 -----------
 - NEW: Support for rails generators: `parse_stack:install` and `parse_stack:model`.
 - Support for calling `before_save` and `before_destroy` callbacks in your model when a Parse::Object is returned by your `before_save` or `before_delete` webhook respectively.

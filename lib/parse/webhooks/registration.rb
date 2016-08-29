@@ -36,7 +36,7 @@ module Parse
 
       def register_functions!(endpoint)
 
-        unless endpoint.starts_with?('https://')
+        unless endpoint.present? && endpoint.starts_with?('https://')
           raise "The HOOKS_URL must be https: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')
@@ -61,7 +61,7 @@ module Parse
 
       def register_triggers!(endpoint, include_wildcard: false)
 
-        unless endpoint.starts_with?('https://')
+        unless endpoint.present? && endpoint.starts_with?('https://')
           raise "The HOOKS_URL must be https: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')

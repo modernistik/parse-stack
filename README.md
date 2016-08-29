@@ -1645,24 +1645,34 @@ Push notifications are implemented through the `Parse::Push` class. To send push
 ## Cloud Code Webhooks
 Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks.
 
-### Cloud Code functions
+### Cloud Code Functions
 You can use the `route()` method to register handler blocks. The last value returned by the block will be returned back to the client in a success response. If `error!(value)` is called inside the block, we will return the correct Parse error response with the value you provided.
 
 ```ruby
 # Register handling the 'helloWorld' function.
 Parse::Webhooks.route(:function, :helloWorld) do
   #  use the Parse::Payload instance methods in this block
-  incoming_params = params #function params
-  name = params['name'].to_s
-
+  name = params['name'].to_s #function params
+  puts "CloudCode Webhook helloWorld called in Ruby!"
   # will return proper error response
-  error!("Missing argument 'name'.") unless name.present?
-  # return early
-  "Hello #{name}!"
+  # error!("Missing argument 'name'.") unless name.present?
+
+  name.present? ? "Hello #{name}!" : "Hello World!"
 end
 
 # Advanced: you can register handlers through classes if you prefer
-Parse::Webhooks.route :function, :myFunc, MyClass.method(:my_func)
+# Parse::Webhooks.route :function, :myFunc, MyClass.method(:my_func)
+```
+
+If you have registered this webhook (see instructions below), you should be able to test it out by running curl using the command below. For a more in-depth example, see [Parse-Server-Rails-Example](https://github.com/modernistik/parse-server-rails-example).
+
+```bash
+curl -X POST \
+  -H "X-Parse-Application-Id: ${APPLICATION_ID}" \
+  -H "X-Parse-REST-API-Key: ${REST_API_KEY}" \
+  -H "Content-Type: application/json" \
+  -d '{}' \
+  https://api.parse.com/1/functions/helloWorld
 ```
 
 If you are creating `Parse::Object` subclasses, you may also register them there to keep common code and functionality centralized.
@@ -1788,16 +1798,12 @@ end
 
 ```
 
-However, we have predefined a few rake tasks you can use in your application. Just require `parse/stack/tasks` in your `Rakefile` and call `Parse::Stack.load_tasks`. This is useful for web frameworks like `Padrino` and `Rails`.
+However, we have predefined a few rake tasks you can use in your application. Just require `parse/stack/tasks` in your `Rakefile` and call `Parse::Stack.load_tasks`. This is useful for web frameworks like `Padrino`. Note that if you are using Parse-Stack with Rails, this is automatically done for you through the Railtie.
 
 ```ruby
-  # Rails Rakefile example
-  require_relative 'config/application'
+  # Add to your Rakefile (if not using Rails)
   require 'parse/stack/tasks' # add this line
-
-  Rails.application.load_tasks
   Parse::Stack.load_tasks # add this line
-
 ```
 
 Then you can see the tasks available by typing `rake -T`.
