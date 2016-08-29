@@ -458,13 +458,18 @@ This class represents the data and columns contained in the standard Parse `_Ins
 
 ```ruby
 class Parse::Installation < Parse::Object
-  property :channels, :array
   property :gcm_sender_id, :string, field: :GCMSenderId
+  property :app_identifier
+  property :app_name
+  property :app_version
   property :badge, :integer
-  property :installation_id
+  property :channels, :array
   property :device_token
+  property :device_token_last_modified, :integer
   property :device_type
+  property :installation_id
   property :locale_identifier
+  property :parse_version
   property :push_type
   property :time_zone
 end
