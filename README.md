@@ -49,15 +49,6 @@ That should create the new collection `Song` in your Parse-Server backend. For a
 - [Field Naming Conventions](#field-naming-conventions)
 - [Connection Setup](#connection-setup)
   - [Connection Options](#connection-options)
-    - [`:server_url`](#server_url)
-    - [`:app_id`](#app_id)
-    - [`:api_key`](#api_key)
-    - [`:master_key` _(optional)_](#master_key-_optional_)
-    - [`:logging`](#logging)
-    - [`:adapter`](#adapter)
-    - [`:cache`](#cache)
-    - [`:expires`](#expires)
-    - [`:faraday`](#faraday)
 - [Parse Config](#parse-config)
 - [Core Classes](#core-classes)
   - [Parse::Pointer](#parsepointer)
@@ -74,21 +65,9 @@ That should create the new collection `Song` in your Parse-Server backend. For a
   - [Defining Properties](#defining-properties)
     - [Accessor Aliasing](#accessor-aliasing)
     - [Property Options](#property-options)
-      - [`:required => (true|false)`](#required--truefalse)
-      - [`:field => (string)`](#field--string)
-      - [`:default => (value|proc)`](#default--valueproc)
-      - [`:alias => (true|false)`](#alias--truefalse)
-      - [`:symbolize => (true|false)`](#symbolize--truefalse)
-      - [Overriding Property Accessors](#overriding-property-accessors)
   - [Associations](#associations)
     - [Belongs To](#belongs-to)
-      - [Options](#options)
-        - [`:required => (true|false)`](#required--truefalse-1)
-        - [`:as => (string)`](#as--string)
-        - [`:field => (string)`](#field--string-1)
     - [Has Many (Array or Relation)](#has-many-array-or-relation)
-      - [Options](#options-1)
-        - [`:through => (:array|:relation)`](#through--arrayrelation)
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
   - [Saving](#saving)
@@ -130,24 +109,22 @@ That should create the new collection `Song` in your Parse-Server backend. For a
     - [Matches Query](#matches-query)
     - [Excludes Query](#excludes-query)
     - [Matches Object Id](#matches-object-id)
-      - [Additional Examples](#additional-examples)
   - [Geo Queries](#geo-queries)
     - [Max Distance Constraint](#max-distance-constraint)
     - [Bounding Box Constraint](#bounding-box-constraint)
   - [Relational Queries](#relational-queries)
   - [Compound Queries](#compound-queries)
-- [Cloud Code Functions](#cloud-code-functions)
-- [Cloud Code Background Jobs](#cloud-code-background-jobs)
-- [Hooks and Callbacks](#hooks-and-callbacks)
+- [Calling Cloud Code Functions](#calling-cloud-code-functions)
+- [Calling Background Jobs](#calling-background-jobs)
+- [Model Callbacks](#model-callbacks)
 - [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
 - [Push Notifications](#push-notifications)
 - [Cloud Code Webhooks](#cloud-code-webhooks)
-  - [Cloud Code functions](#cloud-code-functions)
+  - [Cloud Code Functions](#cloud-code-functions)
   - [Cloud Code Triggers](#cloud-code-triggers)
   - [Mounting Webhooks Application](#mounting-webhooks-application)
   - [Register Webhooks](#register-webhooks)
 - [Parse REST API Client](#parse-rest-api-client)
-      - [Options](#options-2)
   - [Request Caching](#request-caching)
 - [Installation](#installation)
 - [Development](#development)
@@ -1554,7 +1531,7 @@ query.or_where(:wins.lt => 5)
 results = query.results
 ```
 
-## Cloud Code Functions
+## Calling Cloud Code Functions
 You can call on your defined Cloud Code functions using the `call_function()` method. The result will be `nil` in case of errors or the value of the `result` field in the Parse response.
 
 ```ruby
@@ -1567,7 +1544,7 @@ You can call on your defined Cloud Code functions using the `call_function()` me
  response.result unless response.error?
 ```
 
-## Cloud Code Background Jobs
+## Calling Background Jobs
 You can trigger background jobs that you have configured in your Parse application as follows.
 
 ```ruby
@@ -1580,7 +1557,7 @@ You can trigger background jobs that you have configured in your Parse applicati
  response.result unless response.error?
 ```
 
-## Hooks and Callbacks
+## Model Callbacks
 All `Parse::Object` subclasses extend [`ActiveModel::Callbacks`](http://api.rubyonrails.org/classes/ActiveModel/Callbacks.html) for `#save` and `#destroy` operations. You can setup internal hooks for `before`, `during` and `after`. See
 
 ```ruby
@@ -1684,7 +1661,7 @@ class Song < Parse::Object
     the_user = user # available if a Parse user made the call
     params = params
     # ... do stuff ...
-    true
+    some_result
   end
 
 end
@@ -1718,7 +1695,7 @@ You can register webhooks to handle the different object triggers: `:before_save
 
 For any `after_*` hook, return values are not needed since Parse does not utilize them. You may also register as many `after_save` or `after_delete` handlers as you prefer, all of them will be called.
 
-`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved for the object. For this, we recommend using the `payload_update` method. For more details, see [Cloud Code BeforeSave Webhooks](https://parse.com/docs/cloudcode/guide#cloud-code-advanced-beforesave-webhooks)
+`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved. However, we recommend modifying the `parse_object` provided since it has dirty tracking, and then returning that same object. This will automatically call your model specific `before_save` callbacks and send the proper payload back to Parse. For more details, see [Cloud Code BeforeSave Webhooks](https://parse.com/docs/cloudcode/guide#cloud-code-advanced-beforesave-webhooks)
 
 ```ruby
 # recommended way
@@ -1745,7 +1722,7 @@ class Artist < Parse::Object
     end
 
     # *important* returns a special hash of changed values
-    artist.payload_update
+    artist
   end
 
   webhook :before_delete do
