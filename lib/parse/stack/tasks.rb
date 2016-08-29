@@ -19,7 +19,7 @@ module Parse
       def install_tasks
 
         if defined?(::Rails)
-          unless Rake::Task.task_defined?('db:seed')
+          unless Rake::Task.task_defined?('db:seed') || Rails.root.blank?
             namespace :db do
               desc "Seeds your database with by loading db/seeds.rb"
               task :seed => 'parse:env' do
@@ -36,7 +36,7 @@ module Parse
             if Rake::Task.task_defined?('environment')
               Rake::Task['environment'].invoke
               if defined?(::Rails)
-                Rails.application.eager_load!
+                Rails.application.eager_load! if Rails.application.present?
               end
 
             end
