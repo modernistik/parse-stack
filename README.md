@@ -32,6 +32,8 @@ This would create a `song.rb` file in `app/models` with the provided properties.
 
     $ rails parse:upgrade
 
+That should create the new collection `Song` in your Parse-Server backend. For a more full featured example, see [Parse-Server-Rails-Example](https://github.com/modernistik/parse-server-rails-example).
+
 ## Table Of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
