@@ -52,3 +52,11 @@ class DateTime
     Parse::Date.parse iso8601(3)
   end
 end
+
+module ActiveSupport
+  class TimeWithZone
+    def parse_date
+      Parse::Date.parse iso8601(3)
+    end
+  end
+end

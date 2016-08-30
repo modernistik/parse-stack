@@ -230,6 +230,10 @@ module Parse
       self.class.new h
     end
 
+    def pretty
+      JSON.pretty_generate( as_json )
+    end
+
     def clear_attribute_change!(atts)
       clear_attribute_changes(atts)
     end

@@ -26,6 +26,7 @@ module Parse
   module Properties
     # This is an exception that is thrown if there is an issue when creating a specific property for a class.
     class DefinitionError < Exception; end;
+    class ValueError < Exception; end;
 
     # These are the base types supported by Parse.
     TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl].freeze
@@ -411,13 +412,15 @@ module Parse
         elsif val.is_a?(String)
           # if it's a string, try parsing the date
           val = Parse::Date.parse val
+        elsif val.present?
+          raise ValueError, "Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
         end
       else
         # You can provide a specific class instead of a symbol format
         if data_type.respond_to?(:typecast)
           val = data_type.typecast(val)
         else
-          warn "Property :#{key}: :#{data_type} has not valid data type"
+          warn "Property :#{key}: :#{data_type} has no valid data type"
           val = val #default
         end
       end
