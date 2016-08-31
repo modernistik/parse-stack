@@ -96,6 +96,7 @@ module Parse
 
         anchor_date = Parse::Date.now
         constraints.merge! :updated_at.on_or_before => anchor_date
+        constraints.merge! cache: false
         # oldest first, so we create a reduction-cycle
         constraints.merge! order: :updated_at.asc, limit: 100
         update_query = query(constraints)

@@ -48,7 +48,7 @@ module Parse
   end
 
   class BatchOperation
-    MAX_REQ_SEC = 30
+    MAX_REQ_SEC = 25
 
     attr_accessor :requests, :responses
     include Enumerable
