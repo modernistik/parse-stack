@@ -48,7 +48,6 @@ module Parse
   end
 
   class BatchOperation
-    MAX_REQ_SEC = 25
 
     attr_accessor :requests, :responses
     include Enumerable
@@ -120,7 +119,7 @@ module Parse
       @requests.each_slice(segment) do |slice|
         @responses << client.batch_request( BatchOperation.new(slice) )
         #throttle
-        sleep (slice.count.to_f / MAX_REQ_SEC.to_f )
+        # sleep (slice.count.to_f / MAX_REQ_SEC.to_f )
       end
       @responses.flatten!
       #puts "Requests: #{@requests.count} == Response: #{@responses.count}"
