@@ -412,8 +412,9 @@ module Parse
         elsif val.is_a?(String)
           # if it's a string, try parsing the date
           val = Parse::Date.parse val
-        elsif val.present?
-          raise ValueError, "Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
+        #elsif val.present?
+        #  pus "[Parse::Stack] Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
+        #   raise ValueError, "Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
         end
       else
         # You can provide a specific class instead of a symbol format
