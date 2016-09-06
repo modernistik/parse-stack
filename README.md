@@ -327,7 +327,7 @@ end
 
 class Commentary < Parse::Object
   parse_class "Comment"
-	belongs_to :post 	
+	belongs_to :post
 	#'Author' class not defined locally
 	belongs_to :author
 end
@@ -368,7 +368,7 @@ This class represents a Parse file pointer. `Parse::File` has helper methods to 
 
 ```
 
-The default MIME type for all files is `iamge/jpeg`. This can be default can be changed by setting a value to `Parse::File.default_mime_type`. Other ways of creating a `Parse::File` are provided below. The created Parse::File is not uploaded until you call `save`.
+The default MIME type for all files is `image/jpeg`. This can be default can be changed by setting a value to `Parse::File.default_mime_type`. Other ways of creating a `Parse::File` are provided below. The created Parse::File is not uploaded until you call `save`.
 
 ```ruby
   # urls
