@@ -4,7 +4,7 @@ require_relative "properties"
 module Parse
 
   def self.auto_upgrade!
-    klassModels = Parse::Object.descendants - [Parse::User, Parse::Installation, Parse::Role, Parse::Session]
+    klassModels = Parse::Object.descendants
     klassModels.sort_by { |c| c.parse_class }.each do |klass|
       yield(klass) if block_given?
       klass.auto_upgrade!
