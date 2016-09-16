@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'faraday'
 require 'faraday_middleware'
 require_relative 'response'
@@ -42,6 +45,11 @@ module Parse
 
         if self.class.logging
             puts "[Request #{env.method.upcase}] #{env[:url]}"
+            env[:request_headers].each do |k,v|
+              next if k == Parse::Protocol::MASTER_KEY
+              puts "[Header] #{k} : #{v}"
+            end
+
             puts "[Request Body] #{env[:body]}"
         end
         @app.call(env).on_complete do |response_env|

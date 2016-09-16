@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -250,6 +253,7 @@ module Parse
       if json.is_a?(Hash) && json["error"].present? && json["code"].present?
         warn "[Parse::Object] Detected object hash with 'error' and 'code' set. : #{json}"
       end
+      className = parse_class unless parse_class == "Parse::Object".freeze
       return if className.nil?
       # we should do a reverse lookup on who is registered for a different class type
       # than their name with parse_class
@@ -287,78 +291,9 @@ module Parse
       @updated_at.to_time.utc.iso8601(3) if @updated_at.present?
     end
 
-
-
-  end
-
-  # The User class provided by Parse with the required fields. You may
-  # add mixings to this class to add the app specific properties
-  class User < Parse::Object
-    parse_class "_User".freeze
-    property :auth_data, :object
-    property :email
-    property :password
-    property :username
-
-    before_save do
-      # You cannot specify user ACLs.
-      self.clear_attribute_change!(:acl)
-    end
-
-    def anonymous?
-      auth_data.present? && auth_data["anonymous"].present?
-    end
-  end
-
-  class Installation < Parse::Object
-    parse_class "_Installation".freeze
-
-    property :gcm_sender_id, :string, field: :GCMSenderId
-    property :app_identifier
-    property :app_name
-    property :app_version
-    property :badge, :integer
-    property :channels, :array
-    property :device_token
-    property :device_token_last_modified, :integer
-    property :device_type
-    property :installation_id
-    property :locale_identifier
-    property :parse_version
-    property :push_type
-    property :time_zone
-
-  end
-
-  class Role < Parse::Object
-    parse_class "_Role".freeze
-    property :name
-
-    has_many :roles, through: :relation
-    has_many :users, through: :relation
-
-    def update_acl
-      acl.everyone true, false
-    end
-
-    before_save do
-      update_acl
-    end
-  end
-
-  class Session < Parse::Object
-    parse_class "_Session".freeze
-    property :created_with, :object
-    property :expires_at, :date
-    property :installation_id
-    property :restricted, :boolean
-    property :session_token
-
-    belongs_to :user
   end
 
 end
-
 
 class Array
   # This helper method selects all objects in an array that are either inherit from
@@ -381,3 +316,6 @@ class Array
   end
 
 end
+
+
+require_relative 'subclasses'
