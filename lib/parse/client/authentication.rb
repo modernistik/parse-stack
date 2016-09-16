@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'faraday'
 require 'faraday_middleware'
 require 'active_support'
@@ -37,7 +40,6 @@ module Parse
           raise "No Parse Application Id specified for authentication." unless @application_id.present?
           headers[APP_ID] = @application_id
           headers[API_KEY] = @api_key unless @api_key.blank?
-
           unless @master_key.blank? || env[:request_headers][DISABLE_MASTER_KEY].present?
             headers[MASTER_KEY] = @master_key
           end

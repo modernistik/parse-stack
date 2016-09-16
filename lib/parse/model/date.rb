@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'time'
 require 'date'
 require 'active_model'
@@ -19,6 +22,7 @@ require_relative 'model'
 # providing our own encoding for sending to Parse.
 module Parse
   class Date < ::DateTime
+    ATTRIBUTES = {  __type: :string, iso: :string }.freeze
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON
     def self.parse_class; Parse::Model::TYPE_DATE; end;
@@ -27,7 +31,7 @@ module Parse
 
     # called when encoding to JSON.
     def attributes
-      {  __type: :string, iso: :string }.freeze
+      ATTRIBUTES
     end
 
     # this method is defined because it is used by JSON encoding

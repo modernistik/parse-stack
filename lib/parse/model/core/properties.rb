@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -408,7 +411,7 @@ module Parse
           val = val.parse_date
           # if the value is a hash, then it may be the Parse hash format for an iso date.
         elsif val.is_a?(Hash) # val.respond_to?(:iso8601)
-          val = Parse::Date.parse(val["iso".freeze] || val[:iso])
+          val = Parse::Date.parse(val["iso"] || val[:iso])
         elsif val.is_a?(String)
           # if it's a string, try parsing the date
           val = Parse::Date.parse val

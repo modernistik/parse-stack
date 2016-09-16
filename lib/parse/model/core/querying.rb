@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative '../../query'
 
 # This module provides most of the querying methods for Parse Objects.

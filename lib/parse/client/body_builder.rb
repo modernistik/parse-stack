@@ -18,7 +18,7 @@ module Parse
       end
 
       include Parse::Protocol
-      HTTP_OVERRIDE = 'X-Http-Method-Override'.freeze
+      HTTP_OVERRIDE = 'X-Http-Method-Override'
 
       # thread-safety
       def call(env)
@@ -32,7 +32,7 @@ module Parse
         # The standard maximum POST request (which is a server setting), is usually set to 20MBs
         if env[:method] == :get && env[:url].to_s.length > 2_000
           env[:request_headers][HTTP_OVERRIDE] = 'GET'
-          env[:request_headers][CONTENT_TYPE] = 'application/x-www-form-urlencoded'.freeze
+          env[:request_headers][CONTENT_TYPE] = 'application/x-www-form-urlencoded'
           env[:body] = env[:url].query
           env[:url].query = nil
           #override

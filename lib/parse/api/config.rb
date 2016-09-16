@@ -1,3 +1,5 @@
+# encoding: UTF-8
+# frozen_string_literal: true
 
 module Parse
 
@@ -5,7 +7,7 @@ module Parse
     #object fetch methods
     module Config
       attr_accessor :config
-      
+
       def config!
         @config = nil
         self.config

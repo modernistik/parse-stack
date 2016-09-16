@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative "properties"
 # This class adds methods to Parse::Objects in order to create a JSON Parse schema
 # in order to support table creation and table alterations.
@@ -31,13 +34,13 @@ module Parse
           # if it is a basic column property, find the right datatype
           case v
           when :integer, :float
-            result[:type] = "Number".freeze
+            result[:type] = "Number"
           when :geopoint, :geo_point
-            result[:type] = "GeoPoint".freeze
+            result[:type] = "GeoPoint"
           when :pointer
-            result = { type: "Pointer".freeze, targetClass: references[k] }
+            result = { type: "Pointer", targetClass: references[k] }
           when :acl
-            result[:type] = "ACL".freeze
+            result[:type] = "ACL"
           else
             result[:type] = v.to_s.camelize
           end
@@ -47,7 +50,7 @@ module Parse
         end
         #then add all the relational column attributes
         relations.each do |k,v|
-          sch[:fields][k] = { type: "Relation".freeze, targetClass: relations[k] }
+          sch[:fields][k] = { type: "Relation", targetClass: relations[k] }
         end
         sch
       end

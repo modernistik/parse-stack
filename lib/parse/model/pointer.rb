@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -13,10 +16,10 @@ module Parse
     # based on your Parse application tables - however they are used for when a class is found that cannot be
     # associated with a defined ruby class or used when specifically saving Parse relation types.
     class Pointer < Model
-
+      ATTRIBUTES = { __type: :string, className: :string, objectId: :string}.freeze
       attr_accessor :parse_class, :id
 
-      def __type; "Pointer".freeze; end;
+      def __type; "Pointer"; end;
       alias_method :className, :parse_class
       # A Parse object as a className field and objectId. In ruby, we will use the
       # id attribute method, but for usability, we will also alias it to objectId
@@ -32,9 +35,8 @@ module Parse
       end
 
       def attributes
-        { __type: :string, className: :string, objectId: :string}.freeze
+        ATTRIBUTES
       end
-
 
       def json_hash
         JSON.parse to_json

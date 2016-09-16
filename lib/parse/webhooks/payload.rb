@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -9,6 +12,11 @@ require 'active_model_serializers'
 module Parse
 
     class Payload
+    ATTRIBUTES = { master: nil, user: nil,
+           installationId: nil, params: nil,
+             functionName: nil, object: nil,
+                 original: nil, update: nil,
+                 triggerName: nil }.freeze
     include ::ActiveModel::Serializers::JSON
     attr_accessor :master, :user, :installation_id, :params, :function_name, :object, :trigger_name
 
@@ -31,6 +39,10 @@ module Parse
       @original = hash[:original]
       @update = hash[:update] || {} #it comes as an update hash
     end
+    
+    def attributes
+      ATTRIBUTES
+    end
 
     def function?
       @function_name.present?
@@ -38,12 +50,12 @@ module Parse
 
     def parse_class
       return nil unless @object.present?
-      @object["className".freeze] || @object[:className]
+      @object["className"] || @object[:className]
     end
 
     def parse_id
       return nil unless @object.present?
-      @object["objectId".freeze] || @object[:objectId]
+      @object["objectId"] || @object[:objectId]
     end; alias_method :objectId, :parse_id
 
     def trigger?
@@ -115,12 +127,6 @@ module Parse
 
       end # if before_trigger?
       Parse::Object.build(@object)
-    end
-
-
-    def attributes
-      { master: nil, user: nil, installationId: nil, params: nil,
-        functionName: nil, object: nil, original: nil, update: nil, triggerName: nil }.freeze
     end
 
     end # Payload

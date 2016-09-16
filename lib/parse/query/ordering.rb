@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 # Ordering is implemented similarly as constraints in which we add
 # special methods to the Symbol class. The developer can then pass one
 # or an array of fields (as symbols) and call the particular ordering

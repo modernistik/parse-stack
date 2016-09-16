@@ -144,7 +144,7 @@ module Parse
       elsif opts.is_a?(Hash)
         #if the objectId is provided we will consider the object pristine
         #and not track dirty items
-        dirty_track = opts["objectId".freeze] || opts[:objectId] || opts[:id]
+        dirty_track = opts["objectId"] || opts[:objectId] || opts[:id]
         apply_attributes!(opts, dirty_track: !dirty_track)
       end
 
@@ -253,7 +253,7 @@ module Parse
       if json.is_a?(Hash) && json["error"].present? && json["code"].present?
         warn "[Parse::Object] Detected object hash with 'error' and 'code' set. : #{json}"
       end
-      className = parse_class unless parse_class == "Parse::Object".freeze
+      className = parse_class unless parse_class == "Parse::Object"
       return if className.nil?
       # we should do a reverse lookup on who is registered for a different class type
       # than their name with parse_class
@@ -301,7 +301,7 @@ class Array
   # if it constains the proper fields. Non convertible objects will be removed
   # If the className is not contained or known, you can pass a table name as an argument
   def parse_objects(table = nil)
-    f = "className".freeze
+    f = "className"
     map do |m|
       next m if m.is_a?(Parse::Pointer)
       if m.is_a?(Hash) && (m[f] || m[:className] || table)

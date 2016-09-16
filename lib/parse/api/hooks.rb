@@ -1,12 +1,12 @@
-
-
+# encoding: UTF-8
+# frozen_string_literal: true
 
 module Parse
 
 
   module API
     module Hooks
-      HOOKS_PREFIX = "hooks/".freeze
+      HOOKS_PREFIX = "hooks/"
       TRIGGER_NAMES = [:beforeSave, :afterSave, :beforeDelete, :afterDelete].freeze
       def _verify_trigger(triggerName)
         triggerName = triggerName.to_s.camelize(:lower).to_sym

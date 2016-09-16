@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/core_ext'
 
@@ -7,7 +10,7 @@ module Parse
     #object fetch methods
     module Objects
 
-      CLASS_PATH_PREFIX = "classes/".freeze
+      CLASS_PATH_PREFIX = "classes/"
       PREFIX_MAP = { installation: "installations", _installation: "installations",
         user: "users", _user: "users",
         role: "roles", _role: "roles",

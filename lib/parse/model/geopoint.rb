@@ -1,3 +1,5 @@
+# encoding: UTF-8
+# frozen_string_literal: true
 
 require_relative "model"
 
@@ -6,10 +8,10 @@ module Parse
   # A basic geo location object in Parse. It represents a location on a map through a
   # latitude and longitue.
   class GeoPoint < Model
-
+    ATTRIBUTES = {  __type: :string, latitude: :float, longitude: :float }.freeze
     attr_accessor :latitude, :longitude
-    FIELD_LAT = "latitude".freeze
-    FIELD_LNG = "longitude".freeze
+    FIELD_LAT = "latitude"
+    FIELD_LNG = "longitude"
     # Latitude should not be -90.0 or 90.0.
     # Longitude should not be -180.0 or 180.0.
     LAT_MIN = -90.0
@@ -58,7 +60,7 @@ module Parse
     end
 
     def attributes
-      {  __type: :string, latitude: :float, longitude: :float }.freeze
+      ATTRIBUTES
     end
 
     def max_miles(m)

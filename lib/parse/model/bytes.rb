@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/core_ext/object'
 require_relative "model"
@@ -7,6 +10,7 @@ require 'base64'
 module Parse
 
   class Bytes < Model
+    ATTRIBUTES = {__type: :string, base64: :string }.freeze
     attr_accessor :base64
     def parse_class; TYPE_BYTES; end;
     def parse_class; self.class.parse_class; end;
@@ -18,7 +22,7 @@ module Parse
     end
 
     def attributes
-      {__type: :string, base64: :string }.freeze
+      ATTRIBUTES
     end
 
     # takes a string and base64 encodes it
@@ -35,7 +39,7 @@ module Parse
       if a.is_a?(String)
       @bytes = a
       elsif a.is_a?(Hash)
-        @bytes = a["base64".freeze] || @bytes
+        @bytes = a["base64"] || @bytes
       end
     end
 

@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -86,9 +89,9 @@ module Parse
     include Client::Connectable
     extend Webhook::Registration
 
-    HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY".freeze
-    HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID".freeze
-    CONTENT_TYPE = "application/json".freeze
+    HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY"
+    HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID"
+    CONTENT_TYPE = "application/json"
     attr_accessor :key
     class << self
       attr_accessor :logging

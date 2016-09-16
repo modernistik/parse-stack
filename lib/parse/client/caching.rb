@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'faraday'
 require 'faraday_middleware'
 require 'moneta'
@@ -17,9 +20,9 @@ module Parse
          # * 302 - 'Found'
          # * 404 - 'Not Found' - removed
          # * 410 - 'Gone' - removed
-      CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302].freeze
-      CACHE_CONTROL = 'Cache-Control'.freeze
-      CACHE_EXPIRES_DURATION = 'X-Parse-Stack-Cache-Expires'.freeze
+      CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302]
+      CACHE_CONTROL = 'Cache-Control'
+      CACHE_EXPIRES_DURATION = 'X-Parse-Stack-Cache-Expires'
 
       class << self
         attr_accessor :enabled, :logging
@@ -60,7 +63,7 @@ module Parse
         # get default caching state
         @enabled = self.class.enabled
         # disable cache for this request if "no-cache" was passed
-        if @request_headers[CACHE_CONTROL] == "no-cache".freeze
+        if @request_headers[CACHE_CONTROL] == "no-cache"
           @enabled = false
         end
 
@@ -111,7 +114,7 @@ module Parse
           # Only cache GET requests with valid HTTP status codes whose content-length
           # is greater than 20. Otherwise they could be errors, successes and empty result sets.
           if @enabled && method == :get &&  CACHEABLE_HTTP_CODES.include?(response_env.status) &&
-             response_env.present? && response_env.response_headers["content-length".freeze].to_i > 20
+             response_env.present? && response_env.response_headers["content-length"].to_i > 20
                 @store.store(@cache_key, response_env, expires: @expires) # ||= response_env.body
           end # if
           # do something with the response

@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative '../pointer'
 require_relative 'collection_proxy'
 require_relative 'pointer_collection_proxy'
@@ -68,7 +71,7 @@ module Parse
             # if for some reason we retrieved either from store or fetching a
             # hash, lets try to buid a Pointer of that type.
 
-            if val.is_a?(Hash) && ( val["__type"].freeze == "Pointer".freeze ||  val["__type"].freeze == "Object".freeze )
+            if val.is_a?(Hash) && ( val["__type"] == "Pointer" ||  val["__type"] == "Object" )
               val = Parse::Object.build val, ( val["className"] || klassName )
               instance_variable_set ivar, val
             end
@@ -88,7 +91,7 @@ module Parse
           define_method("#{key}_set_attribute!") do |val, track = true|
             if val == Parse::Properties::DELETE_OP
               val = nil
-            elsif val.is_a?(Hash) && ( val["__type"].freeze == "Pointer".freeze ||  val["__type"].freeze == "Object".freeze )
+            elsif val.is_a?(Hash) && ( val["__type"] == "Pointer" ||  val["__type"] == "Object" )
               val = Parse::Object.build val, ( val["className"] || klassName )
             end
 

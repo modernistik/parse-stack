@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'parse/stack'
 require 'parse/stack/tasks'
 require 'rails/generators'

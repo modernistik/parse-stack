@@ -1,3 +1,5 @@
+# encoding: UTF-8
+# frozen_string_literal: true
 
 # An ACL represents the Parse Permissions object used for each record. In Parse,
 # it is composed a hash-like object that represent Parse::User objectIds and/or Parse::Role
@@ -17,7 +19,7 @@ module Parse
     attr_accessor :permissions, :delegate
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON
-    PUBLIC = "*".freeze # Public priviledges are '*' key in Parse
+    PUBLIC = "*" # Public priviledges are '*' key in Parse
 
     # provide a set of acls and the delegate (for dirty tracking)
     # { '*' => { "read": true, "write": true } }

@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/inflector'
 require 'active_support/core_ext/object'
@@ -89,7 +92,7 @@ module Parse
           end
 
           classNames.sort.each do |className|
-            next if className == '*'.freeze
+            next if className == '*'
             url = endpoint + "#{trigger}/#{className}"
             if current_triggers[trigger][className].present? #then you may need to update
               next if current_triggers[trigger][className] == url
@@ -111,7 +114,7 @@ module Parse
           # if it is either an error (which has no results) or there is a result but
           # no registered item with a URL (which implies either none registered or only cloud code registered)
           # then create it.
-          if response.results.none? { |d| d.has_key?("url".freeze) }
+          if response.results.none? { |d| d.has_key?("url") }
             response = client.create_function(name, url)
           else
             # update it
@@ -126,7 +129,7 @@ module Parse
           # if it is either an error (which has no results) or there is a result but
           # no registered item with a URL (which implies either none registered or only cloud code registered)
           # then create it.
-          if response.results.none? { |d| d.has_key?("url".freeze) }
+          if response.results.none? { |d| d.has_key?("url") }
             # create it
             response = client.create_trigger(trigger, name, url)
           else

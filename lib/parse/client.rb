@@ -193,10 +193,10 @@ module Parse
       # http method
       method = method.downcase.to_sym
       # set the User-Agent
-      headers["User-Agent".freeze] = "Parse-Server Ruby Client v#{Parse::Stack::VERSION}".freeze
+      headers["User-Agent"] = "Parse-Server Ruby Client v#{Parse::Stack::VERSION}"
 
       if opts[:cache] == false
-        headers[Parse::Middleware::Caching::CACHE_CONTROL] = "no-cache".freeze
+        headers[Parse::Middleware::Caching::CACHE_CONTROL] = "no-cache"
       elsif opts[:cache].is_a?(Numeric)
         # specify the cache duration of this request
         headers[Parse::Middleware::Caching::CACHE_EXPIRES_DURATION] = opts[:cache].to_i

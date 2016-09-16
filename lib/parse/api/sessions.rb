@@ -5,7 +5,7 @@ module Parse
 
   module API
     module Sessions
-      SESSION_PATH_PREFIX = "sessions".freeze
+      SESSION_PATH_PREFIX = "sessions"
 
       def fetch_session(session_token)
         headers = {Parse::Protocol::SESSION_TOKEN => session_token}

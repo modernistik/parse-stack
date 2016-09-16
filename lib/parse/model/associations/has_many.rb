@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative '../pointer'
 require_relative 'collection_proxy'
 require_relative 'pointer_collection_proxy'

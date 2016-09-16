@@ -1,11 +1,12 @@
-
+# encoding: UTF-8
+# frozen_string_literal: true
 
 module Parse
 
   module API
     #object fetch methods
     module Schema
-      SCHEMA_PREFIX = "schemas/".freeze
+      SCHEMA_PREFIX = "schemas/"
       def schema(className)
         request :get, "#{SCHEMA_PREFIX}#{className}"
       end

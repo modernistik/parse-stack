@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative '../query.rb'
 require_relative '../client.rb'
 require 'active_model_serializers'
@@ -57,7 +60,7 @@ module Parse
       msg = {
         data: {
           alert: alert,
-          badge: badge || "Increment".freeze
+          badge: badge || "Increment"
         }
       }
       msg[:data][:sound] = sound if sound.present?

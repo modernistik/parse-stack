@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative "client"
 require_relative "query/operation"
 require_relative "query/constraints"

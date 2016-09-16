@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -20,20 +23,20 @@ module Parse
     extend  ::ActiveModel::Naming # provides the methods for getting class names from Model classes
 
     # General Parse constants
-    KEY_CLASS_NAME  = 'className'.freeze
-    KEY_OBJECT_ID   = 'objectId'.freeze
-    KEY_CREATED_AT  = 'createdAt'.freeze
-    KEY_UPDATED_AT  = 'updatedAt'.freeze
-    CLASS_USER      = '_User'.freeze
-    CLASS_INSTALLATION = '_Installation'.freeze
-    TYPE_FILE = "File".freeze
-    TYPE_GEOPOINT = "GeoPoint".freeze
-    TYPE_OBJECT = "Object".freeze
-    TYPE_DATE = "Date".freeze
-    TYPE_BYTES = "Bytes".freeze
-    TYPE_POINTER = "Pointer".freeze
-    TYPE_RELATION = "Relation".freeze
-    TYPE_FIELD = "__type".freeze
+    KEY_CLASS_NAME  = 'className'
+    KEY_OBJECT_ID   = 'objectId'
+    KEY_CREATED_AT  = 'createdAt'
+    KEY_UPDATED_AT  = 'updatedAt'
+    CLASS_USER      = '_User'
+    CLASS_INSTALLATION = '_Installation'
+    TYPE_FILE = "File"
+    TYPE_GEOPOINT = "GeoPoint"
+    TYPE_OBJECT = "Object"
+    TYPE_DATE = "Date"
+    TYPE_BYTES = "Bytes"
+    TYPE_POINTER = "Pointer"
+    TYPE_RELATION = "Relation"
+    TYPE_FIELD = "__type"
 
     # To support being able to have different ruby class names from the 'table'
     # names used in Parse, we will need to have a dynamic lookup system where
@@ -63,12 +66,12 @@ module Parse
     # class method to find the responsible ruby Parse::Object subclass that handles
     # the provided parse class (str).
     def self.find_class(str)
-      return Parse::File if str == TYPE_FILE.freeze
-      return Parse::GeoPoint if str == TYPE_GEOPOINT.freeze
-      return Parse::Date if str == TYPE_DATE.freeze
-      return Parse::Bytes if str == TYPE_BYTES.freeze
-      # return Parse::User if str == "User".freeze
-      # return Parse::Installation if str == "Installation".freeze
+      return Parse::File if str == TYPE_FILE
+      return Parse::GeoPoint if str == TYPE_GEOPOINT
+      return Parse::Date if str == TYPE_DATE
+      return Parse::Bytes if str == TYPE_BYTES
+      # return Parse::User if str == "User"
+      # return Parse::Installation if str == "Installation"
 
       str = str.to_s
       # Basically go through all Parse::Object subclasses and see who is has a parse_class
@@ -87,7 +90,7 @@ end
 class String
   # short helper method to provide lower-first-camelcase
   def columnize
-     return "objectId".freeze if self == "id".freeze
+     return "objectId" if self == "id"
      camelize(:lower)
    end;
 

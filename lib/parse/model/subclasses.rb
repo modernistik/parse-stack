@@ -66,7 +66,7 @@ module Parse
   end
 
   class Role < Parse::Object
-    parse_class "_Role".freeze
+    parse_class "_Role"
     property :name
 
     has_many :roles, through: :relation
@@ -83,7 +83,7 @@ module Parse
   end
 
   class Session < Parse::Object
-    parse_class "_Session".freeze
+    parse_class "_Session"
     property :created_with, :object
     property :expires_at, :date
     property :installation_id

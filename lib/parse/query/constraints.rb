@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative 'constraint'
 
 # Eac constraint type is a subclass of Parse::Constraint

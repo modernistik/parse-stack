@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_model'
 require 'active_support'
 require 'active_support/inflector'
@@ -14,8 +17,8 @@ require_relative '../../client/request'
 # hash request format Parse needs in order to modify relational information for classes.
 module Parse
   class RelationAction
-    ADD = "AddRelation".freeze
-    REMOVE = "RemoveRelation".freeze
+    ADD = "AddRelation"
+    REMOVE = "RemoveRelation"
     attr_accessor :polarity, :key, :objects
     # provide the column name of the field, polarity (true = add, false = remove) and the
     # list of objects.
@@ -410,7 +413,7 @@ module Parse
     def set_attributes!(hash, dirty_track = false)
       return unless hash.is_a?(Hash)
       hash.each do |k,v|
-        next if k == "objectId".freeze || k == "id".freeze
+        next if k == "objectId" || k == "id"
         method = "#{k}_set_attribute!"
         send(method, v, dirty_track) if respond_to?(method)
       end

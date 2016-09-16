@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/core_ext/object'
 require_relative "model"
@@ -12,14 +15,14 @@ require 'open-uri'
 module Parse
 
     class File < Model
-
+      ATTRIBUTES = {  __type: :string, name: :string, url: :string }.freeze
       attr_accessor :name, :url
       attr_accessor :contents, :mime_type
       def self.parse_class; TYPE_FILE; end;
       def parse_class; self.class.parse_class; end;
       alias_method :__type, :parse_class
-      FIELD_NAME = "name".freeze
-      FIELD_URL = "url".freeze
+      FIELD_NAME = "name"
+      FIELD_URL = "url"
       class << self
         attr_accessor :default_mime_type
 
@@ -36,7 +39,7 @@ module Parse
       def initialize(name, contents = nil, mime_type = nil)
         mime_type ||= Parse::File.default_mime_type
 
-        if name.is_a?(String) && name.start_with?("http".freeze) #could be url string
+        if name.is_a?(String) && name.start_with?("http") #could be url string
           file = open( name )
           @contents =  file.read
           @name = File.basename file.base_uri.to_s
@@ -72,11 +75,11 @@ module Parse
       # A File object is considered saved if the basename of the URL and the name parameters are equal and
       # the name of the file begins with 'tfss'
       def saved?
-        @url.present? && @name.present? && @name == File.basename(@url) && @name.start_with?("tfss".freeze)
+        @url.present? && @name.present? && @name == File.basename(@url) && @name.start_with?("tfss")
       end
 
       def attributes
-        {  __type: :string, name: :string, url: :string }.freeze
+        ATTRIBUTES
       end
 
       def ==(u)
@@ -135,8 +138,8 @@ class Hash
   def parse_file?
     url = self[Parse::File::FIELD_URL]
     name = self[Parse::File::FIELD_NAME]
-    (count == 2 || self["__type".freeze] == Parse::File.parse_class) &&
+    (count == 2 || self["__type"] == Parse::File.parse_class) &&
     url.present? && name.present? &&
-    name == ::File.basename(url) && name.start_with?("tfss".freeze)
+    name == ::File.basename(url) && name.start_with?("tfss")
   end
 end

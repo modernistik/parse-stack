@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require 'active_support'
 require 'active_support/json'
 # This is the model that represents a response from Parse. A Response can also
@@ -14,10 +17,10 @@ module Parse
     ERROR_EXCEEDED_BURST_LIMIT = 155
     ERROR_OBJECT_NOT_FOUND = 101
 
-    ERROR = "error".freeze
-    CODE = "code".freeze
-    RESULTS = "results".freeze
-    COUNT = "count".freeze
+    ERROR = "error"
+    CODE = "code"
+    RESULTS = "results"
+    COUNT = "count"
     # A response has a result or (a code and an error)
     attr_accessor :parse_class, :code, :error, :result, :http_status
     attr_accessor :request # capture request that created result
@@ -67,7 +70,7 @@ module Parse
       # if batch response, generate array based on the response hash.
       @result.map do |r|
         next r unless r.is_a?(Hash)
-        hash = r["success".freeze] || r["error".freeze]
+        hash = r["success"] || r["error"]
         Parse::Response.new hash
       end
     end

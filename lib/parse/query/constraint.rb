@@ -1,3 +1,6 @@
+# encoding: UTF-8
+# frozen_string_literal: true
+
 require_relative 'operation'
 require 'time'
 # Constraints are the heart of the Parse::Query system.
