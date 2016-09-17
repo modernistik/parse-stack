@@ -193,7 +193,7 @@ module Parse
       # http method
       method = method.downcase.to_sym
       # set the User-Agent
-      headers["User-Agent"] = "Parse-Server Ruby Client v#{Parse::Stack::VERSION}"
+      headers["User-Agent"] = "Parse-Stack v#{Parse::Stack::VERSION}"
 
       if opts[:cache] == false
         headers[Parse::Middleware::Caching::CACHE_CONTROL] = "no-cache"

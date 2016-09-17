@@ -29,14 +29,16 @@ module Parse
     KEY_UPDATED_AT  = 'updatedAt'
     CLASS_USER      = '_User'
     CLASS_INSTALLATION = '_Installation'
-    TYPE_FILE = "File"
-    TYPE_GEOPOINT = "GeoPoint"
-    TYPE_OBJECT = "Object"
-    TYPE_DATE = "Date"
-    TYPE_BYTES = "Bytes"
-    TYPE_POINTER = "Pointer"
-    TYPE_RELATION = "Relation"
-    TYPE_FIELD = "__type"
+    CLASS_SESSION = '_Session'
+    CLASS_ROLE = '_Role'
+    TYPE_FILE = 'File'
+    TYPE_GEOPOINT = 'GeoPoint'
+    TYPE_OBJECT = 'Object'
+    TYPE_DATE = 'Date'
+    TYPE_BYTES = 'Bytes'
+    TYPE_POINTER = 'Pointer'
+    TYPE_RELATION = 'Relation'
+    TYPE_FIELD = '__type'
 
     # To support being able to have different ruby class names from the 'table'
     # names used in Parse, we will need to have a dynamic lookup system where
