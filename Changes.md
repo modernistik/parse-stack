@@ -1,5 +1,14 @@
 # Parse-Stack Changes
 
+1.4.4
+-----------
+- NEW: Support for user login, logout and sessions.
+- NEW: Improved support for Parse session APIs.
+- Fixes: Auto-upgrade did not upgrade core classes.
+- Improves JSON encoding/decoding performance.
+- Removes throttling of requests.
+- Turns off cache when using `save_all` method.
+
 1.4.2
 -----------
 - NEW: Support for rails generators: `parse_stack:install` and `parse_stack:model`.

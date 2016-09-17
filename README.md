@@ -19,20 +19,15 @@ Or install it yourself as:
 
     $ gem install parse-stack
 
+### Rack / Sinatra
+Parse-Stack API, models and webhooks easily integrate in your existing Rack/Sinatra based applications. For more details see [Parse-Stack Rack Example](https://github.com/modernistik/parse-stack-example).
+
 ### Rails
 Parse-Stack comes with support for Rails by adding additional rake tasks and generators. After adding `parse-stack` as a gem dependency in your Gemfile and running `bundle`, you should run the install script:
 
     $ rails g parse_stack:install
 
-This will create a configuration file (`config/initializers/parse.rb`) and a set of sample models and hooks under `app/models` directory. Modify `config/initializers/parse.rb` file with your Parse-Server API keys. You can then generate models with the `parse_stack:model` generator.
-
-    $ rails g parse_stack:model Song name:string released:date genres:array
-
-This would create a `song.rb` file in `app/models` with the provided properties. Once you are ready to update your schema, you can run the `parse:upgrade` task to upgrade the remote Parse-Server schema to match your new models.
-
-    $ rails parse:upgrade
-
-That should create the new collection `Song` in your Parse-Server backend. For a more full featured example, see [Parse-Server-Rails-Example](https://github.com/modernistik/parse-server-rails-example).
+For a more details on the rails integration see [Parse-Stack Rails Example](https://github.com/modernistik/parse-stack-rails-example).
 
 ## Table Of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -58,8 +53,9 @@ That should create the new collection `Song` in your Parse-Server backend. For a
     - [Calculating Distances between locations](#calculating-distances-between-locations)
   - [Parse::Bytes](#parsebytes)
   - [Parse::User](#parseuser)
-  - [Parse::Installation](#parseinstallation)
+    - [Login and Sessions](#login-and-sessions)
   - [Parse::Session](#parsesession)
+  - [Parse::Installation](#parseinstallation)
   - [Parse::Role](#parserole)
 - [Modeling and Subclassing](#modeling-and-subclassing)
   - [Defining Properties](#defining-properties)
@@ -140,9 +136,13 @@ require 'parse/stack'
 
 Parse.setup app_id: APP_ID,
             api_key: REST_API_KEY,
+            master_key: YOUR_MASTER_KEY,
             server_url: 'https://api.parse.com/1/'
 
-# Object Mapper
+# login
+user = Parse::User.login(username, passwd)
+
+# Custom Subclasses
 class Song < Parse::Object
   property :name
   property :play, :integer
@@ -418,15 +418,15 @@ This class manages the GeoPoint data type that Parse provides to support geo-que
 We include helper methods to calculate distances between GeoPoints: `distance_in_miles` and `distance_in_km`.
 
 ```ruby
-san_diego = Parse::GeoPoint.new(32.8233, -117.6542)
-los_angeles = Parse::GeoPoint.new [34.0192341, -118.970792]
+	san_diego = Parse::GeoPoint.new(32.8233, -117.6542)
+	los_angeles = Parse::GeoPoint.new [34.0192341, -118.970792]
 
-# Haversine calculations
-san_diego.distance_in_miles(los_angeles)
-# ~112.33 miles
+	# Haversine calculations
+	san_diego.distance_in_miles(los_angeles)
+	# ~112.33 miles
 
-san_diego.distance_in_km(los_angeles)
-# ~180.793 km
+	san_diego.distance_in_km(los_angeles)
+	# ~180.793 km
 ```
 
 ### Parse::Bytes
@@ -450,6 +450,54 @@ class Parse::User < Parse::Object
   property :email
   property :password
   property :username
+
+end
+```
+
+While `:password` is a property on the User class, which will generally be empty whenever fetching User records.
+
+#### Login and Sessions
+With the `Parse::User` class, you can also perform login and logout functionality. The class special accessors for `session_token` and `session` to manage its authentication state. This will allow you to authenticate users as well as perform Parse queries as a specific user using their session token. To login a user, use the `Parse::User.login` method by supplying the corresponding username and password, or if you already have a user record, use `login!` with the proper password.
+
+```ruby
+user = Parse::User.login(username,password)
+user.session_token # session token from a Parse::Session
+user.session # Parse::Session tied to the token
+
+ # You can login user records
+user = Parse::User.first
+user.session_token # nil
+
+passwd = 'p_n7!-e8' # corresponding password
+user.login!(passwd) # true
+
+user.session_token # 'r:pnktnjyb996sj4p156gjtp4im'
+
+ # logout to delete the session
+user.logout
+```
+
+If you happen to already have a valid session token, you can use it to retrieve the corresponding Parse::User.
+
+```ruby
+# finds user with session token
+user = Parse::User.session(session_token)
+
+user.logout # deletes the corresponding session
+```
+
+### Parse::Session
+This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. It is defined as follows:
+
+```ruby
+class Parse::Session < Parse::Object
+  property :created_with, :object
+  property :expires_at, :date
+  property :installation_id
+  property :restricted, :boolean
+  property :session_token
+
+  belongs_to :user
 end
 ```
 
@@ -472,21 +520,6 @@ class Parse::Installation < Parse::Object
   property :parse_version
   property :push_type
   property :time_zone
-end
-```
-
-### Parse::Session
-This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. It is defined as follows:
-
-```ruby
-class Parse::Session < Parse::Object
-  property :created_with, :object
-  property :expires_at, :date
-  property :installation_id
-  property :restricted, :boolean
-  property :session_token
-
-  belongs_to :user
 end
 ```
 
@@ -1646,7 +1679,7 @@ end
 # Parse::Webhooks.route :function, :myFunc, MyClass.method(:my_func)
 ```
 
-If you have registered this webhook (see instructions below), you should be able to test it out by running curl using the command below. For a more in-depth example, see [Parse-Server-Rails-Example](https://github.com/modernistik/parse-server-rails-example).
+If you have registered this webhook (see instructions below), you should be able to test it out by running curl using the command below.
 
 ```bash
 curl -X POST \

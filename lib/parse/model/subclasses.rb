@@ -42,6 +42,8 @@ module Parse
     def logout
       return true if self.session_token.blank?
       client.logout(session_token)
+      self.session_token = nil
+      true
     rescue Exception => e
       false
     end
@@ -64,7 +66,7 @@ module Parse
       Parse::User.build response.result
     end
 
-    def self.current_user(session_token)
+    def self.session(session_token)
       response = client.current_user(session_token)
       Parse::User.build response.result
     end
