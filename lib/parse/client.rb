@@ -30,15 +30,15 @@ module Parse
 
   # helper method to get the config variables.
   def self.config(s = :default)
-    Parse::Client.session(s).config
+    Parse::Client.client(s).config
   end
 
   def self.config!(s = :default)
-    Parse::Client.session(s).config!
+    Parse::Client.client(s).config!
   end
 
   def self.client(conn = :default)
-    Parse::Client.session(conn)
+    Parse::Client.client(conn)
   end
 
   # Main class for the client. The client class is based on a Faraday stack.
@@ -65,15 +65,27 @@ module Parse
     # The client can support multiple sessions. The first session created, will be placed
     # under the default session tag. The :default session will be the default client to be used
     # by the other classes including Parse::Query and Parse::Objects
-    @@sessions = { default: nil }
+    @@clients = { default: nil }
 
     def self.session?(v = :default)
-        @@sessions[v].present?
+        puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
+        self.client? v
     end
+
+    # DEPRECATED
     # get a session for a given tag. This will also create a new one for the tag if not specified.
     def self.session(connection = :default)
-      #warn "Please call Parse::Client.setup() to initialize your parse session" if @@sessions.empty? || @@sessions[:default].nil?
-      @@sessions[connection] ||= self.new
+      puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
+      self.client(connection)
+    end
+
+    def self.client?(v = :default)
+        @@clients[v].present?
+    end
+
+
+    def self.client(connection = :default)
+      @@clients[connection] ||= self.new
     end
 
     def self.setup(opts = {})
@@ -81,7 +93,7 @@ module Parse
       # its own, it will return a new Proc containing the block given to
       # its surrounding method.
       # http://mudge.name/2011/01/26/passing-blocks-in-ruby-without-block.html
-      @@sessions[:default] = self.new(opts, &Proc.new)
+      @@clients[:default] = self.new(opts, &Proc.new)
     end
 
     # This builds a new Parse::Client stack. The options are:
@@ -112,7 +124,7 @@ module Parse
       #Configure Faraday
       opts[:faraday] ||= {}
       opts[:faraday].merge!(:url => @server_url)
-      @session = Faraday.new(opts[:faraday]) do |conn|
+      @conn = Faraday.new(opts[:faraday]) do |conn|
         #conn.request :json
 
         conn.response :logger if opts[:logging]
@@ -149,7 +161,7 @@ module Parse
         conn.adapter opts[:adapter]
 
       end
-      @@sessions[:default] ||= self
+      @@clients[:default] ||= self
       self
     end
 
@@ -158,7 +170,7 @@ module Parse
     end
 
     def url_prefix
-      @session.url_prefix
+      @conn.url_prefix
     end
 
     def clear_cache!
@@ -206,16 +218,18 @@ module Parse
         headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
       end
 
-      if opts[:session_token].present?
+      token = opts[:session_token]
+      if token.present?
+        token = token.session_token if token.respond_to?(:session_token)
         headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
-        headers[Parse::Protocol::SESSION_TOKEN] = opts[:session_token]
+        headers[Parse::Protocol::SESSION_TOKEN] = token
       end
 
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
       # actually send the request and return the body
-      response_env = @session.send(method, uri, params, headers)
+      response_env = @conn.send(method, uri, params, headers)
       response = response_env.body
       response.request = _request
 
@@ -317,7 +331,7 @@ module Parse
       module ClassMethods
           attr_accessor :client
           def client
-            @client ||= Parse::Client.session #defaults to :default tag
+            @client ||= Parse::Client.client #defaults to :default tag
           end
       end
 
@@ -339,16 +353,18 @@ module Parse
   end
 
   # Helper method to call cloud functions and get results
-  def self.trigger_job(name, body, session: :default, raw: false)
-    response = Parse::Client.session(session).trigger_job(name, body)
-    return response if raw
+  def self.trigger_job(name, body = {}, **opts)
+    conn = opts[:session] || opts[:client] ||  :default
+    response = Parse::Client.client(conn).trigger_job(name, body)
+    return response if opts[:raw].present?
     response.error? ? nil : response.result["result"]
   end
 
   # Helper method to call cloud functions and get results
-  def self.call_function(name, body, session: :default, raw: false)
-    response = Parse::Client.session(session).call_function(name, body)
-    return response if raw
+  def self.call_function(name, body = {}, **opts)
+    conn = opts[:session] || opts[:client] ||  :default
+    response = Parse::Client.client(conn).call_function(name, body)
+    return response if opts[:raw].present?
     response.error? ? nil : response.result["result"]
   end
 

@@ -252,8 +252,8 @@ If you wish to add additional connection middleware to the stack, you may do so 
 Calling `setup` will create the default `Parse::Client` session object that will be used for all models and requests in the stack. You may retrive this client by calling the class `session()` method. It is possible to create different client connections and have different models point to different Parse applications and endpoints at the same time.
 
 ```ruby
-  default_client = Parse::Client.session(:default)
-  # or just Parse::Client.session
+  default_client = Parse::Client.client(:default)
+                   # alias Parse::Client.client
 ```
 
 ### Connection Options
@@ -1841,8 +1841,8 @@ If you are already have setup a client that is being used by your defined models
   client = Song.client
 
   # you can also have multiple clients
-  client = Parse::Client.session #default client session
-  client = Parse::Client.session(:other_session)
+  client = Parse::Client.client #default client session
+  client = Parse::Client.client(:other_session)
 
 ```
 
@@ -1868,7 +1868,7 @@ same_user = Parse::User.first # cached result
 
 # you may clear the cache at any time
 # clear the cache for the default session
-Parse::Client.session.clear_cache!
+Parse::Client.client.clear_cache!
 
 # or through the client accessor of a model
 Song.client.clear_cache!

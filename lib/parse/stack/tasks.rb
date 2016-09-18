@@ -47,7 +47,7 @@ module Parse
 
           task :verify_env => :env do
 
-            unless Parse::Client.session?
+            unless Parse::Client.client?
               raise "Please make sure you have setup the Parse.setup configuration before invoking task. Usually done in the :environment task."
             end
 
