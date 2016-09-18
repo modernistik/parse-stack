@@ -5,6 +5,7 @@ require_relative "client"
 require_relative "query/operation"
 require_relative "query/constraints"
 require_relative "query/ordering"
+require 'active_model'
 require 'active_model_serializers'
 require 'active_support'
 require 'active_support/inflector'
@@ -23,7 +24,9 @@ module Parse
   # constraints - as Parse::Constraint
 
   class Query
+    extend  ::ActiveModel::Callbacks
     include Parse::Client::Connectable
+    define_model_callbacks :prepare, only: [:after, :before]
     # A query needs to be tied to a Parse table name (Parse class)
     # The client object is of type Parse::Client in order to send query requests.
     # You can modify the default client being used by all Parse::Query objects by setting
@@ -332,6 +335,7 @@ module Parse
       end
       response
     end
+    alias_method :execute!, :fetch!
 
     def results(raw: false)
       if @results.nil?
@@ -364,28 +368,30 @@ module Parse
     end
 
     def compile(encode: true, includeClassName: false)
-      q = {} #query
-      q[:limit] = 11_000 if @limit == :max || @limit == :all
-      q[:limit] = @limit if @limit.is_a?(Numeric) && @limit > 0
-      q[:skip] = @skip if @skip > 0
+      run_callbacks :prepare do
+        q = {} #query
+        q[:limit] = 11_000 if @limit == :max || @limit == :all
+        q[:limit] = @limit if @limit.is_a?(Numeric) && @limit > 0
+        q[:skip] = @skip if @skip > 0
 
-      q[:include] = @includes.join(',') unless @includes.empty?
-      q[:keys] = @keys.join(',')  unless @keys.empty?
-      q[:order] = @order.join(',') unless @order.empty?
-      unless @where.empty?
-        q[:where] = Parse::Query.compile_where(@where)
-        q[:where] = q[:where].to_json if encode
-      end
+        q[:include] = @includes.join(',') unless @includes.empty?
+        q[:keys] = @keys.join(',')  unless @keys.empty?
+        q[:order] = @order.join(',') unless @order.empty?
+        unless @where.empty?
+          q[:where] = Parse::Query.compile_where(@where)
+          q[:where] = q[:where].to_json if encode
+        end
 
-      if @count && @count > 0
-        # if count is requested
-        q[:limit] = 0
-        q[:count] = 1
+        if @count && @count > 0
+          # if count is requested
+          q[:limit] = 0
+          q[:count] = 1
+        end
+        if includeClassName
+          q[:className] = @table
+        end
+        q
       end
-      if includeClassName
-        q[:className] = @table
-      end
-      q
     end
 
     def compile_where

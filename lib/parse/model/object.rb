@@ -99,7 +99,7 @@ module Parse
 
     def __type; Parse::Model::TYPE_OBJECT; end;
     # These define callbacks
-    define_model_callbacks :save, :destroy
+    define_model_callbacks :create, :save, :destroy, only: [:after, :before]
     #core attributes. In general these should be treated as read_only, but the
     # setters are available since we will be decoding objects from Parse. The :acl
     # type is documented in its own class file.

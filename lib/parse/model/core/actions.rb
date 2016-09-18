@@ -266,19 +266,21 @@ module Parse
 
     # create this object in Parse
     def create
-      res = client.create_object(parse_class, attribute_updates )
-      unless res.error?
-        result = res.result
-        @id = result["objectId"] || @id
-        @created_at = result["createdAt"] || @created_at
-        #if the object is created, updatedAt == createdAt
-        @updated_at = result["updatedAt"] || result["createdAt"] || @updated_at
-        # Because beforeSave hooks can change the fields we are saving, any items that were
-        # changed, are returned to us and we should apply those locally to be in sync.
-        set_attributes!(result)
+      run_callbacks :create do
+        res = client.create_object(parse_class, attribute_updates )
+        unless res.error?
+          result = res.result
+          @id = result["objectId"] || @id
+          @created_at = result["createdAt"] || @created_at
+          #if the object is created, updatedAt == createdAt
+          @updated_at = result["updatedAt"] || result["createdAt"] || @updated_at
+          # Because beforeSave hooks can change the fields we are saving, any items that were
+          # changed, are returned to us and we should apply those locally to be in sync.
+          set_attributes!(result)
+        end
+        puts "Error creating #{self.parse_class}: #{res.error}" if res.error?
+        res.success?
       end
-      puts "Error creating #{self.parse_class}: #{res.error}" if res.error?
-      res.success?
     end
 
     # saves the object. If the object has not changed, it is a noop. If it is new,

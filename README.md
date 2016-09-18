@@ -35,7 +35,6 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
 
 
 - [Overview](#overview)
-- [Main Features](#main-features)
 - [Architecture](#architecture)
   - [Parse::Client](#parseclient)
   - [Parse::Query](#parsequery)
@@ -112,7 +111,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
   - [Compound Queries](#compound-queries)
 - [Calling Cloud Code Functions](#calling-cloud-code-functions)
 - [Calling Background Jobs](#calling-background-jobs)
-- [Model Callbacks](#model-callbacks)
+- [Active Model Callbacks](#active-model-callbacks)
 - [Schema Upgrades and Migrations](#schema-upgrades-and-migrations)
 - [Push Notifications](#push-notifications)
 - [Cloud Code Webhooks](#cloud-code-webhooks)
@@ -157,12 +156,14 @@ end
 class Artist < Parse::Object
   property :name
   property :genres, :array
+  has_many :fans, as: :user
 end
 
 # updates schemas for your Parse app based on your models (non-destructive)
 Parse.auto_upgrade!
 
 artist = Artist.new(name: "Frank Sinatra", genres: ["swing", "jazz"])
+artist.fans << user
 artist.save
 
 # Query
@@ -192,21 +193,6 @@ result = Parse.call_function :myFunctionName, {param: value}
 
 ```
 
-## Main Features
-While there are many additional features of the framework, these are the main points.
-
-- Support for all Parse Query constraints.
-- Object Relational Mapping with dirty tracking.
-- Easy management of Parse GeoPoints, Files and ACLs.
-- Parse Queries support with caching middleware. (Reduces API usage)
-- Support for all Parse data types.
-- One-to-One, One-to-Many and Many-to-Many relations.
-- Integration with Parse Cloud Code Webhooks.
-- Send Push notifications with advanced targeting.
-- Schema upgrades and migrations.
-- Rake tasks for webhook registrations.
-- Some special magic with :save_all and :max limit fetch.
-
 ## Architecture
 The architecture of `Parse::Stack` is broken into four main components.
 
@@ -220,7 +206,7 @@ This class implements the [Parse REST Querying](https://parse.com/docs/rest/guid
 This component is main class for all object relational mapping subclasses for your application. It provides features in order to map your remote Parse records to a local ruby object. It implements the Active::Model interface to provide a lot of additional features, CRUD operations, querying, including dirty tracking, JSON serialization, save/destroy callbacks and others. While we are overlooking some functionality, for simplicity, you will mainly be working with Parse::Object as your superclass. While not required, it is highly recommended that you define a model (Parse::Object subclass) for all the Parse classes in your application.
 
 ### Parse::Webhooks
-Parse provides a feature called [Cloud Code Webhooks](http://blog.parse.com/announcements/introducing-cloud-code-webhooks/). For most applications, save/delete triggers and cloud functions tend to be implemented by Parse's own hosted Javascript solution called Cloud Code. However, Parse provides the ability to have these hooks utilize your hosted solution instead of their own, since their environment is limited in terms of resources and tools. If you are using the open source [Parse Server](https://github.com/ParsePlatform/parse-server), you must enable this hooks feature by enabling the environment variable `PARSE_EXPERIMENTAL_HOOKS_ENABLED` on your Parse server.
+Parse provides a feature called [Cloud Code Webhooks](http://blog.parse.com/announcements/introducing-cloud-code-webhooks/). For most applications, save/delete triggers and cloud functions tend to be implemented by Parse's own hosted Javascript solution called Cloud Code. However, Parse provides the ability to have these hooks utilize your hosted solution instead of their own, since their environment is limited in terms of resources and tools.
 
 ## Field Naming Conventions
 By convention in Ruby (see [Style Guide](https://github.com/bbatsov/ruby-style-guide#snake-case-symbols-methods-vars)), symbols and variables are expressed in lower_snake_case form. Parse, however, prefers column names in **lower-first camel case** (ex. `objectId`, `createdAt` and `updatedAt`). To keep in line with the style guides between the languages, we do the automatic conversion of the field names when compiling the query. As an additional exception to this rule, the field key of `id` will automatically be converted to the `objectId` field when used. If you do not want this to happen, you can turn off or change the value `Parse::Query.field_formatter` as shown below. Though we recommend leaving the default `:columnize` if possible.
@@ -1595,8 +1581,8 @@ You can trigger background jobs that you have configured in your Parse applicati
  response.result unless response.error?
 ```
 
-## Model Callbacks
-All `Parse::Object` subclasses extend [`ActiveModel::Callbacks`](http://api.rubyonrails.org/classes/ActiveModel/Callbacks.html) for `#save` and `#destroy` operations. You can setup internal hooks for `before`, `during` and `after`. See
+## Active Model Callbacks
+All `Parse::Object` subclasses extend [`ActiveModel::Callbacks`](http://api.rubyonrails.org/classes/ActiveModel/Callbacks.html) for `#save` and `#destroy` operations. You can setup internal hooks for `before` and `after`.
 
 ```ruby
 
@@ -1608,6 +1594,10 @@ class Song < Parse::Object
 		acl.everyone(true, false) if new?
 	end
 
+  after_create do
+    puts "New object successfully saved."
+  end
+
 end
 
 song = Song.new name: "my title"
@@ -1616,6 +1606,8 @@ song.save # runs :save callbacks
 puts song.name # 'My Title'
 
 ```
+
+There are also a special `:create` callback. A `before_create` will be called whenever a unsaved object will be saved, and `after_create` will be called when a previously unsaved object successfully saved for the first time.
 
 ## Schema Upgrades and Migrations
 You may change your local Parse ruby classes by adding new properties. To easily propagate the changes to your Parse application (MongoDB), you can call `auto_upgrade!` on the class to perform an non-destructive additive schema change. This will create the new columns in Parse for the properties you have defined in your models. Parse Stack will calculate the changes and only modify the tables which need new columns to be added. *It will not destroy columns or data*

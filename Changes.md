@@ -8,6 +8,9 @@
 - Improves JSON encoding/decoding performance.
 - Removes throttling of requests.
 - Turns off cache when using `save_all` method.
+- Parse::Query supports ActiveModel::Callbacks for :prepare.
+- Subclasses now support a :create callback that is only executed after a new object is successfully saved.
+- Added alias method :execute! for Parse::Query#fetch! for clarity.
 
 1.4.2
 -----------
