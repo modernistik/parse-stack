@@ -272,7 +272,7 @@ module Parse
       @results = nil
       old_value = @count
       @count = 1
-      res = client.find_objects(@table, compile.as_json ).count
+      res = client.find_objects(@table, compile.as_json, _opts ).count
       @count = old_value
       res
     end
@@ -319,7 +319,7 @@ module Parse
       results
     end
 
-    def fetch!(compiled_query)
+    def _opts
       opts = {}
       opts[:cache] = self.cache || false
       opts[:use_master_key] = self.use_master_key
@@ -328,8 +328,12 @@ module Parse
       if opts[:use_master_key] == false || opts[:session_token].present?
         opts[:cache] = false
       end
+      opts
+    end
 
-      response = client.find_objects(@table, compiled_query.as_json, opts )
+    def fetch!(compiled_query)
+
+      response = client.find_objects(@table, compiled_query.as_json, _opts )
       if response.error?
         puts "[ParseQuery] #{response.error}"
       end
