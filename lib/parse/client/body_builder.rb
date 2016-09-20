@@ -64,7 +64,7 @@ module Parse
 
           begin
             r = Parse::Response.new(response_env.body)
-          rescue Exception => e
+          rescue => e
             r = Parse::Response.new
             r.code = response_env.status
             r.error = "Invalid response for #{env[:method]} #{env[:url]}: #{e}"

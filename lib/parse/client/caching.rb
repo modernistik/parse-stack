@@ -8,7 +8,7 @@ require_relative 'protocol'
 # This is a caching middleware for Parse queries using Moneta.
 module Parse
   module Middleware
-    class CachingError < Exception; end;
+    class CachingError < StandardError; end;
     class Caching < Faraday::Middleware
       include Parse::Protocol
       # Cache-Control: no-cache
