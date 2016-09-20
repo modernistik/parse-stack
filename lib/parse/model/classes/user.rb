@@ -127,8 +127,10 @@ module Parse
       Parse::User.build response.result
     end
 
-    def self.session(session_token)
-      response = client.current_user(session_token)
+    def self.session(token)
+      # support Parse::Session objects
+      token = token.session_token if token.respond_to?(:session_token)
+      response = client.current_user(token)
       Parse::User.build response.result
     end
 

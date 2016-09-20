@@ -497,6 +497,18 @@ class Parse::Session < Parse::Object
 end
 ```
 
+You can get a specific `Parse::Session` given a session_token by using the `session` method. You can also find the user tied to a specific Parse session or session token with `Parse::User.session`.
+
+```ruby
+session = Parse::Session.session(token)
+
+session.user # the Parse user for this session
+
+# or fetch user with a session token
+user = Parse::User.session(token)
+
+```
+
 ### Parse::Installation
 This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. It is defined as follows:
 

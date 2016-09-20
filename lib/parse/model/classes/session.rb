@@ -12,5 +12,15 @@ module Parse
     property :session_token
 
     belongs_to :user
+
+    def self.session(token)
+      response = client.fetch_session(token)
+      if response.success?
+        reutrn Parse::Session.build response.result
+      end
+      nil
+    end
+
   end
+
 end
