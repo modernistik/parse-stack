@@ -10,8 +10,6 @@ module Parse
       # Note that Parse::Objects mainly use the objects.rb API since we can
       # detect class names to proper URI handlers
       USER_PATH_PREFIX = "users"
-      USERNAME_PARAM = "username"
-      PASSWORD_PARAM = "password"
       LOGOUT_PATH = "logout"
       LOGIN_PATH = "login"
       PASSWORD_RESET = "requestPasswordReset"
@@ -52,7 +50,7 @@ module Parse
       def login(username, password, headers: {}, **opts)
         # Probably pass Installation-ID as header
         opts.merge!({use_master_key: false, cache: false})
-        params = { USERNAME_PARAM => username, PASSWORD_PARAM => password }
+        params = { username: username, password: password }
         headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => '1'})
         # headers.merge!( { Parse::Protocol::INSTALLATION_ID => ''} )
         response = request :get, LOGIN_PATH, query: params, headers: headers, opts: opts
@@ -64,6 +62,14 @@ module Parse
         headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token})
         opts.merge!({use_master_key: false, cache: false, session_token: session_token})
         request :post, LOGOUT_PATH, headers: headers, opts: opts
+      end
+
+      def signup(username, password, email = nil, **opts)
+        opts.merge!({use_master_key: false, cache: false})
+        body = { username: username, password: password, email: email }
+        response = request :post, USER_PATH_PREFIX, body: body, opts: opts
+        response.parse_class = Parse::Model::CLASS_USER
+        response
       end
 
     end # Users

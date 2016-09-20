@@ -6,7 +6,14 @@
 require_relative 'object'
 module Parse
 
+  class UsernameMissingError < StandardError; end; # 200
+  class PasswordMissingError < StandardError; end; # 201
+  class UsernameTakenError < StandardError; end; # 202
+  class EmailTakenError < StandardError; end; # 203
+
+
   class User < Parse::Object
+
     parse_class Parse::Model::CLASS_USER
     attr_accessor :session_token
     property :auth_data, :object
@@ -33,7 +40,36 @@ module Parse
       self.session_token.present?
     end
 
-    def login!(password)
+    def signup!(passwd = nil)
+      self.password = passwd || password
+      if username.blank?
+        raise Parse::UsernameMissingError, "Signup requires an username."
+      end
+
+      if password.blank?
+        raise Parse::PasswordMissingError, "Signup requires a password."
+      end
+      response = client.signup(username, password, email)
+
+      unless response.error?
+        return apply_attributes!(response.result)
+      end
+
+      case response.code
+      when Parse::Response::ERROR_USERNAME_MISSING
+        raise Parse::UsernameMissingError, response
+      when Parse::Response::ERROR_PASSWORD_MISSING
+        raise Parse::PasswordMissingError, response
+      when Parse::Response::ERROR_USERNAME_TAKEN
+        raise Parse::UsernameTakenError, response
+      when Parse::Response::ERROR_EMAIL_TAKEN
+        raise Parse::EmailTakenError, response
+      end
+      raise response
+    end
+
+    def login!(passwd = nil)
+      self.password = passwd || self.password
       response = client.login(username.to_s, password.to_s)
       apply_attributes! response.result
       self.session_token.present?
@@ -44,7 +80,7 @@ module Parse
       client.logout(session_token)
       self.session_token = nil
       true
-    rescue Exception => e
+    rescue => e
       false
     end
 
@@ -59,6 +95,25 @@ module Parse
         @session ||= Parse::Session.new(response.result)
       end
       @session
+    end
+
+    def self.signup(username, password, email = nil)
+      response = client.signup(username, password, email)
+      unless response.error?
+        return Parse::User.build response.result
+      end
+
+      case response.code
+      when Parse::Response::ERROR_USERNAME_MISSING
+        raise Parse::UsernameMissingError, response
+      when Parse::Response::ERROR_PASSWORD_MISSING
+        raise Parse::PasswordMissingError, response
+      when Parse::Response::ERROR_USERNAME_TAKEN
+        raise Parse::UsernameTakenError, response
+      when Parse::Response::ERROR_EMAIL_TAKEN
+        raise Parse::EmailTakenError, response
+      end
+      raise response
     end
 
     def self.login(username,password)
@@ -100,12 +155,8 @@ module Parse
     has_many :roles, through: :relation
     has_many :users, through: :relation
 
-    def update_acl
-      acl.everyone true, false
-    end
-
     before_save do
-      update_acl
+      acl.everyone true, false
     end
 
   end
