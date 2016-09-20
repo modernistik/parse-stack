@@ -19,14 +19,14 @@ require_relative "api/all"
 module Parse
 
   # This is an exception that is thrown if there is a client connectivity issue
-  class ConnectionError < Exception; end;
-  class TimeoutError < Exception; end;
-  class ProtocolError < Exception; end;
-  class ServerError < Exception; end;
-  class ServiceUnavailableError < Exception; end;
-  class AuthenticationError < Exception; end;
-  class RequestLimitExceededError < Exception; end;
-  class InvalidSessionTokenError < Exception; end;
+  class ConnectionError < StandardError; end;
+  class TimeoutError < StandardError; end;
+  class ProtocolError < StandardError; end;
+  class ServerError < StandardError; end;
+  class ServiceUnavailableError < StandardError; end;
+  class AuthenticationError < StandardError; end;
+  class RequestLimitExceededError < StandardError; end;
+  class InvalidSessionTokenError < StandardError; end;
 
   # helper method to get the config variables.
   def self.config(s = :default)

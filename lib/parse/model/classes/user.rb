@@ -3,7 +3,7 @@
 
 # The User class provided by Parse with the required fields. You may
 # add mixings to this class to add the app specific properties
-require_relative 'object'
+require_relative '../object'
 module Parse
 
   class UsernameMissingError < StandardError; end; # 200
@@ -49,10 +49,12 @@ module Parse
       if password.blank?
         raise Parse::PasswordMissingError, "Signup requires a password."
       end
+      # first signup the user, then save any additional attributes
       response = client.signup(username, password, email)
 
       unless response.error?
-        return apply_attributes!(response.result)
+        apply_attributes!(response.result)
+        return save!
       end
 
       case response.code
@@ -126,50 +128,6 @@ module Parse
       Parse::User.build response.result
     end
 
-  end
-
-  class Installation < Parse::Object
-    parse_class Parse::Model::CLASS_INSTALLATION
-
-    property :gcm_sender_id, :string, field: :GCMSenderId
-    property :app_identifier
-    property :app_name
-    property :app_version
-    property :badge, :integer
-    property :channels, :array
-    property :device_token
-    property :device_token_last_modified, :integer
-    property :device_type
-    property :installation_id
-    property :locale_identifier
-    property :parse_version
-    property :push_type
-    property :time_zone
-
-  end
-
-  class Role < Parse::Object
-    parse_class Parse::Model::CLASS_ROLE
-    property :name
-
-    has_many :roles, through: :relation
-    has_many :users, through: :relation
-
-    before_save do
-      acl.everyone true, false
-    end
-
-  end
-
-  class Session < Parse::Object
-    parse_class Parse::Model::CLASS_SESSION
-    property :created_with, :object
-    property :expires_at, :date
-    property :installation_id
-    property :restricted, :boolean
-    property :session_token
-
-    belongs_to :user
   end
 
 end

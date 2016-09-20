@@ -284,7 +284,7 @@ module Parse
     end
 
     def _session_token
-      if @_session_token.respond_to(:session_token)
+      if @_session_token.respond_to?(:session_token)
         @_session_token = @_session_token.session_token
       end
       @_session_token

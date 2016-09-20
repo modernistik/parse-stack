@@ -434,7 +434,6 @@ This class represents the data and columns contained in the standard Parse `_Use
 class Parse::User < Parse::Object
   property :auth_data, :object
   property :email
-  property :password
   property :username
 
 end
