@@ -156,7 +156,7 @@ module Parse
         op_hash = { field => op_hash }.as_json
       end
 
-      response = client.update_object(parse_class, id, op_hash, session_token: self.session_token )
+      response = client.update_object(parse_class, id, op_hash, session_token: _session_token )
       if response.error?
         puts "[#{parse_class}:#{field} Operation] #{response.error}"
       end
@@ -246,7 +246,7 @@ module Parse
           warn "[#{parse_class}] warning: #{msg}"
         end
       end
-      response = client.update_object(parse_class, id, attribute_updates, session_token: self.session_token)
+      response = client.update_object(parse_class, id, attribute_updates, session_token: _session_token)
       if response.success?
         result = response.result
         # Because beforeSave hooks can change the fields we are saving, any items that were
@@ -267,12 +267,7 @@ module Parse
     # create this object in Parse
     def create
       run_callbacks :create do
-        opts = {session_token: @_auth}
-        if @_auth.respond_to?(:session_token)
-          opts[:session_token] = @_auth.session_token
-        end
-
-        res = client.create_object(parse_class, attribute_updates, opts)
+        res = client.create_object(parse_class, attribute_updates, session_token: _session_token)
         unless res.error?
           result = res.result
           @id = result["objectId"] || @id
@@ -299,10 +294,10 @@ module Parse
     # we will create the object. If the object has an id, we will update the record.
     # You can define before and after :save callbacks
     # autoraise: set to true will automatically raise an exception if the save fails
-    def save(autoraise: false, auth: nil)
+    def save(autoraise: false, session: nil)
       return true unless changed?
       success = false
-      @_session_token = auth
+      @_session_token = session
       run_callbacks :save do
         #first process the create/update action if any
         #then perform any relation changes that need to be performed
@@ -334,18 +329,18 @@ module Parse
     end
 
     # shortcut for raising an exception of saving this object failed.
-    def save!(auth: nil)
-      save(autoraise: true, auth: auth)
+    def save!(session: nil)
+      save(autoraise: true, session: session)
     end
 
     # only destroy the object if it has an id. You can setup before and after
     #callback hooks on :destroy
-    def destroy(auth: nil)
+    def destroy(session: nil)
       return false if new?
-      @_session_token = auth
+      @_session_token = session
       success = false
       run_callbacks :destroy do
-        res = client.delete_object parse_class, id, session_token: self.session_token
+        res = client.delete_object parse_class, id, session_token: _session_token
         success = res.success?
         if success
           @id = nil
@@ -413,7 +408,7 @@ module Parse
       # since we will have multiple responses, we will track it in array
       [removals, additions].threaded_each do |ops|
         next if ops.empty? #if no operations to be performed, then we are done
-        responses << client.update_object(parse_class, @id, ops, session_token: self.session_token)
+        responses << client.update_object(parse_class, @id, ops, session_token: _session_token)
       end
       # check if any of them ended up in error
       has_error = responses.any? { |response| response.error? }
