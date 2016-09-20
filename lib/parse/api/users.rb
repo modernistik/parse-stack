@@ -64,9 +64,11 @@ module Parse
         request :post, LOGOUT_PATH, headers: headers, opts: opts
       end
 
-      def signup(username, password, email = nil, **opts)
+      # {username: "", password: "", email: nil} # minimum
+      def signup(username, password, email = nil, body: {}, **opts)
         opts.merge!({use_master_key: false, cache: false})
-        body = { username: username, password: password, email: email }
+        body = body.merge({ username: username, password: password })
+        body[:email] = email || body[:email]
         response = request :post, USER_PATH_PREFIX, body: body, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response

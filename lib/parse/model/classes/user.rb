@@ -49,12 +49,16 @@ module Parse
       if password.blank?
         raise Parse::PasswordMissingError, "Signup requires a password."
       end
+
+      signup_attrs = attributes_updates
+      signup_attrs.except! *Parse::Properties::BASE_FIELD_MAP.flatten
+
       # first signup the user, then save any additional attributes
-      response = client.signup(username, password, email)
+      response = client.signup signup_attrs
 
       unless response.error?
-        apply_attributes!(response.result)
-        return save!
+        apply_attributes! response.result
+        return true
       end
 
       case response.code
@@ -79,7 +83,7 @@ module Parse
 
     def logout
       return true if self.session_token.blank?
-      client.logout(session_token)
+      client.logout session_token
       self.session_token = nil
       true
     rescue => e
@@ -99,8 +103,8 @@ module Parse
       @session
     end
 
-    def self.signup(username, password, email = nil)
-      response = client.signup(username, password, email)
+    def self.signup(username, password, email = nil, body: {})
+      response = client.signup(username, password, email, body: body)
       unless response.error?
         return Parse::User.build response.result
       end
@@ -118,7 +122,7 @@ module Parse
       raise response
     end
 
-    def self.login(username,password)
+    def self.login(username, password)
       response = client.login(username.to_s, password.to_s)
       Parse::User.build response.result
     end
