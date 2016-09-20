@@ -42,36 +42,36 @@ module Parse
       end
 
       # /1/classes/<className>	POST	Creating Objects
-      def create_object(className, data = {})
-        response = request :post, uri_path(className) , body: data
+      def create_object(className, body = {}, headers: {}, **opts)
+        response = request :post, uri_path(className) , body: body, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
       # /1/classes/<className>/<objectId>	DELETE	Deleting Objects
-      def delete_object(className, id)
-        response = request :delete, uri_path(className, id)
+      def delete_object(className, id, headers: {}, **opts)
+        response = request :delete, uri_path(className, id), headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
       # /1/classes/<className>/<objectId>	GET	Retrieving Objects
-      def fetch_object(className, id, opts = {})
-        response = request :get, uri_path(className, id), opts: opts
+      def fetch_object(className, id, headers: {}, **opts)
+        response = request :get, uri_path(className, id), headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
       # /1/classes/<className>	GET	Queries
-      def find_objects(className, query = {}, opts = {})
-        response = request :get, uri_path(className), query: query, opts: opts
+      def find_objects(className, query = {}, headers: {}, **opts)
+        response = request :get, uri_path(className), query: query, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
       # /1/classes/<className>/<objectId>	PUT	Updating Objects
-      def update_object(className, id, data = {})
-        response = request :put, uri_path(className,id) , body: data
+      def update_object(className, id, body = {}, headers: {}, **opts)
+        response = request :put, uri_path(className,id) , body: body, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end

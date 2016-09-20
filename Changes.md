@@ -11,6 +11,7 @@
 - Subclasses now support a :create callback that is only executed after a new object is successfully saved.
 - Added alias method :execute! for Parse::Query#fetch! for clarity.
 - `Parse::Client.session` has been deprecated in favor of `Parse::Client.client`
+- All Parse-Stack errors that are raised inherit from StandardError.
 
 ### 1.4.3
 - NEW: Support for rails generators: `parse_stack:install` and `parse_stack:model`.

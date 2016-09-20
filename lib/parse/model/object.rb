@@ -317,5 +317,8 @@ class Array
 
 end
 
-
-require_relative 'subclasses'
+# Load all the core classes.
+require_relative 'classes/installation'
+require_relative 'classes/role'
+require_relative 'classes/session'
+require_relative 'classes/user'

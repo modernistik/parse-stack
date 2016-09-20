@@ -79,7 +79,7 @@ module Parse
     end
   end
 
-  class WebhookErrorResponse < Exception; end;
+  class WebhookErrorResponse < StandardError; end;
   class Webhooks
 
     def self.reload!(args = {})
@@ -192,7 +192,7 @@ module Parse
         request.body.rewind
         begin
           payload = Parse::Payload.new request.body.read
-        rescue Exception => e
+        rescue => e
           warn "Invalid webhook payload format: #{e}"
           response.write error("Invalid payload format. Should be valid JSON.")
           return response.finish

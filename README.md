@@ -434,13 +434,23 @@ This class represents the data and columns contained in the standard Parse `_Use
 class Parse::User < Parse::Object
   property :auth_data, :object
   property :email
-  property :password
   property :username
 
 end
 ```
 
 While `:password` is a property on the User class, which will generally be empty whenever fetching User records.
+
+#### Signup
+You can signup new users in two ways. You can either use a class method `Parse::User.signup` to create a new user with the minimum fields of username, password and email, or create a `Parse::User` object can call the `signup!` method. If signup fails, it will raise the corresponding exception.
+
+```ruby
+user = Parse::User.signup(username, password, email)
+
+#or
+user = Parse::User.new username: "user", password: "s3cret"
+user.signup!
+```
 
 #### Login and Sessions
 With the `Parse::User` class, you can also perform login and logout functionality. The class special accessors for `session_token` and `session` to manage its authentication state. This will allow you to authenticate users as well as perform Parse queries as a specific user using their session token. To login a user, use the `Parse::User.login` method by supplying the corresponding username and password, or if you already have a user record, use `login!` with the proper password.

@@ -10,7 +10,7 @@ require_relative 'constraint'
 # For more information: https://parse.com/docs/rest/guide#queries
 # For more information about the query design pattern from DataMapper
 # that inspired this, see http://datamapper.org/docs/find.html
-class ParseConstraintError < Exception; end;
+class ParseConstraintError < StandardError; end;
 module Parse
 
   class ObjectIdConstraint < Constraint

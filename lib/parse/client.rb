@@ -19,14 +19,14 @@ require_relative "api/all"
 module Parse
 
   # This is an exception that is thrown if there is a client connectivity issue
-  class ConnectionError < Exception; end;
-  class TimeoutError < Exception; end;
-  class ProtocolError < Exception; end;
-  class ServerError < Exception; end;
-  class ServiceUnavailableError < Exception; end;
-  class AuthenticationError < Exception; end;
-  class RequestLimitExceededError < Exception; end;
-  class InvalidSessionTokenError < Exception; end;
+  class ConnectionError < StandardError; end;
+  class TimeoutError < StandardError; end;
+  class ProtocolError < StandardError; end;
+  class ServerError < StandardError; end;
+  class ServiceUnavailableError < StandardError; end;
+  class AuthenticationError < StandardError; end;
+  class RequestLimitExceededError < StandardError; end;
+  class InvalidSessionTokenError < StandardError; end;
 
   # helper method to get the config variables.
   def self.config(s = :default)
@@ -65,35 +65,37 @@ module Parse
     # The client can support multiple sessions. The first session created, will be placed
     # under the default session tag. The :default session will be the default client to be used
     # by the other classes including Parse::Query and Parse::Objects
-    @@clients = { default: nil }
+    @clients = { default: nil }
+    class << self
+      attr_reader :clients
+      def session?(v = :default)
+          puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
+          self.client? v
+      end
 
-    def self.session?(v = :default)
+      # DEPRECATED
+      # get a session for a given tag. This will also create a new one for the tag if not specified.
+      def session(connection = :default)
         puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
-        self.client? v
-    end
+        self.client(connection)
+      end
 
-    # DEPRECATED
-    # get a session for a given tag. This will also create a new one for the tag if not specified.
-    def self.session(connection = :default)
-      puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
-      self.client(connection)
-    end
+      def client?(v = :default)
+        @clients[v].present?
+      end
 
-    def self.client?(v = :default)
-        @@clients[v].present?
-    end
+      def client(connection = :default)
+        @clients[connection] ||= self.new
+      end
 
+      def setup(opts = {})
+        # If Proc.new is called from inside a method without any arguments of
+        # its own, it will return a new Proc containing the block given to
+        # its surrounding method.
+        # http://mudge.name/2011/01/26/passing-blocks-in-ruby-without-block.html
+        @clients[:default] = self.new(opts, &Proc.new)
+      end
 
-    def self.client(connection = :default)
-      @@clients[connection] ||= self.new
-    end
-
-    def self.setup(opts = {})
-      # If Proc.new is called from inside a method without any arguments of
-      # its own, it will return a new Proc containing the block given to
-      # its surrounding method.
-      # http://mudge.name/2011/01/26/passing-blocks-in-ruby-without-block.html
-      @@clients[:default] = self.new(opts, &Proc.new)
     end
 
     # This builds a new Parse::Client stack. The options are:
@@ -161,7 +163,7 @@ module Parse
         conn.adapter opts[:adapter]
 
       end
-      @@clients[:default] ||= self
+      Parse::Client.clients[:default] ||= self
       self
     end
 

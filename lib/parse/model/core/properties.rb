@@ -28,8 +28,8 @@ module Parse
 
   module Properties
     # This is an exception that is thrown if there is an issue when creating a specific property for a class.
-    class DefinitionError < Exception; end;
-    class ValueError < Exception; end;
+    class DefinitionError < StandardError; end;
+    class ValueError < StandardError; end;
 
     # These are the base types supported by Parse.
     TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl].freeze
