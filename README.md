@@ -51,7 +51,9 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
   - [Parse::GeoPoint](#parsegeopoint)
     - [Calculating Distances between locations](#calculating-distances-between-locations)
   - [Parse::Bytes](#parsebytes)
+  - [Parse::ACL](#parseacl)
   - [Parse::User](#parseuser)
+    - [Signup](#signup)
     - [Login and Sessions](#login-and-sessions)
   - [Parse::Session](#parsesession)
   - [Parse::Installation](#parseinstallation)
@@ -426,6 +428,45 @@ The `Bytes` data type represents the storage format for binary content in a Pars
 
   decoded = bytes.decoded # same as Base64.decode64
 ```
+
+### Parse::ACL
+The `ACL` class represents the access control lists for each record. An ACL is represented by a JSON object with the keys being `Parse::User` object ids or the special key of `*`, which indicates the public access permissions.
+The value of each key in the hash is a `Parse::ACL::Permission` object which defines the boolean permission state for `read` and `write`.
+
+The example below illustrates a Parse ACL JSON object where there is a public read permission, but public write is prevented. In addition, the user with id `3KmCvT7Zsb`, is allowed to both read and write this record.
+
+```json
+{
+  "*": { "read": true },
+  "3KmCvT7Zsb": {  "read": true, "write": true }
+}
+```
+
+All `Parse::Object` subclasses have an `acl` property by default. With this property, you can apply and delete permissions for this particular Parse object record.
+
+```ruby
+  user = Parse::User.first
+  artist = Artist.first
+
+  artist.acl # "*": { "read": true, "write": true }
+
+  # apply public read, but no public write
+  artist.acl.everyone true, false
+
+
+  # allow user to have read and write access
+  artist.acl.apply user.id, true, true
+
+  # remove all permissions for this user id
+  artist.acl.delete user.id
+
+  # allow the 'Admins' role read and write
+  artist.acl.apply_role "Admins", true, true
+
+  artist.save
+```
+
+For more information about Parse record ACLs, see the documentation at  [Security](https://parseplatform.github.io/docs/rest/guide/#security)
 
 ### Parse::User
 This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. It is defined as follows:
