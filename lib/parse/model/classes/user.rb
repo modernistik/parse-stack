@@ -128,6 +128,12 @@ module Parse
     end
 
     def self.session(token)
+      self.session! token
+    rescue InvalidSessionTokenError => e
+      nil
+    end
+
+    def self.session!(token)
       # support Parse::Session objects
       token = token.session_token if token.respond_to?(:session_token)
       response = client.current_user(token)
