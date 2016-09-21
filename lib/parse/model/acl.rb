@@ -14,11 +14,27 @@
 # of dirty tracking.
 module Parse
 
-  class ACL
-    # The internal permissions hash and delegate accessors
-    attr_accessor :permissions, :delegate
+  # Base class for supporting custom data types
+  class DataType
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON
+    def attributes
+      {}
+    end
+
+    def self.typecast(value, **opts)
+      value
+    end
+
+    def as_json(*args)
+      {}.as_json
+    end
+
+  end
+
+  class ACL < DataType
+    # The internal permissions hash and delegate accessors
+    attr_accessor :permissions, :delegate
     PUBLIC = "*" # Public priviledges are '*' key in Parse
 
     # provide a set of acls and the delegate (for dirty tracking)

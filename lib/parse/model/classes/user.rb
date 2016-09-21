@@ -27,7 +27,11 @@ module Parse
     end
 
     def anonymous?
-      auth_data.present? && auth_data["anonymous"].present?
+      anonymous_id.nil?
+    end
+
+    def anonymous_id
+      auth_data['anonymous']['id'] if auth_data.present? && auth_data["anonymous"].is_a?(Hash)
     end
 
     # So that apply_attributes! works with session_token for login
@@ -105,7 +109,7 @@ module Parse
 
     def self.signup(username, password, email = nil, body: {})
       response = client.signup(username, password, email, body: body)
-      unless response.error?
+      if response.success?
         return Parse::User.build response.result
       end
 
@@ -124,7 +128,7 @@ module Parse
 
     def self.login(username, password)
       response = client.login(username.to_s, password.to_s)
-      Parse::User.build response.result
+      response.success? ? Parse::User.build(response.result) : nil
     end
 
     def self.session(token)
@@ -137,7 +141,7 @@ module Parse
       # support Parse::Session objects
       token = token.session_token if token.respond_to?(:session_token)
       response = client.current_user(token)
-      Parse::User.build response.result
+      response.success? ? Parse::User.build(response.result) : nil
     end
 
   end

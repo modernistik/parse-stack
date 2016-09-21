@@ -19,7 +19,7 @@ module Parse
       end
 
       def find_users(query = {}, headers: {}, **opts)
-        response = request :get, "#{USER_PATH_PREFIX}", query: query, headers: headers, opts: opts
+        response = request :get, USER_PATH_PREFIX, query: query, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
       end
@@ -37,42 +37,57 @@ module Parse
         response
       end
 
+      # deleting or unlinking is done by setting the authData of the service name to nil
+      def delete_user_auth_data(id, service_name, **opts)
+        auth_data = { service_name => nil }
+        update_user_auth_data(id, auth_data, opts)
+      end
+
+      def update_user_auth_data(id, auth_data, **opts)
+        body = { authData: auth_data }
+        request :put, "#{USER_PATH_PREFIX}/#{id}", body: body, opts: opts
+      end
+
       def delete_user(id, headers: {}, **opts)
         request :delete, "#{USER_PATH_PREFIX}/#{id}", headers: headers, opts: opts
       end
 
       def reset_password(email, **opts)
-        opts.merge!({use_master_key: false, cache: false})
         body = {email: email}
         request :post, PASSWORD_RESET, body: body, opts: opts
       end
 
       def login(username, password, headers: {}, **opts)
         # Probably pass Installation-ID as header
-        opts.merge!({use_master_key: false, cache: false})
-        params = { username: username, password: password }
+        query = { username: username, password: password }
         headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => '1'})
         # headers.merge!( { Parse::Protocol::INSTALLATION_ID => ''} )
-        response = request :get, LOGIN_PATH, query: params, headers: headers, opts: opts
+        response = request :get, LOGIN_PATH, query: query, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
       end
 
       def logout(session_token, headers: {}, **opts)
         headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token})
-        opts.merge!({use_master_key: false, cache: false, session_token: session_token})
+        opts.merge!({use_master_key: false, session_token: session_token})
         request :post, LOGOUT_PATH, headers: headers, opts: opts
       end
 
       # {username: "", password: "", email: nil} # minimum
-      def signup(username, password, email = nil, body: {}, **opts)
-        opts.merge!({use_master_key: false, cache: false})
+      def signup(username, password, email = nil, body: {}, headers: {}, **opts)
+        opts.merge!({use_master_key: false})
         body = body.merge({ username: username, password: password })
         body[:email] = email || body[:email]
-        response = request :post, USER_PATH_PREFIX, body: body, opts: opts
+        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => '1'})
+        response = request :post, USER_PATH_PREFIX, body: body, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
       end
+
+      def signup_service(name, data)
+
+      end
+
 
     end # Users
 
