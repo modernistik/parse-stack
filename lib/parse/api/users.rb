@@ -38,12 +38,12 @@ module Parse
       end
 
       # deleting or unlinking is done by setting the authData of the service name to nil
-      def delete_user_auth_data(id, service_name, **opts)
-        auth_data = { service_name => nil }
+      def set_service_auth_data(id, service_name, auth_data, headers: {}, **opts)
+        auth_data = { service_name => auth_data }
         update_user_auth_data(id, auth_data, opts)
       end
 
-      def update_user_auth_data(id, auth_data, **opts)
+      def update_user_auth_data(id, auth_data, headers: {}, **opts)
         body = { authData: auth_data }
         request :put, "#{USER_PATH_PREFIX}/#{id}", body: body, opts: opts
       end
@@ -82,10 +82,6 @@ module Parse
         response = request :post, USER_PATH_PREFIX, body: body, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
-      end
-
-      def signup_service(name, data)
-
       end
 
 

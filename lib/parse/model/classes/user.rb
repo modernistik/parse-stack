@@ -34,6 +34,18 @@ module Parse
       auth_data['anonymous']['id'] if auth_data.present? && auth_data["anonymous"].is_a?(Hash)
     end
 
+    def link_auth_data!(service_name, **data)
+      response = client.set_service_auth_data(id, service_name, data)
+      apply_attributes!(response.result) if response.success?
+      response.success?
+    end
+
+    def unlink_auth_data!(service_name)
+      response = client.set_service_auth_data(id, service_name, nil)
+      apply_attributes!(response.result) if response.success?
+      response.success?
+    end
+
     # So that apply_attributes! works with session_token for login
     def session_token_set_attribute!(token, track = false)
       @session_token = token.to_s
@@ -60,7 +72,7 @@ module Parse
       # first signup the user, then save any additional attributes
       response = client.signup signup_attrs
 
-      unless response.error?
+      if response.success?
         apply_attributes! response.result
         return true
       end
