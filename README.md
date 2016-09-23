@@ -666,13 +666,13 @@ Properties are considered a literal-type of association. This means that a defin
 - **:string** (_default_) - a generic string.
 - **:integer** - basic number.
 - **:float** - a floating numeric value.
-- **:boolean** - true/false value. (_alias: `:bool`_).
+- **:boolean** (alias **:bool**) - true/false value.
 - **:date** - a Parse date type. Maps to `Parse::Date`.
 - **:array** - a collection of heterogeneous items. Maps to `Parse::CollectionProxy`.
 - **:file** - a Parse file type. Maps to `Parse::File`.
 - **:geopoint** - a GeoPoint type. Maps to `Parse::GeoPoint`.
 - **:bytes** - a Parse bytes data type managed as base64. Maps to `Parse::Bytes`.
-- **:object** - an object Hash data type.
+- **:object** - an object "hash" data type. Uses [ActiveSupport::HashWithIndifferentAccess](http://apidock.com/rails/ActiveSupport/HashWithIndifferentAccess).
 
 For completeness, the `:id` and `:acl` data types are also defined in order to handle the Parse `objectId` field and the `ACL` object. Those are special and should not be used in your class (unless you know what you are doing). New data types can be implemented through the internal `typecast` interface. **TODO: discuss `typecast` interface in the future**
 

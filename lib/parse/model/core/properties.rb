@@ -10,6 +10,7 @@ require 'active_support/inflector'
 require 'active_model_serializers'
 require 'active_support/inflector'
 require 'active_model_serializers'
+require 'active_support/hash_with_indifferent_access'
 require 'time'
 
 =begin
@@ -373,7 +374,7 @@ module Parse
 
       case data_type
       when :object
-        val = val #should be regular hash, maybe in the future we return hashie?
+        val = val.with_indifferent_access if val.is_a?(Hash) 
       when :array
         # All "array" types use a collection proxy
         val = val.to_a if val.is_a?(Parse::CollectionProxy) #all objects must be in array form
