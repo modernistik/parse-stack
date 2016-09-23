@@ -676,6 +676,8 @@ Properties are considered a literal-type of association. This means that a defin
 
 For completeness, the `:id` and `:acl` data types are also defined in order to handle the Parse `objectId` field and the `ACL` object. Those are special and should not be used in your class (unless you know what you are doing). New data types can be implemented through the internal `typecast` interface. **TODO: discuss `typecast` interface in the future**
 
+In addition, `:boolean` data types create a special method that uses the `?` convention. As an example, if you have a property named `approved`, the normal getter `obj.approved` can return true, false or nil based on the value in Parse. However with the `obj.approved?` method, it will return true if it set to true, false for any other value.
+
 Using the example above, we can add the base properties to our classes.
 
 ```ruby

@@ -218,6 +218,14 @@ module Parse
           value
         end
 
+        # support question mark methods for boolean
+        if data_type == :boolean
+          # returns true if set to true, false otherwise
+          define_method("#{key}?") do
+            (send(key) == true)
+          end
+        end
+
         # The second method to be defined is a setter method. This is done by
         # defining :key with a '=' sign. However, to support setting the attribute
         # with and without dirty tracking, we really will just proxy it to another method
@@ -290,6 +298,7 @@ module Parse
       self.class.fields(type)
     end
 
+    # TODO: We can optimize
     def attributes
       {__type: :string, :className => :string}.merge!(self.class.attributes)
     end

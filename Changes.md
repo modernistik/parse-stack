@@ -15,6 +15,7 @@
 - `Parse::Client.session` has been deprecated in favor of `Parse::Client.client`
 - All Parse-Stack errors that are raised inherit from StandardError.
 - All :object data types is now cast as ActiveSupport::HashWithIndifferentAccess.
+- :boolean properties now have a special `?` method to access true/false values.
 
 ### 1.4.3
 - NEW: Support for rails generators: `parse_stack:install` and `parse_stack:model`.
