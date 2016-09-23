@@ -10,7 +10,7 @@ module Parse
   class PasswordMissingError < StandardError; end; # 201
   class UsernameTakenError < StandardError; end; # 202
   class EmailTakenError < StandardError; end; # 203
-
+  class EmailMissing < StandardError; end; # 204
 
   class User < Parse::Object
 
@@ -54,6 +54,11 @@ module Parse
 
     def logged_in?
       self.session_token.present?
+    end
+
+    def request_password_reset
+      return false if email.nil?
+      Parse::User.request_password_reset(email)
     end
 
     def signup!(passwd = nil)
@@ -119,8 +124,8 @@ module Parse
       @session
     end
 
-    def self.signup(username, password, email = nil, body: {})
-      response = client.signup(username, password, email, body: body)
+    def self.create(body, **opts)
+      response = client.create_user(body, opts: opts)
       if response.success?
         return Parse::User.build response.result
       end
@@ -138,9 +143,28 @@ module Parse
       raise response
     end
 
+    # method will signup or login a user given the third-party authentication data
+    def self.autologin_service(service_name, auth_data, body: {})
+      body = body.merge({authData: {service_name => auth_data} })
+      self.create(body)
+    end
+
+    def self.signup(username, password, email = nil, body: {})
+      body = body.merge({username: username, password: password })
+      body[:email] = email if email.present?
+      self.create(body)
+    end
+
     def self.login(username, password)
       response = client.login(username.to_s, password.to_s)
       response.success? ? Parse::User.build(response.result) : nil
+    end
+
+    def self.request_password_reset(email)
+      email = email.email if email.is_a?(Parse::User)
+      return false if email.blank?
+      response = client.reset_password(email)
+      response.success?
     end
 
     def self.session(token)

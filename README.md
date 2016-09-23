@@ -52,12 +52,15 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
     - [Calculating Distances between locations](#calculating-distances-between-locations)
   - [Parse::Bytes](#parsebytes)
   - [Parse::ACL](#parseacl)
-  - [Parse::User](#parseuser)
-    - [Signup](#signup)
-    - [Login and Sessions](#login-and-sessions)
   - [Parse::Session](#parsesession)
   - [Parse::Installation](#parseinstallation)
   - [Parse::Role](#parserole)
+  - [Parse::User](#parseuser)
+    - [Signup](#signup)
+      - [Third-Party Services](#third-party-services)
+    - [Login and Sessions](#login-and-sessions)
+    - [Linking and Unlinking Users](#linking-and-unlinking-users)
+    - [Request Password Reset](#request-password-reset)
 - [Modeling and Subclassing](#modeling-and-subclassing)
   - [Defining Properties](#defining-properties)
     - [Accessor Aliasing](#accessor-aliasing)
@@ -468,61 +471,6 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 
 For more information about Parse record ACLs, see the documentation at  [Security](https://parseplatform.github.io/docs/rest/guide/#security)
 
-### Parse::User
-This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. It is defined as follows:
-
-```ruby
-class Parse::User < Parse::Object
-  property :auth_data, :object
-  property :email
-  property :username
-
-end
-```
-
-While `:password` is a property on the User class, which will generally be empty whenever fetching User records.
-
-#### Signup
-You can signup new users in two ways. You can either use a class method `Parse::User.signup` to create a new user with the minimum fields of username, password and email, or create a `Parse::User` object can call the `signup!` method. If signup fails, it will raise the corresponding exception.
-
-```ruby
-user = Parse::User.signup(username, password, email)
-
-#or
-user = Parse::User.new username: "user", password: "s3cret"
-user.signup!
-```
-
-#### Login and Sessions
-With the `Parse::User` class, you can also perform login and logout functionality. The class special accessors for `session_token` and `session` to manage its authentication state. This will allow you to authenticate users as well as perform Parse queries as a specific user using their session token. To login a user, use the `Parse::User.login` method by supplying the corresponding username and password, or if you already have a user record, use `login!` with the proper password.
-
-```ruby
-user = Parse::User.login(username,password)
-user.session_token # session token from a Parse::Session
-user.session # Parse::Session tied to the token
-
- # You can login user records
-user = Parse::User.first
-user.session_token # nil
-
-passwd = 'p_n7!-e8' # corresponding password
-user.login!(passwd) # true
-
-user.session_token # 'r:pnktnjyb996sj4p156gjtp4im'
-
- # logout to delete the session
-user.logout
-```
-
-If you happen to already have a valid session token, you can use it to retrieve the corresponding Parse::User.
-
-```ruby
-# finds user with session token
-user = Parse::User.session(session_token)
-
-user.logout # deletes the corresponding session
-```
-
 ### Parse::Session
 This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. It is defined as follows:
 
@@ -582,6 +530,115 @@ class Parse::Role < Parse::Object
   has_many :roles, through: :relation
   has_many :users, through: :relation
 end
+```
+
+### Parse::User
+This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. It is defined as follows:
+
+```ruby
+class Parse::User < Parse::Object
+  property :auth_data, :object
+  property :email
+  property :username
+
+end
+```
+
+While `:password` is a property on the User class, which will generally be empty whenever fetching User records.
+
+#### Signup
+You can signup new users in two ways. You can either use a class method `Parse::User.signup` to create a new user with the minimum fields of username, password and email, or create a `Parse::User` object can call the `signup!` method. If signup fails, it will raise the corresponding exception.
+
+```ruby
+user = Parse::User.signup(username, password, email)
+
+#or
+user = Parse::User.new username: "user", password: "s3cret"
+user.signup!
+```
+
+##### Third-Party Services
+You can signup users using third-party services like Facebook and Twitter as described in: [Signing Up and Logging In](https://parseplatform.github.io/docs/rest/guide/#signing-up-and-logging-in). To do this with Parse-Stack, you can call the `Parse::User.autologin_service` method by passing the service name and the corresponding authentication hash data. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
+
+```ruby
+fb_auth = {}
+fb_auth[:id] = "123456789"
+fb_auth[:access_token] = "SaMpLeAAiZBLR995wxBvSGNoTrEaL"
+fb_auth[:expiration_date] = "2025-02-21T23:49:36.353Z"
+
+# signup or login a user with this auth data.
+user = Parse::User.autologin_service(:facebook, fb_auth)
+```
+
+You may also combine both approaches of signing up a new user with a third-party service and set additional custom fields. For this, use the method `Parse::User.create`.
+
+```ruby
+# or to signup a user with additional data, but linked to Facebook
+data = {
+  username: "johnsmith",
+  name: "John",
+  email: "user@example.com",
+  authData: { facebook: fb_auth }
+}
+user = Parse::User.create data
+```
+
+#### Login and Sessions
+With the `Parse::User` class, you can also perform login and logout functionality. The class special accessors for `session_token` and `session` to manage its authentication state. This will allow you to authenticate users as well as perform Parse queries as a specific user using their session token. To login a user, use the `Parse::User.login` method by supplying the corresponding username and password, or if you already have a user record, use `login!` with the proper password.
+
+```ruby
+user = Parse::User.login(username,password)
+user.session_token # session token from a Parse::Session
+user.session # Parse::Session tied to the token
+
+ # You can login user records
+user = Parse::User.first
+user.session_token # nil
+
+passwd = 'p_n7!-e8' # corresponding password
+user.login!(passwd) # true
+
+user.session_token # 'r:pnktnjyb996sj4p156gjtp4im'
+
+ # logout to delete the session
+user.logout
+```
+
+If you happen to already have a valid session token, you can use it to retrieve the corresponding Parse::User.
+
+```ruby
+# finds user with session token
+user = Parse::User.session(session_token)
+
+user.logout # deletes the corresponding session
+```
+
+#### Linking and Unlinking Users
+You can signup or login uses with third-party services like Facebook and Twitter as described in: [Linking and Unlinking Users](https://parseplatform.github.io/docs/rest/guide/#linking). To do this, you must first get the corresponding authentication data for the specific service, and then apply it to the user using the linking and unlinking methods. Each method returns true or false if the action was successful. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
+
+```ruby
+
+user = Parse::User.first
+
+fb_auth = { ... } # Facebook auth data
+
+# Link this user's Facebook account with Parse
+user.link_auth_data! :facebook, fb_auth
+
+# Unlinks this user's Facebook account from Parse
+user.unlink_auth_data! :facebook
+```
+
+#### Request Password Reset
+You can reset a user's password using the `Parse::User.request_password_reset` method.
+
+```ruby
+user = Parse::User.first
+
+# pass a user object
+Parse::User.request_password_reset user
+# or email
+Parse::User.request_password_reset("user@example.com")
 ```
 
 

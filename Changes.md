@@ -2,6 +2,8 @@
 
 ### 1.4.4
 - NEW: Support for user login, logout and sessions.
+- NEW: Support for signup, including signing up with third-party services.
+- NEW: Support for linking and unlinking user accounts with third-party services.
 - NEW: Improved support for Parse session APIs.
 - Fixes: Auto-upgrade did not upgrade core classes.
 - Improves JSON encoding/decoding performance.
