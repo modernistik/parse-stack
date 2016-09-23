@@ -71,11 +71,11 @@ module Parse
         raise Parse::PasswordMissingError, "Signup requires a password."
       end
 
-      signup_attrs = attributes_updates
+      signup_attrs = attribute_updates
       signup_attrs.except! *Parse::Properties::BASE_FIELD_MAP.flatten
 
       # first signup the user, then save any additional attributes
-      response = client.signup signup_attrs
+      response = client.create_user signup_attrs
 
       if response.success?
         apply_attributes! response.result
