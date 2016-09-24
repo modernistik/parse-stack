@@ -170,13 +170,30 @@ module Parse
 
           self.enums.merge!( key => enum_values )
 
+          # You can use the :_prefix or :_suffix options when you need to define multiple enums with same values.
+          # If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
+          prefix = opts[:_prefix]
+          add_suffix = opts[:_suffix] == true
+          prefix_or_key = (prefix.blank? ? key : prefix).to_sym
+
           self.singleton_class.class_eval do
-            define_method(key.to_s.pluralize) { enum_values }
+            class_method_name = prefix_or_key.to_s.pluralize
+            define_method(class_method_name) { enum_values }
           end
 
+          method_name = add_suffix ? :"valid_#{prefix_or_key}?" : :"#{prefix_or_key}_valid?"
+          define_method(method_name) { enum_values.include?(instance_variable_get(ivar).to_s.to_sym) }
+
           enum_values.each do |enum|
-            define_method("#{enum}!") { instance_variable_set(ivar, enum) }
-            define_method("#{enum}?") { enum == instance_variable_get(ivar).to_s.to_sym }
+            method_name = enum # default
+            if add_suffix
+              method_name = :"#{enum}_#{prefix_or_key}"
+            elsif prefix.present?
+              method_name = :"#{prefix}_#{enum}"
+            end
+
+            define_method("#{method_name}!") { instance_variable_set(ivar, enum) }
+            define_method("#{method_name}?") { enum == instance_variable_get(ivar).to_s.to_sym }
           end
 
           validates key, inclusion: { in: enum_values }, allow_nil: opts[:required]

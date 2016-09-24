@@ -711,6 +711,9 @@ class Post < Parse::Object
   # a list using
   property :tags, :array
 
+  # string column as enummerated type. see :enum
+  property :status, enum: [:active, :archived]
+
   # Maps to "featuredImage" column representing a File.
   property :featured_image, :file
 
@@ -797,6 +800,57 @@ if post.state == :draft
 	post.state = :published
 	post.save
 end
+```
+
+##### `:enum => [array]`
+The enum option allows you to define a set of possible values that the particular `:string` property should hold. This feature has similarities in the methods and accessors generated for you as described in `[ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html)`. Using the example in that documentation:
+
+```ruby
+class Conversation < Parse::Object
+  property :status, enum: [ :active, :archived ]
+end
+
+Conversation.statuses # => [ :active, :archived ]
+
+conversation.active! # sets status to active!
+conversation.active? # => true
+conversation.status  # => :active
+
+conversation.archived!
+conversation.archived? # => true
+conversation.status    # => :archived
+
+# equivalent
+conversation.status = "archived"
+conversation.status = :archived
+
+# allowed by the setter
+conversation.status = "banana"
+conversation.status_valid? # => false
+
+```
+
+Similar to `[ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html)`, you can use the `:_prefix` or `:_suffix` options when you need to define multiple enums with same values. If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
+
+```ruby
+class Conversation < Parse::Object
+  property :status, enum: [:active, :archived], _suffix: true
+  property :comments_status, enum: [:active, :inactive], _prefix: :comments
+  # combined
+  property :discussion, enum: [:casual, :business], _prefix: :talk, _suffix: true
+end
+
+conversation.active_status!
+conversation.archived_status? # => false
+
+conversation.status = "banana"
+conversation.valid_status? # => false
+
+conversation.comments_inactive!
+conversation.comments_active? # => false
+
+conversation.casual_talk!
+conversation.business_talk?? # => false
 ```
 
 ##### Overriding Property Accessors

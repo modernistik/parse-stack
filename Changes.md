@@ -1,6 +1,7 @@
 ## Parse-Stack Changelog
 
 ### 1.4.4
+- NEW: Enumerated property types that mimic ActiveRecord::Enum behavior.
 - NEW: Support for user login, logout and sessions.
 - NEW: Support for signup, including signing up with third-party services.
 - NEW: Support for linking and unlinking user accounts with third-party services.
