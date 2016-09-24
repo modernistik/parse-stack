@@ -1,11 +1,14 @@
 ## Parse-Stack Changelog
 
-### 1.4.4
+### 1.5.0rc1
 - NEW: Enumerated property types that mimic ActiveRecord::Enum behavior.
+- NEW: Support for scoped queries similar to ActiveRecord::Scope.
 - NEW: Support for user login, logout and sessions.
 - NEW: Support for signup, including signing up with third-party services.
 - NEW: Support for linking and unlinking user accounts with third-party services.
 - NEW: Improved support for Parse session APIs.
+- NEW: Boolean properties automatically generate a positive query scope for the field.
+- Added property options for `:scopes`, `:enum`, `:_prefix` and `:_suffix`
 - Fixes: Auto-upgrade did not upgrade core classes.
 - Improves JSON encoding/decoding performance.
 - Removes throttling of requests.
@@ -17,6 +20,9 @@
 - All Parse-Stack errors that are raised inherit from StandardError.
 - All :object data types is now cast as ActiveSupport::HashWithIndifferentAccess.
 - :boolean properties now have a special `?` method to access true/false values.
+- Adds chaining to Parse::Query#conditions.
+- Adds alias instance method `Parse::Query#query` to `Parse::Query#conditions`.
+- `Parse::Object.where` is now an alias to `Parse::Object.query`. You can now use `Parse::Object.where_literal`.
 
 ### 1.4.3
 - NEW: Support for rails generators: `parse_stack:install` and `parse_stack:model`.

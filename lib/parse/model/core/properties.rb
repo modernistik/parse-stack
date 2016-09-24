@@ -115,10 +115,16 @@ module Parse
 
         # allow :bool for :boolean
         data_type = :boolean if data_type == :bool
+        data_type = :integer if data_type == :int
+
         # set defaults
         opts = { required: false,
                  alias: true,
                  symbolize: false,
+                 enum: nil,
+                 scopes: true,
+                 _prefix: nil,
+                 _suffix: false,
                  field: key.to_s.camelize(:lower)
                }.merge( opts )
         #By default, the remote field name is a lower-first-camelcase version of the key
@@ -152,51 +158,60 @@ module Parse
           # validate that it is not empty
           validates_presence_of key
         end
-        opts[:values] ||= opts[:enum] || opts[:allowed]
-        is_enum_type = opts[:values].present?
+
+
+        is_enum_type = opts[:enum].nil? == false
 
         if is_enum_type
-          enum_values = opts[:values].dup
+
           unless data_type == :string
-            raise DefinitionError, "Property #{self}##{parse_field} :values option is only supported on :string data types."
+            raise DefinitionError, "Property #{self}##{parse_field} :enum option is only supported on :string data types."
           end
 
-          unless enum_values.is_a?(Array)
-            raise DefinitionError, "Property #{self}##{parse_field} :values option must be an Array type of symbols."
+          enum_values = opts[:enum]
+          unless enum_values.is_a?(Array) && enum_values.empty? == false
+            raise DefinitionError, "Property #{self}##{parse_field} :enum option must be an Array type of symbols."
           end
           opts[:symbolize] = true
 
-          enum_values = enum_values.map(&:to_sym).freeze
+          enum_values = enum_values.dup.map(&:to_sym).freeze
 
           self.enums.merge!( key => enum_values )
+          validates key, inclusion: { in: enum_values }, allow_nil: opts[:required]
 
-          # You can use the :_prefix or :_suffix options when you need to define multiple enums with same values.
-          # If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
-          prefix = opts[:_prefix]
-          add_suffix = opts[:_suffix] == true
-          prefix_or_key = (prefix.blank? ? key : prefix).to_sym
+          unless opts[:scopes] == false
+            # You can use the :_prefix or :_suffix options when you need to define multiple enums with same values.
+            # If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
+            prefix = opts[:_prefix]
+            add_suffix = opts[:_suffix] == true
+            prefix_or_key = (prefix.blank? ? key : prefix).to_sym
 
-          self.singleton_class.class_eval do
-            class_method_name = prefix_or_key.to_s.pluralize
-            define_method(class_method_name) { enum_values }
-          end
-
-          method_name = add_suffix ? :"valid_#{prefix_or_key}?" : :"#{prefix_or_key}_valid?"
-          define_method(method_name) { enum_values.include?(instance_variable_get(ivar).to_s.to_sym) }
-
-          enum_values.each do |enum|
-            method_name = enum # default
-            if add_suffix
-              method_name = :"#{enum}_#{prefix_or_key}"
-            elsif prefix.present?
-              method_name = :"#{prefix}_#{enum}"
+            class_method_name = prefix_or_key.to_s.pluralize.to_sym
+            if singleton_class.method_defined?(class_method_name)
+              raise DefinitionError, "You tried to define an enum named `#{key}` for #{self} " + \
+              "but this will generate a method  `#{self}.#{class_method_name}` " + \
+              " which is already defined. Try using :_suffix or :_prefix options."
             end
 
-            define_method("#{method_name}!") { instance_variable_set(ivar, enum) }
-            define_method("#{method_name}?") { enum == instance_variable_get(ivar).to_s.to_sym }
-          end
+            define_singleton_method(class_method_name) { enum_values }
 
-          validates key, inclusion: { in: enum_values }, allow_nil: opts[:required]
+            method_name = add_suffix ? :"valid_#{prefix_or_key}?" : :"#{prefix_or_key}_valid?"
+            define_method(method_name) { enum_values.include?(instance_variable_get(ivar).to_s.to_sym) }
+
+            enum_values.each do |enum|
+              method_name = enum # default
+              scope_name = enum
+              if add_suffix
+                method_name = :"#{enum}_#{prefix_or_key}"
+              elsif prefix.present?
+                method_name = :"#{prefix}_#{enum}"
+              end
+              self.scope method_name, ->(ex = {}){ ex.merge!(key => enum); query( ex )  }
+              define_method("#{method_name}!") { instance_variable_set(ivar, enum) }
+              define_method("#{method_name}?") { enum == instance_variable_get(ivar).to_s.to_sym }
+            end
+          end # unless scopes
+
         end
 
         symbolize_value = opts[:symbolize]
@@ -275,6 +290,9 @@ module Parse
         if data_type == :boolean
           # returns true if set to true, false otherwise
           define_method("#{key}?") { (send(key) == true) }
+          unless opts[:scopes] == false
+            scope key, ->(opts = {}){ query( opts.merge(key => true) ) }
+          end
         end
 
         # The second method to be defined is a setter method. This is done by

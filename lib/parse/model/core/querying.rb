@@ -15,14 +15,30 @@ module Parse
 
     module ClassMethods
 
+      def scope(name, body)
+        unless body.respond_to?(:call)
+          raise ArgumentError, 'The scope body needs to be callable.'
+        end
+
+        name = name.to_sym
+        if respond_to?(name, true)
+          puts "Creating scope :#{name}. Will overwrite existing method #{self}.#{name}."
+        end
+
+        define_singleton_method(name) do |*args|
+          res = body.call(*args)
+          res || query
+        end
+
+      end
       # This query method helper returns a Query object tied to a parse class.
       # The parse class should be the name of the one that will be sent in the query
       # request pointing to the remote table.
       def query(constraints = {})
         Parse::Query.new self.parse_class, constraints
-      end
+      end; alias_method :where, :query
 
-      def where(clauses = {})
+      def literal_where(clauses = {})
         query.where(clauses)
       end
 

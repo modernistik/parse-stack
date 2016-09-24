@@ -134,7 +134,8 @@ module Parse
           add_constraint(expression, value)
         end
       end # each
-    end
+      self #chaining
+    end; alias_method :query, :conditions
 
     def table=(t)
       @table = t.to_s.camelize
@@ -194,7 +195,7 @@ module Parse
     def related_to(field, pointer)
       raise "Object value must be a Parse::Pointer type" unless pointer.is_a?(Parse::Pointer)
       add_constraint field.to_sym.related_to, pointer
-      self
+      self #chaining
     end
 
     def includes(*fields)
@@ -237,7 +238,7 @@ module Parse
           add_constraint(operator, value, opts)
         end
       end
-      self  #chaining
+      self #chaining
     end
 
     def or_where(where_clauses = [])

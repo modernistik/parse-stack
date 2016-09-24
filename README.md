@@ -114,6 +114,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
     - [Bounding Box Constraint](#bounding-box-constraint)
   - [Relational Queries](#relational-queries)
   - [Compound Queries](#compound-queries)
+- [Query Scopes](#query-scopes)
 - [Calling Cloud Code Functions](#calling-cloud-code-functions)
 - [Calling Background Jobs](#calling-background-jobs)
 - [Active Model Callbacks](#active-model-callbacks)
@@ -162,6 +163,8 @@ class Artist < Parse::Object
   property :name
   property :genres, :array
   has_many :fans, as: :user
+
+  scope :recent, ->(x) { query(:created_at.after => x) }
 end
 
 # updates schemas for your Parse app based on your models (non-destructive)
@@ -671,10 +674,10 @@ end
 ### Defining Properties
 Properties are considered a literal-type of association. This means that a defined local property maps directly to a column name for that remote Parse class which contain the value. **All properties are implicitly formatted to map to a lower-first camelcase version in Parse (remote).** Therefore a local property defined as `like_count`, would be mapped to the remote column of `likeCount` automatically. The only special behavior to this rule is the `:id` property which maps to `objectId` in Parse. This implicit conversion mapping is the default behavior, but can be changed on a per-property basis. All Parse data types are supported and all Parse::Object subclasses already provide definitions for `:id` (objectId), `:created_at` (createdAt), `:updated_at` (updatedAt) and `:acl` (ACL) properties.
 
-- **:string** (_default_) - a generic string.
-- **:integer** - basic number.
+- **:string** (_default_) - a generic string. Can be used as an enum field, see [Enum](#enum--array).
+- **:integer** (alias **:int**) - basic number.
 - **:float** - a floating numeric value.
-- **:boolean** (alias **:bool**) - true/false value.
+- **:boolean** (alias **:bool**) - true/false value. This will also generate a class scope helper. See [Query Scopes](#query-scopes).
 - **:date** - a Parse date type. Maps to `Parse::Date`.
 - **:array** - a collection of heterogeneous items. Maps to `Parse::CollectionProxy`.
 - **:file** - a Parse file type. Maps to `Parse::File`.
@@ -812,6 +815,10 @@ end
 
 Conversation.statuses # => [ :active, :archived ]
 
+# named scopes
+Conversation.active # where status: :active
+Conversation.archived(limit: 10) # where status: :archived, limit 10
+
 conversation.active! # sets status to active!
 conversation.active? # => true
 conversation.status  # => :active
@@ -844,6 +851,11 @@ Conversation.statuses # => [:active, :archived]
 Conversation.comments # => [:active, :inactive]
 Conversation.talks # => [:casual, :business]
 
+# affects scopes names
+Conversation.archived_status
+Conversation.comments_inactive
+Conversation.business_talk
+
 conversation.active_status!
 conversation.archived_status? # => false
 
@@ -856,6 +868,9 @@ conversation.comments_active? # => false
 conversation.casual_talk!
 conversation.business_talk? # => false
 ```
+
+##### `:scope => (true|false)`
+For some data types like `:boolean` and enums, some [query scopes](#query-scopes) are generated to more easily query data. To prevent generating these scopes for a particular property, set this value to `false`.
 
 ### Associations
 Parse supports a three main types of relational associations. One type of relation is the `One-to-One` association. This is implemented through a specific column in Parse with a Pointer data type. This pointer column, contains a local value that refers to a different record in a separate Parse table. This association is implemented using the `:belongs_to` feature. The second association is of `One-to-Many`. This is implemented is in Parse as a Array type column that contains a list of of Parse pointer objects. It is recommended by Parse that this array does not exceed 100 items for performance reasons. This feature is implemented using the `:has_many` operation with the plural name of the local Parse class. The last association type is a Parse Relation. These can be used to implement a large `Many-to-Many` association without requiring an explicit intermediary Parse table or class. This feature is also implemented using the `:has_many` method but passing the option of `:relation`.
@@ -1739,6 +1754,56 @@ query.or_where(:wins.lt => 5)
 # where wins > 150 || wins < 5
 results = query.results
 ```
+
+## Query Scopes
+This feature is a small subset of the [ActiveRecord named scopes](http://guides.rubyonrails.org/active_record_querying.html#scopes) feature. Scoping allows you to specify commonly-used queries which can be referenced as class method calls and are chainable with other scopes. You can use every `Parse::Query` method previously covered such as `where`, `includes` and `limit`.
+
+```ruby
+
+class Article < Parse::Object
+  property :published, :boolean
+  scope :published, -> { query(published: true) }
+end
+```
+
+This is the same as defining your own class method for the query.
+
+```ruby
+class Article < Parse::Object
+  def self.published
+    query(published: true)
+  end
+end
+```
+
+You can also chain scopes and pass parameters. In addition, boolean and enumerated properties have automatically generated scopes for you to use.
+
+```ruby
+# continued from above definition
+class Article < Parse::Object
+  property :comment_count, :integer
+  property :category
+  property :approved, :boolean
+
+  scope :published_and_commented, -> { published.where :comment_count.gt => 0 }
+  scope :popular_topics, ->(name) { published_and_commented.where category: name }
+end
+
+# simple scope
+Article.published
+
+# chained scope
+Article.published_and_commented # published where comment_count > 0
+
+# scope with parameters
+Article.popular_topic("music") # => popular music articles
+
+# automatically generated scope
+Article.approved(category: "tour") # => where approved: true, category: 'tour'
+
+```
+
+If you would like to turn off automatic scope generation for property types, set the option `:scope` to false when declaring the property.
 
 ## Calling Cloud Code Functions
 You can call on your defined Cloud Code functions using the `call_function()` method. The result will be `nil` in case of errors or the value of the `result` field in the Parse response.
