@@ -803,7 +803,7 @@ end
 ```
 
 ##### `:enum => [array]`
-The enum option allows you to define a set of possible values that the particular `:string` property should hold. This feature has similarities in the methods and accessors generated for you as described in `[ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html)`. Using the example in that documentation:
+The enum option allows you to define a set of possible values that the particular `:string` property should hold. This feature has similarities in the methods and accessors generated for you as described in [ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html). Using the example in that documentation:
 
 ```ruby
 class Conversation < Parse::Object
@@ -825,12 +825,12 @@ conversation.status = "archived"
 conversation.status = :archived
 
 # allowed by the setter
-conversation.status = "banana"
+conversation.status = :banana
 conversation.status_valid? # => false
 
 ```
 
-Similar to `[ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html)`, you can use the `:_prefix` or `:_suffix` options when you need to define multiple enums with same values. If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
+Similar to [ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html), you can use the `:_prefix` or `:_suffix` options when you need to define multiple enums with same values. If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
 
 ```ruby
 class Conversation < Parse::Object
@@ -840,21 +840,22 @@ class Conversation < Parse::Object
   property :discussion, enum: [:casual, :business], _prefix: :talk, _suffix: true
 end
 
+Conversation.statuses # => [:active, :archived]
+Conversation.comments # => [:active, :inactive]
+Conversation.talks # => [:casual, :business]
+
 conversation.active_status!
 conversation.archived_status? # => false
 
-conversation.status = "banana"
+conversation.status = :banana
 conversation.valid_status? # => false
 
 conversation.comments_inactive!
 conversation.comments_active? # => false
 
 conversation.casual_talk!
-conversation.business_talk?? # => false
+conversation.business_talk? # => false
 ```
-
-##### Overriding Property Accessors
-When a `property` is defined, special accessors are created for it. It is not recommended that you override the generated accessors for the properties you have defined.
 
 ### Associations
 Parse supports a three main types of relational associations. One type of relation is the `One-to-One` association. This is implemented through a specific column in Parse with a Pointer data type. This pointer column, contains a local value that refers to a different record in a separate Parse table. This association is implemented using the `:belongs_to` feature. The second association is of `One-to-Many`. This is implemented is in Parse as a Array type column that contains a list of of Parse pointer objects. It is recommended by Parse that this array does not exceed 100 items for performance reasons. This feature is implemented using the `:has_many` operation with the plural name of the local Parse class. The last association type is a Parse Relation. These can be used to implement a large `Many-to-Many` association without requiring an explicit intermediary Parse table or class. This feature is also implemented using the `:has_many` method but passing the option of `:relation`.
