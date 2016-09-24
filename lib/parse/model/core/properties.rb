@@ -65,6 +65,10 @@ module Parse
         @field_map ||= BASE_FIELD_MAP.dup
       end
 
+      def enums
+        @enums ||= {}
+      end
+
       # Keeps track of all the attributes supported by this class.
       def attributes=(hash)
         @attributes = BASE.merge(hash)
@@ -97,10 +101,11 @@ module Parse
       # for enum type fields that are string columns in Parse. Ex. a booking_status for a field
       # could be either "submitted" or "completed" in Parse, however with symbolize, these would
       # be available as :submitted or :completed.
-      def property(key, data_type = :string, opts = {})
+      def property(key, data_type = :string, **opts)
 
         key = key.to_sym
-
+        ivar = :"@#{key}"
+        will_change_method = :"#{key}_will_change!"
         if data_type.is_a?(Hash)
           opts.merge!(data_type)
           data_type = :string
@@ -145,12 +150,43 @@ module Parse
           # validate that it is not empty
           validates_presence_of key
         end
+        opts[:values] ||= opts[:enum] || opts[:allowed]
+        is_enum_type = opts[:values].present?
+
+        if is_enum_type
+          enum_values = opts[:values].dup
+          unless data_type == :string
+            raise DefinitionError, "Property #{self}##{parse_field} :values option is only supported on :string data types."
+          end
+
+          unless enum_values.is_a?(Array)
+            raise DefinitionError, "Property #{self}##{parse_field} :values option must be an Array type of symbols."
+          end
+          opts[:symbolize] = true
+
+          enum_values = enum_values.map(&:to_sym).freeze
+
+          self.enums.merge!( key => enum_values )
+
+          self.singleton_class.class_eval do
+            define_method(key.to_s.pluralize) { enum_values }
+          end
+
+          define_method("#{key}_values") { enum_values }
+
+          enum_values.each do |enum|
+            define_method("#{enum}!") { instance_variable_set(ivar, enum) }
+            define_method("#{enum}?") { enum == instance_variable_get(ivar).to_s.to_sym }
+          end
+
+          validates key, inclusion: { in: enum_values }, allow_nil: opts[:required]
+        end
 
         symbolize_value = opts[:symbolize]
 
         #only support symbolization of string data types
         if symbolize_value && (data_type == :string || data_type == :array) == false
-          raise 'Symbolization is only supported on :string or :array data types.'
+          raise DefinitionError, 'Symbolization is only supported on :string or :array data types.'
         end
 
         # Here is the where the 'magic' begins. For each property defined, we will
@@ -170,11 +206,11 @@ module Parse
         end
 
         # We define a getter with the key
+
         define_method(key) do
 
           # we will get the value using the internal value of the instance variable
           # using the instance_variable_get
-          ivar = :"@#{key}"
           value = instance_variable_get ivar
 
           # If the value is nil and this current Parse::Object instance is a pointer?
@@ -195,7 +231,7 @@ module Parse
              value = format_value(key, value, data_type)
             # lets set the variable with the updated value
              instance_variable_set ivar, value
-             send "#{key}_will_change!"
+             send will_change_method
           end
 
           # if the value is a String (like an iso8601 date) and the data type of
@@ -203,7 +239,7 @@ module Parse
           if value.is_a?(String) && data_type == :date
             value = format_value(key, value, data_type)
             instance_variable_set ivar, value
-            send "#{key}_will_change!"
+            send will_change_method
           end
           # finally return the value
           if symbolize_value
@@ -221,9 +257,7 @@ module Parse
         # support question mark methods for boolean
         if data_type == :boolean
           # returns true if set to true, false otherwise
-          define_method("#{key}?") do
-            (send(key) == true)
-          end
+          define_method("#{key}?") { (send(key) == true) }
         end
 
         # The second method to be defined is a setter method. This is done by
@@ -247,7 +281,7 @@ module Parse
           # this will grab the current value and keep a copy of it - but we only do this if
           # the new value being set is different from the current value stored.
           if track == true
-            send :"#{key}_will_change!" unless val == instance_variable_get( :"@#{key}" )
+            send will_change_method unless val == instance_variable_get( ivar )
           end
 
           if symbolize_value
@@ -259,8 +293,12 @@ module Parse
               val.set_collection! items
             end
           end
+
+          # if is_enum_type
+          #
+          # end
           # now set the instance value
-          instance_variable_set :"@#{key}", val
+          instance_variable_set ivar, val
         end
 
         # The core methods above support all attributes with the base local :key parameter
@@ -310,7 +348,7 @@ module Parse
 
       @id ||= hash["id"] || hash["objectId"] || hash[:objectId]
       hash.each do |key, value|
-        method = "#{key}_set_attribute!"
+        method = "#{key}_set_attribute!".freeze
         send(method, value, dirty_track) if respond_to?( method )
       end
     end
@@ -354,21 +392,22 @@ module Parse
     def format_operation(key, val, data_type)
       return val unless val.is_a?(Hash) && val["__op"].present?
       op = val["__op"]
+      ivar = :"@#{key}"
       #handles delete case otherwise 'null' shows up in column
       if "Delete" == op
         val = nil
       elsif "Add" == op && data_type == :array
-        val = (instance_variable_get(:"@#{key}") || []).to_a + (val["objects"] || [])
+        val = (instance_variable_get(ivar) || []).to_a + (val["objects"] || [])
       elsif "Remove" == op && data_type == :array
-        val = (instance_variable_get(:"@#{key}") || []).to_a - (val["objects"] || [])
+        val = (instance_variable_get(ivar) || []).to_a - (val["objects"] || [])
       elsif "AddUnique" == op && data_type == :array
         objects = (val["objects"] || []).uniq
-        original_items = (instance_variable_get(:"@#{key}") || []).to_a
+        original_items = (instance_variable_get(ivar) || []).to_a
         objects.reject! { |r| original_items.include?(r) }
         val = original_items + objects
       elsif "Increment" == op && data_type == :integer || data_type == :integer
         # for operations that increment by a certain amount, they come as a hash
-        val = (instance_variable_get(:"@#{key}") || 0) + (val["amount"] || 0).to_i
+        val = (instance_variable_get(ivar) || 0) + (val["amount"] || 0).to_i
       end
       val
     end
@@ -383,7 +422,7 @@ module Parse
 
       case data_type
       when :object
-        val = val.with_indifferent_access if val.is_a?(Hash) 
+        val = val.with_indifferent_access if val.is_a?(Hash)
       when :array
         # All "array" types use a collection proxy
         val = val.to_a if val.is_a?(Parse::CollectionProxy) #all objects must be in array form
