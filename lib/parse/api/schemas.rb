@@ -6,17 +6,17 @@ module Parse
   module API
     #object fetch methods
     module Schema
-      SCHEMA_PREFIX = "schemas/"
+      SCHEMAS_PATH = "schemas"
       def schema(className)
-        request :get, "#{SCHEMA_PREFIX}#{className}"
+        request :get, "#{SCHEMAS_PATH}/#{className}"
       end
 
       def create_schema(className, schema)
-        request :post, "#{SCHEMA_PREFIX}#{className}", body: schema
+        request :post, "#{SCHEMAS_PATH}/#{className}", body: schema
       end
 
       def update_schema(className, schema)
-        request :put, "#{SCHEMA_PREFIX}#{className}", body: schema
+        request :put, "#{SCHEMAS_PATH}/#{className}", body: schema
       end
 
     end #Schema

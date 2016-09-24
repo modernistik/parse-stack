@@ -6,9 +6,9 @@ module Parse
   module API
     #object fetch methods
     module Push
-
+      PUSH_PATH = "push"
       def push(payload = {})
-        request :post, "push", body: payload.as_json
+        request :post, PUSH_PATH, body: payload.as_json
       end
 
     end

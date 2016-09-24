@@ -7,29 +7,25 @@ module Parse
 
     module Apps
 
-
-      def fetch_app_keys(appid, email, password)
-        headers = {}
-        headers.merge!( { 'X-Parse-Email' => email, 'X-Parse-Password' => password } )
-        request :get, "apps/#{appid}", headers: headers
+      APPS_PATH = "apps"
+      def fetch_app_keys(appid, email, password, headers: {})
+        headers.merge!( { Parse::Protocol::EMAIL => email, Parse::Protocol::PASSWORD => password } )
+        request :get, "#{APPS_PATH}/#{appid}", headers: headers
       end
 
-      def fetch_apps(email, password)
-        headers = {}
-        headers.merge!( { 'X-Parse-Email' => email, 'X-Parse-Password' => password } )
-        request :get, "apps", headers: headers
+      def fetch_apps(email, password, headers: {})
+        headers.merge!( { Parse::Protocol::EMAIL => email, Parse::Protocol::PASSWORD => password } )
+        request :get, APPS_PATH, headers: headers
       end
 
-      def create_app(opts, email, password)
-        headers = {}
-        headers.merge!( { 'X-Parse-Email' => email, 'X-Parse-Password' => password } )
-        request :post, "apps", body: opts, headers: headers
+      def create_app(body, email, password, headers: {})
+        headers.merge!( { Parse::Protocol::EMAIL => email, Parse::Protocol::PASSWORD => password } )
+        request :post, APPS_PATH, body: body, headers: headers
       end
 
-      def update_app(appid, opts, email, password)
-        headers = {}
-        headers.merge!( { 'X-Parse-Email' => email, 'X-Parse-Password' => password } )
-        request :put, "apps/#{appid}", body: opts, headers: headers
+      def update_app(appid, body, email, password, headers: {})
+        headers.merge!( { Parse::Protocol::EMAIL => email, Parse::Protocol::PASSWORD => password } )
+        request :put, "#{APPS_PATH}/#{appid}", body: body, headers: headers
       end
 
 

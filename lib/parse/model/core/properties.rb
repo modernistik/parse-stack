@@ -106,6 +106,8 @@ module Parse
         key = key.to_sym
         ivar = :"@#{key}"
         will_change_method = :"#{key}_will_change!"
+        set_attribute_method = :"#{key}_set_attribute!"
+
         if data_type.is_a?(Hash)
           opts.merge!(data_type)
           data_type = :string
@@ -171,8 +173,6 @@ module Parse
           self.singleton_class.class_eval do
             define_method(key.to_s.pluralize) { enum_values }
           end
-
-          define_method("#{key}_values") { enum_values }
 
           enum_values.each do |enum|
             define_method("#{enum}!") { instance_variable_set(ivar, enum) }
@@ -267,12 +267,12 @@ module Parse
         define_method("#{key}=") do |val|
           #we proxy the method passing the value and true. Passing true to the
           # method tells it to make sure dirty tracking is enabled.
-          self.send "#{key}_set_attribute!", val, true
+          self.send set_attribute_method, val, true
         end
 
         # This is the real setter method. Takes two arguments, the value to set
         # and whether to mark it as dirty tracked.
-        define_method("#{key}_set_attribute!") do |val, track = true|
+        define_method(set_attribute_method) do |val, track = true|
           # Each value has a data type, based on that we can treat the incoming
           # value as input, and format it to the correct storage format. This method is
           # defined in this file (instance method)
@@ -317,7 +317,7 @@ module Parse
         if self.method_defined?(parse_field) == false && opts[:alias]
           alias_method parse_field, key
           alias_method "#{parse_field}=", "#{key}="
-          alias_method "#{parse_field}_set_attribute!", "#{key}_set_attribute!"
+          alias_method "#{parse_field}_set_attribute!", set_attribute_method
         elsif parse_field.to_sym != :objectId
           warn "Alias property method #{self}##{parse_field} already defined."
         end

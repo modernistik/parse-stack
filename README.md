@@ -324,6 +324,10 @@ class Commentary < Parse::Object
 end
 
 comment = Commentary.first
+comment.post? # true because it is non-nil
+comment.artist? # true because it is non-nil
+
+# both are true because they are in a Pointer state
 comment.post.pointer? # true
 comment.author.pointer? # true
 
@@ -332,6 +336,10 @@ comment.post # <Post @parse_class="Post", @id="xdqcCqfngz">
 
  # we have not defined an Author class handler
 comment.author # <Parse::Pointer @parse_class="Author", @id="hZLbW6ofKC">
+
+
+comment.post.fetch # fetch the relation
+comment.post.pointer? # false, it is now a full object.
 ```
 
 The effect is that for any unknown classes that the framework encounters, it will generate Parse::Pointer instances until you define those classes with valid properties and associations. While this might be ok for some classes you do not use, we still recommend defining all your Parse classes locally in the framework.

@@ -68,6 +68,11 @@ module Parse
           klassName = opts[:as].to_parse_class singularize: true
           parse_field = opts[:field].to_sym
           access_type = opts[:through].to_sym
+
+          ivar = :"@#{key}"
+          will_change_method = :"#{key}_will_change!"
+          set_attribute_method = :"#{key}_set_attribute!"
+
           # verify that the user did not duplicate properties or defined different properties with the same name
           if self.fields[key].present? && Parse::Properties::BASE_FIELD_MAP[key].nil?
             raise Parse::Properties::DefinitionError, "Has_many property #{self}##{key} already defined with type #{klassName}"
@@ -99,7 +104,6 @@ module Parse
 
           # The first method to be defined is a getter.
           define_method(key) do
-            ivar = :"@#{key}"
             val = instance_variable_get(ivar)
             # if the value for this is nil and we are a pointer, then autofetch
             if val.nil? && pointer?
@@ -119,11 +123,11 @@ module Parse
 
           # proxy setter that forwards with dirty tracking
           define_method("#{key}=") do |val|
-              send "#{key}_set_attribute!", val, true
+              send set_attribute_method, val, true
           end
 
           # This will set the content of the proxy.
-          define_method("#{key}_set_attribute!") do |val, track = true|
+          define_method(set_attribute_method) do |val, track = true|
             # If it is a hash, with a __type of Relation, createa a new RelationCollectionProxy, regardless
             # of what is defined because we must have gotten this from Parse.
 
@@ -153,11 +157,11 @@ module Parse
 
             # send dirty tracking if set
             if track == true
-              send :"#{key}_will_change!" unless val == instance_variable_get( :"@#{key}" )
+              send will_change_method unless val == instance_variable_get( ivar )
             end
             # TODO: Only allow empty proxy collection class as a value or nil.
             if val.is_a?(Parse::CollectionProxy)
-              instance_variable_set(:"@#{key}", val)
+              instance_variable_set(ivar, val)
             else
               warn "[#{self.class}] Invalid value #{val} for :has_many field #{key}. Should be an Array or a CollectionProxy"
             end
@@ -188,7 +192,7 @@ module Parse
           if self.method_defined?(parse_field) == false
             alias_method parse_field, key
             alias_method "#{parse_field}=", "#{key}="
-            alias_method "#{parse_field}_set_attribute!", "#{key}_set_attribute!"
+            alias_method "#{parse_field}_set_attribute!", set_attribute_method
           elsif parse_field.to_sym != :objectId
             warn "Alias has_many method #{self}##{parse_field} already defined."
           end

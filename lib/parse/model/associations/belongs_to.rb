@@ -35,6 +35,11 @@ module Parse
           opts = {as: key, field: key.to_s.camelize(:lower), required: false}.merge(opts)
           klassName = opts[:as].to_parse_class
           parse_field = opts[:field].to_sym
+
+          ivar = :"@#{key}"
+          will_change_method = :"#{key}_will_change!"
+          set_attribute_method = :"#{key}_set_attribute!"
+
           if self.fields[key].present? && Parse::Properties::BASE_FIELD_MAP[key].nil?
             raise Parse::Properties::DefinitionError, "Belongs relation #{self}##{key} already defined with type #{klassName}"
           end
@@ -59,7 +64,7 @@ module Parse
 
           # We generate the getter method
           define_method(key) do
-            ivar = :"@#{key}"
+
             val = instance_variable_get ivar
             # We provide autofetch functionality. If the value is nil and the
             # current Parse::Object is a pointer, then let's auto fetch it
@@ -84,11 +89,11 @@ module Parse
 
           # A proxy setter method that has dirty tracking enabled.
           define_method("#{key}=") do |val|
-            send "#{key}_set_attribute!", val, true
+            send set_attribute_method, val, true
           end
 
           # We only support pointers, either by object or by transforming a hash.
-          define_method("#{key}_set_attribute!") do |val, track = true|
+          define_method(set_attribute_method) do |val, track = true|
             if val == Parse::Properties::DELETE_OP
               val = nil
             elsif val.is_a?(Hash) && ( val["__type"] == "Pointer" ||  val["__type"] == "Object" )
@@ -96,12 +101,12 @@ module Parse
             end
 
             if track == true
-              send :"#{key}_will_change!" unless val == instance_variable_get( :"@#{key}" )
+              send will_change_method unless val == instance_variable_get( ivar )
             end
 
             # Never set an object that is not a Parse::Pointer
             if val.nil? || val.is_a?(Parse::Pointer)
-              instance_variable_set(:"@#{key}", val)
+              instance_variable_set(ivar, val)
             else
               warn "[#{self.class}] Invalid value #{val} set for belongs_to field #{key}"
             end
@@ -113,7 +118,7 @@ module Parse
           if self.method_defined?(parse_field) == false
             alias_method parse_field, key
             alias_method "#{parse_field}=", "#{key}="
-            alias_method "#{parse_field}_set_attribute!", "#{key}_set_attribute!"
+            alias_method "#{parse_field}_set_attribute!", set_attribute_method
           elsif parse_field.to_sym != :objectId
             warn "Alias belongs_to method #{self}##{parse_field} already defined."
           end
