@@ -21,10 +21,8 @@ module Parse
 
         # has one are not property but instance scope methods
         def has_one(key, scope = nil, **opts)
-          foreign_field = parse_class
-          foreign_field.sub!('_','') if foreign_field.starts_with?("_")
 
-          opts.reverse_merge!({as: key, field: foreign_field.camelize(:lower)})
+          opts.reverse_merge!({as: key, field: parse_class.columnize})
           klassName = opts[:as].to_parse_class
           foreign_field = opts[:field].to_sym
           ivar = :"@_has_one_#{key}"
@@ -37,9 +35,9 @@ module Parse
             return nil if @id.nil?
             _pointer = instance_variable_get(ivar)
             # only cache the result if the scope takes no arguments that could change the query
-            return _pointer if (scope.nil? || scope.arity.zero?) && _pointer.is_a?(Parse::Pointer)
+            return _pointer if (scope.nil? || scope.arity.zero?) && args.empty? && _pointer.is_a?(Parse::Pointer)
             query = Parse::Query.new(klassName, foreign_field => self )
-            query.instance_exec(*args,&scope)
+            query.instance_exec(*args,&scope) if scope
             _pointer = query.first
             instance_variable_set(ivar, _pointer)
             _pointer

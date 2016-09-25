@@ -58,16 +58,42 @@ module Parse
         # By default, all associations are stored in 'through: :array' form. If you are working with a Parse Relation, you
         # should specify the 'through: :relation' property instead. This will switch the internal storage mechanisms
         # from using a PointerCollectionProxy to a RelationCollectionProxy.
+        def has_many_queried(key, scope = nil, **opts)
+          # key will be the name of the property
+          # the remote class is either key or as.
+
+          klassName = (opts[:as] || key).to_parse_class singularize: true
+          foreign_field = (opts[:field] || parse_class.columnize ).to_sym
+
+          define_method(key) do |*args|
+            return [] if @id.nil?
+            query = Parse::Query.new(klassName, foreign_field => self, limit: :max )
+            if scope
+              query.instance_exec(*args,&scope)
+            else
+              query.conditions(*args)
+            end
+            return query.results unless block_given?
+            query.results { |r| yield(r) } # TODO: Make more efficient
+          end
+
+        end
 
         def has_many(key, **opts)
+          opts[:through] ||= :query
 
-          opts.reverse_merge!({through: :array,
+          if opts[:through] == :query
+            return has_many_queried(key, nil, opts)
+          end
+
+          # below this is the same
+          opts.reverse_merge!({
                   field: key.to_s.camelize(:lower),
                   required: false,
                   as: key})
 
           klassName = opts[:as].to_parse_class singularize: true
-          parse_field = opts[:field].to_sym
+          parse_field = opts[:field].to_sym # name of the column (local or remote)
           access_type = opts[:through].to_sym
 
           ivar = :"@#{key}"

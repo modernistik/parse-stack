@@ -65,10 +65,26 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
   - [Defining Properties](#defining-properties)
     - [Accessor Aliasing](#accessor-aliasing)
     - [Property Options](#property-options)
+      - [`:required`](#required)
+      - [`:field`](#field)
+      - [`:default`](#default)
+      - [`:alias`](#alias)
+      - [`:symbolize`](#symbolize)
+      - [`:enum`](#enum)
+      - [`:scope`](#scope)
   - [Associations](#associations)
     - [Belongs To](#belongs-to)
+      - [Options](#options)
+        - [`:required`](#required-1)
+        - [`:as`](#as)
+        - [`:field`](#field-1)
     - [Has One](#has-one)
-    - [Has Many (Array or Relation)](#has-many-array-or-relation)
+    - [Has Many](#has-many)
+      - [Query](#query)
+      - [Array](#array)
+      - [Parse Relation](#parse-relation)
+      - [Options](#options-1)
+        - [`:through`](#through)
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
   - [Saving](#saving)
@@ -676,16 +692,16 @@ end
 ### Defining Properties
 Properties are considered a literal-type of association. This means that a defined local property maps directly to a column name for that remote Parse class which contain the value. **All properties are implicitly formatted to map to a lower-first camelcase version in Parse (remote).** Therefore a local property defined as `like_count`, would be mapped to the remote column of `likeCount` automatically. The only special behavior to this rule is the `:id` property which maps to `objectId` in Parse. This implicit conversion mapping is the default behavior, but can be changed on a per-property basis. All Parse data types are supported and all Parse::Object subclasses already provide definitions for `:id` (objectId), `:created_at` (createdAt), `:updated_at` (updatedAt) and `:acl` (ACL) properties.
 
-- **:string** (_default_) - a generic string. Can be used as an enum field, see [Enum](#enum--array).
+- **:string** (_default_) - a generic string. Can be used as an enum field, see [Enum](#enum).
 - **:integer** (alias **:int**) - basic number.
 - **:float** - a floating numeric value.
 - **:boolean** (alias **:bool**) - true/false value. This will also generate a class scope helper. See [Query Scopes](#query-scopes).
-- **:date** - a Parse date type. Maps to `Parse::Date`.
-- **:array** - a collection of heterogeneous items. Maps to `Parse::CollectionProxy`.
-- **:file** - a Parse file type. Maps to `Parse::File`.
-- **:geopoint** - a GeoPoint type. Maps to `Parse::GeoPoint`.
-- **:bytes** - a Parse bytes data type managed as base64. Maps to `Parse::Bytes`.
-- **:object** - an object "hash" data type. Uses [ActiveSupport::HashWithIndifferentAccess](http://apidock.com/rails/ActiveSupport/HashWithIndifferentAccess).
+- **:date** - a Parse date type. See [Parse::Date](#parsedate).
+- **:array** - a heterogeneous list with dirty tracking. See [Parse::CollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/collection_proxy.rb).
+- **:file** - a Parse file type. See [Parse::File](#parsefile).
+- **:geopoint** - a GeoPoint type. See [Parse::GeoPoint](#parsegeopoint).
+- **:bytes** - a Parse bytes data type managed as base64. See [Parse::Bytes](#parsebytes).
+- **:object** - an object "hash" data type. See [ActiveSupport::HashWithIndifferentAccess](http://apidock.com/rails/ActiveSupport/HashWithIndifferentAccess).
 
 For completeness, the `:id` and `:acl` data types are also defined in order to handle the Parse `objectId` field and the `ACL` object. Those are special and should not be used in your class (unless you know what you are doing). New data types can be implemented through the internal `typecast` interface. **TODO: discuss `typecast` interface in the future**
 
@@ -769,13 +785,13 @@ post.SEO # the alias method since 'field: "SEO"'
 #### Property Options
 These are the supported options when defining properties. Parse::Objects are backed by `ActiveModel`, which means you can add additional validations and features supported by that library.
 
-##### `:required => (true|false)`
-This option provides information to the property builder that it is a required property. The requirement is not strongly enforced for a save, which means even though the value for the property may not be present, saves and updates can be successfully performed. However, the setting `required` to true, it will set some ActiveModel validations on the property to be used when calling `valid?`. By default it will add a `validates_presence_of` for the property key. If the data type of the property is either `:integer` or `:float`, it will also add a `validates_numericality_of` validation. Default `false`.
+##### `:required`
+A boolean property. This option provides information to the property builder that it is a required property. The requirement is not strongly enforced for a save, which means even though the value for the property may not be present, saves and updates can be successfully performed. However, the setting `required` to true, it will set some ActiveModel validations on the property to be used when calling `valid?`. By default it will add a `validates_presence_of` for the property key. If the data type of the property is either `:integer` or `:float`, it will also add a `validates_numericality_of` validation. Default `false`.
 
-##### `:field => (string)`
+##### `:field`
 This option allows you to set the name of the remote column for the Parse table. Using this will explicitly set the remote property name to the value of this option. The value provided for this option will affect the name of the alias method that is generated when `alias` option is used. **By default, the name of the remote column is the lower-first camelcase version of the property name. As an example, for a property with key `:my_property_name`, the framework will implicitly assume that the remote column is `myPropertyName`.**
 
-##### `:default => (value|proc)`
+##### `:default`
 This option provides you to set a default value for a specific property when the getter accessor method is used and the internal value of the instance object's property is nil. It can either take a literal value or a Proc/lambda.
 
 ```ruby
@@ -787,11 +803,11 @@ class SomeClass < Parse::Object
 end
 ```
 
-##### `:alias => (true|false)`
-It is highly recommended that this is set to true, which is the default. This option allows for the generation of the additional accessors with the value of `:field`. By allowing two accessors methods, aliased to each other, allows for easier importing and automatic object instantiation based on Parse object JSON data into the Parse::Object subclass.
+##### `:alias`
+A boolean property. It is highly recommended that this is set to true, which is the default. This option allows for the generation of the additional accessors with the value of `:field`. By allowing two accessors methods, aliased to each other, allows for easier importing and automatic object instantiation based on Parse object JSON data into the Parse::Object subclass.
 
-##### `:symbolize => (true|false)`
-This option is only available for fields with data type of `:string`. This allows you to utilize the values for this property as symbols instead of the literal strings, which is Parse's storage format. This feature is useful if a particular property represents a set of enumerable states described in string form. As an example, if you have a `Post` object which has a set of publish states stored in Parse as "draft","scheduled", and "published" - we can use ruby symbols to make our code easier.
+##### `:symbolize`
+A boolean property. This option is only available for fields with data type of `:string`. This allows you to utilize the values for this property as symbols instead of the literal strings, which is Parse's storage format. This feature is useful if a particular property represents a set of enumerable states described in string form. As an example, if you have a `Post` object which has a set of publish states stored in Parse as "draft","scheduled", and "published" - we can use ruby symbols to make our code easier.
 
 ```ruby
 class Post < Parse::Object
@@ -807,8 +823,8 @@ if post.state == :draft
 end
 ```
 
-##### `:enum => [array]`
-The enum option allows you to define a set of possible values that the particular `:string` property should hold. This feature has similarities in the methods and accessors generated for you as described in [ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html). Using the example in that documentation:
+##### `:enum`
+The enum option allows you to define an array of possible values that the particular `:string` property should hold. This feature has similarities in the methods and accessors generated for you as described in [ActiveRecord::Enum](http://edgeapi.rubyonrails.org/classes/ActiveRecord/Enum.html). Using the example in that documentation:
 
 ```ruby
 class Conversation < Parse::Object
@@ -871,8 +887,8 @@ conversation.casual_talk!
 conversation.business_talk? # => false
 ```
 
-##### `:scope => (true|false)`
-For some data types like `:boolean` and enums, some [query scopes](#query-scopes) are generated to more easily query data. To prevent generating these scopes for a particular property, set this value to `false`.
+##### `:scope`
+A boolean property. For some data types like `:boolean` and enums, some [query scopes](#query-scopes) are generated to more easily query data. To prevent generating these scopes for a particular property, set this value to `false`.
 
 ### Associations
 Parse supports a three main types of relational associations. One type of relation is the `One-to-One` association. This is implemented through a specific column in Parse with a Pointer data type. This pointer column, contains a local value that refers to a different record in a separate Parse table. This association is implemented using the `:belongs_to` feature. The second association is of `One-to-Many`. This is implemented is in Parse as a Array type column that contains a list of of Parse pointer objects. It is recommended by Parse that this array does not exceed 100 items for performance reasons. This feature is implemented using the `:has_many` operation with the plural name of the local Parse class. The last association type is a Parse Relation. These can be used to implement a large `Many-to-Many` association without requiring an explicit intermediary Parse table or class. This feature is also implemented using the `:has_many` method but passing the option of `:relation`.
@@ -906,10 +922,10 @@ post.save
 ##### Options
 You can override some of the default functionality when creating both `belongs_to`, `has_one` and `has_many` associations.
 
-###### `:required => (true|false)`
-Setting the requirement, automatically creates an ActiveModel validation of `validates_presence_of` for the association. This will not prevent the save, but affects the validation check when `valid?` is called on an instance. Default is false.
+###### `:required`
+A boolean property. Setting the requirement, automatically creates an ActiveModel validation of `validates_presence_of` for the association. This will not prevent the save, but affects the validation check when `valid?` is called on an instance. Default is false.
 
-###### `:as => (string)`
+###### `:as`
 This option allows you to override the foreign Parse class that this association refers while allowing you to have a different accessor name. As an example, you may have a class `Band` which has a `manager` who is of type `Parse::User` and a set of band members, represented by the class `Artist`. You can override the default casting class as follows:
 
 ```ruby
@@ -929,7 +945,7 @@ band.lead_singer # Artist object
 band.drummer # Artist object
 ```
 
-###### `:field => (string)`
+###### `:field`
 This option allows you to set the name of the remote Parse column for this property. Using this will explicitly set the remote property name to the value of this option. The value provided for this option will affect the name of the alias method that is generated when `alias` option is used. **By default, the name of the remote column is the lower-first camel case version of the property name. As an example, for a property with key `:my_property_name`, the framework will implicitly assume that the remote column is `myPropertyName`.**
 
 #### Has One
@@ -978,72 +994,141 @@ end
 # every user manages a band
 class Parse::User
   has_one :recently_approved, ->{ where(order: :approved_date.desc) }
-  has_one :band, ->(status) { where(approved: status) },  field: :manager
+  has_one :band_by_status, ->(status) { where(approved: status) },  field: :manager
 end
 
 # gets the band most recently approved
 user.recently_approved
 
 # fetch the managed band that is not approved
-user.band(false)
+user.band_by_status(false)
 
 ```
 
-#### Has Many (Array or Relation)
-Parse has two ways of implementing a `has_many` association. The first type is where you can designate a column to be of Array type that contains a list of Parse pointers. It is recommended that this is used for associations where the quantity is less than 100 in order to maintain query and fetch performance. The second implementation is through a Parse Relation. This is done by passing the option `:through => :relation` to the `has_many` method. Designating a column as a Parse relation to another class type, will create a one-way intermediate "join" table between the local table class and the foreign one. One important distinction of this compared to other types of data stores (ex. PostgresSQL) is that:
+#### Has Many
+Parse has many ways to implement one-to-many and many-to-many associations: `Array`, `Parse Relation` or through a `Query`. How you decide to implement your associations, will affect how `has_many` works in Parse-Stack. Parse natively supports one-to-many and many-to-many relationships using `Array` and `Relations`, as described in [Relational Data](https://parseplatform.github.io/docs/js/guide/#relational-data). Both of these methods require you define a specific column type in your Parse table that will be used to store information about the association.
 
-1. The inverse relationship association is not available automatically. Therefore, having a column of `artists` in a `Band` class that relates to members of the band (as `Artist` class), does not automatically make a set of `Band` records available to `Artist` records for which they have been related. If you need to maintain both the inverse relationship between a foreign class to its associations, you will need to manually manage that.
-2. Querying the relation is actually performed against the implicit join table, not the local one.
-3. Applying query constraints for a set of records within a relation is performed against the foreign table class, not the class having the relational column.
+In addition to `Array` and `Relation`, Parse-Stack also implements the standard `has_many` behavior prevalent in other frameworks through a query where the associated class contains a foreign pointer to the local class, usually the inverse of a `belongs_to`. This requires that the associated class
 
-The Parse documentation provides more details on associations, see [Parse Relations Guide](https://parse.com/docs/ios/guide#relations). The good news is that the framework will handle the work for (2) and (3) automatically.
+##### Query
+In this implementation, a `has_many` association for a Parse class requires that another Parse class will have a foreign pointer that refers to instances of this class. This is the standard way that `has_many` relationships work in most databases systems. This is usually the case when you have a class that has a `belongs_to` relationship to instances of the local class.
 
-To define a `has_many` association, provide the name of the foreign relation class in plural form. The framework will use the camelcase singular form of the property name as being the name of the foreign table class.
+In the example below, many songs belong to a specific artist. We set this association by setting `:belongs_to` relationship from `Song` to `Artist`. Knowing there is a column in `Song` that points to instances of an `Artist`, we can setup a `has_many` association to `Song` instances in the `Artist` class. Doing so will generate a helper query method on the `Artist` instance objects.
 
 ```ruby
+class Song < Parse::Object
+  property :released, :date
+  # this class will have a pointer column to an Artist
+  belongs_to :artist
+end
 
+class Artist < Parse::Object
+  has_many :songs
+end
+
+artist = Artist.first
+
+artist.songs # => [all songs belonging to artist]
+# equivalent: Song.all(artist: artist)
+
+# filter also by release date
+artist.songs(:released.after => 1.year.ago)
+# equivalent: Song.all(artist: artist, :released.after => 1.year.ago)
+
+```
+
+In order to modify the associated objects (ex. `songs`), you must modify their corresponding `belongs_to` field (in this case `song.artist`), to another record and save it.
+
+Options for `has_many` using this approach are `:as` and `:field`. The `:as` option behaves similarly to the `:belongs_to` counterpart. The `:field` option can be used to override the derived column name located in the foreign class. The default value for `:field` is the columnized version of the Parse subclass `parse_class` method.
+
+```ruby
+class Parse::User
+  # since the foreign column name is :agent
+  has_many :artists, field: :agent
+end
+
+class Artist < Parse::Object
+  belongs_to :manager, as: :user, field: :agent
+end
+
+artist.manager # => Parse::User object
+
+user.artists # => [artists where :agent column is user]
+```
+
+##### Array
+In this implementation, you can designate a column to be of `Array` type that contains a list of Parse pointers. Parse-Stack supports this by passing the option `through: :array` to the `has_many` method. If you use this approach, it is recommended that this is used for associations where the quantity is less than 100 in order to maintain query and fetch performance. You would be in charge of maintaining the array with the proper list of Parse pointers that are associated to the object. Parse-Stack does help by wrapping the array in a [Parse::PointerCollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/pointer_collection_proxy.rb) which provides dirty tracking.
+
+```ruby
 class Artist < Parse::Object
 end
 
+class Band < Parse::Object
+	has_many :artists, through: :array
+end
+
+artist = Artist.first
+
+# find all bands that contain this artist
+bands = Band.all( :artists.in => [artist.pointer] )
+
+band = bands.first
+band.artists # => [array of Artist pointers]
+
+# remove artists
+band.artists.remove artist
+
+# add artist
+band.artists.add artist
+
+# save changes
+band.save
+```
+
+##### Parse Relation
+Other than the use of arrays, Parse supports native one-to-many and many-to-many associations through what is referred to as a [Parse Relation](https://parseplatform.github.io/docs/js/guide/#many-to-many-relationships). This is implemented by defining a column to be of type `Relation` which refers to a foreign class. Parse-Stack supports this by passing the `through: :relation` option to the `has_many` method. Designating a column as a Parse relation to another class type, will create a one-way intermediate "join-list" between the local class and the foreign class. One important distinction of this compared to other types of data stores (ex. PostgresSQL) is that:
+
+1. The inverse relationship association is not available automatically. Therefore, having a column of `artists` in a `Band` class that relates to members of the band (as `Artist` class), does not automatically make a set of `Band` records available to `Artist` records for which they have been related. If you need to maintain both the inverse relationship between a foreign class to its associations, you will need to manually manage that by adding two Parse relation columns in each class, or by creating a separate class (ex. `ArtistBands`) that is used as a join table.
+2. Querying the relation is actually performed against the implicit join table, not the local one.
+3. Applying query constraints for a set of records within a relation is performed against the foreign table class, not the class having the relational column.
+
+The Parse documentation provides more details on associations, see [Parse Relations Guide](https://parse.com/docs/ios/guide#relations). Parse-Stack will handle the work for (2) and (3) automatically.
+
+In the example below, a `Band` can have thousands of `Fans`. We setup a `Relation<Fan>` column in the `Band` class that references the `Fan` class. Parse-Stack provides methods to manage the relationship under the [Parse::RelationCollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/relation_collection_proxy.rb) class.
+
+```ruby
+
 class Fan < Parse::Object
+  # .. lots of properties ...
 	property :location, :geopoint
 end
 
 class Band < Parse::Object
-  property :category, :integer, default: 1
-	# assume any band as < 100 members
-	has_many :artists # assumes `through: :array`
-	# bands can have millions of fans (Parse::User objects),
-  # we use relations instead
-	has_many :fans, as: :user, through: :relation 
+	has_many :fans, through: :relation 
 end
 
- # Find all bands which have a category in this array.
-bands = Band.all( :category.in => [1,3,5,7,9] )
-
- # Find all bands which have Joe as an artist.
-banjoe = Artist.first name: "Joe Banjoe"
-bands = Band.all( :artists.in => [banjoe.pointer] )
-band = bands.first
+band = Band.first
 
  # the number of fans in the relation
 band.fans.count
 
 # get the first object in relation
-fan = bands.fans.first
+fan = bands.fans.first # => Parse::User object
 
 # use `add` or `remove` to modify relations
-band.fans.add Parse::User.first
+band.fans.add user
+bands.fans.remove user
+
 # updates the relation as well as changes to `band`
 band.fans.save
 
- # Find 50 fans who are near San Diego, CA
+# Find 50 fans who are near San Diego, CA
 downtown = Parse::GeoPoint.new(32.82, -117.23)
-fans = band.fans.all(:location.near => downtown, :limit => 50)
+fans = band.fans.all :location.near => downtown
 
 ```
 
-You can perform atomic additions and removals of objects from `has_many` relations. Parse allows this by providing a specific atomic operation request. You can use the methods below to perform these types of atomic operations. __Note: The operation is performed directly on Parse server and not on your local object.__
+You can perform atomic additions and removals of objects from `has_many` relations. Parse allows this by providing a specific atomic operation request. You can use the methods below to perform these types of atomic operations. __Note: The operation is performed directly on Parse server and not on your instance object.__
 
 ```ruby
 
@@ -1065,10 +1150,10 @@ band.op_destroy!("category") # { __op: :Delete }
 ```
 
 ##### Options
-Options for `has_many` are the same as the `belongs_to` counterpart with support for `:required`, `:as` and `:field`. It has this additional option of `:through` which helps specify whether it is an Array or Relation association type.
+Options for `has_many` are the same as the `belongs_to` counterpart with support for `:required`, `:as` and `:field`. It has this additional option of `:through` which helps specify whether it is an `Array` or `Relation` association type.
 
-###### `:through => (:array|:relation)`
-This sets the type of the `has_many` relation. If `:relation` is set, it tells the framework that the column defined is of type Parse Relation. The default value is `:array`, which defines the column in Parse as being an array of Parse pointer objects.
+###### `:through`
+This sets the type of the `has_many` relation whose possible values are `:array`, `:relation` or `:query` (implicit default). If set to `:array`, it defines the column in Parse as being an array of Parse pointer objects and will be managed locally using a `Parse::PointerCollectionProxy`. If set to `:relation`, it defines a column of type Parse Relation with the foreign class and will be managed locally using a `Parse::RelationCollectionProxy`. If set to `:query`, no storage is required on the local class as the associated records will be fetched using a Parse query.
 
 ## Creating, Saving and Deleting Records
 This section provides some of the basic methods when creating, updating and deleting objects from Parse. To illustrate the various methods available for saving Parse records, we use this example class:
