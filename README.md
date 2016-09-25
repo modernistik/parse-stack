@@ -67,6 +67,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
     - [Property Options](#property-options)
   - [Associations](#associations)
     - [Belongs To](#belongs-to)
+    - [Has One](#has-one)
     - [Has Many (Array or Relation)](#has-many-array-or-relation)
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
@@ -163,6 +164,7 @@ class Artist < Parse::Object
   property :name
   property :genres, :array
   has_many :fans, as: :user
+  has_one :manager, as: :user
 
   scope :recent, ->(x) { query(:created_at.after => x) }
 end
@@ -902,7 +904,7 @@ post.save
 ```
 
 ##### Options
-You can override some of the default functionality when creating both `belongs_to` and `has_many` associations.
+You can override some of the default functionality when creating both `belongs_to`, `has_one` and `has_many` associations.
 
 ###### `:required => (true|false)`
 Setting the requirement, automatically creates an ActiveModel validation of `validates_presence_of` for the association. This will not prevent the save, but affects the validation check when `valid?` is called on an instance. Default is false.
@@ -929,6 +931,62 @@ band.drummer # Artist object
 
 ###### `:field => (string)`
 This option allows you to set the name of the remote Parse column for this property. Using this will explicitly set the remote property name to the value of this option. The value provided for this option will affect the name of the alias method that is generated when `alias` option is used. **By default, the name of the remote column is the lower-first camel case version of the property name. As an example, for a property with key `:my_property_name`, the framework will implicitly assume that the remote column is `myPropertyName`.**
+
+#### Has One
+Defining a `has_one` property generates an helper query method to fetch a particular record from a foreign class based on the `:id` property. This is useful for setting up the inverse relationship accessors of a `:belongs_to`. In the case of the `has_one` relationship, the `:field` represents the name of the column of the foreign table where the id is stored.
+
+In the example below, a `Band` has a local column named `manager` which has a pointer to a `Parse::User` record. This setups up the accessor for `Band` objects to access the band's manager.
+
+```ruby
+# every band has a manager
+class Band < Parse::Object
+	belongs_to :manager, as: :user
+end
+
+band = Band.first id: '12345'
+
+# the user represented by this manager
+user = band.manger
+
+```
+
+Since we know there is a column named `manager` in the `Band` class that points to a single `Parse::User`, and assuming only one user can be the manager of a single band, you can setup the inverse getter accessor in the `Parse::User` class.
+
+```ruby
+# every user manages a band
+class Parse::User
+  # inverse relationship to `Band.belongs_to :manager`
+  has_one :band, field: :manager
+end
+
+user = Parse::User.first
+# use the generated has_one accessor `band`.
+user.band # similar to query: Band.first(:manager => user)
+
+```
+
+You may optionally use `has_one` with scopes, in order to fine tune the query result. Using the example above, you can customize the query with a scope that only fetches the association if the band is approved. If the association cannot be fetched, `nil` is returned.
+
+```ruby
+# adding to previous example
+class Band < Parse::Object
+  property :approved, :boolean
+  property :approved_date, :date
+end
+
+# every user manages a band
+class Parse::User
+  has_one :recently_approved, ->{ where(order: :approved_date.desc) }
+  has_one :band, ->(status) { where(approved: status) },  field: :manager
+end
+
+# gets the band most recently approved
+user.recently_approved
+
+# fetch the managed band that is not approved
+user.band(false)
+
+```
 
 #### Has Many (Array or Relation)
 Parse has two ways of implementing a `has_many` association. The first type is where you can designate a column to be of Array type that contains a list of Parse pointers. It is recommended that this is used for associations where the quantity is less than 100 in order to maintain query and fetch performance. The second implementation is through a Parse Relation. This is done by passing the option `:through => :relation` to the `has_many` method. Designating a column as a Parse relation to another class type, will create a one-way intermediate "join" table between the local table class and the foreign one. One important distinction of this compared to other types of data stores (ex. PostgresSQL) is that:

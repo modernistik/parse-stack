@@ -24,6 +24,7 @@ require_relative 'core/actions'
 require_relative 'core/querying'
 require_relative "core/schema"
 require_relative "core/properties"
+require_relative "associations/has_one"
 require_relative "associations/belongs_to"
 require_relative "associations/has_many"
 
@@ -90,6 +91,7 @@ module Parse
 
   class Object < Pointer
     include Properties
+    include Associations::HasOne
     include Associations::BelongsTo
     include Associations::HasMany
     include Querying

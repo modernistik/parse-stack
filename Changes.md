@@ -1,6 +1,8 @@
 ## Parse-Stack Changelog
 
 ### 1.5.0rc1
+- NEW: Support for `has_one` type of associations.
+- NEW: `has_many` and `has_one` associations support scopes as second parameter.
 - NEW: Enumerated property types that mimic ActiveRecord::Enum behavior.
 - NEW: Support for scoped queries similar to ActiveRecord::Scope.
 - NEW: Support for user login, logout and sessions.
