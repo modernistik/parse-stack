@@ -878,7 +878,7 @@ For some data types like `:boolean` and enums, some [query scopes](#query-scopes
 Parse supports a three main types of relational associations. One type of relation is the `One-to-One` association. This is implemented through a specific column in Parse with a Pointer data type. This pointer column, contains a local value that refers to a different record in a separate Parse table. This association is implemented using the `:belongs_to` feature. The second association is of `One-to-Many`. This is implemented is in Parse as a Array type column that contains a list of of Parse pointer objects. It is recommended by Parse that this array does not exceed 100 items for performance reasons. This feature is implemented using the `:has_many` operation with the plural name of the local Parse class. The last association type is a Parse Relation. These can be used to implement a large `Many-to-Many` association without requiring an explicit intermediary Parse table or class. This feature is also implemented using the `:has_many` method but passing the option of `:relation`.
 
 #### Belongs To
-Utilizing the `belongs_to` method in defining a property in a Parse::Object subclass sets up an association between the local table and a foreign table. Specifying the `belongs_to` in the class, tells the framework that the Parse table contains a local column in its schema that has a reference to a record in a foreign table. The argument to `belongs_to` should be the singularized version of the foreign Parse::Object class. you should specify the foreign table as the snake_case singularized version of the foreign table class. It is important to note that the reverse relationship is not generated automatically.
+This association creates a one-to-one association with another Parse model. This association says that this class contains a foreign pointer column which references a different class. Utilizing the `belongs_to` method in defining a property in a Parse::Object subclass sets up an association between the local table and a foreign table. Specifying the `belongs_to` in the class, tells the framework that the Parse table contains a local column in its schema that has a reference to a record in a foreign table. The argument to `belongs_to` should be the singularized version of the foreign Parse::Object class. you should specify the foreign table as the snake_case singularized version of the foreign table class. It is important to note that the reverse relationship is not generated automatically.
 
 ```ruby
 class Author < Parse::Object
@@ -933,7 +933,9 @@ band.drummer # Artist object
 This option allows you to set the name of the remote Parse column for this property. Using this will explicitly set the remote property name to the value of this option. The value provided for this option will affect the name of the alias method that is generated when `alias` option is used. **By default, the name of the remote column is the lower-first camel case version of the property name. As an example, for a property with key `:my_property_name`, the framework will implicitly assume that the remote column is `myPropertyName`.**
 
 #### Has One
-Defining a `has_one` property generates an helper query method to fetch a particular record from a foreign class based on the `:id` property. This is useful for setting up the inverse relationship accessors of a `:belongs_to`. In the case of the `has_one` relationship, the `:field` represents the name of the column of the foreign table where the id is stored.
+The `has_one` creates a one-to-one association with another Parse class. This association says that the other class in the association contains a foreign pointer column which references instances of this class. If your model contains a column that is a Parse pointer to another class, you should use `belongs_to` for that association instead.
+
+Defining a `has_one` property generates a helper query method to fetch a particular record from a foreign class. This is useful for setting up the inverse relationship accessors of a `belongs_to`. In the case of the `has_one` relationship, the `:field` option represents the name of the column of the foreign class where the Parse pointer is stored. By default, the lower-first camel case version of the Parse class name is used.
 
 In the example below, a `Band` has a local column named `manager` which has a pointer to a `Parse::User` record. This setups up the accessor for `Band` objects to access the band's manager.
 
@@ -944,13 +946,12 @@ class Band < Parse::Object
 end
 
 band = Band.first id: '12345'
-
 # the user represented by this manager
 user = band.manger
 
 ```
 
-Since we know there is a column named `manager` in the `Band` class that points to a single `Parse::User`, and assuming only one user can be the manager of a single band, you can setup the inverse getter accessor in the `Parse::User` class.
+Since we know there is a column named `manager` in the `Band` class that points to a single `Parse::User`, you can setup the inverse association read accessor in the `Parse::User` class. Note, that to change the association, you need to modify the `manager` property on the band instance since it contains the `belongs_to` property.
 
 ```ruby
 # every user manages a band

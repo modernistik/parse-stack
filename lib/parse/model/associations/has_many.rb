@@ -59,11 +59,12 @@ module Parse
         # should specify the 'through: :relation' property instead. This will switch the internal storage mechanisms
         # from using a PointerCollectionProxy to a RelationCollectionProxy.
 
-        def has_many(key, opts = {})
-          opts = {through: :array,
+        def has_many(key, **opts)
+
+          opts.reverse_merge!({through: :array,
                   field: key.to_s.camelize(:lower),
                   required: false,
-                  as: key}.merge(opts)
+                  as: key})
 
           klassName = opts[:as].to_parse_class singularize: true
           parse_field = opts[:field].to_sym
