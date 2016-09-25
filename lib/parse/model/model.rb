@@ -93,8 +93,8 @@ class String
   # short helper method to provide lower-first-camelcase
   def columnize
      return "objectId" if self == "id"
-     camelize(:lower)
-   end;
+     (first == '_' ? sub('_','') : self).camelize(:lower)
+  end
 
   #users for properties: ex. :users -> "_User" or :songs -> Song
   def to_parse_class(singularize: false)
