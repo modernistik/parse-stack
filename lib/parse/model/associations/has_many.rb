@@ -61,13 +61,15 @@ module Parse
         def has_many_queried(key, scope = nil, **opts)
           # key will be the name of the property
           # the remote class is either key or as.
-
+          opts[:scope_only] ||= false
           klassName = (opts[:as] || key).to_parse_class singularize: true
           foreign_field = (opts[:field] || parse_class.columnize ).to_sym
 
           define_method(key) do |*args|
             return [] if @id.nil?
-            query = Parse::Query.new(klassName, foreign_field => self, limit: :max )
+            query = Parse::Query.new(klassName, limit: :max)
+
+            query.where(foreign_field => self) unless opts[:scope_only] == true
 
             if scope.is_a?(Proc)
               # magic, override the singleton method_missing with accessing object level methods

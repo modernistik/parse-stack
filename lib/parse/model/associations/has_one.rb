@@ -22,7 +22,7 @@ module Parse
         # has one are not property but instance scope methods
         def has_one(key, scope = nil, **opts)
 
-          opts.reverse_merge!({as: key, field: parse_class.columnize})
+          opts.reverse_merge!({as: key, field: parse_class.columnize, scope_only: false})
           klassName = opts[:as].to_parse_class
           foreign_field = opts[:field].to_sym
           ivar = :"@_has_one_#{key}"
@@ -32,11 +32,13 @@ module Parse
           end
 
           define_method(key) do |*args|
-            return nil if @id.nil?
+            return nil if @id.nil? && opts[:scope_only] == false
             _pointer = instance_variable_get(ivar)
             # only cache the result if the scope takes no arguments that could change the query
             return _pointer if (scope.nil? || scope.arity.zero?) && args.empty? && _pointer.is_a?(Parse::Pointer)
-            query = Parse::Query.new(klassName, foreign_field => self )
+            query = Parse::Query.new(klassName)
+            query.where(foreign_field => self) unless opts[:scope_only] == true
+
             if scope
               # any method not part of Query, gets delegated to the instance object
               query.define_singleton_method(:method_missing) { |m| instance.send(m) }

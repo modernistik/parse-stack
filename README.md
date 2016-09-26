@@ -1184,10 +1184,31 @@ band.op_destroy!("category") # { __op: :Delete }
 ```
 
 ##### Options
-Options for `has_many` are the same as the `belongs_to` counterpart with support for `:required`, `:as` and `:field`. It has this additional option of `:through` which helps specify whether it is an `Array` or `Relation` association type.
+Options for `has_many` are the same as the `belongs_to` counterpart with support for `:required`, `:as` and `:field`. It has these additional options.
 
 ###### `:through`
 This sets the type of the `has_many` relation whose possible values are `:array`, `:relation` or `:query` (implicit default). If set to `:array`, it defines the column in Parse as being an array of Parse pointer objects and will be managed locally using a `Parse::PointerCollectionProxy`. If set to `:relation`, it defines a column of type Parse Relation with the foreign class and will be managed locally using a `Parse::RelationCollectionProxy`. If set to `:query`, no storage is required on the local class as the associated records will be fetched using a Parse query.
+
+###### `:scope_only`
+Setting this option to `true`, makes the association fetch based only on the scope provided and does not use the local instance object as a foreign pointer in the query. This allows for cases where another property of the local class, is needed to match the resulting records in the association.
+
+In the example below, the `Post` class does not have a `:belongs_to` association to `Author`, but using the author's name, we can find related posts.
+
+```ruby
+
+class Author < Parse::Object
+  property :name
+  has_many :posts, ->{ where :tags.in => name.downcase }, scope_only: true
+end
+
+class Post < Parse::Object
+  property :tags, :array
+end
+
+author.posts # => Posts where author's name is a tag
+# equivalent: Post.all( :tags.in => artist.name.downcase )
+
+```
 
 ## Creating, Saving and Deleting Records
 This section provides some of the basic methods when creating, updating and deleting objects from Parse. To illustrate the various methods available for saving Parse records, we use this example class:
