@@ -28,8 +28,17 @@ module Parse
         define_singleton_method(name) do |*args, &block|
           res = body.call(*args)
           _q = res || query
+          klass = self
           if _q.is_a?(Parse::Query)
-            _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+            _q.define_singleton_method(:method_missing) do |m, *args, &block|
+              if klass.respond_to?(m, true)
+                klass_scope = klass.send(m, *args, &block)
+                return klass_scope.is_a?(Parse::Query) ?
+                  self.add_constraints( klass_scope.constraints ) :
+                  klass_scope
+              end
+              return self.results.send(m, *args, &block)
+            end
           end
           return _q if block.nil?
           _q.results(&block)

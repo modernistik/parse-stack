@@ -183,7 +183,7 @@ module Parse
             # You can use the :_prefix or :_suffix options when you need to define multiple enums with same values.
             # If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
             prefix = opts[:_prefix]
-            unless prefix.is_a?(Symbol) || prefix.is_a?(String)
+            unless opts[:_prefix].nil? || prefix.is_a?(Symbol) || prefix.is_a?(String)
               raise DefinitionError, "Enumeration option :_prefix must either be a symbol or string."
             end
             add_suffix = opts[:_suffix] == true

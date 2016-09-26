@@ -31,7 +31,7 @@ module Parse
             puts "Creating has_one :#{key} association. Will overwrite existing method #{self}##{key}."
           end
 
-          define_method(key) do |*args|
+          define_method(key) do |*args, &block|
             return nil if @id.nil?
             query = Parse::Query.new(klassName, limit: 1)
             query.where(foreign_field => self) unless opts[:scope_only] == true
@@ -52,8 +52,8 @@ module Parse
               query.conditions(*args)
             end
             query.define_singleton_method(:method_missing) { |m, *args, &block| self.first.send(m, *args, &block) }
-            return query unless block_given?
-            Proc.new.call(query.first)
+            return query if block.nil?
+            block.call(query.first)
           end
 
         end

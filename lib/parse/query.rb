@@ -92,7 +92,7 @@ module Parse
       self
     end
 
-    def initialize(table, **constraints)
+    def initialize(table, constraints = {})
       table = table.to_s.to_parse_class if table.is_a?(Symbol)
       table = table.parse_class if table.respond_to?(:parse_class)
       raise "First parameter should be the name of the Parse class (table)" unless table.is_a?(String)

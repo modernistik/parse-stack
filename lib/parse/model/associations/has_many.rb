@@ -65,7 +65,7 @@ module Parse
           klassName = (opts[:as] || key).to_parse_class singularize: true
           foreign_field = (opts[:field] || parse_class.columnize ).to_sym
 
-          define_method(key) do |*args|
+          define_method(key) do |*args, &block|
             return [] if @id.nil?
             query = Parse::Query.new(klassName, limit: :max)
 
@@ -87,9 +87,20 @@ module Parse
             elsif args.present?
               query.conditions(*args)
             end
-            query.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
-            return query unless block_given?
-            query.results(&Proc.new)
+
+            query.define_singleton_method(:method_missing) do |m, *args, &block|
+              klass = Parse.classify klassName
+              if klass.present? && klass.respond_to?(m)
+                klass_scope = klass.send(m, *args, &block)
+                return klass_scope.is_a?(Parse::Query) ?
+                    self.add_constraints( klass_scope.constraints ) :
+                    klass_scope
+              end
+              self.results.send(m, *args, &block)
+            end
+
+            return query if block.nil?
+            query.results(&block)
           end
 
         end
