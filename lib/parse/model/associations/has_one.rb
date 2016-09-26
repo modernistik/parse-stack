@@ -33,22 +33,27 @@ module Parse
 
           define_method(key) do |*args|
             return nil if @id.nil?
-            _pointer = instance_variable_get(ivar)
-            # only cache the result if the scope takes no arguments that could change the query
-            return _pointer if (scope.nil? || scope.arity.zero?) && args.empty? && _pointer.is_a?(Parse::Pointer)
-            query = Parse::Query.new(klassName)
+            query = Parse::Query.new(klassName, limit: 1)
             query.where(foreign_field => self) unless opts[:scope_only] == true
 
-            if scope
+            if scope.is_a?(Proc)
               # any method not part of Query, gets delegated to the instance object
+              instance = self
               query.define_singleton_method(:method_missing) { |m| instance.send(m) }
-              # solution available in case of collision.
               query.define_singleton_method(:i) { instance }
-              query.instance_exec(*args,&scope)
+
+              if scope.arity.zero?
+                query.instance_eval &scope
+                query.conditions(*args) if args.present?
+              else
+                query.instance_exec(*args,&scope)
+              end
+            elsif args.present?
+              query.conditions(*args)
             end
-            _pointer = query.first
-            instance_variable_set(ivar, _pointer)
-            _pointer
+            query.define_singleton_method(:method_missing) { |m, *args, &block| self.first.send(m, *args, &block) }
+            return query unless block_given?
+            Proc.new.call(query.first)
           end
 
         end
