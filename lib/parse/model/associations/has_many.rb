@@ -81,8 +81,9 @@ module Parse
             elsif args.present?
               query.conditions(*args)
             end
-            return query.results unless block_given?
-            query.results { |r| yield(r) } # TODO: Make more efficient
+            query.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+            return query unless block_given?
+            query.results(&Proc.new)
           end
 
         end

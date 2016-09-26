@@ -27,7 +27,11 @@ module Parse
 
         define_singleton_method(name) do |*args|
           res = body.call(*args)
-          res || query
+          _q = res || query
+          if _q.is_a?(Parse::Query)
+            _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+          end
+          _q
         end
 
       end
@@ -74,12 +78,16 @@ module Parse
 
       def newest(**constraints)
         constraints.merge!(order: :created_at.desc)
-        query(constraints)
+        _q = query(constraints)
+        _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+        _q
       end
 
       def oldest(**constraints)
         constraints.merge!(order: :created_at.asc)
-        query(constraints).results
+        _q = query(constraints)
+        _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+        _q
       end
 
       # Find objects based on objectIds. The result is a list (or single item) of the

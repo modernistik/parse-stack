@@ -32,7 +32,7 @@ module Parse
           end
 
           define_method(key) do |*args|
-            return nil if @id.nil? && opts[:scope_only] == false
+            return nil if @id.nil?
             _pointer = instance_variable_get(ivar)
             # only cache the result if the scope takes no arguments that could change the query
             return _pointer if (scope.nil? || scope.arity.zero?) && args.empty? && _pointer.is_a?(Parse::Pointer)
