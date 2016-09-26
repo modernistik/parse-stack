@@ -25,13 +25,14 @@ module Parse
           puts "Creating scope :#{name}. Will overwrite existing method #{self}.#{name}."
         end
 
-        define_singleton_method(name) do |*args|
+        define_singleton_method(name) do |*args, &block|
           res = body.call(*args)
           _q = res || query
           if _q.is_a?(Parse::Query)
             _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
           end
-          _q
+          return _q if block.nil?
+          _q.results(&block)
         end
 
       end
