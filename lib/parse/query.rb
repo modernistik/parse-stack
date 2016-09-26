@@ -130,7 +130,7 @@ module Parse
           self.use_master_key = value
         elsif expression == :session
           # you can pass a session token or a Parse::Session
-          value = value.is_a?(Parse::Session) ? value.session_token : value
+          value = value.respond_to?(:session_token) ? value.session_token : value
           self.session_token = value
         else
           add_constraint(expression, value)
@@ -213,9 +213,18 @@ module Parse
     end
     alias_method :include, :includes
 
-    def add_constraint(operator, value, opts = {})
+    def add_constraints(list)
+      list = Array.wrap(list).select { |m| m.is_a?(Parse::Constraint) }
+      @where = @where + list
+      self
+    end
+
+    def add_constraint(operator, value = nil, **opts)
       @where ||= []
-      constraint = Parse::Constraint.create operator, value
+      constraint = operator # assume Parse::Constraint
+      unless constraint.is_a?(Parse::Constraint)
+        constraint = Parse::Constraint.create(operator, value)
+      end
       return unless constraint.is_a?(Parse::Constraint)
       # to support select queries where you have to pass a `key` parameter for matching
       # different tables.
