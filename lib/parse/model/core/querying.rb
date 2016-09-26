@@ -68,8 +68,18 @@ module Parse
       end
 
       # creates a count request (which is more performant when counting objects)
-      def count(constraints = {})
+      def count(**constraints)
         query(constraints).count
+      end
+
+      def newest(**constraints)
+        constraints.merge!(order: :created_at.desc)
+        query(constraints)
+      end
+
+      def oldest(**constraints)
+        constraints.merge!(order: :created_at.asc)
+        query(constraints).results
       end
 
       # Find objects based on objectIds. The result is a list (or single item) of the

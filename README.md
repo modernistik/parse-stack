@@ -993,15 +993,17 @@ end
 
 # every user manages a band
 class Parse::User
-  has_one :recently_approved, ->{ where(order: :approved_date.desc) }
-  has_one :band_by_status, ->(status) { where(approved: status) },  field: :manager
+  has_one :recently_approved, ->{ where(order: :approved_date.desc) }, field: :manager, as: :band
+  has_one :band_by_status, ->(status) { where(approved: status) },  field: :manager, as: :band
 end
 
 # gets the band most recently approved
 user.recently_approved
+# equivalent: Band.first(manager: user, order: :approved_date.desc)
 
 # fetch the managed band that is not approved
 user.band_by_status(false)
+# equivalent: Band.first(manager: user, approved: false)
 
 ```
 
@@ -1978,8 +1980,10 @@ end
 You can also chain scopes and pass parameters. In addition, boolean and enumerated properties have automatically generated scopes for you to use.
 
 ```ruby
-# continued from above definition
+
 class Article < Parse::Object
+  scope :published, -> { query(published: true) }
+
   property :comment_count, :integer
   property :category
   property :approved, :boolean
