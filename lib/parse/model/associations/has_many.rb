@@ -68,9 +68,15 @@ module Parse
           define_method(key) do |*args|
             return [] if @id.nil?
             query = Parse::Query.new(klassName, foreign_field => self, limit: :max )
-            if scope
+
+            if scope.is_a?(Proc)
+              # magic, override the singleton method_missing with accessing object level methods
+              # that don't collide with Parse::Query instance. Still accessible under :i
+              instance = self
+              query.define_singleton_method(:method_missing) { |m| instance.send(m) }
+              query.define_singleton_method(:i) { instance }
               query.instance_exec(*args,&scope)
-            else
+            elsif args.present?
               query.conditions(*args)
             end
             return query.results unless block_given?
@@ -79,11 +85,11 @@ module Parse
 
         end
 
-        def has_many(key, **opts)
+        def has_many(key, scope = nil, **opts)
           opts[:through] ||= :query
 
           if opts[:through] == :query
-            return has_many_queried(key, nil, opts)
+            return has_many_queried(key, scope, opts)
           end
 
           # below this is the same

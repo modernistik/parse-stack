@@ -231,7 +231,10 @@ module Parse
       @results = nil
       self #chaining
     end
-    def constraints; @where; end;
+
+    def constraints
+      @where
+    end
 
     def where(conditions = nil, opts = {})
       return @where if conditions.nil?

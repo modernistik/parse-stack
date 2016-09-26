@@ -6,17 +6,8 @@ require 'dotenv'
 require 'byebug'
 Dotenv.load
 
-
 Parse.setup
 
-class Song < Parse::Object
-  property :name
-
-  before_save do
-    self.name = self.name.truncate(60)
-  end
-
-end
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
 

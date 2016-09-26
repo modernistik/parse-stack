@@ -1056,6 +1056,40 @@ artist.manager # => Parse::User object
 user.artists # => [artists where :agent column is user]
 ```
 
+When using this approach, you may also employ the use of scopes to filter the particular data from the `has_many` association.
+
+```ruby
+class Artist
+  has_many :songs, ->(timeframe) { where(:created_at.after => timeframe) }
+end
+
+artist.songs(6.months.ago)
+# => [artist's songs created in the last 6 months]
+
+```
+
+You may also call property methods in your scopes related to the local class. You also have access to the instance object for the local class through a special `:i` method in the scope.
+
+```ruby
+class Concert
+  property :city
+  belongs_to :artist
+end
+
+class Artist
+  property :hometown
+  has_many :local_concerts, -> { where(:city => hometown) }, as: :concerts
+end
+
+# assume
+artist.hometown = "San Diego"
+
+# artist's concerts in their hometown of 'San Diego'
+artist.local_concerts
+# equivalent: Concert.all(artist: artist, city: artist.hometown)
+
+```
+
 ##### Array
 In this implementation, you can designate a column to be of `Array` type that contains a list of Parse pointers. Parse-Stack supports this by passing the option `through: :array` to the `has_many` method. If you use this approach, it is recommended that this is used for associations where the quantity is less than 100 in order to maintain query and fetch performance. You would be in charge of maintaining the array with the proper list of Parse pointers that are associated to the object. Parse-Stack does help by wrapping the array in a [Parse::PointerCollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/pointer_collection_proxy.rb) which provides dirty tracking.
 

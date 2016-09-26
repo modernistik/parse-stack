@@ -37,7 +37,13 @@ module Parse
             # only cache the result if the scope takes no arguments that could change the query
             return _pointer if (scope.nil? || scope.arity.zero?) && args.empty? && _pointer.is_a?(Parse::Pointer)
             query = Parse::Query.new(klassName, foreign_field => self )
-            query.instance_exec(*args,&scope) if scope
+            if scope
+              # any method not part of Query, gets delegated to the instance object
+              query.define_singleton_method(:method_missing) { |m| instance.send(m) }
+              # solution available in case of collision.
+              query.define_singleton_method(:i) { instance }
+              query.instance_exec(*args,&scope)
+            end
             _pointer = query.first
             instance_variable_set(ivar, _pointer)
             _pointer

@@ -1,7 +1,9 @@
 ## Parse-Stack Changelog
 
-### 1.5.0rc1
+### 1.5.0.pre
+- BREAKING CHANGE: The default `has_many` implementation is `:query` instead of `:array`.
 - NEW: Support for `has_one` type of associations.
+- NEW: `has_many` associations support `Query` implementation as the inverse of `:belongs_to`.
 - NEW: `has_many` and `has_one` associations support scopes as second parameter.
 - NEW: Enumerated property types that mimic ActiveRecord::Enum behavior.
 - NEW: Support for scoped queries similar to ActiveRecord::Scope.
@@ -15,7 +17,7 @@
 - Improves JSON encoding/decoding performance.
 - Removes throttling of requests.
 - Turns off cache when using `save_all` method.
-- Parse::Query supports ActiveModel::Callbacks for :prepare.
+- Parse::Query supports ActiveModel::Callbacks for `:prepare`.
 - Subclasses now support a :create callback that is only executed after a new object is successfully saved.
 - Added alias method :execute! for Parse::Query#fetch! for clarity.
 - `Parse::Client.session` has been deprecated in favor of `Parse::Client.client`

@@ -36,11 +36,11 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "moneta", [">= 0.7", "< 1"]
   spec.add_runtime_dependency "rack", "< 3"
 
-#   spec.post_install_message = <<UPGRADE
-#
-# ** IMPORTANT **
-#  Parse::Webhook exception handling has changed in 1.3.0 and later.
-#  See guide: https://github.com/modernistik/parse-stack/wiki/Webhook-Migration-1.2.x-to-1.3.0
-#
-# UPGRADE
+  spec.post_install_message = <<UPGRADE
+
+** BREAKING CHANGES **
+ The default `has_many` association form has changed from :array to :query.
+ To use arrays, you must now pass `through: :array` option to `has_many`.
+
+UPGRADE
 end
