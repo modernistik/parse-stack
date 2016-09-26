@@ -83,6 +83,10 @@ module Parse
             val
           end
 
+          if self.method_defined?("#{key}?")
+              puts "Creating belongs_to helper :#{key}?. Will overwrite existing method #{self}##{key}?."
+          end
+
           define_method("#{key}?") do
             self.send(key).is_a?(Parse::Pointer)
           end
