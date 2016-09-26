@@ -288,6 +288,10 @@ module Parse
 
         # support question mark methods for boolean
         if data_type == :boolean
+          if self.method_defined?("#{key}?")
+            puts "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}?."
+          end
+
           # returns true if set to true, false otherwise
           define_method("#{key}?") { (send(key) == true) }
           unless opts[:scopes] == false
