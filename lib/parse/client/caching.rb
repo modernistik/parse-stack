@@ -83,6 +83,14 @@ module Parse
         url = env.url
         method = env.method
         @cache_key = url.to_s
+
+        if @request_headers.key?(SESSION_TOKEN)
+          session_token = @request_headers[SESSION_TOKEN]
+          @cache_key = "#{session_token}#{@cache_key}" # prefix tokens
+        elsif @request_headers.key?(MASTER_KEY)
+          @cache_key = "mk:#{@cache_key}" # prefix for master key requests
+        end
+
         begin
           if method == :get && @cache_key.present? && @store.key?(@cache_key)
             puts("[Parse::Cache::Hit] >> #{url}") if self.class.logging.present?

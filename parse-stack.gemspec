@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Anthony Persaud"]
   spec.email         = ["persaud@modernistik.com"]
 
-  spec.summary       = %q{Parse-Server Ruby Client and Active Model Object Relational Mapping}
+  spec.summary       = %q{Parse-Server Ruby Client and Relational Mapper}
   spec.description   = %q{Parse-Server Ruby Client, Active Model based Data Mapper, and Query engine to manage larger scale Parse server applications}
   spec.homepage      = "https://github.com/modernistik/parse-stack"
   spec.license       = "MIT"
