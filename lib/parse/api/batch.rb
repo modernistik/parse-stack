@@ -56,7 +56,7 @@ module Parse
     include Enumerable
 
     def client
-      @client ||= Parse::Client.session
+      @client ||= Parse::Client.client
     end
 
     def initialize(reqs = nil)
