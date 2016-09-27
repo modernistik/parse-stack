@@ -26,7 +26,14 @@ module Parse
         end
 
         define_singleton_method(name) do |*args, &block|
-          res = body.call(*args)
+
+          if body.arity.zero?
+            res = body.call
+            res.conditions(*args) if args.present?
+          else
+            res = body.call(*args)
+          end
+
           _q = res || query
 
           if _q.is_a?(Parse::Query)
