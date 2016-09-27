@@ -52,8 +52,10 @@ module Parse
             elsif args.present?
               query.conditions(*args)
             end
-            query.define_singleton_method(:method_missing) { |m, *args, &block| self.first.send(m, *args, &block) }
-            return query if block.nil?
+            # query.define_singleton_method(:method_missing) do |m, *args, &block|
+            #   self.first.send(m, *args, &block)
+            # end
+            return query.first if block.nil?
             block.call(query.first)
           end
 
