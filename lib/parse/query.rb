@@ -26,6 +26,7 @@ module Parse
   class Query
     extend  ::ActiveModel::Callbacks
     include Parse::Client::Connectable
+    include Enumerable
     define_model_callbacks :prepare, only: [:after, :before]
     # A query needs to be tied to a Parse table name (Parse class)
     # The client object is of type Parse::Client in order to send query requests.
@@ -295,6 +296,25 @@ module Parse
     def each
        return results.enum_for(:each) unless block_given? # Sparkling magic!
        results.each(&Proc.new)
+    end
+
+    def map
+      return results.enum_for(:map) unless block_given? # Sparkling magic!
+      results.map(&Proc.new)
+    end
+
+    def select
+      return results.enum_for(:select) unless block_given? # Sparkling magic!
+      results.select(&Proc.new)
+    end
+
+    def to_a
+      results.to_a
+    end
+
+    def select
+      return results.enum_for(:select) unless block_given? # Sparkling magic!
+      results.select(&Proc.new)
     end
 
     def first(limit = 1)
