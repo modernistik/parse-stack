@@ -84,12 +84,13 @@ module Parse
               else
                 query.instance_exec(*args,&scope)
               end
+              instance = nil # help clean up ruby gc
             elsif args.present?
               query.conditions(*args)
             end
 
             query.define_singleton_method(:method_missing) do |m, *args, &block|
-              klass = Parse.classify klassName
+              klass = Parse::Model.find_class klassName
               if klass.present? && klass.respond_to?(m)
                 klass_scope = klass.send(m, *args, &block)
                 return klass_scope.is_a?(Parse::Query) ?

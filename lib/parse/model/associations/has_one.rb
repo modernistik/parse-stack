@@ -48,6 +48,7 @@ module Parse
               else
                 query.instance_exec(*args,&scope)
               end
+              instance = nil # help clean up ruby gc
             elsif args.present?
               query.conditions(*args)
             end

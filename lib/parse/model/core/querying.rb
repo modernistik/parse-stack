@@ -28,15 +28,19 @@ module Parse
         define_singleton_method(name) do |*args, &block|
           res = body.call(*args)
           _q = res || query
-          klass = self
+
           if _q.is_a?(Parse::Query)
+            klass = self
             _q.define_singleton_method(:method_missing) do |m, *args, &block|
               if klass.respond_to?(m, true)
                 klass_scope = klass.send(m, *args, &block)
-                return klass_scope.is_a?(Parse::Query) ?
-                  self.add_constraints( klass_scope.constraints ) :
-                  klass_scope
+                if klass_scope.is_a?(Parse::Query)
+                  return self.add_constraints( klass_scope.constraints )
+                end
+                klass = nil # help clean up ruby gc
+                return klass_scope
               end
+              klass = nil # help clean up ruby gc
               return self.results.send(m, *args, &block)
             end
           end
@@ -45,6 +49,8 @@ module Parse
         end
 
       end
+
+
       # This query method helper returns a Query object tied to a parse class.
       # The parse class should be the name of the one that will be sent in the query
       # request pointing to the remote table.
