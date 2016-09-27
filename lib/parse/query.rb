@@ -285,7 +285,6 @@ module Parse
     end
 
     def count
-      @results = nil
       old_value = @count
       @count = 1
       res = client.find_objects(@table, compile.as_json, _opts ).count
@@ -318,7 +317,7 @@ module Parse
     end
 
     def first(limit = 1)
-      @results = nil
+      @results = nil if @limit != limit
       @limit = limit
       limit == 1 ? results.first : results.first(limit)
     end
