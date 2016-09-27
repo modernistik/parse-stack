@@ -177,7 +177,7 @@ module Parse
           enum_values = enum_values.dup.map(&:to_sym).freeze
 
           self.enums.merge!( key => enum_values )
-          validates key, inclusion: { in: enum_values }, allow_nil: opts[:required]
+          validates key, inclusion: { in: enum_values }, allow_nil: (opts[:required] == false)
 
           unless opts[:scopes] == false
             # You can use the :_prefix or :_suffix options when you need to define multiple enums with same values.
