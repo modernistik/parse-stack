@@ -177,7 +177,8 @@ module Parse
           enum_values = enum_values.dup.map(&:to_sym).freeze
 
           self.enums.merge!( key => enum_values )
-          validates key, inclusion: { in: enum_values }, allow_nil: (opts[:required] == false)
+          allow_nil = opts[:required] == false
+          validates key, inclusion: { in: enum_values }, allow_nil: allow_nil
 
           unless opts[:scopes] == false
             # You can use the :_prefix or :_suffix options when you need to define multiple enums with same values.
@@ -199,7 +200,11 @@ module Parse
             define_singleton_method(class_method_name) { enum_values }
 
             method_name = add_suffix ? :"valid_#{prefix_or_key}?" : :"#{prefix_or_key}_valid?"
-            define_method(method_name) { enum_values.include?(instance_variable_get(ivar).to_s.to_sym) }
+            define_method(method_name) do
+              value = instance_variable_get(ivar)
+              return true if allow_nil && value.nil?
+              enum_values.include?(value.to_s.to_sym)
+            end
 
             enum_values.each do |enum|
               method_name = enum # default
