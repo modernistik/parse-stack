@@ -96,7 +96,7 @@ module Parse
     def initialize(table, constraints = {})
       table = table.to_s.to_parse_class if table.is_a?(Symbol)
       table = table.parse_class if table.respond_to?(:parse_class)
-      raise "First parameter should be the name of the Parse class (table)" unless table.is_a?(String)
+      raise ArgumentError, "First parameter should be the name of the Parse class (table)" unless table.is_a?(String)
       @count = 0 #non-zero/1 implies a count query request
       @where = []
       @order = []
@@ -196,7 +196,7 @@ module Parse
     end
 
     def related_to(field, pointer)
-      raise "Object value must be a Parse::Pointer type" unless pointer.is_a?(Parse::Pointer)
+      raise ArgumentError, "Object value must be a Parse::Pointer type" unless pointer.is_a?(Parse::Pointer)
       add_constraint field.to_sym.related_to, pointer
       self #chaining
     end
@@ -278,7 +278,7 @@ module Parse
     end
 
     def |(other_query)
-        raise "Parse queries must be of the same class #{@table}." unless @table == other_query.table
+        raise ArgumentError, "Parse queries must be of the same class #{@table}." unless @table == other_query.table
         copy_query = self.clone
         copy_query.or_where other_query.where
         copy_query

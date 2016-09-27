@@ -10,7 +10,7 @@ module Parse
       TRIGGER_NAMES = [:beforeSave, :afterSave, :beforeDelete, :afterDelete].freeze
       def _verify_trigger(triggerName)
         triggerName = triggerName.to_s.camelize(:lower).to_sym
-        raise "Invalid trigger name #{triggerName}" unless TRIGGER_NAMES.include?(triggerName)
+        raise ArgumentError, "Invalid trigger name #{triggerName}" unless TRIGGER_NAMES.include?(triggerName)
         triggerName
       end
 

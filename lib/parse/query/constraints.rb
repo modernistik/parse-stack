@@ -187,14 +187,14 @@ module Parse
         remote_field_name = res[:key] || remote_field_name
         query = res[:query]
         unless query.is_a?(Parse::Query)
-          raise "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
+          raise ParseConstraintError, "Invalid Parse::Query object provided in :query field of value: #{@operation.operand}.#{$dontSelect} => #{@value}"
         end
         query = query.compile(encode: false, includeClassName: true)
       elsif @value.is_a?(Parse::Query)
         # if its a query, then assume dontSelect key is the same name as operand.
         query = @value.compile(encode: false, includeClassName: true)
       else
-        raise "Invalid `:select` query constraint. It should follow the format: :field.select => { key: 'key', query: '<Parse::Query>' }"
+        raise ParseConstraintError, "Invalid `:select` query constraint. It should follow the format: :field.select => { key: 'key', query: '<Parse::Query>' }"
       end
       { @operation.operand => { :$select => { key: remote_field_name, query: query } } }
     end

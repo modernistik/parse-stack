@@ -152,7 +152,7 @@ module Parse
 
         if opts[:cache].present? && opts[:expires].to_i > 0
           unless opts[:cache].is_a?(Moneta::Transformer)
-            raise "Parse::Client option :cache needs to be a type of Moneta::Transformer store."
+            raise ArgumentError, "Parse::Client option :cache needs to be a type of Moneta::Transformer store."
           end
           self.cache = opts[:cache]
           conn.use Parse::Middleware::Caching, self.cache, {expires: opts[:expires].to_i }
@@ -316,7 +316,7 @@ module Parse
     end
 
     def send_request(req) #Parse::Request object
-      raise "Object not of Parse::Request type." unless req.is_a?(Parse::Request)
+      raise ArgumentError, "Object not of Parse::Request type." unless req.is_a?(Parse::Request)
       request req.method, req.path, req.body, req.headers
     end
 

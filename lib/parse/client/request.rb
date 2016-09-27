@@ -14,7 +14,7 @@ module Parse
         @tag = 0
         method = method.downcase.to_sym
         unless method == :get || method == :put || method == :post || method == :delete
-          raise "Invalid method #{method} for request : '#{uri}'"
+          raise ArgumentError, "Invalid method #{method} for request : '#{uri}'"
         end
         self.method = method
         self.path = uri

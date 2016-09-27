@@ -40,7 +40,7 @@ module Parse
       def register_functions!(endpoint)
 
         unless endpoint.present? && endpoint.starts_with?('https://')
-          raise "The HOOKS_URL must be https: '#{endpoint}''"
+          raise ArgumentError, "The HOOKS_URL must be https: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')
         functionsMap = {}
@@ -65,7 +65,7 @@ module Parse
       def register_triggers!(endpoint, include_wildcard: false)
 
         unless endpoint.present? && endpoint.starts_with?('https://')
-          raise "The HOOKS_URL must be https: '#{endpoint}''"
+          raise ArgumentError, "The HOOKS_URL must be https: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')
 
@@ -108,7 +108,7 @@ module Parse
 
       def register_webhook!(trigger, name, url)
         trigger = trigger.to_s.camelize(:lower).to_sym
-        raise "Invalid hook trigger #{trigger}" unless ALLOWED_HOOKS.include?(trigger)
+        raise ArgumentError, "Invalid hook trigger #{trigger}" unless ALLOWED_HOOKS.include?(trigger)
         if trigger == :function
           response = client.fetch_function(name)
           # if it is either an error (which has no results) or there is a result but

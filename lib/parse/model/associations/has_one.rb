@@ -43,7 +43,7 @@ module Parse
               query.define_singleton_method(:i) { instance }
 
               if scope.arity.zero?
-                query.instance_eval &scope
+                query.instance_exec(&scope)
                 query.conditions(*args) if args.present?
               else
                 query.instance_exec(*args,&scope)

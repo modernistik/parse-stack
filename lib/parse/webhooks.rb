@@ -56,7 +56,7 @@ module Parse
 
       if type == :function
         unless block.is_a?(String) || block.is_a?(Symbol)
-          raise "Invalid Cloud Code function name: #{block}"
+          raise ArgumentError, "Invalid Cloud Code function name: #{block}"
         end
         Parse::Webhooks.route(:function, block, &Proc.new)
         # then block must be a symbol or a string
@@ -111,7 +111,7 @@ module Parse
         className = className.to_s
         block = Proc.new if block_given?
         if routes[type].nil? || block.respond_to?(:call) == false
-          raise "Invalid Webhook registration trigger #{type} #{className}"
+          raise ArgumentError, "Invalid Webhook registration trigger #{type} #{className}"
         end
 
         # AfterSave/AfterDelete hooks support more than one

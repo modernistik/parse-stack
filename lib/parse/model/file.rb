@@ -39,7 +39,7 @@ module Parse
       def initialize(name, contents = nil, mime_type = nil)
         mime_type ||= Parse::File.default_mime_type
 
-        if name.is_a?(String) && name.start_with?("http") #could be url string
+        if name.is_a?(String) && name.start_with?('http') #could be url string
           file = open( name )
           @contents =  file.read
           @name = File.basename file.base_uri.to_s
@@ -57,7 +57,7 @@ module Parse
           @contents = contents
         end
         if @name.blank?
-          raise "Invalid Parse::File initialization with name '#{@name}'"
+          raise ArgumentError, "Invalid Parse::File initialization with name '#{@name}'"
         end
 
         @mime_type ||= mime_type

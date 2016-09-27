@@ -37,7 +37,7 @@ module Parse
       def call!(env)
           # We add the main Parse protocol headers
           headers = {}
-          raise "No Parse Application Id specified for authentication." unless @application_id.present?
+          raise ArgumentError, "No Parse Application Id specified for authentication." unless @application_id.present?
           headers[APP_ID] = @application_id
           headers[API_KEY] = @api_key unless @api_key.blank?
           unless @master_key.blank? || env[:request_headers][DISABLE_MASTER_KEY].present?
