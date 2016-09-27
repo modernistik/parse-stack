@@ -39,7 +39,7 @@ module Parse
             if scope.is_a?(Proc)
               # any method not part of Query, gets delegated to the instance object
               instance = self
-              query.define_singleton_method(:method_missing) { |m| instance.send(m) }
+              query.define_singleton_method(:method_missing) { |m, *args, &block| instance.send(m, *args, &block) }
               query.define_singleton_method(:i) { instance }
 
               if scope.arity.zero?

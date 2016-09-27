@@ -75,11 +75,11 @@ module Parse
               # magic, override the singleton method_missing with accessing object level methods
               # that don't collide with Parse::Query instance. Still accessible under :i
               instance = self
-              query.define_singleton_method(:method_missing) { |m| instance.send(m) }
+              query.define_singleton_method(:method_missing) { |m, *args, &block| instance.send(m, *args, &block) }
               query.define_singleton_method(:i) { instance }
               # if the scope takes no arguments, assume arguments are additional conditions
               if scope.arity.zero?
-                query.instance_eval &scope
+                query.instance_exec(&scope)
                 query.conditions(*args) if args.present?
               else
                 query.instance_exec(*args,&scope)
