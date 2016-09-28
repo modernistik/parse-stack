@@ -42,6 +42,11 @@ module Parse
 
   class Object
 
+    def validate!
+      return self if valid?
+      raise WebhookErrorResponse, errors.full_messages.first
+    end
+
     def self.webhook_function(functionName, block = nil)
       if block_given?
         Parse::Webhooks.route(:function, functionName, &Proc.new)
