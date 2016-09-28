@@ -27,6 +27,8 @@
 - Adds chaining to Parse::Query#conditions.
 - Adds alias instance method `Parse::Query#query` to `Parse::Query#conditions`.
 - `Parse::Object.where` is now an alias to `Parse::Object.query`. You can now use `Parse::Object.where_literal`.
+- Parse::Query and Parse::CollectionProxy support Enumerable mixin.
+- Parse::Query#constraints allow you to combine constraints from different queries.
 
 ### 1.4.3
 - NEW: Support for rails generators: `parse_stack:install` and `parse_stack:model`.
