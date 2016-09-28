@@ -69,7 +69,7 @@ module Parse
     # is adding it to the @additions array and making sure it is
     # removed from the @removals array.
     def add(*items)
-      items = items.flatten
+      items = items.flatten.parse_objects
       return @collection if items.empty?
 
       notify_will_change!

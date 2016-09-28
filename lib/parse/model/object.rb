@@ -304,7 +304,7 @@ class Array
   # if it constains the proper fields. Non convertible objects will be removed
   # If the className is not contained or known, you can pass a table name as an argument
   def parse_objects(table = nil)
-    f = "className"
+    f = "className".freeze
     map do |m|
       next m if m.is_a?(Parse::Pointer)
       if m.is_a?(Hash) && (m[f] || m[:className] || table)

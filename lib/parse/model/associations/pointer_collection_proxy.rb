@@ -24,8 +24,8 @@ module Parse
     # If they are not, and it is a hash, we check to see if it is a Parse hash.
     def add(*items)
       notify_will_change! if items.count > 0
-      items.flatten.each do |item|
-        collection.push(item)
+      items.flatten.parse_objects.each do |item|
+        collection.push(item) if item.is_a?(Parse::Pointer)
       end
       @collection
     end
