@@ -33,6 +33,14 @@ module Parse
     Parse::Client.client(s).config
   end
 
+  def self.set_config(field, value, s = :default)
+    Parse::Client.client(s).update_config({ field => value })
+  end
+
+  def self.update_config(params, s = :default)
+    Parse::Client.client(s).update_config(params)
+  end
+
   def self.config!(s = :default)
     Parse::Client.client(s).config!
   end

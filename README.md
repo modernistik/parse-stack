@@ -313,13 +313,19 @@ Sets the default cache expiration time (in seconds) for successful non-empty `GE
 You may pass a hash of options that will be passed to the `Faraday` constructor.
 
 ## Parse Config
-Getting your configuration variables once you have a default client setup can be done with `Parse.config`. The first time this method is called, Parse-Stack will get the configuration from Parse-Server, and cache it. To force a reload of the config, use `config!`.
+Getting your configuration variables once you have a default client setup can be done with `Parse.config`. The first time this method is called, Parse-Stack will get the configuration from Parse-Server, and cache it. To force a reload of the config, use `config!`. You
 
 ```ruby
   Parse.setup( ... )
 
   val = Parse.config["myKey"]
   val = Parse.config["myKey"] # cached
+
+  # update a config with Parse
+  Parse.set_config "myKey", "someValue"
+
+  # batch update several
+  Parse.update_config({fieldEnabled: true, searchMiles: 50})
 
   # Force fetch of config!
   val = Parse.config!["myKey"]

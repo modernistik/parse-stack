@@ -7,6 +7,7 @@
 - NEW: `has_many` and `has_one` associations support scopes as second parameter.
 - NEW: Enumerated property types that mimic ActiveRecord::Enum behavior.
 - NEW: Support for scoped queries similar to ActiveRecord::Scope.
+- NEW: Support updating Parse config using `set_config` and `update_config`
 - NEW: Support for user login, logout and sessions.
 - NEW: Support for signup, including signing up with third-party services.
 - NEW: Support for linking and unlinking user accounts with third-party services.
