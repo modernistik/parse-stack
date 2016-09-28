@@ -46,7 +46,8 @@ module Parse
       super
       self
     rescue ActiveModel::ValidationError => e
-      raise WebhookErrorResponse, errors.full_messages.first
+      # re-raise but with a different message.
+      raise ActiveModel::ValidationError, errors.full_messages.first
     end
 
     def self.webhook_function(functionName, block = nil)
