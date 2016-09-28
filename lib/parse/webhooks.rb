@@ -43,7 +43,9 @@ module Parse
   class Object
 
     def validate!
-      return self if valid?
+      super
+      self
+    rescue ActiveModel::ValidationError => e
       raise WebhookErrorResponse, errors.full_messages.first
     end
 
@@ -239,7 +241,7 @@ module Parse
           end
           response.write success(result)
           return response.finish
-        rescue Parse::WebhookErrorResponse => e
+        rescue Parse::WebhookErrorResponse, ActiveModel::ValidationError => e
           if payload.trigger?
             puts "[Webhook ResponseError] >> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}: #{e}"
           elsif payload.function?
