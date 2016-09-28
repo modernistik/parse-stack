@@ -24,7 +24,7 @@ module Parse
     # If they are not, and it is a hash, we check to see if it is a Parse hash.
     def add(*items)
       notify_will_change! if items.count > 0
-      items.flatten.parse_pointers.each do |item|
+      items.flatten.each do |item|
         collection.push(item)
       end
       @collection
@@ -33,20 +33,20 @@ module Parse
     # removes items from the collection
     def remove(*items)
       notify_will_change! if items.count > 0
-      items.flatten.parse_pointers.each do |item|
+      items.flatten.each do |item|
         collection.delete item
       end
       @collection
     end
-    
+
     def add!(*items)
       super(items.flatten.parse_pointers)
     end
-    
+
     def add_unique!(*items)
       super(items.flatten.parse_pointers)
     end
-    
+
     def remove!(*items)
       super(items.flatten.parse_pointers)
     end
@@ -67,6 +67,10 @@ module Parse
     # or storing them in Parse, we actually just want Parse::Pointer objects.
     def as_json(*args)
       collection.parse_pointers.as_json
+    end
+
+    def parse_pointers
+      collection.parse_pointers
     end
 
   end

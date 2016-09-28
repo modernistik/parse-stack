@@ -69,7 +69,7 @@ module Parse
     # is adding it to the @additions array and making sure it is
     # removed from the @removals array.
     def add(*items)
-      items = items.flatten.parse_pointers
+      items = items.flatten
       return @collection if items.empty?
 
       notify_will_change!
@@ -89,7 +89,7 @@ module Parse
     # The process of removing is deleting it from the @removals array,
     # and adding it to the @additions array.
     def remove(*items)
-      items = items.flatten.parse_pointers
+      items = items.flatten
       return @collection if items.empty?
       notify_will_change!
       additions_will_change!

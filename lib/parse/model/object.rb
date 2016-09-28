@@ -216,6 +216,7 @@ module Parse
         remote_field = self.field_map[key.to_sym] || key
         h[remote_field] = send key
         # make an exception to Parse::Objects, we should return a pointer to them instead
+        h[remote_field] = h[remote_field].parse_pointers if h[remote_field].is_a?(Parse::PointerCollectionProxy)
         h[remote_field] = h[remote_field].pointer if h[remote_field].respond_to?(:pointer)
       end
       h

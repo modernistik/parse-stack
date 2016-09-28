@@ -1,6 +1,6 @@
 ## Parse-Stack Changelog
 
-### 1.5.0.pre
+### 1.5.0
 - BREAKING CHANGE: The default `has_many` implementation is `:query` instead of `:array`.
 - NEW: Support for `has_one` type of associations.
 - NEW: `has_many` associations support `Query` implementation as the inverse of `:belongs_to`.
@@ -13,7 +13,8 @@
 - NEW: Improved support for Parse session APIs.
 - NEW: Boolean properties automatically generate a positive query scope for the field.
 - Added property options for `:scopes`, `:enum`, `:_prefix` and `:_suffix`
-- Fixes: Auto-upgrade did not upgrade core classes.
+- FIX: Auto-upgrade did not upgrade core classes.
+- FIX: Pointer and Relation collection proxies will delay pointer casting until update.
 - Improves JSON encoding/decoding performance.
 - Removes throttling of requests.
 - Turns off cache when using `save_all` method.

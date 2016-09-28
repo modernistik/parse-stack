@@ -429,6 +429,8 @@ module Parse
         h[remote_field] = send key
         h[remote_field] = {__op: :Delete} if h[remote_field].nil?
         # in the case that the field is a Parse object, generate a pointer
+        # if it is a Parse::PointerCollectionProxy, then make sure we get a list of pointers.
+        h[remote_field] = h[remote_field].parse_pointers if h[remote_field].is_a?(Parse::PointerCollectionProxy)
         h[remote_field] = h[remote_field].pointer if h[remote_field].respond_to?(:pointer)
       end
       h
