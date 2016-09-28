@@ -193,14 +193,14 @@ module Parse
 
             if val.is_a?(Hash) && val["__type"] == "Relation"
               relation_objects = val["objects"] || []
-              val = Parse::RelationCollectionProxy.new relation_objects, delegate: self, key: key, parse_class: (val["className"] || klassName)
+              val = Parse::RelationCollectionProxy.new relation_objects, delegate: self, key: key, parse_class: (val[Parse::Model::KEY_CLASS_NAME] || klassName)
             elsif val.is_a?(Hash) && val["__op"] == "AddRelation" && val["objects"].present?
-              _collection = proxyKlass.new [], delegate: self, key: key, parse_class: (val["className"] || klassName)
+              _collection = proxyKlass.new [], delegate: self, key: key, parse_class: (val[Parse::Model::KEY_CLASS_NAME] || klassName)
               _collection.loaded = true
               _collection.add val["objects"].parse_objects
               val = _collection
             elsif val.is_a?(Hash) && val["__op"] == "RemoveRelation" && val["objects"].present?
-              _collection = proxyKlass.new [], delegate: self, key: key, parse_class: (val["className"] || klassName)
+              _collection = proxyKlass.new [], delegate: self, key: key, parse_class: (val[Parse::Model::KEY_CLASS_NAME] || klassName)
               _collection.loaded = true
               _collection.remove val["objects"].parse_objects
               val = _collection

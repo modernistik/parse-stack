@@ -270,7 +270,7 @@ module Parse
         res = client.create_object(parse_class, attribute_updates, session_token: _session_token)
         unless res.error?
           result = res.result
-          @id = result["objectId"] || @id
+          @id = result[Parse::Model::OBJECT_ID] || @id
           @created_at = result["createdAt"] || @created_at
           #if the object is created, updatedAt == createdAt
           @updated_at = result["updatedAt"] || result["createdAt"] || @updated_at
@@ -424,7 +424,7 @@ module Parse
     def set_attributes!(hash, dirty_track = false)
       return unless hash.is_a?(Hash)
       hash.each do |k,v|
-        next if k == "objectId" || k == "id"
+        next if k == Parse::Model::OBJECT_ID || k == Parse::Model::ID
         method = "#{k}_set_attribute!"
         send(method, v, dirty_track) if respond_to?(method)
       end

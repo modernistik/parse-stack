@@ -30,9 +30,9 @@ module Parse
         client.triggers.results.sort_by { |f| [f['triggerName'],f['className']] }.each do |f|
           next unless f["url"].present?
           triggerName = f["triggerName"]
-          className = f["className"]
+          className = f[Parse::Model::KEY_CLASS_NAME]
           client.delete_trigger triggerName, className
-          yield(f['triggerName'], f['className']) if block_given?
+          yield(f['triggerName'], f[Parse::Model::KEY_CLASS_NAME]) if block_given?
         end
 
       end

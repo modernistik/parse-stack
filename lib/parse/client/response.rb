@@ -120,7 +120,7 @@ module Parse
       # if batch response, generate array based on the response hash.
       @result.map do |r|
         next r unless r.is_a?(Hash)
-        hash = r["success"] || r["error"]
+        hash = r["success"] || r[ERROR]
         Parse::Response.new hash
       end
     end

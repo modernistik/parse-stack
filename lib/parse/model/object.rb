@@ -98,6 +98,7 @@ module Parse
     include Fetching
     include Actions
     include Schema
+    BASE_OBJECT_CLASS = "Parse::Object".freeze # used for comparison
 
     def __type; Parse::Model::TYPE_OBJECT; end;
     # These define callbacks
@@ -146,7 +147,7 @@ module Parse
       elsif opts.is_a?(Hash)
         #if the objectId is provided we will consider the object pristine
         #and not track dirty items
-        dirty_track = opts["objectId"] || opts[:objectId] || opts[:id]
+        dirty_track = opts[Parse::Model::OBJECT_ID] || opts[:objectId] || opts[:id]
         apply_attributes!(opts, dirty_track: !dirty_track)
       end
 
@@ -230,7 +231,7 @@ module Parse
     # Returns a twin copy of the object without the objectId
     def twin
       h = self.as_json
-      h.delete("objectId")
+      h.delete(Parse::Model::OBJECT_ID)
       h.delete(:objectId)
       h.delete(:id)
       self.class.new h
@@ -252,11 +253,11 @@ module Parse
     # will be returned instead.
     def self.build(json, table = nil)
       className = table
-      className ||= (json["className"] || json[:className]) if json.is_a?(Hash)
+      className ||= (json[Parse::Model::KEY_CLASS_NAME] || json[:className]) if json.is_a?(Hash)
       if json.is_a?(Hash) && json["error"].present? && json["code"].present?
         warn "[Parse::Object] Detected object hash with 'error' and 'code' set. : #{json}"
       end
-      className = parse_class unless parse_class == "Parse::Object"
+      className = parse_class unless parse_class == BASE_OBJECT_CLASS
       return if className.nil?
       # we should do a reverse lookup on who is registered for a different class type
       # than their name with parse_class
@@ -267,7 +268,7 @@ module Parse
         # we are considering these objects as "pristine"
         o = klass.new(json)
       else
-        o = Parse::Pointer.new className, (json["objectId"] || json[:objectId])
+        o = Parse::Pointer.new className, (json[Parse::Model::OBJECT_ID] || json[:objectId])
       end
       return o
     # rescue NameError => e
@@ -304,7 +305,7 @@ class Array
   # if it constains the proper fields. Non convertible objects will be removed
   # If the className is not contained or known, you can pass a table name as an argument
   def parse_objects(table = nil)
-    f = "className".freeze
+    f = Parse::Model::KEY_CLASS_NAME
     map do |m|
       next m if m.is_a?(Parse::Pointer)
       if m.is_a?(Hash) && (m[f] || m[:className] || table)
@@ -315,7 +316,7 @@ class Array
   end
 
   def parse_ids
-    parse_objects.map { |d| d.id }
+    parse_objects.map(&:id)
   end
 
 end

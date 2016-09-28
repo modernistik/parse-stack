@@ -77,7 +77,7 @@ module Parse
             # hash, lets try to buid a Pointer of that type.
 
             if val.is_a?(Hash) && ( val["__type"] == "Pointer" ||  val["__type"] == "Object" )
-              val = Parse::Object.build val, ( val["className"] || klassName )
+              val = Parse::Object.build val, ( val[Parse::Model::KEY_CLASS_NAME] || klassName )
               instance_variable_set ivar, val
             end
             val
@@ -101,7 +101,7 @@ module Parse
             if val == Parse::Properties::DELETE_OP
               val = nil
             elsif val.is_a?(Hash) && ( val["__type"] == "Pointer" ||  val["__type"] == "Object" )
-              val = Parse::Object.build val, ( val["className"] || klassName )
+              val = Parse::Object.build val, ( val[Parse::Model::KEY_CLASS_NAME] || klassName )
             end
 
             if track == true

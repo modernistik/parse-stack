@@ -398,7 +398,7 @@ module Parse
     def apply_attributes!(hash, dirty_track: false)
       return unless hash.is_a?(Hash)
 
-      @id ||= hash["id"] || hash["objectId"] || hash[:objectId]
+      @id ||= hash[Parse::Model::ID] || hash[Parse::Model::OBJECT_ID] || hash[:objectId]
       hash.each do |key, value|
         method = "#{key}_set_attribute!".freeze
         send(method, value, dirty_track) if respond_to?( method )

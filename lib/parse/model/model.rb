@@ -23,8 +23,10 @@ module Parse
     extend  ::ActiveModel::Naming # provides the methods for getting class names from Model classes
 
     # General Parse constants
-    KEY_CLASS_NAME  = 'className'
-    KEY_OBJECT_ID   = 'objectId'
+    ID = "id".freeze
+    OBJECT_ID   = 'objectId'.freeze
+    KEY_CLASS_NAME  = 'className'.freeze
+    KEY_OBJECT_ID   = 'objectId'.freeze
     KEY_CREATED_AT  = 'createdAt'
     KEY_UPDATED_AT  = 'updatedAt'
     CLASS_USER      = '_User'
@@ -92,8 +94,9 @@ end
 class String
   # short helper method to provide lower-first-camelcase
   def columnize
-     return "objectId" if self == "id"
-     (first == '_' ? sub('_','') : self).camelize(:lower)
+     return Parse::Model::OBJECT_ID if self == Parse::Model::ID
+     u = '_'.freeze
+     (first == u ? sub(u,'') : self).camelize(:lower)
   end
 
   #users for properties: ex. :users -> "_User" or :songs -> Song

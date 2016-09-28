@@ -39,7 +39,7 @@ module Parse
       @original = hash[:original]
       @update = hash[:update] || {} #it comes as an update hash
     end
-    
+
     def attributes
       ATTRIBUTES
     end
@@ -50,12 +50,12 @@ module Parse
 
     def parse_class
       return nil unless @object.present?
-      @object["className"] || @object[:className]
+      @object[Parse::Model::KEY_CLASS_NAME] || @object[:className]
     end
 
     def parse_id
       return nil unless @object.present?
-      @object["objectId"] || @object[:objectId]
+      @object[Parse::Model::OBJECT_ID] || @object[:objectId]
     end; alias_method :objectId, :parse_id
 
     def trigger?

@@ -100,8 +100,8 @@ class Array
       #if its an exact Parse::Pointer
       if m.is_a?(Parse::Pointer) || m.respond_to?(:pointer)
         next m.pointer
-      elsif m.is_a?(Hash) && m["className"] && m["objectId"]
-        next Parse::Pointer.new m["className"], m["objectId"]
+      elsif m.is_a?(Hash) && m[Parse::Model::KEY_CLASS_NAME] && m[Parse::Model::OBJECT_ID]
+        next Parse::Pointer.new m[Parse::Model::KEY_CLASS_NAME], m[Parse::Model::OBJECT_ID]
       elsif m.is_a?(Hash) && m[:className] && m[:objectId]
         next Parse::Pointer.new m[:className], m[:objectId]
       end
