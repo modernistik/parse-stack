@@ -21,7 +21,7 @@ module Parse
     class CollectionProxy
       include ::ActiveModel::Model
       include ::ActiveModel::Dirty
-
+      include ::Enumerable
       attr_accessor :collection, :delegate, :loaded
       attr_reader :delegate, :key
       attr_accessor :parse_class
@@ -196,6 +196,16 @@ module Parse
       def each
         return collection.enum_for(:each) unless block_given?
         collection.each &Proc.new
+      end
+
+      def map
+        return collection.enum_for(:map) unless block_given?
+        collection.map &Proc.new
+      end
+
+      def select
+        return collection.enum_for(:select) unless block_given?
+        collection.select &Proc.new
       end
 
       def inspect

@@ -1993,13 +1993,14 @@ class Article < Parse::Object
 end
 
 # simple scope
-Article.published
+Article.published # => where published is true
 
 # chained scope
-Article.published_and_commented # published where comment_count > 0
+Article.published_and_commented # published is true and comment_count > 0
 
 # scope with parameters
 Article.popular_topic("music") # => popular music articles
+# equivalent: where(published: true, :comment_count.gt => 0, category: name)
 
 # automatically generated scope
 Article.approved(category: "tour") # => where approved: true, category: 'tour'
