@@ -42,5 +42,7 @@ Gem::Specification.new do |spec|
  The default `has_many` association form has changed from :array to :query.
  To use arrays, you must now pass `through: :array` option to `has_many`.
 
+ Visit: https://github.com/modernistik/parse-stack/wiki/Changes-to-has_many-in-1.5.0
+
 UPGRADE
 end
