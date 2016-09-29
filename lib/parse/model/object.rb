@@ -228,6 +228,14 @@ module Parse
       restore_attributes
     end
 
+    # overrides ActiveModel::Validations validate! instance method
+    # if it fails, it raises ActiveModel::ValidationError
+    # otherwise return self instead of true
+    def validate!
+      super
+      self
+    end
+
     # Returns a twin copy of the object without the objectId
     def twin
       h = self.as_json
