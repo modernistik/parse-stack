@@ -33,7 +33,7 @@ module Parse
     # removes items from the collection
     def remove(*items)
       notify_will_change! if items.count > 0
-      items.flatten.each do |item|
+      items.flatten.parse_objects.each do |item|
         collection.delete item
       end
       @collection

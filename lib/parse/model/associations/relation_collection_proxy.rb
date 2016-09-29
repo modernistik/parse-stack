@@ -89,7 +89,7 @@ module Parse
     # The process of removing is deleting it from the @removals array,
     # and adding it to the @additions array.
     def remove(*items)
-      items = items.flatten
+      items = items.flatten.parse_objects
       return @collection if items.empty?
       notify_will_change!
       additions_will_change!

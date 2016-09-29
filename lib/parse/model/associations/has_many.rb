@@ -267,11 +267,7 @@ module Parse
         changed.each do |key|
           next unless relations[key.to_sym].present? && send(key).changed?
           remote_field = self.field_map[key.to_sym] || key
-          h[remote_field] = send key
-          #TODO: Might be redundant since as_json should take care of it.
-          if h[remote_field].is_a?(Parse::PointerCollectionProxy)
-             h[remote_field] = h[remote_field].parse_pointers
-          end
+          h[remote_field] = send key # we still need to send a proxy collection
         end
         h
       end
