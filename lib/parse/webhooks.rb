@@ -42,12 +42,11 @@ module Parse
 
   class Object
 
-    def validate!
+    def validate! #Override the behavior to return self when successful
       super
       self
     rescue ActiveModel::ValidationError => e
-      # re-raise but with a different message.
-      raise ActiveModel::ValidationError, errors.full_messages.first
+      raise WebhookErrorResponse, e
     end
 
     def self.webhook_function(functionName, block = nil)
