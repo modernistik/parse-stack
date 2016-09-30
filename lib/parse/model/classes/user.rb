@@ -37,13 +37,13 @@ module Parse
     def link_auth_data!(service_name, **data)
       response = client.set_service_auth_data(id, service_name, data)
       apply_attributes!(response.result) if response.success?
-      response.success?
+      response
     end
 
     def unlink_auth_data!(service_name)
       response = client.set_service_auth_data(id, service_name, nil)
       apply_attributes!(response.result) if response.success?
-      response.success?
+      response
     end
 
     # So that apply_attributes! works with session_token for login
