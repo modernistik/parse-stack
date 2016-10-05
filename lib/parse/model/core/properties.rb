@@ -220,7 +220,8 @@ module Parse
                 method_name = :"#{prefix}_#{enum}"
               end
               self.scope method_name, ->(ex = {}){ ex.merge!(key => enum); query( ex )  }
-              define_method("#{method_name}!") { instance_variable_set(ivar, enum) }
+
+              define_method("#{method_name}!") { self.send "#{key}=", enum }
               define_method("#{method_name}?") { enum == instance_variable_get(ivar).to_s.to_sym }
             end
           end # unless scopes
