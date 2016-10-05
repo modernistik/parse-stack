@@ -163,7 +163,7 @@ module Parse
     def self.request_password_reset(email)
       email = email.email if email.is_a?(Parse::User)
       return false if email.blank?
-      response = client.reset_password(email)
+      response = client.request_password_reset(email)
       response.success?
     end
 
