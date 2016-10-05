@@ -64,7 +64,7 @@ module Parse
     def signup!(passwd = nil)
       self.password = passwd || password
       if username.blank?
-        raise Parse::UsernameMissingError, "Signup requires an username."
+        raise Parse::UsernameMissingError, "Signup requires a username."
       end
 
       if password.blank?
