@@ -95,18 +95,18 @@ module Parse
       end
 
       # creates a count request (which is more performant when counting objects)
-      def count(**constraints)
+      def count(constraints = {})
         query(constraints).count
       end
 
-      def newest(**constraints)
+      def newest(constraints = {})
         constraints.merge!(order: :created_at.desc)
         _q = query(constraints)
         _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
         _q
       end
 
-      def oldest(**constraints)
+      def oldest(constraints = {})
         constraints.merge!(order: :created_at.asc)
         _q = query(constraints)
         _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
