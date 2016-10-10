@@ -53,7 +53,7 @@ require 'active_support/json'
 # be a set of responses (from a Batch response).
 module Parse
 
-
+  class ResponseError < StandardError; end;
   class Response
     include Enumerable
 
