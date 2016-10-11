@@ -455,8 +455,8 @@ module Parse
   module Fetching
 
     # force fetches the current object with the data contained in Parse.
-    def fetch!
-      response = client.fetch_object(parse_class, id)
+    def fetch!(opts = {})
+      response = client.fetch_object(parse_class, id, opts)
       if response.error?
         puts "[Fetch Error] #{response.code}: #{response.error}"
       end

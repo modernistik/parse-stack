@@ -7,7 +7,7 @@
 - FIXES: Issues when passing a block to chaining scope.
 - FIXES: Enums properly handle default values.
 - FIXES: Enums macro methods now are dirty tracked.
-- Session methods support client request options.
+- `reload!` and session methods support client request options.
 - Proactively deletes possible matching cache keys on non GET requests.
 
 ### 1.5.1

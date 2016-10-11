@@ -181,9 +181,9 @@ module Parse
     end
 
     # force reload and replace any local fields with data from the persistent store
-    def reload!
+    def reload!(opts = {})
     # get the values from the persistence layer
-      fetch!
+      fetch!(opts)
       clear_changes!
     end
 
