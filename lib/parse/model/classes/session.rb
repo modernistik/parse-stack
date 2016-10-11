@@ -13,10 +13,10 @@ module Parse
 
     belongs_to :user
 
-    def self.session(token)
-      response = client.fetch_session(token)
+    def self.session(token, **opts)
+      response = client.fetch_session(token, opts)
       if response.success?
-        reutrn Parse::Session.build response.result
+        return Parse::Session.build response.result
       end
       nil
     end

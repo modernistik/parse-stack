@@ -1,5 +1,15 @@
 ## Parse-Stack Changelog
 
+### 1.5.2
+- FIXES #16: Constraints to `count` were not properly handled.
+- FIXES #15: Incorrect call to `request_password_reset`.
+- FIXES #14: Typos
+- FIXES: Issues when passing a block to chaining scope.
+- FIXES: Enums properly handle default values.
+- FIXES: Enums macro methods now are dirty tracked.
+- Session methods support client request options.
+- Proactively deletes possible matching cache keys on non GET requests.
+
 ### 1.5.1
 - BREAKING CHANGE: The default `has_many` implementation is `:query` instead of `:array`.
 - NEW: Support for `has_one` type of associations.

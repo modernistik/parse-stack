@@ -22,6 +22,8 @@ module Parse
          # * 410 - 'Gone' - removed
       CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302]
       CACHE_CONTROL = 'Cache-Control'
+      CONTENT_LENGTH_KEY = "content-length"
+      CACHE_RESPONSE_HEADER = "X-Cache-Response"
       CACHE_EXPIRES_DURATION = 'X-Parse-Stack-Cache-Expires'
 
       class << self
@@ -85,8 +87,8 @@ module Parse
         @cache_key = url.to_s
 
         if @request_headers.key?(SESSION_TOKEN)
-          session_token = @request_headers[SESSION_TOKEN]
-          @cache_key = "#{session_token}#{@cache_key}" # prefix tokens
+          @session_token = @request_headers[SESSION_TOKEN]
+          @cache_key = "#{@session_token}:#{@cache_key}" # prefix tokens
         elsif @request_headers.key?(MASTER_KEY)
           @cache_key = "mk:#{@cache_key}" # prefix for master key requests
         end
@@ -98,7 +100,7 @@ module Parse
             res_env = @store[@cache_key] # previous cached response
             body = res_env.respond_to?(:body) ? res_env.body : nil
             if body.present?
-              response.finish({status: 200, response_headers: { "X-Cache-Response" => true }, body: body })
+              response.finish({status: 200, response_headers: { CACHE_RESPONSE_HEADER => true }, body: body })
               return response
             else
               @store.delete @cache_key
@@ -107,7 +109,9 @@ module Parse
             #non GET requets should clear the cache for that same resource path.
             #ex. a POST to /1/classes/Artist/<objectId> should delete the cache for a GET
             # request for the same '/1/classes/Artist/<objectId>' where objectId are equivalent
-            @store.delete @cache_key
+            @store.delete url.to_s # regular
+            @store.delete "mk:#{url.to_s}" # master key cache-key
+            @store.delete @cache_key # final key
           end
         rescue Errno::EINVAL, Redis::CannotConnectError => e
           # if the cache store fails to connect, catch the exception but proceed
@@ -122,7 +126,7 @@ module Parse
           # Only cache GET requests with valid HTTP status codes whose content-length
           # is greater than 20. Otherwise they could be errors, successes and empty result sets.
           if @enabled && method == :get &&  CACHEABLE_HTTP_CODES.include?(response_env.status) &&
-             response_env.present? && response_env.response_headers["content-length"].to_i > 20
+             response_env.present? && response_env.response_headers[CONTENT_LENGTH_KEY].to_i > 20
                 @store.store(@cache_key, response_env, expires: @expires) # ||= response_env.body
           end # if
           # do something with the response
