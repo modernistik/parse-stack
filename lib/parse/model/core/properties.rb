@@ -206,7 +206,7 @@ module Parse
 
             method_name = add_suffix ? :"valid_#{prefix_or_key}?" : :"#{prefix_or_key}_valid?"
             define_method(method_name) do
-              value = instance_variable_get(ivar)
+              value = send(key) # call default getter
               return true if allow_nil && value.nil?
               enum_values.include?(value.to_s.to_sym)
             end
@@ -221,8 +221,9 @@ module Parse
               end
               self.scope method_name, ->(ex = {}){ ex.merge!(key => enum); query( ex )  }
 
-              define_method("#{method_name}!") { self.send "#{key}=", enum }
-              define_method("#{method_name}?") { enum == instance_variable_get(ivar).to_s.to_sym }
+
+              define_method("#{method_name}!") { send set_attribute_method, enum, true }
+              define_method("#{method_name}?") { enum == send(key).to_s.to_sym }
             end
           end # unless scopes
 
