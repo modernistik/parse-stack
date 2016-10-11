@@ -89,15 +89,19 @@ module Parse
               query.conditions(*args)
             end
 
-            query.define_singleton_method(:method_missing) do |m, *args, &block|
+            query.define_singleton_method(:method_missing) do |m, *args, &chained_block|
               klass = Parse::Model.find_class klassName
+
               if klass.present? && klass.respond_to?(m)
-                klass_scope = klass.send(m, *args, &block)
-                return klass_scope.is_a?(Parse::Query) ?
-                    self.add_constraints( klass_scope.constraints ) :
-                    klass_scope
+
+                klass_scope = klass.send(m, *args) # blocks only passed to final result set
+                return klass_scope unless klass_scope.is_a?(Parse::Query)
+                # merge constraints
+                add_constraints( klass_scope.constraints )
+                # if a block was passed, execute the query, otherwise return the query
+                return chained_block.present? ? results(&chained_block) : self
               end
-              self.results.send(m, *args, &block)
+              results.send(m, *args, &chained_block)
             end
 
             return query if block.nil?

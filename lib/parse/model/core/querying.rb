@@ -38,17 +38,21 @@ module Parse
 
           if _q.is_a?(Parse::Query)
             klass = self
-            _q.define_singleton_method(:method_missing) do |m, *args, &block|
+            _q.define_singleton_method(:method_missing) do |m, *args, &chained_block|
               if klass.respond_to?(m, true)
-                klass_scope = klass.send(m, *args, &block)
+                # must be a scope
+                klass_scope = klass.send(m, *args)
                 if klass_scope.is_a?(Parse::Query)
-                  return self.add_constraints( klass_scope.constraints )
-                end
+                  # merge constraints
+                  add_constraints( klass_scope.constraints )
+                  # if a block was passed, execute the query, otherwise return the query
+                  return chained_block.present? ? results(&chained_block) : self
+                end # if
                 klass = nil # help clean up ruby gc
                 return klass_scope
               end
               klass = nil # help clean up ruby gc
-              return self.results.send(m, *args, &block)
+              return results.send(m, *args, &chained_block)
             end
           end
           return _q if block.nil?
