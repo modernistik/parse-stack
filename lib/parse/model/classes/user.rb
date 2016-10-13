@@ -11,6 +11,7 @@ module Parse
   class UsernameTakenError < StandardError; end; # 202
   class EmailTakenError < StandardError; end; # 203
   class EmailMissing < StandardError; end; # 204
+  class InvalidEmailAddress < StandardError; end; # 125
 
   class User < Parse::Object
 
@@ -91,8 +92,10 @@ module Parse
         raise Parse::UsernameTakenError, response
       when Parse::Response::ERROR_EMAIL_TAKEN
         raise Parse::EmailTakenError, response
+      when Parse::Response::ERROR_EMAIL_INVALID
+        raise Parse::InvalidEmailAddress, response
       end
-      raise response
+      raise Parse::ResponseError, response
     end
 
     def login!(passwd = nil)
