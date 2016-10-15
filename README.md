@@ -1,4 +1,4 @@
-# Parse-Stack - A Parse-Server Ruby Client and ORM
+# Parse-Stack - The Parse Server Ruby Client and ORM
 Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) REST API Client and ORM framework for ruby. It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ### Code Status
@@ -286,7 +286,7 @@ Calling `setup` will create the default `Parse::Client` session object that will
 There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
 
 #### `:server_url`
-The server url of your Parse-Server if you are not using the hosted Parse.com service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
+The server url of your Parse Server if you are not using the hosted Parse.com service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
 
 #### `:app_id`
 The Parse application id. By default it will use `PARSE_APP_ID` environment variable if not specified.
@@ -313,7 +313,7 @@ Sets the default cache expiration time (in seconds) for successful non-empty `GE
 You may pass a hash of options that will be passed to the `Faraday` constructor.
 
 ## Parse Config
-Getting your configuration variables once you have a default client setup can be done with `Parse.config`. The first time this method is called, Parse-Stack will get the configuration from Parse-Server, and cache it. To force a reload of the config, use `config!`. You
+Getting your configuration variables once you have a default client setup can be done with `Parse.config`. The first time this method is called, Parse-Stack will get the configuration from Parse Server, and cache it. To force a reload of the config, use `config!`. You
 
 ```ruby
   Parse.setup( ... )
@@ -410,6 +410,19 @@ The default MIME type for all files is `image/jpeg`. This can be default can be 
 
   # or another Parse::File object
   file = Parse::File.new parse_file
+```
+
+If you are using displaying these files on a secure site and want to make sure that urls returned by a call to `url` are `https`, you can set `Parse::File.force_ssl` to true.
+
+```ruby
+# Assume file is a Parse::File
+
+file.url # => http://www.example.com/file.png
+
+Parse::File.force_ssl = true # make all urls be https
+
+file.url # => https://www.example.com/file.png
+
 ```
 
 ### Parse::Date

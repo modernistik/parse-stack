@@ -9,6 +9,7 @@
 - FIXES: Enums macro methods now are dirty tracked.
 - `reload!` and session methods support client request options.
 - Proactively deletes possible matching cache keys on non GET requests.
+- Parse::File now has a `force_ssl` option that makes sure all urls returned are `https`.
 
 ### 1.5.1
 - BREAKING CHANGE: The default `has_many` implementation is `:query` instead of `:array`.

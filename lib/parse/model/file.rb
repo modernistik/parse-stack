@@ -25,10 +25,17 @@ module Parse
       FIELD_URL = "url"
       class << self
         attr_accessor :default_mime_type
+        attr_accessor :force_ssl
 
         def default_mime_type
           @default_mime_type ||= "image/jpeg"
         end
+
+        # Force all calls to `url`, return an https version.
+        def force_ssl
+          @force_ssl ||= false
+        end
+
       end
       # The initializer to create a new file supports different inputs.
       # If the first paramter is a string which starts with 'http', we then download
@@ -76,6 +83,13 @@ module Parse
       # the name of the file begins with 'tfss'
       def saved?
         @url.present? && @name.present? && @name == File.basename(@url) && @name.start_with?("tfss")
+      end
+
+      def url
+        if @url.present? && Parse::File.force_ssl && @url.starts_with?('http://')
+          return @url.sub('http://', 'https://')
+        end
+        @url
       end
 
       def attributes
