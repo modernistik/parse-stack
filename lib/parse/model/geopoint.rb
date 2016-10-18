@@ -97,6 +97,10 @@ module Parse
       @latitude == g.latitude && @longitude == g.longitude
     end
 
+    def estimated(precision = 2)
+      Parse::GeoPoint.new(@latitude.to_f.round(precision), @longitude.round(precision))
+    end
+
     def to_a
       [@latitude,@longitude]
     end

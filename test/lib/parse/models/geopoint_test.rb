@@ -105,4 +105,26 @@ class TestGeoPoint < Minitest::Test
     assert_equal @san_diego.distance_in_km(@san_diego), 0
   end
 
+  def test_estimated
+    @san_diego_estimated = @san_diego.estimated
+    lat = @san_diego.latitude.to_f.round(2)
+    lng = @san_diego.longitude.to_f.round(2)
+    assert_equal @san_diego_estimated.lat, lat
+    assert_equal @san_diego_estimated.lng, lng
+
+    @san_diego_estimated = @san_diego.estimated(3)
+    lat = @san_diego.latitude.to_f.round(3)
+    lng = @san_diego.longitude.to_f.round(3)
+    assert_equal @san_diego_estimated.lat, lat
+    assert_equal @san_diego_estimated.lng, lng
+
+    @san_diego_estimated = @san_diego.estimated(0)
+    lat = @san_diego.latitude.to_f.round(0)
+    lng = @san_diego.longitude.to_f.round(0)
+    assert_equal @san_diego_estimated.lat, lat
+    assert_equal @san_diego_estimated.lng, lng
+    assert_equal @san_diego.estimated(0).max_miles(50), [lat,lng,50]
+
+  end
+
 end
