@@ -147,13 +147,15 @@ end
 
 
 class Hash
-  # {"name"=>"tfss-cat.jpg", "url"=>"http://files.parsetfss.com/bcf638bb-3db0-4042-b846-7840b345b0d6/tfss-cat.jpg"}
-  # This is a helper method that determines whether a hash looks like a Parse::File hash
+  # Determines if the hash contains Parse File json metadata fields. This is determined whether
+  # the key `__type` exists and is of type `__File` and whether the `name` field matches the File.basename
+  # of the `url` field.
+  #
+  # @return [Boolean] True if this hash contains Parse file metadata.
   def parse_file?
     url = self[Parse::File::FIELD_URL]
     name = self[Parse::File::FIELD_NAME]
     (count == 2 || self["__type"] == Parse::File.parse_class) &&
-    url.present? && name.present? &&
-    name == ::File.basename(url) && name.start_with?("tfss")
+    url.present? && name.present? && name == ::File.basename(url)
   end
 end

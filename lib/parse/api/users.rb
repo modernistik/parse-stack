@@ -78,7 +78,7 @@ module Parse
         request :post, LOGOUT_PATH, headers: headers, opts: opts
       end
 
-      # {username: "", password: "", email: nil} # minimum
+      # Signup a user given a username, password and, optionally, their email.
       def signup(username, password, email = nil, body: {}, **opts)
         body = body.merge({ username: username, password: password })
         body[:email] = email || body[:email]
