@@ -15,7 +15,7 @@ module Parse
 
       ALLOWED_HOOKS = Parse::API::Hooks::TRIGGER_NAMES + [:function]
 
-
+      # removes all registered webhook functions with Parse Server.
       def remove_all_functions!
 
           client.functions.results.sort_by { |f| f['functionName'] }.each do |f|
@@ -25,6 +25,7 @@ module Parse
           end
       end
 
+      # removes all registered webhook triggers with Parse Server.
       def remove_all_triggers!
 
         client.triggers.results.sort_by { |f| [f['triggerName'],f['className']] }.each do |f|
@@ -37,6 +38,8 @@ module Parse
 
       end
 
+      # Registers all webhook functions registered with Parse::Stack with Parse server.
+      # @param endpoing [String] an https url that points to the webhook server.
       def register_functions!(endpoint)
 
         unless endpoint.present? && endpoint.starts_with?('https://')
@@ -62,6 +65,8 @@ module Parse
 
       end
 
+      # Registers all webhook triggers registered with Parse::Stack with Parse server.
+      # @param endpoing [String] an https url that points to the webhook server.
       def register_triggers!(endpoint, include_wildcard: false)
 
         unless endpoint.present? && endpoint.starts_with?('https://')
@@ -106,6 +111,11 @@ module Parse
         end
       end
 
+      # Registers a webhook trigger with a given endpoint url.
+      # @param trigger [Symbol] Trigger type based on Parse::API::Hooks::TRIGGER_NAMES or :function.
+      # @param name [String] the name of the webhook.
+      # @param url [String] the https url endpoint that will handle the request.
+      # @see Parse::API::Hooks::TRIGGER_NAMES
       def register_webhook!(trigger, name, url)
         trigger = trigger.to_s.camelize(:lower).to_sym
         raise ArgumentError, "Invalid hook trigger #{trigger}" unless ALLOWED_HOOKS.include?(trigger)

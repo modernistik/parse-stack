@@ -216,19 +216,35 @@ module Parse
       raise  Parse::ResponseError, response
     end
 
-    # method will signup or login a user given the third-party authentication data
+    # Automatically and implicitly signup a user if it did not already exists and
+    # authenticates them (login) using third-party authentication data. May raise exceptions
+    # similar to `create` depending on what you provide the _body_ parameter.
+    # @param service_name [Symbol] the name of the service key (ex. :facebook)
+    # @param auth_data [Hash] the specific service data to place in the user's auth-data for this service.
+    # @param body [Hash] any additional User related fields or properties when signing up this User record.
+    # @return [User] a logged in user, or nil.
+    # @see User.create
     def self.autologin_service(service_name, auth_data, body: {})
       body = body.merge({authData: {service_name => auth_data} })
       self.create(body)
     end
 
+    # This method will signup a new user using the parameters below. The required fields
+    # to create a user in Parse is the _username_ and _password_ fields. The _email_ field is optional.
+    # Both _username_ and _email_ (if provided), must be unique. At a minimum, it is recommended you perform
+    # a query using the supplied _username_ first to verify do not already have an account with that username.
+    # This method will raise all the exceptions from the similar `create` method.
+    # @see User.create
     def self.signup(username, password, email = nil, body: {})
       body = body.merge({username: username, password: password })
       body[:email] = email if email.present?
       self.create(body)
     end
 
-    # Login and find a Parse::User with this username/password combination.
+    # Login and return a Parse::User with this username/password combination.
+    # @param username [String] the user's username
+    # @param password [String] the user's password
+    # @return [User] a logged in user for the provided username. Returns nil otherwise.
     def self.login(username, password)
       response = client.login(username.to_s, password.to_s)
       response.success? ? Parse::User.build(response.result) : nil

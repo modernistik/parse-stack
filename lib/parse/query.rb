@@ -23,6 +23,7 @@ module Parse
   # name. Using Parse::Operations with values, we can build different types of
   # constraints - as Parse::Constraint
 
+
   class Query
     extend  ::ActiveModel::Callbacks
     include Parse::Client::Connectable
@@ -46,7 +47,10 @@ module Parse
     # if you do not want any field formatting to be performed.
     @field_formatter = :columnize
     class << self
-      #field formatter getters and setters.
+      # Parse by convention uses lowercase-first camelcase syntax for field/column names, but ruby
+      # uses snakecase. To support this methodology we process all field constraints through the method
+      # defined by the field formatter.
+      # @return [Symbol] The filter method to process column and field names. Default `:columnize`.
       attr_accessor :field_formatter
 
       def format_field(str)

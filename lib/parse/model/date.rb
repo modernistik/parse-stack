@@ -13,38 +13,41 @@ require 'active_support/core_ext/time/calculations'
 require 'active_model_serializers'
 require_relative 'model'
 
-# Parse has a specific date format. One of the supported types is a date string in
-# ISO 8601 format (including milliseconds). The other is a hash object that contains
-# the similar information. When sending data to Parse, we need to use the hash object,
-# but when receiving data from Parse, we may either get the string version or the hash version.
-# To make things easier to use in ruby, th Parse::Date class inherits from the DateTime class.
-# This will allow us to use all the great ActiveSupport methods for date (ex. 3.days.ago) while
-# providing our own encoding for sending to Parse.
 module Parse
+  # This class manages dates in the special JSON format it requires for
+  # properties of type _:date_. One important note with dates, is that 'created_at' and 'updated_at'
+  # columns do not follow this convention all the time. Depending on the
+  # Cloud Code SDK, they can be the Parse ISO hash date format or the `iso8601`
+  # string format. By default, these are serialized as `iso8601` when sent as
+  # responses to Parse for backwards compatibility with some clients. To use
+  # the Parse ISO hash format for these fields instead, set
+  # `Parse::Object.disable_serialized_string_date = true`.
   class Date < ::DateTime
     ATTRIBUTES = {  __type: :string, iso: :string }.freeze
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON
+
+    # @return [Parse::Model::TYPE_DATE]
     def self.parse_class; Parse::Model::TYPE_DATE; end;
+    # @return [Parse::Model::TYPE_DATE]
     def parse_class; self.class.parse_class; end;
     alias_method :__type, :parse_class
 
-    # called when encoding to JSON.
     def attributes
       ATTRIBUTES
     end
 
-    # this method is defined because it is used by JSON encoding
+    # @return [String] the ISO8601 time string including milliseconds
     def iso
-      to_time.utc.iso8601(3) #include milliseconds
+      to_time.utc.iso8601(3)
     end
 
   end
 end
 
-# To enable conversion of other date class objects, we will add a mixin to turn
-# Time and DateTime objects to Parse::Date objects
+
 class Time
+  # @return [Parse::Date] Converts object to Parse::Date
   def parse_date
     Parse::Date.parse iso8601(3)
   end
@@ -52,6 +55,7 @@ class Time
 end
 
 class DateTime
+  # @return [Parse::Date] Converts object to Parse::Date
   def parse_date
     Parse::Date.parse iso8601(3)
   end
@@ -59,6 +63,7 @@ end
 
 module ActiveSupport
   class TimeWithZone
+    # @return [Parse::Date] Converts object to Parse::Date
     def parse_date
       Parse::Date.parse iso8601(3)
     end

@@ -5,33 +5,57 @@ require 'active_support'
 require 'active_support/core_ext/object'
 require_relative "model"
 require 'open-uri'
-# Parse File objects are the only non Parse::Object subclass that has a save method.
-# In general, a Parse File needs content and a specific mime-type to be created. When it is saved, it
-# is sent to AWS/S3 to be saved (by Parse), and the result is a new URL pointing to that file.
-# This however is return as a type of File pointer object (hash format)
-# It only has two fields, the absolute URL of the file and the basename of the file.
-# The contents and mime_type are only present when creating a new file locally and are not
-# stored as part of the parse pointer.
-module Parse
 
+module Parse
+    # This class represents a Parse file pointer. `Parse::File` has helper
+    # methods to upload Parse files directly to Parse and manage file
+    # associations with your classes.
+    # @example
+    #  file = File.open("file_path.jpg")
+    #  contents = file.read
+    #  file = Parse::File.new("myimage.jpg", contents , "image/jpeg")
+    #  file.saved? # => false
+    #  file.save
+    #
+    #  file.url # https://files.parsetfss.com/....
+    #
+    #  # or create and upload a remote file (auto-detected mime type)
+    #  file = Parse::File.create(some_url)
+    #
+    #
+    # @note The default MIME type for all files is _image/jpeg_. This can be default
+    #       can be changed by setting a value to `Parse::File.default_mime_type`.
     class File < Model
       ATTRIBUTES = {  __type: :string, name: :string, url: :string }.freeze
-      attr_accessor :name, :url
-      attr_accessor :contents, :mime_type
+      # @return [String] the name of the file including extension (if any)
+      attr_accessor :name
+      # @return [String] the url resource of the file.
+      attr_accessor :url
+
+      # You may set the contents of the file.
+      attr_accessor :contents
+
+      # @return [String] the mime-type of the file whe
+      attr_accessor :mime_type
+      # @return [Model::TYPE_FILE]
       def self.parse_class; TYPE_FILE; end;
+      # @return [Model::TYPE_FILE]
       def parse_class; self.class.parse_class; end;
       alias_method :__type, :parse_class
       FIELD_NAME = "name"
       FIELD_URL = "url"
       class << self
+
         attr_accessor :default_mime_type
+
         attr_accessor :force_ssl
 
+        # @return [String] The default mime type for created instances. Default: _'image/jpeg'_
         def default_mime_type
           @default_mime_type ||= "image/jpeg"
         end
 
-        # Force all calls to `url`, return an https version.
+        # @return [Boolean] When set to true, it will make all calls to File#url
         def force_ssl
           @force_ssl ||= false
         end
@@ -43,6 +67,9 @@ module Parse
       # If the first parameter is a hash, we assume it might be the Parse File hash format which contains url and name fields only.
       # If the first paramter is a Parse::File, then we copy fields over
       # Otherwise, creating a new file requires a name, the actual contents (usually from a File.open("local.jpg").read ) and the mime-type
+      # @param name [String]
+      # @param contents [Object]
+      # @param mime_type [String] Default see default_mime_type
       def initialize(name, contents = nil, mime_type = nil)
         mime_type ||= Parse::File.default_mime_type
 
@@ -72,6 +99,8 @@ module Parse
       end
 
       # This creates a new Parse File Object with from a URL, saves it and returns it
+      # @param url [String] A url which will be used to create the file and automatically save it.
+      # @return [Parse::File] A newly saved file based on contents of _url_
       def self.create(url)
         url = url.url if url.is_a?(Parse::File)
         file = self.new(url)
@@ -79,12 +108,15 @@ module Parse
         file
       end
 
-      # A File object is considered saved if the basename of the URL and the name parameters are equal and
-      # the name of the file begins with 'tfss'
+      # A File object is considered saved if the basename of the URL and the name parameters are equal
+      # @return [Boolean] true if this file has already been saved.
       def saved?
-        @url.present? && @name.present? && @name == File.basename(@url) && @name.start_with?("tfss")
+        @url.present? && @name.present? && @name == File.basename(@url)
       end
 
+      # Returns the url string for this Parse::File pointer. If the *force_ssl* option is
+      # set to true, it will make sure it returns a secure url.
+      # @return [String] the url string for the file.
       def url
         if @url.present? && Parse::File.force_ssl && @url.starts_with?('http://')
           return @url.sub('http://', 'https://')
@@ -92,10 +124,12 @@ module Parse
         @url
       end
 
+      # @return [Hash]
       def attributes
         ATTRIBUTES
       end
 
+      # @return [Boolean] Two files are equal if they have the same url
       def ==(u)
         return false unless u.is_a?(self.class)
         @url == u.url
@@ -111,7 +145,11 @@ module Parse
         end
       end
 
-      # This is a proxy to the ruby ::File.basename method
+      # A proxy method for ::File.basename
+      # @param file_name [String]
+      # @param suffix [String]
+      # @return [String] File.basename(file_name)
+      # @see ::File.basename
       def self.basename(file_name, suffix = nil)
        if suffix.nil?
          ::File.basename(file_name)
@@ -120,7 +158,8 @@ module Parse
        end
       end
 
-      # save (create) the file if it has all the proper fields. You cannot update Parse Files.
+      # Save the file by uploading it to Parse and creating a file pointer.
+      # @return [Boolean] true if successfully uploaded and saved.
       def save
         unless saved? || @contents.nil? || @name.nil?
           response = client.create_file(@name, @contents, @mime_type)
@@ -133,10 +172,13 @@ module Parse
         saved?
       end
 
+      # @!visibility private
       def inspect
         "<Parse::File @name='#{@name}' @mime_type='#{@mime_type}' @contents=#{@contents.nil?} @url='#{@url}'>"
       end
 
+      # @return [String] the url
+      # @see #url
       def to_s
         @url
       end

@@ -73,13 +73,29 @@ module Parse
     CODE = "code"
     RESULTS = "results"
     COUNT = "count"
-    # A response has a result or (a code and an error)
-    attr_accessor :parse_class, :code, :error, :result, :http_status
-    attr_accessor :request # capture request that created result
+
+    # @!attribute [rw] parse_class
+    #  @return [String] the Parse class for this request
+    # @!attribute [rw] code
+    #  @return [Integer] the error code
+    # @!attribute [rw] error
+    #  @return [Integer] the error message
+    # @!attribute [rw] result
+    #  @return [Hash] the body of the response result.
+    # @!attribute [rw] http_status
+    #  @return [Integer] the HTTP status code from the response.
+    # @!attribute [rw] request
+    #  @return [Integer] the Parse::Request that generated this response.
+    #  @see Parse::Request
+    attr_accessor :parse_class, :code, :error, :result, :http_status,
+                  :request
     # You can query Parse for counting objects, which may not actually have
     # results.
+    # @return [Integer] the count result from a count query request.
     attr_reader :count
 
+    # Create an instance with a Parse response JSON hash.
+    # @param res [Hash] the JSON hash
     def initialize(res = {})
       @http_status = 0
       @count = 0
@@ -101,21 +117,14 @@ module Parse
 
     end
 
+    # true if this was a batch response.
     def batch?
       @batch_response
     end
-    #batch response
-    #
-    # [
-    #   {
-    #     "success":{"createdAt":"2015-11-22T19:04:16.104Z","objectId":"s4tEzOVQFc"}
-    #   },
-    #  {
-    #  "error":{"code":101,"error":"object not found for update"}
-    #  }
-    # ]
+
     # If it is a batch respnose, we'll create an array of Response objects for each
     # of the ones in the batch.
+    # @return [Array] an array of Response objects.
     def batch_responses
 
       return [@result] unless @batch_response
@@ -130,7 +139,6 @@ module Parse
     # This method takes the result hash and determines if it is a regular
     # parse query result, object result or a count result. The response should
     # be a hash either containing the result data or the error.
-
     def parse_result(h)
       @result = {}
       return unless h.is_a?(Hash)
@@ -145,31 +153,38 @@ module Parse
       end
 
     end
+    alias_method :parse_result!, :parse_result
 
-    # determines if the response is successful.
+    # true if the response is successful.
+    # @see #error?
     def success?
       @code.nil? && @error.nil?
     end
 
+    # true if the response has an error code.
+    # @see #success?
     def error?
       ! success?
     end
 
+    # true if the response has an error code of 'object not found'
+    # @see ERROR_OBJECT_NOT_FOUND
     def object_not_found?
       @code == ERROR_OBJECT_NOT_FOUND
     end
 
-    # returns the result data from the response. Always returns an array.
+    # @return [Array] the result data from the response.
     def results
       return [] if @result.nil?
       @result.is_a?(Array) ? @result : [@result]
     end
 
-    # returns the first thing in the array.
+    # @return [Object] the first thing in the result array.
     def first
       @result.is_a?(Array) ? @result.first : @result
     end
-
+    # Iterate through each result item.
+    # @yieldparam [Object] a result entry.
     def each
       return enum_for(:each) unless block_given?
       results.each(&Proc.new)
@@ -184,6 +199,7 @@ module Parse
       end
     end
 
+    # @return [String] JSON encoded object, or an error string.
     def to_s
       return "[E-#{@code}] #{@request} : #{@error} (#{@http_status})" if error?
       @result.to_json

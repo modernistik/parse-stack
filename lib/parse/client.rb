@@ -18,7 +18,7 @@ require_relative "api/all"
 
 module Parse
 
-  # This is an exception that is thrown if there is a client connectivity issue
+  # This is an exception that is thrown if there is a client connectivity issue.
   class ConnectionError < StandardError; end;
   class TimeoutError < StandardError; end;
   class ProtocolError < StandardError; end;

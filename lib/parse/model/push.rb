@@ -5,19 +5,82 @@ require_relative '../query.rb'
 require_relative '../client.rb'
 require 'active_model_serializers'
 module Parse
-
+  # This class represents the API to send push notification to devices that are
+  # available in the Installation table. Push notifications are implemented
+  # through the `Parse::Push` class. To send push notifications through the
+  # REST API, you must enable `REST push enabled?` option in the `Push
+  # Notification Settings` section of the `Settings` page in your Parse
+  # application. Push notifications targeting uses the Installation Parse
+  # class to determine which devices receive the notification. You can provide
+  # any query constraint, similar to using `Parse::Query`, in order to target
+  # the specific set of devices you want given the columns you have configured
+  # in your `Installation` class. The `Parse::Push` class supports many other
+  # options not listed here.
+  # @example
+  #
+  #   push = Parse::Push.new
+  #   push.send( "Hello World!") # to everyone
+  #
+  #   # simple channel push
+  #   push = Parse::Push.new
+  #   push.channels = ["addicted2salsa"]
+  #   push.send "You are subscribed to Addicted2Salsa!"
+  #
+  #   # advanced targeting
+  #   push = Parse::Push.new( {..where query constraints..} )
+  #   # or use `where()`
+  #   push.where :device_type.in => ['ios','android'], :location.near => some_geopoint
+  #   push.alert = "Hello World!"
+  #   push.sound = "soundfile.caf"
+  #
+  #   # additional payload data
+  #   push.data = { uri: "app://deep_link_path" }
+  #
+  #   # Send the push
+  #   push.send
+  #
+  #
   class Push
     include Client::Connectable
-    attr_accessor :query, :alert, :badge, :sound, :title, :data
-    attr_accessor :expiration_time, :expiration_interval, :push_time, :channels
+
+    # @!attribute [rw] query
+    # Sending a push notification is done by performing a query against the Installation
+    # collection with a Parse::Query. This query contains the constraints that will be
+    # sent to Parse with the push payload.
+    #   @return [Parse::Query] the query containing Installation constraints.
+
+    # @!attribute [rw] alert
+    #   @return [String]
+    # @!attribute [rw] badge
+    #   @return [Integer]
+    # @!attribute [rw] sound
+    #   @return [String] the name of the sound file
+    # @!attribute [rw] title
+    #   @return [String]
+    # @!attribute [rw] data
+    #   @return [Hash] specific payload data.
+    # @!attribute [rw] expiration_time
+    #   @return [Parse::Date]
+    # @!attribute [rw] expiration_interval
+    #   @return [Integer]
+    # @!attribute [rw] push_time
+    #   @return [Parse::Date]
+    # @!attribute [rw] channels
+    #   @return [Array] an array of strings for subscribed channels.
+    attr_accessor :query, :alert, :badge, :sound, :title, :data,
+    :expiration_time, :expiration_interval, :push_time, :channels
 
     alias_method :message, :alert
     alias_method :message=, :alert=
 
+    # Send a push notification using a push notification hash
+    # @param payload [Hash] a push notification hash payload
     def self.send(payload)
       client.push payload.as_json
     end
 
+    # Initialize a new push notification request.
+    # @param constraints [Hash] a set of query constraints
     def initialize(constraints = {})
       self.where constraints
     end
@@ -26,6 +89,8 @@ module Parse
       @query ||= Parse::Query.new(Parse::Model::CLASS_INSTALLATION)
     end
 
+    # @!attribute [rw] where
+    #   @return [Hash] a hash of 'where' query constraints
     def where=(where_clausees)
       query.where where_clauses
     end
@@ -37,7 +102,7 @@ module Parse
     end
 
     def channels=(list)
-      @channels = [list].flatten
+      @channels = Array.wrap(list)
     end
 
     def data=(h)
@@ -48,14 +113,19 @@ module Parse
       end
     end
 
+    # @return [Hash] a JSON encoded hash.
     def as_json(*args)
       payload.as_json
     end
 
+    # @return [String] a JSON encoded string.
     def to_json(*args)
       as_json.to_json
     end
 
+    # This method takes all the parameters of the instance and creates a proper
+    # hash structure, required by Parse, in order to process the push notification.
+    # @return [Hash] the prepared push payload to be used in the request.
     def payload
       msg = {
         data: {
@@ -91,6 +161,8 @@ module Parse
       msg
     end
 
+    # helper method to send a message
+    # @param message [String] the message to send
     def send(message = nil)
       @alert = message if message.is_a?(String)
       @data = message if message.is_a?(Hash)

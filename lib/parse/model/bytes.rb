@@ -6,31 +6,37 @@ require 'active_support/core_ext/object'
 require_relative "model"
 require 'base64'
 
-# Support for Bytes type in Parse
+
 module Parse
 
+  # Support for the Bytes type in Parse
   class Bytes < Model
     ATTRIBUTES = {__type: :string, base64: :string }.freeze
+    # @return [String] the base64 string representing the content
     attr_accessor :base64
-    def parse_class; TYPE_BYTES; end;
+    # @return [TYPE_BYTES]
+    def self.parse_class; TYPE_BYTES; end;
+    # @return [TYPE_BYTES]
     def parse_class; self.class.parse_class; end;
     alias_method :__type, :parse_class
 
     # initialize with a base64 string or a Bytes object
+    # @param bytes [String] The content as base64 string.
     def initialize(bytes = "")
       @base64 = (bytes.is_a?(Bytes) ? bytes.base64 : bytes).dup
     end
 
+    # @return [Hash]
     def attributes
       ATTRIBUTES
     end
 
-    # takes a string and base64 encodes it
+    # Base64 encode and set the instance contents
     def encode(s)
       @base64 = Base64.encode64(s)
     end
 
-    # decode the internal data
+    # Get the content as decoded base64 bytes
     def decoded
       Base64.decode64(@base64 || "")
     end
@@ -43,7 +49,7 @@ module Parse
       end
     end
 
-    # two Bytes objects are equal if they have the same base64 signature
+    # Two Parse::Bytes objects are equal if they have the same base64 signature
     def ==(u)
       return false unless u.is_a?(self.class)
       @base64 == u.base64

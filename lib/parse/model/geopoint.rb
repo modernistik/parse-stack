@@ -5,31 +5,54 @@ require_relative "model"
 
 module Parse
 
-  # A basic geo location object in Parse. It represents a location on a map through a
-  # latitude and longitue.
+  # This class manages the GeoPoint data type that Parse provides to support
+  # geo-queries. To define a GeoPoint property, use the `:geopoint` data type.
+  # Please note that latitudes should not be between -90.0 and 90.0, and
+  # longitudes should be between -180.0 and 180.0.
+  # @example
+  #   class PlaceObject < Parse::Object
+  #     property :location, :geopoint
+  #   end
+  #
+  #   san_diego = Parse::GeoPoint.new(32.8233, -117.6542)
+  #   los_angeles = Parse::GeoPoint.new [34.0192341, -118.970792]
+  #   san_diego == los_angeles # false
+  #
+  #   place = PlaceObject.new
+  #   place.location = san_diego
+  #   place.save
+  #
   class GeoPoint < Model
     ATTRIBUTES = {  __type: :string, latitude: :float, longitude: :float }.freeze
-    attr_accessor :latitude, :longitude
+
+    # @return [Float] latitude value between -90.0 and 90.0
+    attr_accessor :latitude
+    # @return [Float] longitude value between -180.0 and 180.0
+    attr_accessor :longitude
     FIELD_LAT = "latitude"
     FIELD_LNG = "longitude"
-    # Latitude should not be -90.0 or 90.0.
-    # Longitude should not be -180.0 or 180.0.
+
     LAT_MIN = -90.0
     LAT_MAX = 90.0
     LNG_MIN = -180.0
     LNG_MAX = 180.0
+
     alias_method :lat, :latitude
     alias_method :lng, :longitude
+    # @return [Model::TYPE_GEOPOINT]
     def self.parse_class; TYPE_GEOPOINT; end;
+    # @return [Model::TYPE_GEOPOINT]
     def parse_class; self.class.parse_class; end;
     alias_method :__type, :parse_class
-    # To create a GeoPoint, you can either pass a hash (ex. {latitude: 32, longitue: -117})
-    # or an array (ex. [32,-117]) as the first parameter.
-    # You may also pass a GeoPoint object or both a lat/lng pair (Ex. GeoPoint.new(32, -117) )
-    # Points should not equal or exceed the extreme ends of the ranges.
 
-    # Attempting to use GeoPoint’s with latitude and/or longitude outside these ranges will cause an error.
-
+    # The initializer can create a GeoPoint with a hash, array or values.
+    # @example
+    #  san_diego = Parse::GeoPoint.new(32.8233, -117.6542)
+    #  san_diego = Parse::GeoPoint.new [32.8233, -117.6542]
+    #  san_diego = Parse::GeoPoint.new { latitude: 32.8233, longitude: -117.6542}
+    #
+    # @param latitude [Numeric] The latitude value between LAT_MIN and LAT_MAX.
+    # @param longitude [Numeric] The longitude value between LNG_MIN and LNG_MAX.
     def initialize(latitude = nil, longitude = nil)
       @latitude = @longitude = 0.0
       if latitude.is_a?(Hash) || latitude.is_a?(Array)
@@ -45,6 +68,7 @@ module Parse
       _validate_point
     end
 
+    # @!visibility private
     def _validate_point
 
       unless @latitude.nil? || @latitude.between?(LAT_MIN, LAT_MAX)
@@ -59,10 +83,13 @@ module Parse
 
     end
 
+    # @return [Hash]
     def attributes
       ATTRIBUTES
     end
 
+    # Helper method for performing geo-queries with radial miles constraints
+    # @return [Array] containing [lat,lng,miles]
     def max_miles(m)
       m = 0 if m.nil?
       [@latitude,@longitude,m]
@@ -92,28 +119,55 @@ module Parse
       _validate_point
     end
 
+    # @return [Boolean] true if two geopoints are equal based on lat and lng.
     def ==(g)
       return false unless g.is_a?(GeoPoint)
       @latitude == g.latitude && @longitude == g.longitude
     end
 
+    # Helper method for reducing the precision of a geopoint.
+    # @param precision [Integer] The number of floating digits to keep.
+    # @return [GeoPoint] Reduces the precision of a geopoint.
     def estimated(precision = 2)
       Parse::GeoPoint.new(@latitude.to_f.round(precision), @longitude.round(precision))
     end
 
+    # Returns a tuple containing latitude and longitude
+    # @return [Array]
     def to_a
       [@latitude,@longitude]
     end
 
+    # @!visibility private
     def inspect
       "#<GeoPoint [#{@latitude},#{@longitude}]>"
     end
 
-    # either GeoPoint, array or lat,lng
+    # Calculate the distance in miles to another GeoPoint using Haversine.
+    # You may also call this method with a latitude and longitude.
+    # @example
+    #   point.distance_in_miles(geotpoint)
+    #   point.distance_in_miles(lat, lng)
+    #
+    # @param geopoint [GeoPoint]
+    # @param lng [Float] Longitude assuming that the first parameter
+    # is longitude instead of a GeoPoint.
+    # @return [Float] number of miles between geopoints.
+    # @see #distance_in_km
     def distance_in_miles(geopoint,lng = nil)
       distance_in_km(geopoint, lng) * 0.621371
     end
 
+    # Calculate the distance in kilometers to another GeoPoint using Haversine
+    # method. You may also call this method with a latitude and longitude.
+    # @example
+    #   point.distance_in_km(geotpoint)
+    #   point.distance_in_km(lat, lng)
+    #
+    # @param geopoint [GeoPoint]
+    # @param lng [Float] Longitude assuming that the first parameter is a latitude instead of a GeoPoint.
+    # @return [Float] number of miles between geopoints.
+    # @see #distance_in_miles
     def distance_in_km(geopoint,lng = nil)
       unless geopoint.is_a?(Parse::GeoPoint)
         geopoint = Parse::GeoPoint.new(geopoint, lng)
