@@ -104,7 +104,7 @@ module Parse
       # If a string is used for initializing, treat it as JSON
       res = JSON.parse(res) if res.is_a?(String)
       # If it is a hash (or parsed JSON), then parse the result.
-      parse_result(res) if res.is_a?(Hash)
+      parse_result!(res) if res.is_a?(Hash)
       # if the result is an Array, then most likely it is a set of responses
       # from using a Batch API.
       if res.is_a?(Array)
@@ -139,7 +139,7 @@ module Parse
     # This method takes the result hash and determines if it is a regular
     # parse query result, object result or a count result. The response should
     # be a hash either containing the result data or the error.
-    def parse_result(h)
+    def parse_result!(h)
       @result = {}
       return unless h.is_a?(Hash)
       @code = h[CODE]
@@ -153,7 +153,7 @@ module Parse
       end
 
     end
-    alias_method :parse_result!, :parse_result
+    alias_method :parse_results!, :parse_result!
 
     # true if the response is successful.
     # @see #error?

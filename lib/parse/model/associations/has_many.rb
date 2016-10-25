@@ -104,6 +104,9 @@ module Parse
               results.send(m, *args, &chained_block)
             end
 
+            query.define_singleton_method(:to_s) { self.results.to_s }
+            query.define_singleton_method(:inspect) { self.results.to_a.inspect }
+
             return query if block.nil?
             query.results(&block)
           end
