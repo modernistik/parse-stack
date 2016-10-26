@@ -33,6 +33,7 @@ module Parse
     def parse_class; self.class.parse_class; end;
     alias_method :__type, :parse_class
 
+    # @return [Hash]
     def attributes
       ATTRIBUTES
     end

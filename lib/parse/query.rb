@@ -12,28 +12,131 @@ require 'active_support/inflector'
 require 'active_support/core_ext'
 
 module Parse
-  # This is the main engine behind making Parse queries on tables. It takes
-  # a set of constraints and generatse the proper hash parameters that are passed
-  # to a client :get request in order to retrive the results.
-  # The design of querying is based on ruby DataMapper orm where we define
-  # symbols with specific methos attached to values.
-  # At the core of each item is a Parse::Operation. An operation is
+  # The {Parse::Query} class provides the lower-level querying interface for
+  # your Parse collections by utilizing the {http://parseplatform.github.io/docs/rest/guide/#queries
+  # REST Querying interface}. This is the main engine behind making Parse queries
+  # on remote collections. It takes a set of constraints and generates the
+  # proper hash parameters that are passed to an API request in order to retrive
+  # matching results. The querying design pattern is inspired from
+  # {http://datamapper.org/ DataMapper} where symbols are overloaded with
+  # specific methods with attached values.
+  #
+  # At the core of each item is a {Parse::Operation}. An operation is
   # made up of a field name and an operator. Therefore calling
   # something like :name.eq, defines an equality operator on the field
-  # name. Using Parse::Operations with values, we can build different types of
-  # constraints - as Parse::Constraint
-
-
+  # name. Using {Parse::Operation}s with values, we can build different types of
+  # constraints, known as {Parse::Constraint}s.
+  #
+  # This component can be used on its own without defining your models as all
+  # results are provided in hash form.
+  #
+  # *Field-Formatter*
+  #
+  # By convention in Ruby (see
+  # {https://github.com/bbatsov/ruby-style-guide#snake-case-symbols-methods-vars Style Guide}),
+  # symbols and variables are expressed in lower_snake_case form. Parse, however,
+  # prefers column names in {String#columnize} format (ex. `objectId`,
+  # `createdAt` and `updatedAt`). To keep in line with the style
+  # guides between the languages, we do the automatic conversion of the field
+  # names when compiling the query. This feature can be overridden by changing the
+  # value of {Parse::Query.field_formatter}.
+  #
+  #  # default uses :columnize
+  #  query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+  #  query.compile_where # => {"fieldOne"=>1, "fieldTwo"=>2, "fieldThree"=>3}
+  #
+  #  # turn off
+  #  Parse::Query.field_formatter = nil
+  #  query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+  #  query.compile_where # => {"field_one"=>1, "FieldTwo"=>2, "Field_Three"=>3}
+  #
+  #  # force everything camel case
+  #  Parse::Query.field_formatter = :camelize
+  #  query = Parse::User.query :field_one => 1, :FieldTwo => 2, :Field_Three => 3
+  #  query.compile_where # => {"FieldOne"=>1, "FieldTwo"=>2, "FieldThree"=>3}
+  #
+  # Most of the constraints supported by Parse are available to `Parse::Query`.
+  # Assuming you have a column named `field`, here are some examples. For an
+  # explanation of the constraints, please see
+  # {http://parseplatform.github.io/docs/rest/guide/#queries Parse Query Constraints documentation}.
+  # You can build your own custom query constraints by creating a `Parse::Constraint`
+  # subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
   class Query
     extend  ::ActiveModel::Callbacks
     include Parse::Client::Connectable
     include Enumerable
+    # @!group Callbacks
+    #
+    # @!method before_prepare
+    #   A callback called before the query is compiled
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!method after_prepare
+    #   A callback called after the query is compiled
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!endgroup
     define_model_callbacks :prepare, only: [:after, :before]
     # A query needs to be tied to a Parse table name (Parse class)
     # The client object is of type Parse::Client in order to send query requests.
     # You can modify the default client being used by all Parse::Query objects by setting
     # Parse::Query.client. You can override individual Parse::Query object clients
     # by changing their client variable to a different Parse::Client object.
+
+    # @!attribute [rw] table
+    #  @return [String] the name of the Parse collection to query against.
+    # @!attribute [rw] client
+    #  @return [Parse::Client] the client to use for the API Query request.
+    # @!attribute [rw] key
+    #  This parameter is used to support `select` queries where you have to
+    #  pass a `key` parameter for matching different tables.
+    #  @return [String] the foreign key to match against.
+    # @!attribute [rw] cache
+    #  Set whether this query should be cached and for how long. This parameter
+    #  is used to cache queries when using {Parse::Middleware::Caching}. If
+    #  the caching middleware is configured, all queries will be cached for the
+    #  duration allowed by the cache, and therefore some queries could return
+    #  cached results. To disable caching and cached results for this specific query,
+    #  you may set this field to `false`. To specify the specific amount of time
+    #  you want this query to be cached, set a duration (in number of seconds) that
+    #  the caching middleware should cache this request.
+    #  @example
+    #   # find all users with name "Bob"
+    #   query = Parse::Query.new("_User", :name => "Bob")
+    #
+    #   query.cache = true # (default) cache using default cache duration.
+    #
+    #   query.cache = 1.day # cache for 86400 seconds
+    #
+    #   query.cache = false # do not cache or use cache results
+    #
+    #   # You may optionally pass this into the constraint hash.
+    #   query = Parse::Query.new("_User", :name => "Bob", :cache => 1.day)
+    #
+    #  @return [Boolean] if set to true or false on whether it should use the default caching
+    #   length set when configuring {Parse::Middleware::Caching}.
+    #  @return [Integer] if set to a number of seconds to cache this specific request
+    #   with the {Parse::Middleware::Caching}.
+    # @!attribute [rw] use_master_key
+    #  True or false on whether we should send the master key in this request. If
+    #  You have provided the master_key when initializing Parse, then all requests
+    #  will send the master key by default. This feature is useful when you want to make
+    #  a particular query be performed with public credentials, or on behalf of a user using
+    #  a {session_token}. Default is set to true.
+    #  @see #session_token
+    #  @example
+    #   # disable use of the master_key in the request.
+    #   query = Parse::Query.new("_User", :name => "Bob", :master_key => false)
+    #  @return [Boolean] whether we should send the master key in this request.
+    # @!attribute [rw] session_token
+    #  Set the session token to send with this API request. A session token is tied to
+    #  a logged in {Parse::User}. When sending a session_token in the request,
+    #  this performs the query on behalf of the user (with their allowed priviledges).
+    #  @example
+    #   # perform this query as user represented by session_token
+    #   query = Parse::Query.new("_User", :name => "Bob", :session_token => "r:XyX123...")
+    #  @note Using a session_token automatically disables sending the master key in the request.
+    #  @return [String] the session token to send with this API request.
     attr_accessor :table, :client, :key, :cache, :use_master_key, :session_token
 
     # We have a special class method to handle field formatting. This turns
@@ -45,14 +148,18 @@ module Parse
     # in lower case). You can specify a different method to call by setting the Parse::Query.field_formatter
     # variable with the symbol name of the method to call on the object. You can set this to nil
     # if you do not want any field formatting to be performed.
+
     @field_formatter = :columnize
     class << self
-      # Parse by convention uses lowercase-first camelcase syntax for field/column names, but ruby
+      # The method to use when converting field names to Parse column names. Default is {String#columnize}.
+      # By convention Parse uses lowercase-first camelcase syntax for field/column names, but ruby
       # uses snakecase. To support this methodology we process all field constraints through the method
-      # defined by the field formatter.
-      # @return [Symbol] The filter method to process column and field names. Default `:columnize`.
+      # defined by the field formatter. You may set this to nil to turn off this functionality.
+      # @return [Symbol] The filter method to process column and field names. Default {String#columnize}.
       attr_accessor :field_formatter
 
+      # @param str [String] the string to format
+      # @return [String] formatted string using {Parse::Query.field_formatter}.
       def format_field(str)
         res = str.to_s.strip
         if field_formatter.present? && res.respond_to?(field_formatter)
@@ -61,18 +168,48 @@ module Parse
         res
       end
 
-      # Simple way to create a query.
-      def all(table, constraints = {})
-        self.new(table, {limit: :max}.merge(constraints) )
+      # Helper method to create a query with constraints for a specific Parse collection.
+      # Also sets the default limit count to `:max`.
+      # @param table [String] the name of the Parse collection to query. (ex. "_User")
+      # @param constraints [Hash] a set of query constraints.
+      # @return [Query] a new query for the Parse collection with the passed in constraints.
+      def all(table, constraints = {limit: :max})
+        self.new(table, constraints.reverse_merge({limit: :max}))
+      end
+
+      # This methods takes a set of constraints and merges them to build a final
+      # `where` constraint clause for sending to the Parse backend.
+      # @param where [Array] an array of {Parse::Constraint} objects.
+      # @return [Hash] a hash representing the compiled query
+      def compile_where(where)
+        constraint_reduce( where )
+      end
+
+      # @!visibility private
+      def constraint_reduce(clauses)
+        # @todo Need to add proper constraint merging
+        clauses.reduce({}) do |clause, subclause|
+          #puts "Merging Subclause: #{subclause.as_json}"
+
+          clause.deep_merge!( subclause.as_json || {} )
+          clause
+        end
       end
 
     end
 
+    # @!attribute [r] client
+    # @return [Parse::Client] the client to use for making the API request.
+    # @see Parse::Client::Connectable
     def client
       # use the set client or the default client.
       @client ||= self.class.client
     end
 
+    # Clear a specific clause of this query. This can be one of: :where, :order,
+    # :includes, :skip, :limit, :count, :keys or :results.
+    # @param item [:Symbol] the clause to clear.
+    # @return [self]
     def clear(item = :results)
       case item
       when :where
@@ -93,10 +230,27 @@ module Parse
         @keys = []
       end
       @results = nil
-
-      self
+      self # chaining
     end
 
+    # Constructor method to create a query with constraints for a specific Parse collection.
+    # Also sets the default limit count to `:max`.
+    # @overload new(table)
+    #   Create a query for this Parse collection name.
+    #   @example
+    #     Parse::Query.new "_User"
+    #     Parse::Query.new "_Installation", :device_type => 'ios'
+    #   @param table [String] the name of the Parse collection to query. (ex. "_User")
+    #   @param constraints [Hash] a set of query constraints.
+    # @overload new(parseSubclass)
+    #   Create a query for this Parse model (or anything that responds to {Parse::Object.parse_class}).
+    #   @example
+    #     Parse::Query.new Parse::User
+    #     # assume Post < Parse::Object
+    #     Parse::Query.new Post, like_count.gt => 0
+    #   @param parseSubclass [Parse::Object] the Parse model constant
+    #   @param constraints [Hash] a set of query constraints.
+    # @return [Query] a new query for the Parse collection with the passed in constraints.
     def initialize(table, constraints = {})
       table = table.to_s.to_parse_class if table.is_a?(Symbol)
       table = table.parse_class if table.respond_to?(:parse_class)
@@ -112,9 +266,11 @@ module Parse
       @cache = true
       @use_master_key = true
       conditions constraints
-      self # chaining
     end # initialize
 
+    # Add a set of query expressions and constraints.
+    # @param expressions
+    # @return [self]
     def conditions(expressions = {})
       expressions.each do |expression, value|
         if expression == :order
@@ -148,12 +304,29 @@ module Parse
       @table = t.to_s.camelize
     end
 
-    # returns the query parameter for the particular clause
+    # returns the query clause for the particular clause
+    # @param clause_name [Symbol] One of supported clauses to return: :keys,
+    #  :where, :order, :includes, :limit, :skip
+    # @return [Object] the content of the clause for this query.
     def clause(clause_name = :where)
       return unless [:keys, :where, :order, :includes, :limit, :skip].include?(clause_name)
       instance_variable_get "@#{clause_name}".to_sym
     end
 
+    # Restrict the fields returned by the query. This is useful for larger query
+    # results set where some of the data will not be used, which reduces network
+    # traffic and deserialization performance.
+    # @example
+    #  # results only contain :name field
+    #  Song.all :keys => :name
+    #
+    #  # multiple keys
+    #  Song.all :keys => [:name,:artist]
+    # @note Use this feature with caution when working with the results, as
+    #    values for the fields not specified in the query will be omitted in
+    #    the resulting object.
+    # @param fields [Array] the name of the fields to return.
+    # @return [self]
     def keys(*fields)
       @keys ||= []
       fields.flatten.each do |field|
@@ -166,6 +339,16 @@ module Parse
       self # chaining
     end
 
+    # Add a sorting order for the query.
+    # @example
+    #  # order updated_at ascending order
+    #  Song.all :order => :updated_at
+    #
+    #  # first order by highest like_count, then by ascending name.
+    #  # Note that ascending is the default if not specified (ex. `:name.asc`)
+    #  Song.all :order => [:like_count.desc, :name]
+    # @param ordering [Parse::Order] an ordering
+    # @return [self]
     def order(*ordering)
       @order ||= []
       ordering.flatten.each do |order|
@@ -179,6 +362,13 @@ module Parse
       self #chaining
     end #order
 
+    # Use with limit to paginate through results. Default is 0 with
+    # maximum value being 10,000.
+    # @example
+    #  # get the next 3 songs after the first 10
+    #  Song.all :limit => 3, :skip => 10
+    # @param count [Integer] The number of records to skip.
+    # @return [self]
     def skip(count)
       #  min <= count <= max
       @skip = [ 0, count.to_i, 10_000].sort[1]
@@ -186,6 +376,19 @@ module Parse
       self #chaining
     end
 
+    # Limit the number of objects returned by the query. The default is 100, with
+    # Parse allowing a maximum of 1000. The framework also allows a value of
+    # `:max`. Utilizing this will have the framework continually intelligently
+    # utilize `:skip` to continue to paginate through results until an empty
+    # result set is received or the `:skip` limit is reached (10,000). When
+    # utilizing `all()`, `:max` is the default option for `:limit`.
+    # @example
+    #  Song.all :limit => 1 # same as Song.first
+    #  Song.all :limit => 1000 # maximum allowed by Parse
+    #  Song.all :limit => :max # up to 11,000 records (theoretical).
+    # @param count [Integer,Symbol] The number of records to return. You may pass :max
+    #  to get as many as 11_000 records with the aid if skipping.
+    # @return [self]
     def limit(count)
       if count == :max || count == :all
         @limit = 11_000
@@ -205,6 +408,19 @@ module Parse
       self #chaining
     end
 
+    # Set a list of Parse Pointer columns to be fetched for matching records.
+    # You may chain multiple columns with the `.` operator.
+    # @example
+    #  # assuming an 'Artist' has a pointer column for a 'Manager'
+    #  # and a Song has a pointer column for an 'Artist'.
+    #
+    #  # include the full artist object
+    #  Song.all(:includes => [:artist])
+    #
+    #  # Chaining - fetches the artist and the artist's manager for matching songs
+    #  Song.all :includes => ['artist.manager']
+    # @param fields [Array] the list of Pointer columns to fetch.
+    # @return [self]
     def includes(*fields)
       @includes ||= []
       fields.flatten.each do |field|
@@ -216,14 +432,27 @@ module Parse
       @results = nil if fields.count > 0
       self # chaining
     end
-    alias_method :include, :includes
 
+    # Combine a list of {Parse::Constraint} objects
+    # @param list [Array<Parse::Constraint>] an array of Parse::Constraint subclasses.
+    # @return [self]
     def add_constraints(list)
       list = Array.wrap(list).select { |m| m.is_a?(Parse::Constraint) }
       @where = @where + list
       self
     end
 
+    # Add a constraint to the query. This is mainly used internally for compiling constraints.
+    # @example
+    #  # add where :field equals "value"
+    #  query.add_constraint(:field.eq, "value")
+    #
+    #  # add where :like_count is greater than 20
+    #  query.add_constraint(:like_count.gt, 20)
+    #
+    # @param operator [Parse::Operator] an operator object containing the operation and operand.
+    # @param value [Object] the value for the constraint.
+    # @return [self]
     def add_constraint(operator, value = nil, **opts)
       @where ||= []
       constraint = operator # assume Parse::Constraint
@@ -246,10 +475,26 @@ module Parse
       self #chaining
     end
 
+    # @return [Array<Parse::Constraint>] an array of constraints
+    #  composing the :where clause for this query.
     def constraints
       @where
     end
 
+    # Add additional query constraints to the `where` clause. The `where` clause
+    # is based on utilizing a set of constraints on the defined column names in
+    # your Parse classes. The constraints are implemented as method operators on
+    # field names that are tied to a value. Any symbol/string that is not one of
+    # the main expression keywords described here will be considered as a type of
+    # query constraint for the `where` clause in the query.
+    # @example
+    #  # parts of a single where constraint
+    #  { :column.constraint => value }
+    # @see Parse::Constraint
+    # @param conditions [Hash] a set of constraints for this query.
+    # @param opts [Hash] a set of options when adding the constraints. This is
+    #  specific for each Parse::Constraint.
+    # @return [self]
     def where(conditions = nil, opts = {})
       return @where if conditions.nil?
       if conditions.is_a?(Hash)
@@ -260,6 +505,12 @@ module Parse
       self #chaining
     end
 
+    # Combine two where clauses into an OR constraint. Equivalent to the `$or`
+    # Parse query operation. This is useful if you want to find objects that
+    # match several queries. We overload the `|` operator in order to have a
+    # clean syntax for joining these `or` operations.
+    # @param where_clauses [Array<Parse::Constraint>] a list of Parse::Constraint objects to combine.
+    # @return [Query] the combined query with an OR clause.
     def or_where(where_clauses = [])
       where_clauses = where_clauses.where if where_clauses.is_a?(Parse::Query)
       where_clauses = Parse::Query.new(@table, where_clauses ).where if where_clauses.is_a?(Hash)
@@ -281,6 +532,8 @@ module Parse
       self #chaining
     end
 
+    # @see #or_where
+    # @return [Query] the combined query with an OR clause.
     def |(other_query)
         raise ArgumentError, "Parse queries must be of the same class #{@table}." unless @table == other_query.table
         copy_query = self.clone
@@ -288,6 +541,16 @@ module Parse
         copy_query
     end
 
+    # Perform a count query.
+    # @example
+    #  # get number of songs with a play_count > 10
+    #  Song.count :play_count.gt => 10
+    #
+    #  # same
+    #  query = Parse::Query.new("Song")
+    #  query.where :play_count.gt => 10
+    #  query.count
+    # @return [Integer] the count result
     def count
       old_value = @count
       @count = 1
@@ -357,6 +620,7 @@ module Parse
       results
     end
 
+    # @!visibility private
     def _opts
       opts = {}
       opts[:cache] = self.cache || false
@@ -438,20 +702,6 @@ module Parse
 
     def compile_where
       self.class.compile_where( @where || [] )
-    end
-
-    def self.compile_where(where)
-      constraint_reduce( where )
-    end
-
-    def self.constraint_reduce(clauses)
-      # TODO: Need to add proper constraint merging
-      clauses.reduce({}) do |clause, subclause|
-        #puts "Merging Subclause: #{subclause.as_json}"
-
-        clause.deep_merge!( subclause.as_json || {} )
-        clause
-      end
     end
 
     def print

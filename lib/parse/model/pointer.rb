@@ -132,7 +132,8 @@ module Parse
 
       # This method is a general implementation that gets overriden by Parse::Object subclass.
       # Given the class name and the id, we will go to Parse and fetch the actual record, returning the
-      # JSON object. Note that the subclass implementation does something a bit different.
+      # JSON object.
+      # @return [Parse::Object] the fetched Parse::Object, nil otherwise.
       def fetch
         response = client.fetch_object(parse_class, id)
         return nil if response.error?
@@ -141,7 +142,7 @@ module Parse
 
       # Two Parse::Pointers (or Parse::Objects) are equal if both of them have
       # the same Parse class and the same id.
-      # @return [Boolean] true if
+      # @return [Boolean]
       def ==(o)
         return false unless o.is_a?(Pointer)
         #only equal if the Parse class and object ID are the same.
@@ -160,21 +161,21 @@ end
 # extensions
 class Array
   # This method maps all the ids (String) of all Parse::Objects in the array.
-  # @return [Array] an array of strings of ids.
+  # @return [Array<String>] an array of strings of ids.
   def objectIds
     map { |m| m.is_?(Parse::Pointer) ? m.id : nil }.compact
   end
 
   # Filter all objects in the array that do not inherit from Parse::Pointer or
   # Parse::Object.
-  # @return [Array] an array of Parse::Objects.
+  # @return [Array<Parse::Object,Parse::Pointer>] an array of Parse::Objects.
   def valid_parse_objects
     select { |s| s.is_a?(Parse::Pointer) }
   end
 
   # Convert all potential objects in the array to a list of Parse::Pointer instances.
   # The array can contain a mixture of objects types including JSON Parse-like hashes.
-  # @return [Array] an array of Parse::Pointer objects.
+  # @return [Array<Parse::Pointer>] an array of Parse::Pointer objects.
   def parse_pointers(table = nil)
     self.map do |m|
       #if its an exact Parse::Pointer

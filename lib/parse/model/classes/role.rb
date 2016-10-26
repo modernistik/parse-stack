@@ -5,15 +5,15 @@ require_relative 'user'
 module Parse
   # This class represents the data and columns contained in the standard Parse `_Role` collection.
   class Role < Parse::Object
-    # @return [Model::CLASS_ROLE]
+    
     parse_class Parse::Model::CLASS_ROLE
     # @return [String] the name of this role.
     property :name
     # The roles Parse relation provides a mechanism to create a hierarchical inheritable types of permissions
     # by assigning child roles.
-    # @return [RelationCollectionProxy] a collection of Roles.
+    # @return [RelationCollectionProxy<Role>] a collection of Roles.
     has_many :roles, through: :relation
-    # @return [RelationCollectionProxy] a Parse relation of users belonging to this role.
+    # @return [RelationCollectionProxy<User>] a Parse relation of users belonging to this role.
     has_many :users, through: :relation
 
     before_save do

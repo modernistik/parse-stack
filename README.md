@@ -226,7 +226,7 @@ The architecture of `Parse::Stack` is broken into four main components.
 This class is the core and low level API for the Parse SDK REST interface that is used by the other components. It can manage multiple sessions, which means you can have multiple client instances pointing to different Parse Applications at the same time. It handles sending raw requests as well as providing Request/Response objects for all API handlers. The connection engine is Faraday, which means it is open to add any additional middleware for features you'd like to implement.
 
 ### Parse::Query
-This class implements the [Parse REST Querying](https://parse.com/docs/rest/guide#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
+This class implements the [Parse REST Querying](http://parseplatform.github.io/docs/rest/guide/#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
 
 ### Parse::Object
 This component is main class for all object relational mapping subclasses for your application. It provides features in order to map your remote Parse records to a local ruby object. It implements the Active::Model interface to provide a lot of additional features, CRUD operations, querying, including dirty tracking, JSON serialization, save/destroy callbacks and others. While we are overlooking some functionality, for simplicity, you will mainly be working with Parse::Object as your superclass. While not required, it is highly recommended that you define a model (Parse::Object subclass) for all the Parse classes in your application.
@@ -1029,7 +1029,8 @@ user.band_by_status(false)
 #### Has Many
 Parse has many ways to implement one-to-many and many-to-many associations: `Array`, `Parse Relation` or through a `Query`. How you decide to implement your associations, will affect how `has_many` works in Parse-Stack. Parse natively supports one-to-many and many-to-many relationships using `Array` and `Relations`, as described in [Relational Data](https://parseplatform.github.io/docs/js/guide/#relational-data). Both of these methods require you define a specific column type in your Parse table that will be used to store information about the association.
 
-In addition to `Array` and `Relation`, Parse-Stack also implements the standard `has_many` behavior prevalent in other frameworks through a query where the associated class contains a foreign pointer to the local class, usually the inverse of a `belongs_to`. This requires that the associated class
+In addition to `Array` and `Relation`, Parse-Stack also implements the standard `has_many` behavior prevalent in other frameworks through a query where the associated class contains a foreign pointer to the local class, usually the inverse of a `belongs_to`. This requires that the associated class has a defined column
+that contains a pointer the refers to the defining class.
 
 ##### Query
 In this implementation, a `has_many` association for a Parse class requires that another Parse class will have a foreign pointer that refers to instances of this class. This is the standard way that `has_many` relationships work in most databases systems. This is usually the case when you have a class that has a `belongs_to` relationship to instances of the local class.
@@ -1147,7 +1148,7 @@ Other than the use of arrays, Parse supports native one-to-many and many-to-many
 2. Querying the relation is actually performed against the implicit join table, not the local one.
 3. Applying query constraints for a set of records within a relation is performed against the foreign table class, not the class having the relational column.
 
-The Parse documentation provides more details on associations, see [Parse Relations Guide](https://parse.com/docs/ios/guide#relations). Parse-Stack will handle the work for (2) and (3) automatically.
+The Parse documentation provides more details on associations, see [Parse Relations Guide](http://parseplatform.github.io/docs/ios/guide/#relations). Parse-Stack will handle the work for (2) and (3) automatically.
 
 In the example below, a `Band` can have thousands of `Fans`. We setup a `Relation<Fan>` column in the `Band` class that references the `Fan` class. Parse-Stack provides methods to manage the relationship under the [Parse::RelationCollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/relation_collection_proxy.rb) class.
 
@@ -1581,7 +1582,7 @@ When a query API is made, the results are cached in the query object in case you
 ```
 
 ### Counting
-If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead. As a reminder, there are a few [caveats to counting records as detailed by Parse](https://parse.com/docs/rest/guide#queries-counting-objects).
+If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead. 
 
 ```ruby
  # get number of songs with a play_count > 10
@@ -1672,7 +1673,7 @@ Song.all limit: 3, use_master_key: false
 ```
 
 #### :session_token
-A Parse session token string. If you would like to perform a query as a particular user, you may pass their session token in the query. This will make sure that the query is performed on behalf (and with the priviledges) of that user which will cause record ACLs to be enforced. If a session token is provided, caching will be disabled for this request.
+A Parse session token string. If you would like to perform a query as a particular user, you may pass their session token in the query. This will make sure that the query is performed on behalf (and with the privileges) of that user which will cause record ACLs to be enforced. If a session token is provided, caching will be disabled for this request.
 
 ```ruby
 # disable sending the master key in the request if configured

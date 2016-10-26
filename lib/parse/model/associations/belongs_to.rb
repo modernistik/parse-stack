@@ -6,20 +6,111 @@ require_relative 'collection_proxy'
 require_relative 'pointer_collection_proxy'
 require_relative 'relation_collection_proxy'
 
-# BelongsTo relation is the simplies association in which the local
-# table constains a column that points to a foreign table record using
-# a given Parse Pointer. The key of the property is implied to be the
-# name of the class/parse table that contains the foreign associated record.
-# All belongs to relationship column types have the special data type of :pointer.
+
 module Parse
   module Associations
-
+    # This association creates a one-to-one association with another Parse model.
+    # BelongsTo relation is the simplies association in which the local
+    # Parse table constains a column that has a Parse::Pointer to a foreign table record.
+    #
+    # This association says that this class contains a foreign pointer column
+    # which references a different class. Utilizing the `belongs_to` method in
+    # defining a property in a Parse::Object subclass sets up an association
+    # between the local table and a foreign table. Specifying the `belongs_to`
+    # in the class, tells the framework that the Parse table contains a local
+    # column in its schema that has a reference to a record in a foreign table.
+    # The argument to `belongs_to` should be the singularized version of the
+    # foreign Parse::Object class. you should specify the foreign table as the
+    # snake_case singularized version of the foreign table class.
+    #
+    # Note that the reverse relationship on the foreign class is not generated automatically.
+    # You can use a `has_one` on the foreign model to create it.
+    # @example
+    #  class Author < Parse::Object
+    #  	property :name
+    #  end
+    #
+    #
+    #  class Post < Parse::Object
+    #  	belongs_to :author
+    #  end
+    #
+    #  Post.references # => {:author=>"Author"}
+    #
+    #  post = Post.first
+    #  post.author? # => true if has a pointer
+    #
+    #  # Follow the author pointer and get name
+    #  post.author.name
+    #
+    #  other_author = Author.first
+    #  # change author by setting new pointer
+    #  post.author = other_author
+    #  post.save
+    #
+    # @see Parse::Associations::HasOne
+    # @see Parse::Associations::HasMany
     module BelongsTo
 
+      # @!attribute [rw] self.references
+      #  A hash mapping of all belongs_to associations for this model.
+      #  @return [Hash]
+
+      # @!method key?
+      # A dynamically generated method based on the value of `key` passed to the
+      # belongs_to method, which returns true if this instance has a pointer for
+      # this field.
+      # @example
+      #
+      #  class Post < Parse::Object
+      #  	belongs_to :author # generates 'author?'
+      #  end
+      #
+      #  post = Post.new
+      #  post.author? # => false
+      #  post.author = Author.new
+      #  post.author? # => true
+      # @return [Boolean] true if field contains a Parse::Pointer or subclass.
+
+
+      # @!method self.belongs_to(key, opts = {})
+      # Creates a one-to-one association with another Parse model.
+      # @param [Symbol] key The singularized version of the foreign class and the name of the
+      #   local column in the remote Parse table where the pointer is stored.
+      # @option opts [Symbol] :field override the name of the remote column
+      #  where the pointer is stored. By default this is inferred as
+      #  the columnized of the key parameter.
+      # @option opts [Symbol] :as override the inferred Parse::Object subclass.
+      #  By default this is inferred as the singularized camel case version of
+      #  the key parameter. This option allows you to override the typecast of
+      #  foreign Parse model of the association, while allowing you to have a
+      #  different accessor name.
+      # @option opts [Boolean] :required Setting to `true`, automatically creates
+      #   an ActiveModel validation of `validates_presence_of` for the
+      #   association. This will not prevent the save, but affects the validation
+      #   check when `valid?` is called on an instance. Default is false.
+      # @example
+      #  # Assumes 'Artist' is foreign class.
+      #  belongs_to :artist
+      #
+      #  # uses Parse::User as foreign class
+      #  belongs_to :manager, as: :user
+      #
+      #  # sets attribute name to `featured_song` for foreign class Song with the remote
+      #  # column name in Parse as 'theFeaturedSong'.
+      #  belongs_to :featured_song, as: :song, field: :theFeaturedSong
+      #
+      # @see String#columnize
+      # @see #key?
+      # @return [Parse::Object] a Parse::Object subclass when using the accessor
+      #  when fetching the association.
+
+      # @!visibility private
       def self.included(base)
         base.extend(ClassMethods)
       end
 
+      # @!visibility private
       module ClassMethods
         attr_accessor :references
         # We can keep references to all "belong_to" properties
@@ -27,9 +118,6 @@ module Parse
           @references ||= {}
         end
 
-        # belongs_to :featured_song, as: :song, field: :featuredSong, through: :reference
-        # belongs_to :artist
-        # belongs_to :manager, as: :user
         # These items are added as attributes with the special data type of :pointer
         def belongs_to(key, opts = {})
           opts = {as: key, field: key.to_s.camelize(:lower), required: false}.merge(opts)

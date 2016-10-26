@@ -146,6 +146,7 @@ module Parse
     # with the final object. This will return a dirty tracked Parse::Object subclass,
     # that will have information on which fields have changed between the previous state
     # in the persistent store and the one about to be saved.
+    # @param pristine [Boolean] whether the object should be returned without dirty tracking.
     # @return [Parse::Object] a dirty tracked Parse::Object subclass instance
     def parse_object(pristine = false)
       return nil unless object?

@@ -12,7 +12,7 @@ module Parse
   # installations which have subscribed to one or more push notification channels.
   # @see Push
   class Installation < Parse::Object
-    # @return [Model::CLASS_INSTALLATION]
+
     parse_class Parse::Model::CLASS_INSTALLATION
     # This field only has meaning for Android installations that use the GCM
     # push type. It is reserved for directing Parse to send pushes to this

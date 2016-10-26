@@ -51,24 +51,29 @@ module Parse
   # The implementation of this class is large and has been broken up into several modules.
   #
   # Properties:
+  #
   # All columns in a Parse object are considered a type of property (ex. string, numbers, arrays, etc)
   # except in two cases - Pointers and Relations. For the list of basic supported data types, please see the
   # Properties module variable Parse::Properties::TYPES . When defining a property,
   # dynamic methods are created that take advantage of all the ActiveModel
   # plugins (dirty tracking, callbacks, json, etc).
   #
-  # Associations (BelongsTo):
-  # This module adds support for creating an association between one object to another using a
-  # Parse object pointer. By defining a belongs_to relationship in a specific class, it implies
-  # that the remote Parse table contains a local column, which has a pointer, referring to another
-  # Parse table.
+  # Associations:
   #
-  # Associations (HasMany):
-  # In Parse there are two ways to deal with one-to-many and many-to-many relationships
-  # One is through an array of pointers (which is recommended to be less than 100) and
-  # through an intermediary table called a Relation (or a Join table in other languages.)
-  # The way Parse::Objects treat these associations different from defining a :property of array type, is
-  # by making sure items in the array as of a particular class cast type.
+  # Parse supports a three main types of relational associations. One type of
+  # relation is the `One-to-One` association. This is implemented through a
+  # specific column in Parse with a Pointer data type. This pointer column,
+  # contains a local value that refers to a different record in a separate Parse
+  # table. This association is implemented using the `:belongs_to` feature. The
+  # second association is of `One-to-Many`. This is implemented is in Parse as a
+  # Array type column that contains a list of of Parse pointer objects. It is
+  # recommended by Parse that this array does not exceed 100 items for performance
+  # reasons. This feature is implemented using the `:has_many` operation with the
+  # plural name of the local Parse class. The last association type is a Parse
+  # Relation. These can be used to implement a large `Many-to-Many` association
+  # without requiring an explicit intermediary Parse table or class. This feature
+  # is also implemented using the `:has_many` method but passing the option of `:relation`.
+  #
   #
   # Querying:
   # The querying module provides all the general methods to be able to find and query a specific
@@ -96,6 +101,37 @@ module Parse
     def __type; Parse::Model::TYPE_OBJECT; end;
 
     # Default ActiveModel::Callbacks
+    # @!group Callbacks
+    #
+    # @!method before_create
+    #   A callback called before the object has been created.
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!method after_create
+    #   A callback called after the object has been created.
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!method before_save
+    #   A callback called before the object is saved.
+    #   @note This is not related to a Parse beforeSave webhook trigger.
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!method after_save
+    #   A callback called after the object has been successfully saved.
+    #   @note This is not related to a Parse afterSave webhook trigger.
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!method before_destroy
+    #   A callback called before the object is about to be deleted.
+    #   @note This is not related to a Parse beforeDelete webhook trigger.
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!method after_destroy
+    #   A callback called after the object has been successfully deleted.
+    #   @note This is not related to a Parse afterDelete webhook trigger.
+    #   @yield A block to execute for the callback.
+    #   @see ActiveModel::Callbacks
+    # @!endgroup
     define_model_callbacks :create, :save, :destroy, only: [:after, :before]
 
     attr_accessor :created_at, :updated_at, :acl
@@ -106,20 +142,20 @@ module Parse
     # the remote Parse table is named 'Artist'. You may override this behavior by utilizing the `parse_class(<className>)` method
     # to set it to something different.
     class << self
-      # @!attribute [rw] disable_serialized_string_date
-      # Disables returning a serialized string date properties when encoding to JSON.
-      # This affects created_at and updated_at fields in order to be backwards compatible with old SDKs.
-      #   @return [Boolean]
-      attr_accessor :disable_serialized_string_date
 
-      attr_accessor :parse_class, :acl
+      attr_accessor :disable_serialized_string_date, :parse_class, :acl
+
+      # @!attribute [rw] disable_serialized_string_date
+      #  Disables returning a serialized string date properties when encoding to JSON.
+      #  This affects created_at and updated_at fields in order to be backwards compatible with old SDKs.
+      #  @return [Boolean]
 
       # The class method to override the implicitly assumed Parse collection name
       # in your Parse database. The default Parse collection name is the singular form
       # of the ruby Parse::Object subclass name. The Parse class value should match to
       # the corresponding remote table in your database in order to properly store records and
       # perform queries.
-      ## @example
+      # @example
       #  class Song < Parse::Object; end;
       #  class Artist < Parse::Object
       #    parse_class "Musician" # remote collection name
@@ -129,13 +165,11 @@ module Parse
       #  Song.parse_class # => 'Song'
       #  Artist.parse_class # => 'Musician'
       #
-      # @param c [String] the name of the remote collection
-      # @return [String]
-      def parse_class(c = nil)
+      # @param remoteName [String] the name of the remote collection
+      # @return [String] the name of the Parse collection for this model.
+      def parse_class(remoteName = nil)
         @parse_class ||= model_name.name
-        unless c.nil?
-          @parse_class = c.to_s
-        end
+        @parse_class = remoteName.to_s unless remoteName.nil?
         @parse_class
       end
 
@@ -165,16 +199,24 @@ module Parse
     # The main constructor for subclasses. It can take different parameter types
     # including a String and a JSON hash. Assume a `Post` class that inherits
     # from Parse::Object:
-    # @example
-    #  # using an object id
-    #  Post.new "1234"
+    # @note Should only be called with Parse::Object subclasses.
+    # @overload new(id)
+    #   Create a new object with an objectId. This method is useful for creating
+    #   an unfetched object (pointer-state).
+    #   @example
+    #     Post.new "1234"
+    #   @param id [String] The object id.
+    # @overload new(hash = {})
+    #   Create a new object with Parse JSON hash.
+    #   @example
+    #    # JSON hash from Parse
+    #    Post.new({"className" => "Post", "objectId" => "1234", "title" => "My Title"})
     #
-    #  # using a JSON hash
-    #  Post.new({"className" => "Post", "objectId" => "1234"})
+    #    post = Post.new title: "My Title"
+    #    post.title # => "My Title"
     #
-    #  # or regular ruby
-    #  Post.new field: "value"
-    #
+    #   @param hash [Hash] the hash representing the object
+    # @return [Parse::Object] a the corresponding Parse::Object or subclass.
     def initialize(opts = {})
       if opts.is_a?(String) #then it's the objectId
         @id = opts.to_s
@@ -247,7 +289,7 @@ module Parse
     # is a helper method in a webhook afterSave to know if this object was recently
     # saved in the beforeSave webhook.
     # @note You should not use this method inside a beforeSave webhook.
-    # @return [Boolean] true if the last beforeSave webhook successfuly saved this object for the first time.
+    # @return [Boolean] true if the last beforeSave webhook successfully saved this object for the first time.
     def existed?
       if @id.blank? || @created_at.blank? || @updated_at.blank?
         return false
@@ -324,6 +366,15 @@ module Parse
     # @note If a Parse class object hash is encoutered for which we don't have a
     #       corresponding Parse::Object subclass for, a Parse::Pointer will be returned instead.
     #
+    # @example
+    #   # assume you have defined Post subclass
+    #   post = Parse::Object.build({"className" => "Post", "objectId" => '1234'})
+    #   post # => #<Post:....>
+    #
+    #   # if you know the table name
+    #   post = Parse::Object.build({"title" => "My Title"}, "Post")
+    #   # or
+    #   post = Post.build({"title" => "My Title"})
     # @param json [Hash] a JSON hash that contains a Parse object.
     # @param table [String] the Parse class for this hash. If not passed it will be detected.
     # @return [Parse::Object] an instance of the Parse subclass
@@ -381,6 +432,7 @@ module Parse
 
   end
 
+
 end
 
 class Array
@@ -388,19 +440,20 @@ class Array
   # Parse::Pointer or are a JSON Parse hash. If it is a hash, a Pare::Object will be built from it
   # if it constains the proper fields. Non-convertible objects will be removed.
   # If the className is not contained or known, you can pass a table name as an argument
-  # @return [Array] an array of Parse::Object subclasses.
-  def parse_objects(table = nil)
+  # @param className [String] the name of the Parse class if it could not be detected.
+  # @return [Array<Parse::Object>] an array of Parse::Object subclasses.
+  def parse_objects(className = nil)
     f = Parse::Model::KEY_CLASS_NAME
     map do |m|
       next m if m.is_a?(Parse::Pointer)
-      if m.is_a?(Hash) && (m[f] || m[:className] || table)
-        next Parse::Object.build m, (m[f] || m[:className] || table)
+      if m.is_a?(Hash) && (m[f] || m[:className] || className)
+        next Parse::Object.build m, (m[f] || m[:className] || className)
       end
       nil
     end.compact
   end
 
-  # @return [Array] an array of objectIds for all objects that are Parse::Objects.
+  # @return [Array<String>] an array of objectIds for all objects that are Parse::Objects.
   def parse_ids
     parse_objects.map(&:id)
   end

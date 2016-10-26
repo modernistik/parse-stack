@@ -39,7 +39,7 @@ module Parse
       end
 
       # Registers all webhook functions registered with Parse::Stack with Parse server.
-      # @param endpoing [String] an https url that points to the webhook server.
+      # @param endpoint [String] a https url that points to the webhook server.
       def register_functions!(endpoint)
 
         unless endpoint.present? && endpoint.starts_with?('https://')
@@ -66,7 +66,8 @@ module Parse
       end
 
       # Registers all webhook triggers registered with Parse::Stack with Parse server.
-      # @param endpoing [String] an https url that points to the webhook server.
+      # @param endpoint [String] a https url that points to the webhook server.
+      # @param include_wildcard [Boolean] Allow wildcard registrations
       def register_triggers!(endpoint, include_wildcard: false)
 
         unless endpoint.present? && endpoint.starts_with?('https://')

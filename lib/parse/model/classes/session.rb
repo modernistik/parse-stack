@@ -10,7 +10,7 @@ module Parse
   # user for that session. Deleting a Session record (and session token), effectively logs out the user, when making Parse requests
   # on behalf of the user using the session token.
   class Session < Parse::Object
-    # @return [Model::CLASS_SESSION]
+
     parse_class Parse::Model::CLASS_SESSION
     # @return [Hash] data on how this Session was created.
     property :created_with, :object

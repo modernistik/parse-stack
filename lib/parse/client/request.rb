@@ -23,7 +23,9 @@ module Parse
     # @!attribute [rw] cache
     #   @return [Boolean]
     attr_accessor :method, :path, :body, :headers, :opts, :cache
+
     # @!visibility private
+    # Used to correlate batching requests with their responses.
     attr_accessor :tag
 
     # Creates a new request
@@ -73,7 +75,7 @@ module Parse
     def inspect
         "#<#{self.class} @method=#{@method} @path='#{@path}'>"
     end
-    
+
     # @return [String]
     def to_s
       "#{@method.to_s.upcase} #{@path}"

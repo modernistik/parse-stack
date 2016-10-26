@@ -7,7 +7,7 @@ require 'active_support/core_ext'
 module Parse
 
   module API
-    #object fetch methods
+    # REST API methods for fetching CRUD operations on Parse objects.
     module Objects
 
       CLASS_PATH_PREFIX = "classes/"

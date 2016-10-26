@@ -7,21 +7,31 @@ require 'active_support/inflector'
 require 'active_support/core_ext/object'
 require_relative 'collection_proxy'
 
-# A PointerCollectionProxy is a collection proxy that only allows Parse Pointers (Objects)
-# to be part of the collection. This is done by typecasting the collection to a particular
-# Parse class. Ex. An Artist may have several Song objects. Therefore an Artist could have a
-# column :songs, that is an array (collection) of Song (Parse::Object) objects.
-# Because this collection is typecasted, we can do some more interesting things.
-module Parse
 
+module Parse
+  # A PointerCollectionProxy is a collection proxy that only allows Parse Pointers (Objects)
+  # to be part of the collection. This is done by typecasting the collection to a particular
+  # Parse class. Ex. An Artist may have several Song objects. Therefore an Artist could have a
+  # column :songs, that is an array (collection) of Song (Parse::Object subclass) objects.
   class PointerCollectionProxy < CollectionProxy
 
+    # @!attribute [rw] collection
+    #  The internal backing store of the collection.
+    # @return [Array<Parse::Object>]
+    # @see CollectionProxy#collection
     def collection=(c)
       notify_will_change!
       @collection = c
     end
-    # When we add items, we will verify that they are of type Parse::Pointer at a minimum.
-    # If they are not, and it is a hash, we check to see if it is a Parse hash.
+
+    # Add Parse::Objects to the collection.
+    # @overload add(parse_object)
+    #  Add a Parse::Object or Parse::Pointer to this collection.
+    #  @param parse_object [Parse::Object,Parse::Pointer] the object to add
+    # @overload add(parse_objects)
+    #  Add an array of Parse::Objects or Parse::Pointers to this collection.
+    #  @param parse_objects [Array<Parse::Object,Parse::Pointer>] the array to append.
+    # @return [Array<Parse::Object>] the collection
     def add(*items)
       notify_will_change! if items.count > 0
       items.flatten.parse_objects.each do |item|
@@ -30,7 +40,14 @@ module Parse
       @collection
     end
 
-    # removes items from the collection
+    # Removes Parse::Objects from the collection.
+    # @overload remove(parse_object)
+    #  Remove a Parse::Object or Parse::Pointer to this collection.
+    #  @param parse_object [Parse::Object,Parse::Pointer] the object to remove
+    # @overload remove(parse_objects)
+    #  Remove an array of Parse::Objects or Parse::Pointers from this collection.
+    #  @param parse_objects [Array<Parse::Object,Parse::Pointer>] the array of objects to remove.
+    # @return [Array<Parse::Object>] the collection
     def remove(*items)
       notify_will_change! if items.count > 0
       items.flatten.parse_objects.each do |item|
@@ -39,36 +56,51 @@ module Parse
       @collection
     end
 
+    # Atomically add a set of Parse::Objects to this collection.
+    # This is done by making the API request directly with Parse server; the
+    # local object is not updated with changes.
+    # @see CollectionProxy#add!
+    # @see #add_unique!
     def add!(*items)
       super(items.flatten.parse_pointers)
     end
 
+    # Atomically add a set of Parse::Objects to this collection for those not already
+    # in the collection.
+    # This is done by making the API request directly with Parse server; the
+    # local object is not updated with changes.
+    # @see CollectionProxy#add_unique!
+    # @see #add!
     def add_unique!(*items)
       super(items.flatten.parse_pointers)
     end
 
+    # Atomically remove a set of Parse::Objects to this collection.
+    # This is done by making the API request directly with Parse server; the
+    # local object is not updated with changes.
+    # @see CollectionProxy#remove!
     def remove!(*items)
       super(items.flatten.parse_pointers)
     end
 
-    # We define a fetch and fetch! methods on array
-    # that contain pointer objects. This will make requests for each object
-    # in the array that is of pointer state (object with unfetch data) and fetch
-    # them in parallel.
-
+    # Force fetch the set of pointer objects in this collection.
+    # @see Array.fetch_objects!
     def fetch!
       collection.fetch_objects!
     end
 
+    # Fetch the set of pointer objects in this collection.
+    # @see Array.fetch_objects
     def fetch
       collection.fetch_objects
     end
-    # Even though we may have full Parse Objects in the collection, when updating
-    # or storing them in Parse, we actually just want Parse::Pointer objects.
+
+    # Encode the collection as a JSON object of Parse::Pointers.
     def as_json(*args)
       collection.parse_pointers.as_json
     end
 
+    # @return [Array<Parse::Pointer>] an array of pointers representing this collection.
     def parse_pointers
       collection.parse_pointers
     end
