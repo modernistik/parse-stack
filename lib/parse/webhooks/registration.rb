@@ -93,7 +93,7 @@ module Parse
           classNames = routes[trigger].keys.dup
           if include_wildcard && classNames.include?('*') #then create the list for all classes
             classNames.delete '*' #delete the wildcard before we expand it
-            classNames = classNames + Parse.registered_classes
+            classNames = classNames + Parse.registered_classes - ['_Session']
             classNames.uniq!
           end
 
