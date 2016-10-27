@@ -12,6 +12,7 @@
 - Proactively deletes possible matching cache keys on non GET requests.
 - Parse::File now has a `force_ssl` option that makes sure all urls returned are `https`.
 - Documentation
+- ParseConstraintError is now Parse::ConstraintError.
 
 ### 1.5.1
 - BREAKING CHANGE: The default `has_many` implementation is `:query` instead of `:array`.
@@ -65,7 +66,7 @@
 - Added new `ServiceUnavailableError` exception for Parse error code 2 and HTTP 503 errors.
 - Upon a `ServiceUnavailableError`, we will retry the request one more time after 2 seconds.
 - `:not_in` and `:contains_all` queries will format scalar values into an array.
-- `:exists` and `:null` will raise `ParseConstraintError` if non-boolean values are passed.
+- `:exists` and `:null` will raise `ConstraintError` if non-boolean values are passed.
 - NEW: `:id` constraint to allow passing an objectId to a query where we will infer the class.
 
 ### 1.3.7

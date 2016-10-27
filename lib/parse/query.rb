@@ -509,6 +509,16 @@ module Parse
     # Parse query operation. This is useful if you want to find objects that
     # match several queries. We overload the `|` operator in order to have a
     # clean syntax for joining these `or` operations.
+    # @example
+    #  query = Player.where(:wins.gt => 150)
+    #  query.or_where(:wins.lt => 5)
+    #  # where wins > 150 || wins < 5
+    #  results = query.results
+    #
+    #  # or_query = query1 | query2 | query3 ...
+    #  # ex. where wins > 150 || wins < 5
+    #  query = Player.where(:wins.gt => 150) | Player.where(:wins.lt => 5)
+    #  results = query.results
     # @param where_clauses [Array<Parse::Constraint>] a list of Parse::Constraint objects to combine.
     # @return [Query] the combined query with an OR clause.
     def or_where(where_clauses = [])
@@ -559,36 +569,47 @@ module Parse
       res
     end
 
+    # @yield a block yield for each object in the result
+    # @return [Array]
+    # @see Array#each
     def each
        return results.enum_for(:each) unless block_given? # Sparkling magic!
        results.each(&Proc.new)
     end
 
+    # @yield a block yield for each object in the result
+    # @return [Array]
+    # @see Array#map
     def map
       return results.enum_for(:map) unless block_given? # Sparkling magic!
       results.map(&Proc.new)
     end
 
+    # @yield a block yield for each object in the result
+    # @return [Array]
+    # @see Array#select
     def select
       return results.enum_for(:select) unless block_given? # Sparkling magic!
       results.select(&Proc.new)
     end
 
+    # @return [Array]
+    # @see Array#to_a
     def to_a
       results.to_a
     end
 
-    def select
-      return results.enum_for(:select) unless block_given? # Sparkling magic!
-      results.select(&Proc.new)
-    end
-
+    # @param limit [Integer] the number of first items to return.
+    # @return [Parse::Object] the first object from the result.
     def first(limit = 1)
       @results = nil if @limit != limit
       @limit = limit
       limit == 1 ? results.first : results.first(limit)
     end
 
+    # max_results is used to iterate through as many API requests as possible using
+    # :skip and :limit paramter.
+    # @!visibility private
     def max_results(raw: false)
       compiled_query = compile
       query_limit = compiled_query[:limit] ||= 1_000
@@ -598,10 +619,9 @@ module Parse
       results = []
 
       iterations.times do |idx|
-        #puts "Fetching 1000 after #{compiled_query[:skip]}"
         response = fetch!( compiled_query )
         break if response.error? || response.results.empty?
-        #puts "Appending #{response.results.count} results..."
+
         items = response.results
         items = decode(items) unless raw
 
@@ -633,6 +653,9 @@ module Parse
       opts
     end
 
+    # Performs the fetch request for the query.
+    # @param compiled_query [Hash] the compiled query
+    # @return [Parse::Response] a response for a query request.
     def fetch!(compiled_query)
 
       response = client.find_objects(@table, compiled_query.as_json, _opts )
@@ -643,6 +666,27 @@ module Parse
     end
     alias_method :execute!, :fetch!
 
+    # Executes the query and builds the result set of Parse::Objects that matched.
+    # When this method is passed a block, the block is yielded for each matching item
+    # in the result, and the items are not returned. This methodology is more performant
+    # as large quantifies of objects are fetched in batches and all of them do
+    # not have to be kept in memory after the query finishes executing. This is the recommended
+    # method of processing large result sets.
+    # @example
+    #  query = Parse::Query.new("_User", :created_at.before => DateTime.now)
+    #  users = query.results # => Array of Parse::User objects.
+    #
+    #  query = Parse::Query.new("_User", limit: :max)
+    #
+    #  query.results do |user|
+    #   # recommended; more memory efficient
+    #  end
+    #
+    # @param raw [Boolean] whether to get the raw hash results of the query instead of
+    #   a set of Parse::Object subclasses.
+    # @yield a block to iterate for each object that matched the query.
+    # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
+    # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
     def results(raw: false)
       if @results.nil?
         if @limit.nil? || @limit.to_i <= 1_000
@@ -661,18 +705,32 @@ module Parse
     end
     alias_method :result, :results
 
+    # Builds objects based on the set of Parse JSON hashes in an array.
+    # @param list [Array<Hash>] a list of Parse JSON hashes
+    # @return [Array<Parse::Object>] an array of Parse::Object subclasses.
     def decode(list)
       list.map { |m| Parse::Object.build(m, @table) }.compact
     end
 
+    # @return [Hash]
     def as_json(*args)
       compile.as_json
     end
 
+    # Returns a compiled query without encoding the where clause.
+    # @param includeClassName [Boolean] whether to include the class name of the collection
+    #  in the resulting compiled query.
+    # @return [Hash] a hash representing the prepared query request.
     def prepared(includeClassName: false)
       compile(encode: false, includeClassName: includeClassName)
     end
 
+    # Complies the query and runs all prepare callbacks.
+    # @param encode [Boolean] whether to encode the `where` clause to a JSON string.
+    # @param includeClassName [Boolean] whether to include the class name of the collection.
+    # @return [Hash] a hash representing the prepared query request.
+    # @see #before_prepare
+    # @see #after_prepare
     def compile(encode: true, includeClassName: false)
       run_callbacks :prepare do
         q = {} #query
@@ -700,12 +758,15 @@ module Parse
       end
     end
 
+    # @return [Hash] a hash representing just the `where` clause of this query.
     def compile_where
       self.class.compile_where( @where || [] )
     end
 
-    def print
-      puts JSON.pretty_generate( as_json )
+    # Retruns a formatted JSON string representing the query, useful for debugging.
+    # @return [String]
+    def pretty
+      JSON.pretty_generate( as_json )
     end
 
   end # Query

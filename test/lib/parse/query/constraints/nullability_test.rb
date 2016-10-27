@@ -29,7 +29,7 @@ class TestNullabilityConstraint < Minitest::Test
 
     ["true", 1, nil].each do |value|
       constraint = @klass.new(:field, value)
-      assert_raises(ParseConstraintError) do
+      assert_raises(Parse::ConstraintError) do
         expected = build(value).as_json
         constraint.build.as_json
       end

@@ -2,10 +2,9 @@
 # frozen_string_literal: true
 
 require_relative "properties"
-# This class adds methods to Parse::Objects in order to create a JSON Parse schema
-# in order to support table creation and table alterations.
-module Parse
 
+module Parse
+  # Upgrade all
   def self.auto_upgrade!
     klassModels = Parse::Object.descendants
     klassModels.sort_by { |c| c.parse_class }.each do |klass|

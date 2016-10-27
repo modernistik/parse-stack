@@ -3,8 +3,6 @@
 
 require_relative '../../query'
 
-# This module provides most of the querying methods for Parse Objects.
-# It proxies much of the query methods to the Parse::Query object.
 module Parse
 
   module Querying
@@ -65,6 +63,7 @@ module Parse
       # This query method helper returns a Query object tied to a parse class.
       # The parse class should be the name of the one that will be sent in the query
       # request pointing to the remote table.
+
       def query(constraints = {})
         Parse::Query.new self.parse_class, constraints
       end; alias_method :where, :query
@@ -75,6 +74,7 @@ module Parse
 
       # Most common method to use when querying a class. This takes a hash of constraints
       # and conditions and returns the results.
+
       def all(constraints = {})
         constraints = {limit: :max}.merge(constraints)
         prepared_query = query(constraints)
@@ -86,6 +86,7 @@ module Parse
       # then we treat it as a count.
       # Ex. Object.first( :name => "Anthony" ) (returns single object)
       # Ex. Object.first(3) # first 3 objects (array of 3 objects)
+
       def first(constraints = {})
         fetch_count = 1
         if constraints.is_a?(Numeric)
@@ -99,6 +100,7 @@ module Parse
       end
 
       # creates a count request (which is more performant when counting objects)
+      
       def count(constraints = {})
         query(constraints).count
       end

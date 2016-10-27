@@ -18,7 +18,6 @@ require_relative "api/all"
 
 module Parse
 
-  # This is an exception that is thrown if there is a client connectivity issue.
   class ConnectionError < StandardError; end;
   class TimeoutError < StandardError; end;
   class ProtocolError < StandardError; end;
@@ -28,31 +27,54 @@ module Parse
   class RequestLimitExceededError < StandardError; end;
   class InvalidSessionTokenError < StandardError; end;
 
-  # helper method to get the config variables.
-  def self.config(s = :default)
-    Parse::Client.client(s).config
+  # Retrieve the App specific Parse configuration parameters. The configuration
+  # for a connection is cached after the first request. Use the bang version to
+  # force update from the Parse backend.
+  # @see Parse.config!
+  # @param conn [Symbol] the name of the client connection to use.
+  # @return [Hash] the Parse config hash for the session.
+  def self.config(conn = :default)
+    Parse::Client.client(conn).config
   end
 
-  def self.set_config(field, value, s = :default)
-    Parse::Client.client(s).update_config({ field => value })
+  # Set a parameter in the Parse configuration for an application.
+  # @param field [String] the name configuration variable.
+  # @param value [Object] the value configuration variable. Only Parse types are supported.
+  # @param conn [Symbol] the name of the client connection to use.
+  # @return [Hash] the Parse config hash for the session.
+  def self.set_config(field, value, conn = :default)
+    Parse::Client.client(conn).update_config({ field => value })
   end
 
-  def self.update_config(params, s = :default)
-    Parse::Client.client(s).update_config(params)
+  # Set a key value pairs in the Parse configuration for an application.
+  # @param params [Hash] a set of key value pairs to set in the Parse configuration.
+  # @param conn [Symbol] the name of the client connection to use.
+  # @return [Hash] the Parse config hash for the session.
+  def self.update_config(params, conn = :default)
+    Parse::Client.client(conn).update_config(params)
   end
 
-  def self.config!(s = :default)
-    Parse::Client.client(s).config!
+  # Force fetch updated Parse configuration
+  # @param conn [Symbol] the name of the client connection to use.
+  # @return [Hash] the Parse configuration
+  def self.config!(conn = :default)
+    Parse::Client.client(conn).config!
   end
 
+  # Helper method to get the default Parse client.
+  # @param conn [Symbol] the name of the client connection to use.
+  # @return [Parse::Client] a client object for the connection name.
   def self.client(conn = :default)
     Parse::Client.client(conn)
   end
 
-  # Main class for the client. The client class is based on a Faraday stack.
-  # The Faraday stack is similar to a Rack-style application in which you can define middlewares
-  # that will be called for each request going out and coming back in. We use this in order to setup
-  # some helper middlewares such as encoding to JSON, handling Parse authentication and caching.
+  # This class is the core and low level API for the Parse SDK REST interface that
+  # is used by the other components. It can manage multiple sessions, which means
+  # you can have multiple client instances pointing to different Parse Applications
+  # at the same time. It handles sending raw requests as well as providing
+  # Request/Response objects for all API handlers. The connection engine is
+  # Faraday, which means it is open to add any additional middleware for
+  # features you'd like to implement.
   class Client
     include Parse::API::Objects
     include Parse::API::Config
@@ -68,39 +90,56 @@ module Parse
     RETRY_COUNT = 2
     RETRY_DELAY = 2 #seconds
 
-    attr_accessor :session, :cache
+    # @!attribute cache
+    #  The underlying cache store for caching API requests.
+    #  @return [Moneta::Transformer]
+    # @!attribute [r] application_id
+    #  The Parse application identifier to be sent in every API request.
+    #  @return [String]
+    # @!attribute [r] api_key
+    #  The Parse API key to be sent in every API request.
+    #  @return [String]
+    # @!attribute [r] master_key
+    #  The Parse master key for this application, which when set, will be sent
+    #  in every API request. (There is a way to prevent this on a per request basis.)
+    #  @return [String]
+    # @!attribute [r] server_url
+    #  The Parse server url that will be receiving these API requests. By default
+    #  this will be {Parse::Protocol::SERVER_URL}.
+    #  @return [String]
+    attr_accessor :cache
     attr_reader :application_id, :api_key, :master_key, :server_url
+    alias_method :app_id, :application_id
     # The client can support multiple sessions. The first session created, will be placed
     # under the default session tag. The :default session will be the default client to be used
     # by the other classes including Parse::Query and Parse::Objects
     @clients = { default: nil }
     class << self
+      # @!attribute [r] clients
+      #  A hash of Parse::Client instances.
+      #  @return [Hash<Parse::Client>]
       attr_reader :clients
-      def session?(v = :default)
-          puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
-          self.client? v
+
+      # @param conn [Symbol] the name of the connection.
+      # @return [Boolean] true if a Parse::Client has been configured.
+      def client?(conn = :default)
+        @clients[conn].present?
       end
 
-      # DEPRECATED
-      # get a session for a given tag. This will also create a new one for the tag if not specified.
-      def session(connection = :default)
-        puts '[Warning] Parse::Client#session is DEPRECATED. Please use Parse::Client#client instead.'
-        self.client(connection)
+      # Returns or create a new Parse::Client connection for the given connection
+      # name.
+      # @param conn [Symbol] the name of the connection.
+      # @return [Parse::Client]
+      def client(conn = :default)
+        @clients[conn] ||= self.new
       end
 
-      def client?(v = :default)
-        @clients[v].present?
-      end
-
-      def client(connection = :default)
-        @clients[connection] ||= self.new
-      end
-
+      # Setup the Parse-Stack framework with the appropriate Parse app keys and middleware.
+      # @yield a block for additional configuration
+      # @param opts [Hash] the set of options to configure the :default Parse::Client connection.
+      # @return [Parse::Client]
+      # @see Parse::Client#initialize
       def setup(opts = {})
-        # If Proc.new is called from inside a method without any arguments of
-        # its own, it will return a new Proc containing the block given to
-        # its surrounding method.
-        # http://mudge.name/2011/01/26/passing-blocks-in-ruby-without-block.html
         @clients[:default] = self.new(opts, &Proc.new)
       end
 
@@ -128,7 +167,7 @@ module Parse
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
       if @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
-        raise "Please call Parse.setup(application_id:, api_key:) to setup a session"
+        raise "Please call Parse.setup(application_id:, api_key:) to setup a client"
       end
       @server_url += '/' unless @server_url.ends_with?('/')
       #Configure Faraday
@@ -175,14 +214,12 @@ module Parse
       self
     end
 
-    def app_id
-      @application_id
-    end
-
+    # @return [String] the url prefix of the Parse Server url.
     def url_prefix
       @conn.url_prefix
     end
 
+    # Clear the client cache
     def clear_cache!
       self.cache.clear if self.cache.present?
     end
@@ -318,7 +355,7 @@ module Parse
       request :put, uri, body: body, headers: headers
     end
 
-    # shorthand for request(:delete, uri, body: {})
+    # shorthand for request(:delete, uri, body: {}, headers: {})
     def delete(uri, body = nil, headers = {})
       request :delete, uri, body: body, headers: headers
     end

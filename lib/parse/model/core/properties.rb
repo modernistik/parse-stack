@@ -13,17 +13,16 @@ require 'active_model_serializers'
 require 'active_support/hash_with_indifferent_access'
 require 'time'
 
-=begin
-This module provides support for handling all the different types of column data types
-supported in Parse and mapping them between their remote names with their local ruby named attributes.
-By default, the convention used for naming parameters is that the remote column should be in lower-first-camelcase, (ex. myField, eventAddress), except for
-a few special columns like "id" and "acl".
-Properties are defined when creating subclasses of Parse::Object and using the `property` class method.
 
-By defining properties, dynamic methods are created in order to allow getters and setters to be used. We will go into detail below.
-
-Each class will have a different copy of attribute mapping and field mappings.
-=end
+# This module provides support for handling all the different types of column data types
+# supported in Parse and mapping them between their remote names with their local ruby named attributes.
+# By default, the convention used for naming parameters is that the remote column should be in lower-first-camelcase, (ex. myField, eventAddress), except for
+# a few special columns like "id" and "acl".
+# Properties are defined when creating subclasses of Parse::Object and using the `property` class method.
+#
+# By defining properties, dynamic methods are created in order to allow getters and setters to be used. We will go into detail below.
+#
+# Each class will have a different copy of attribute mapping and field mappings.
 
 module Parse
 

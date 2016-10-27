@@ -1582,7 +1582,7 @@ When a query API is made, the results are cached in the query object in case you
 ```
 
 ### Counting
-If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead. 
+If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead.
 
 ```ruby
  # get number of songs with a play_count > 10

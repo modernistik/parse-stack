@@ -9,7 +9,6 @@ require 'time'
 require 'parallel'
 require_relative '../../client/request'
 
-#This module provides many of the CRUD operations on Parse::Object.
 
 # A Parse::RelationAction is special operation that adds one object to a relational
 # table as to another. Depending on the polarity of the action, the objects are
@@ -46,8 +45,13 @@ end
 # we use temporary Request objects have contain the operation to be performed (in some cases).
 # This allows to group a list of Request methods, into a batch for sending all at once to Parse.
 module Parse
+
+  # An error raised when a save failure occurs.
   class SaveFailureError < StandardError
+    # @return [Parse::Object] the Parse::Object that failed to save.
     attr_reader :object
+
+    # @param object [Parse::Object] the object that failed.
     def initialize(object)
       @object = object
     end

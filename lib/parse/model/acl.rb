@@ -12,9 +12,9 @@
 # JSON structure.
 # The class below also implements a type of delegate pattern in order to inform the main Parse::Object
 # of dirty tracking.
+
 module Parse
 
-  # Base class for supporting custom data types
   class DataType
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON
@@ -33,12 +33,10 @@ module Parse
   end
 
   class ACL < DataType
-    # The internal permissions hash and delegate accessors
-    attr_accessor :permissions, :delegate
-    PUBLIC = "*" # Public priviledges are '*' key in Parse
 
-    # provide a set of acls and the delegate (for dirty tracking)
-    # { '*' => { "read": true, "write": true } }
+    attr_accessor :permissions, :delegate
+    PUBLIC = "*"
+
     def initialize(acls = {}, owner: nil)
       everyone(true, true) # sets Public read/write
       @delegate = owner
@@ -48,7 +46,6 @@ module Parse
 
     end
 
-    # helper
     def self.permission(read, write = nil)
         ACL::Permission.new(read, write)
     end
@@ -63,15 +60,13 @@ module Parse
       permissions.keys.all? { |per| permissions[per] == other_acl.permissions[per] }
     end
 
-    # method to set the Public read/write priviledges ('*'). Alias is 'world'
     def everyone(read, write)
       apply(PUBLIC, read, write)
       permissions[PUBLIC]
     end
     alias_method :world, :everyone
 
-    # dirty tracking. We will tell the delegate through the acl_will_change!
-    # method
+    # dirty tracking. We will tell the delegate through the acl_will_change! method
     def will_change!
       @delegate.acl_will_change! if @delegate.respond_to?(:acl_will_change!)
     end

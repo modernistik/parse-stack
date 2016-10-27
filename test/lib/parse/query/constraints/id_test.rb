@@ -19,7 +19,7 @@ class TestObjectIdConstraint < Minitest::Test
   def test_scalar_values
     [10, nil, true, false].each do |value|
       constraint = @klass.new(:field, value)
-      assert_raises(ParseConstraintError) do
+      assert_raises(Parse::ConstraintError) do
         # all should fail
         constraint.build.as_json
       end

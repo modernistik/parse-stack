@@ -14,30 +14,6 @@ require_relative 'model/object'
 require_relative 'webhooks/payload'
 require_relative 'webhooks/registration'
 
-
-=begin
-  Some methods take a block, and this pattern frequently appears for a block:
-
-  {|x| x.foo}
-  and people would like to write that in a more concise way. In order to do that,
-   a symbol, the method Symbol#to_proc, implicit class casting, and & operator
-   are used in combination. If you put & in front of a Proc instance in the
-   argument position, that will be interpreted as a block. If you combine
-   something other than a Proc instance with &, then implicit class casting
-   will try to convert that to a Proc instance using to_proc method defined on
-   that object if there is any. In case of a Symbol instance, to_proc works in
-   this way:
-
-    :foo.to_proc # => ->x{x.foo}
-
-   For example, suppose you write like this:
-
-    bar(&:foo)
-   The & operator is combined with :foo, which is not a Proc instance, so implicit class cast applies Symbol#to_proc to it, which gives ->x{x.foo}. The & now applies to this and is interpreted as a block, which gives:
-
-   bar{|x| x.foo}
-=end
-
 module Parse
 
   class Object
