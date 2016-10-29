@@ -3,7 +3,9 @@
 
 module Parse
   # @author Anthony Persaud
+  # The Parse Server SDK for Ruby
   module Stack
+    # The current version.
     VERSION = "1.5.3"
   end
 end

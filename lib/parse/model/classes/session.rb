@@ -21,10 +21,14 @@ module Parse
     property :installation_id
     # @return [Boolean] whether this session token is restricted.
     property :restricted, :boolean
-    # @return [String] the session token for this installation and user pair.
+    # @!attribute [r] session_token
+    #  @return [String] the session token for this installation and user pair.
     property :session_token
-    # @return [User] the user corresponding to this session.
-    # @see User
+    # @!attribute [r] user
+    #  This property is mapped as a `belongs_to` association with the {Parse::User}
+    #  class. Every session instance is tied to a specific logged in user.
+    #  @return [User] the user corresponding to this session.
+    #  @see User
     belongs_to :user
 
     # Return the Session record for this session token.

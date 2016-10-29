@@ -4,17 +4,31 @@
 module Parse
 
   module API
-    #object fetch methods
+    # Defines the Schema interface for the Parse REST API
     module Schema
       SCHEMAS_PATH = "schemas"
+
+      # Get the schema for a collection.
+      # @param className [String] the name of the remote Parse collection.
+      # @return [Parse::Response]
       def schema(className)
         request :get, "#{SCHEMAS_PATH}/#{className}"
       end
 
+      # Create a new collection with the specific schema.
+      # @param className [String] the name of the remote Parse collection.
+      # @param schema [Hash] the schema hash. This is a specific format specified by
+      #  Parse.
+      # @return [Parse::Response]
       def create_schema(className, schema)
         request :post, "#{SCHEMAS_PATH}/#{className}", body: schema
       end
 
+      # Update the schema for a collection.
+      # @param className [String] the name of the remote Parse collection.
+      # @param schema [Hash] the schema hash. This is a specific format specified by
+      #  Parse.
+      # @return [Parse::Response]
       def update_schema(className, schema)
         request :put, "#{SCHEMAS_PATH}/#{className}", body: schema
       end

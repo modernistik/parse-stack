@@ -4,15 +4,62 @@
 require_relative '../../query'
 
 module Parse
-
+  # Defines the querying methods applied to a Parse::Object.
   module Querying
 
-    def self.included(base)
-        base.extend(ClassMethods)
-    end
-
-    module ClassMethods
-
+      # This feature is a small subset of the
+      # {http://guides.rubyonrails.org/active_record_querying.html#scopes
+      # ActiveRecord named scopes} feature. Scoping allows you to specify
+      # commonly-used queries which can be referenced as class method calls and
+      # are chainable with other scopes. You can use every {Parse::Query}
+      # method previously covered such as `where`, `includes` and `limit`.
+      #
+      #  class Article < Parse::Object
+      #    property :published, :boolean
+      #    scope :published, -> { query(published: true) }
+      #  end
+      #
+      # This is the same as defining your own class method for the query.
+      #
+      #  class Article < Parse::Object
+      #    def self.published
+      #      query(published: true)
+      #    end
+      #  end
+      #
+      # You can also chain scopes and pass parameters. In addition, boolean and
+      # enumerated properties have automatically generated scopes for you to use.
+      #
+      #  class Article < Parse::Object
+      #    scope :published, -> { query(published: true) }
+      #
+      #    property :comment_count, :integer
+      #    property :category
+      #    property :approved, :boolean
+      #
+      #    scope :published_and_commented, -> { published.where :comment_count.gt => 0 }
+      #    scope :popular_topics, ->(name) { published_and_commented.where category: name }
+      #  end
+      #
+      #  # simple scope
+      #  Article.published # => where published is true
+      #
+      #  # chained scope
+      #  Article.published_and_commented # published is true and comment_count > 0
+      #
+      #  # scope with parameters
+      #  Article.popular_topic("music") # => popular music articles
+      #  # equivalent: where(published: true, :comment_count.gt => 0, category: name)
+      #
+      #  # automatically generated scope
+      #  Article.approved(category: "tour") # => where approved: true, category: 'tour'
+      #
+      # If you would like to turn off automatic scope generation for property types,
+      # set the option `:scope` to false when declaring the property.
+      # @param name [Symbol] the name of the scope.
+      # @param body [Proc] the proc related to the scope.
+      # @raise ArgumentError if body parameter does not respond to `call`
+      # @return [Symbol] the name of the singleton method created.
       def scope(name, body)
         unless body.respond_to?(:call)
           raise ArgumentError, 'The scope body needs to be callable.'
@@ -60,33 +107,59 @@ module Parse
       end
 
 
-      # This query method helper returns a Query object tied to a parse class.
-      # The parse class should be the name of the one that will be sent in the query
-      # request pointing to the remote table.
-
+      # Creates a new {Parse::Query} with the given constraints for this class.
+      # @example
+      #  # assume Post < Parse::Object
+      #  query = Post.query(:updated_at.before => DateTime.now)
+      # @return [Parse::Query] a new query with the given constraints for this
+      #  Parse::Object subclass.
       def query(constraints = {})
         Parse::Query.new self.parse_class, constraints
       end; alias_method :where, :query
 
-      def literal_where(clauses = {})
-        query.where(clauses)
+      # @param conditions (see Parse::Query#where)
+      # @return (see Parse::Query#where)
+      # @see Parse::Query#where
+      def literal_where(conditions = {})
+        query.where(conditions)
       end
 
-      # Most common method to use when querying a class. This takes a hash of constraints
-      # and conditions and returns the results.
-
-      def all(constraints = {})
-        constraints = {limit: :max}.merge(constraints)
+      # Fetch all matching objects in this collection matching the constraints.
+      # This will be the most common way when querying Parse objects for a subclass.
+      # When no block is passed, all objects are returned. Using a block is more memory
+      # efficient as matching objects are fetched in batches and discarded after the iteration
+      # is completed.
+      # @param constraints [Hash] a set of {Parse::Query} constraints.
+      # @yield a block to iterate with each matching object.
+      # @example
+      #
+      #  songs = Song.all( ... expressions ...) # => array of Parse::Objects
+      #  # memory efficient for large amounts of records.
+      #  Song.all( ... expressions ...) do |song|
+      #      # ... do something with song..
+      #  end
+      #
+      # @return [Array<Parse::Object>] an array of matching objects. If a block is passed,
+      #  an empty array is returned.
+      def all(constraints = {limit: :max})
+        constraints = constraints.reverse_merge({limit: :max})
         prepared_query = query(constraints)
         return prepared_query.results(&Proc.new) if block_given?
         prepared_query.results
       end
 
-      # returns the first item matching the constraint. If constraint parameter is numeric,
-      # then we treat it as a count.
-      # Ex. Object.first( :name => "Anthony" ) (returns single object)
-      # Ex. Object.first(3) # first 3 objects (array of 3 objects)
-
+      # Returns the first item matching the constraint.
+      # @overload first(count = 1)
+      #  @param count [Interger] The number of items to return.
+      #  @example
+      #   Object.first(2) # => an array of the first 2 objects in the collection.
+      #  @return [Parse::Object] if count == 1
+      #  @return [Array<Parse::Object>] if count > 1
+      # @overload first(constraints = {})
+      #  @param constraints [Hash] a set of {Parse::Query} constraints.
+      #  @example
+      #   Object.first( :name => "Anthony" )
+      #  @return [Parse::Object] the first matching object.
       def first(constraints = {})
         fetch_count = 1
         if constraints.is_a?(Numeric)
@@ -99,12 +172,20 @@ module Parse
         return res.first fetch_count
       end
 
-      # creates a count request (which is more performant when counting objects)
-      
+      # Creates a count request which is more performant when counting objects.
+      # @example
+      #  # number of songs with a like count greater than 20.
+      #  count = Song.count( :like_count.gt => 20 )
+      # @param constraints (see #all)
+      # @return [Interger] the number of records matching the query.
+      # @see Parse::Query#count
       def count(constraints = {})
         query(constraints).count
       end
 
+      # Find objects matching the constraint ordered by the descending created_at date.
+      # @param constraints (see #all)
+      # @return [Array<Parse::Object>]
       def newest(constraints = {})
         constraints.merge!(order: :created_at.desc)
         _q = query(constraints)
@@ -112,6 +193,9 @@ module Parse
         _q
       end
 
+      # Find objects matching the constraint ordered by the ascending created_at date.
+      # @param constraints (see #all)
+      # @return [Array<Parse::Object>]
       def oldest(constraints = {})
         constraints.merge!(order: :created_at.asc)
         _q = query(constraints)
@@ -119,18 +203,20 @@ module Parse
         _q
       end
 
-      # Find objects based on objectIds. The result is a list (or single item) of the
-      # objects that were successfully found.
-      # Example:
-      # Object.find "<objectId>"
-      # Object.find "<objectId>", "<objectId>"....
-      # Object.find ["<objectId>", "<objectId>"]
-      # Additional named parameters:
-      # type: - :parrallel by default - makes all find requests in parallel vs serial.
-      #         :batch - makes a single query request for all objects with a "contained in" query.
-      # compact: - true by default, removes any nil values from the array as it is potential
-      # that an object with a specified ID does not exist.
-
+      # Find objects for a given objectId in this collection.The result is a list
+      # (or single item) of the objects that were successfully found.
+      # @example
+      #  Object.find "<objectId>"
+      #  Object.find "<objectId>", "<objectId>"....
+      #  Object.find ["<objectId>", "<objectId>"]
+      # @param parse_ids [String] the objectId to find.
+      # @param type [Symbol] the fetching methodology to use if more than one id was passed.
+      #  - *:parallel* : Utilizes parrallel HTTP requests to fetch all objects requested.
+      #  - *:batch* : This uses a batch fetch request using a contained_in clause.
+      # @param compact [Boolean] whether to remove nil items from the returned array for objects
+      #  that were not found.
+      # @return [Parse::Object] if only one id was provided as a parameter.
+      # @return [Array<Parse::Object>] if more than one id was provided as a parameter.
       def find(*parse_ids, type: :parallel, compact: true)
         # flatten the list of Object ids.
         parse_ids.flatten!
@@ -159,8 +245,6 @@ module Parse
 
         as_array ? results : results.first
       end; alias_method :get, :find
-
-    end # ClassMethods
 
   end # Querying
 

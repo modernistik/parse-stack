@@ -11,9 +11,6 @@ require_relative 'constraint'
 # For more information about the query design pattern from DataMapper
 # that inspired this, see http://datamapper.org/docs/find.html
 
-
-
-
 module Parse
   # Error for when there is a problem with the input passed to a constraint.
   class ConstraintError < StandardError; end;

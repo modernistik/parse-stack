@@ -4,59 +4,70 @@
 require 'active_support'
 require 'active_support/inflector'
 
-# The base operation class used in generating queries.
-# An Operation contains an operand (field) and the
-# operator (ex. equals, greater than, etc)
-# Each unique operation type needs a handler that is responsible
-# for creating a Constraint with a given value.
-# When creating a new operation, you need to register the operation
-# method and the class that will be the handler.
+
 module Parse
+
+  # An operation is the core part of {Parse::Constraint} when performing
+  # queries. It contains an operand (the Parse field) and an operator (the Parse
+  # operation). These combined with a value, provide you with a constraint.
+  #
+  # All operation registrations add methods to the Symbol class.
   class Operation
-    attr_accessor :operand, :operator
+
+    # @!attribute operand
+    # The field in Parse for this operation.
+    # @return [Symbol]
+    attr_accessor :operand
+
+    # @!attribute operator
+    # The type of Parse operation.
+    # @return [Symbol]
+    attr_accessor :operator
+
     class << self
+      # @return [Hash] a hash containing all supported Parse operations mapped
+      # to their {Parse::Constraint} subclass.
       attr_accessor :operators
+
       def operators
         @operators ||= {}
       end
     end
-    # a valid Operation has a handler, operand and operator.
+
+    # Whether this operation is defined properly.
     def valid?
       ! (@operand.nil? || @operator.nil? || handler.nil?)
     end
 
-    # returns the constraint class designed to handle this operator
+    # @return [Parse::Constraint] the constraint class designed to handle
+    #  this operator.
     def handler
       Operation.operators[@operator] unless @operator.nil?
     end
 
+    # Create a new operation.
+    # @param field [Symbol] the name of the Parse field
+    # @param op [Symbol] the operator name (ex. :eq, :lt)
     def initialize(field, op)
       self.operand = field.to_sym
       self.operand = :objectId if operand == :id
       self.operator = op.to_sym
     end
 
+    # @!visibility private
     def inspect
       "#{operator.inspect}(#{operand.inspect})"
     end
 
-    # create a new constraint based on the handler that had
+    # Create a new constraint based on the handler that had
     # been registered with this operation.
+    # @param value [Object] a value to pass to the constraint subclass.
+    # @return [Parse::Constraint] a constraint with this operation and value.
     def constraint(value = nil)
       handler.new(self, value)
     end
 
-    # have a way to register an operation type.
-    # Example:
-    # register :eq, MyEqualityHandlerClass
-    # the above registered the equality operator which we define to be
-    # a new method on the Symbol class ('eq'), which when passed a value
-    # we will forward the request to the MyEqualityHandlerClass, so that
-    # for a field called 'name', we can do
-    #
-    # :name.eq (returns operation)
-    # :name.eq(value) # returns constraint provided by the handler
-    #
+    # Register a new symbol operator method mapped to a specific {Parse::Constraint}.
     def self.register(op, klass)
         Operation.operators[op.to_sym] = klass
         Symbol.send :define_method, op do |value = nil|

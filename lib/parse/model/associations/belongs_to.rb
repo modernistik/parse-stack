@@ -8,6 +8,7 @@ require_relative 'relation_collection_proxy'
 
 
 module Parse
+  # Defines all the types of Parse object associations.
   module Associations
     # This association creates a one-to-one association with another Parse model.
     # BelongsTo relation is the simplies association in which the local

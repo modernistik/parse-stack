@@ -4,15 +4,21 @@
 module Parse
 
   module API
-    #object fetch methods
+    # Defines the Config interface for the Parse REST API
     module Config
+      # @return [Hash] the cached config hash for the client.
       attr_accessor :config
       CONFIG_PATH = "config"
+
+      # @return [Hash] force fetch the application configuration hash.
       def config!
         @config = nil
         self.config
       end
 
+      # Return the configuration hash for the configured application for this client.
+      # This method caches the configuration after the first time it is fetched.
+      # @return [Hash] force fetch the application configuration hash.
       def config
         if @config.nil?
           response = request :get, CONFIG_PATH
@@ -23,6 +29,9 @@ module Parse
         @config
       end
 
+      # Update the application configuration
+      # @param params [Hash] the hash of key value pairs.
+      # @return [Boolean] true if the configuration was successfully updated.
       def update_config(params)
         body = { params: params }
         response = request :put, CONFIG_PATH, body: body

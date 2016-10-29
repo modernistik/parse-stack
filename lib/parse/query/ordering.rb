@@ -20,12 +20,15 @@ module Parse
     class Order
       # The Parse operators to indicate ordering direction.
       ORDERING = {asc: '', desc: '-'}.freeze
+
       # @!attribute [rw] field
-      #   @return [Symbol] the name of the field
+      # @return [Symbol] the name of the field
+      attr_accessor :field
+      
       # @!attribute [rw] direction
-      #   The direction of the sorting. This is either `:asc` or `:desc`.
-      #   @return [Symbol]
-      attr_accessor :field, :direction
+      # The direction of the sorting. This is either `:asc` or `:desc`.
+      # @return [Symbol]
+      attr_accessor :direction
 
       def initialize(field, order = :asc)
         @field = field.to_sym || :objectId
@@ -36,16 +39,18 @@ module Parse
         @field = f.to_sym
       end
 
-      # get the Parse keyword for ordering.
+      # @return [String] the sort direction
       def polarity
         ORDERING[@direction] || ORDERING[:asc]
       end # polarity
 
+      # @return [String] the ordering as a string
       def to_s
         "" if @field.nil?
          polarity + @field.to_s
       end
 
+      # @!visibility private
       def inspect
         "#{@direction.to_s}(#{@field.inspect})"
       end

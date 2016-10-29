@@ -8,23 +8,29 @@ require_relative 'protocol'
 require 'active_support'
 require 'active_support/core_ext'
 require 'active_model_serializers'
-# This middleware takes an incoming response (after an outgoing request)
-# and creates a Parse::Response object.
+
 module Parse
   module Middleware
+    # This middleware takes an incoming Parse response, after an outgoing request,
+    # and creates a Parse::Response object.
     class BodyBuilder < Faraday::Middleware
-      class << self
-        attr_accessor :logging
-      end
-
       include Parse::Protocol
       HTTP_OVERRIDE = 'X-Http-Method-Override'
 
+      class << self
+        # Allows logging. Set to `true` to enable logging, `false` to disable.
+        # You may specify `:debug` for additional verbosity.
+        # @return [Boolean]
+        attr_accessor :logging
+      end
+
       # thread-safety
+      # @!visibility private
       def call(env)
         dup.call!(env)
       end
 
+      # @!visibility private
       def call!(env)
         # the maximum url size is ~2KB, so if we request a Parse API url greater than this
         # (which is most likely a very complicated query), we need to override the request method
@@ -55,7 +61,7 @@ module Parse
         @app.call(env).on_complete do |response_env|
           # on a response, create a new Parse::Response and replace the :body
           # of the env
-          # TODO: CHECK FOR HTTP STATUS CODES
+          # @todo CHECK FOR HTTP STATUS CODES
           if self.class.logging
             puts "[[Response #{response_env[:status]}]] ----------------------------------"
             puts response_env.body

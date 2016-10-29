@@ -11,6 +11,7 @@ require 'active_support/core_ext/time/calculations'
 require 'active_support/core_ext'
 require_relative "client/request"
 require_relative "client/response"
+require_relative "client/batch"
 require_relative "client/body_builder"
 require_relative "client/authentication"
 require_relative "client/caching"
@@ -30,6 +31,9 @@ module Parse
   # Retrieve the App specific Parse configuration parameters. The configuration
   # for a connection is cached after the first request. Use the bang version to
   # force update from the Parse backend.
+  # @example
+  #  val = Parse.config["myKey"]
+  #  val = Parse.config["myKey"] # cached
   # @see Parse.config!
   # @param conn [Symbol] the name of the client connection to use.
   # @return [Hash] the Parse config hash for the session.
@@ -38,6 +42,9 @@ module Parse
   end
 
   # Set a parameter in the Parse configuration for an application.
+  # @example
+  #  # update a config with Parse
+  #  Parse.set_config "myKey", "someValue"
   # @param field [String] the name configuration variable.
   # @param value [Object] the value configuration variable. Only Parse types are supported.
   # @param conn [Symbol] the name of the client connection to use.
@@ -47,6 +54,9 @@ module Parse
   end
 
   # Set a key value pairs in the Parse configuration for an application.
+  # @example
+  #   # batch update several
+  #   Parse.update_config({fieldEnabled: true, searchMiles: 50})
   # @param params [Hash] a set of key value pairs to set in the Parse configuration.
   # @param conn [Symbol] the name of the client connection to use.
   # @return [Hash] the Parse config hash for the session.
@@ -134,31 +144,68 @@ module Parse
         @clients[conn] ||= self.new
       end
 
-      # Setup the Parse-Stack framework with the appropriate Parse app keys and middleware.
-      # @yield a block for additional configuration
-      # @param opts [Hash] the set of options to configure the :default Parse::Client connection.
-      # @return [Parse::Client]
-      # @see Parse::Client#initialize
+      # Setup the a new client with the appropriate Parse app keys, middleware and
+      # options.
+      # @example
+      #   Parse.setup app_id: "YOUR_APP_ID",
+      #               api_key: "YOUR_API_KEY",
+      #               master_key: "YOUR_MASTER_KEY", # optional
+      #               server_url: 'https://api.parse.com/1/' #default
+      # @param opts (see Parse::Client#initialize)
+      # @option opts (see Parse::Client#initialize)
+      # @yield the block for additional configuration with Faraday middleware.
+      # @return (see Parse::Client#initialize)
+      # @see Parse::Middleware::BodyBuilder
+      # @see Parse::Middleware::Caching
+      # @see Parse::Middleware::Authentication
+      # @see Parse::Protocol
       def setup(opts = {})
         @clients[:default] = self.new(opts, &Proc.new)
       end
 
     end
 
-    # This builds a new Parse::Client stack. The options are:
-    # required
-    # :application_id -  Parse Application ID. If not set it will be read from the
-    #                    PARSE_APP_ID environment variable
-    # :api_key - the Parse REST API Key. If not set it will be
-    #            read from PARSE_API_KEY environment variable
-    # :master_key - the Parse Master Key (optional). If PARSE_MASTER_KEY env is set
-    #               it will be used.
-    # optional
-    # :logger - boolean - whether to print the requests and responses.
-    # :cache - Moneta::Transformer - if set, it should be a Moneta store instance
-    # :expires - Integer - if set, it should be a Moneta store instance
-    # :adapter - the HTTP adapter to use with Faraday, defaults to Faraday.default_adapter
-    # :host - defaults to Parse::Protocol::SERVER_URL (https://api.parse.com/1/)
+    # Create a new client connected to the Parse Server REST API endpoint.
+    # @param opts [Hash] a set of connection options to configure the client.
+    # @option opts [String] :server_url The server url of your Parse Server if you
+    #   are not using the hosted Parse service. By default it will use
+    #   PARSE_SERVER_URL environment variable available or fall back to
+    #   https://api.parse.com/1/ if not specified.
+    # @option opts [String] :app_id The Parse application id. By default it will
+    #    use PARSE_APP_ID environment variable if not specified.
+    # @option opts [String] :api_key The Parse REST API Key. By default it will
+    #    use PARSE_API_KEY environment variable if not specified.
+    # @option opts [String] :master_key The Parse application master key (optional).
+    #    If this key is set, it will be sent on every request sent by the client
+    #    and your models. By default it will use PARSE_MASTER_KEY environment
+    #    variable if not specified.
+    # @option opts [Boolean] :logging It provides you additional logging information
+    #    of requests and responses. If set to the special symbol of *:debug*, it
+    #    will provide additional payload data in the log messages. This option affects
+    #    the logging performed by {Parse::Middleware::BodyBuilder}.
+    # @option opts [Object] :adapter The connection adapter. By default it uses
+    #    the `Faraday.default_adapter` which is Net/HTTP.
+    # @option opts [Moneta::Transformer] :cache A caching adapter of type
+    #    {https://github.com/minad/moneta Moneta::Transformer} that will be used
+    #    by the caching middleware {Parse::Middleware::Caching}.
+    #    Caching queries and object fetches can help improve the performance of
+    #    your application, even if it is for a few seconds. Only successful GET
+    #    object fetches and non-empty result queries will be cached by default.
+    #    You may set the default expiration time with the expires option.
+    #    At any point in time you may clear the cache by calling the {Parse::Client#clear_cache!}
+    #    method on the client connection. See {https://github.com/minad/moneta Moneta}.
+    # @option opts [Integer] :expires Sets the default cache expiration time
+    #    (in seconds) for successful non-empty GET requests when using the caching
+    #    middleware. The default value is 3 seconds. If :expires is set to 0,
+    #    caching will be disabled. You can always clear the current state of the
+    #    cache using the clear_cache! method on your Parse::Client instance.
+    # @option opts [Hash] :faraday You may pass a hash of options that will be
+    #    passed to the Faraday constructor.
+    # @raise ArgumentError if the cache instance passed to the :cache option is not of Moneta::Transformer.
+    # @see Parse::Middleware::BodyBuilder
+    # @see Parse::Middleware::Caching
+    # @see Parse::Middleware::Authentication
+    # @see Parse::Protocol
     def initialize(opts = {})
       @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
       @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_SERVER_APPLICATION_ID']
@@ -211,7 +258,6 @@ module Parse
 
       end
       Parse::Client.clients[:default] ||= self
-      self
     end
 
     # @return [String] the url prefix of the Parse Server url.
@@ -224,17 +270,62 @@ module Parse
       self.cache.clear if self.cache.present?
     end
 
-    # This is the base method to make raw requests. The first parameter is a symbol
-    # of the type of request - either :get, :put, :post, :delete. The second parameter
-    # is the path api to use. For example, to make a request for objects, you would pass the "/1/classes/<ClassName>".
-    # After the first two parameters, the rest are named parameters. If the request is of type :get, you can pass
-    # any query string parameters in hash form with query:. If it is any other request, the body of the request should be sent
-    # with the body: parameter. Note that the middleware will handle turning the hash sent into the body: parameter into JSON.
-    # If you need to override or add additional headers to a specific request (ex. when uploading a Parse File), you can do so
-    # with the header: paramter (also a hash).
-    # This method also takes in a Parse::Request object instead of the arguments listed above.
+    # Send a REST API request to the server. This is the low-level API used for all requests
+    # to the Parse server with the provided options. Every request sent to Parse through
+    # the client goes through the configured set of middleware that can be modified by applying
+    # different headers or specific options.
+    # This method supports retrying requests a few times when a {Parse::ServiceUnavailableError}
+    # is raised.
+    # @param method [Symbol] The method type of the HTTP request (ex. :get, :post).
+    #   - This parameter can also be a {Parse::Request} object.
+    # @param uri [String] the url path. It should not be an absolute url.
+    # @param body [Hash] the body of the request.
+    # @param query [Hash] the set of url query parameters to use in a GET request.
+    # @param headers [Hash] additional headers to apply to this request.
+    # @param opts [Hash] a set of options to pass through the middleware stack.
+    #  - *:cache* [Integer] the number of seconds to cache this specific request.
+    #    If set to `false`, caching will be disabled completely all together, which means even if
+    #    a cached response exists, it will not be used.
+    #  - *:use_master_key* [Boolean] whether this request should send the master key, if
+    #    it was configured with {Parse.setup}. By default, if a master key was configured,
+    #    all outgoing requests will contain it in the request header. Default `true`.
+    #  - *:session_token* [String] The session token to send in this request. This disables
+    #    sending the master key in the request, and sends this request with the credentials provided by
+    #    the session_token.
+    #  - *:retry* [Integer] The number of retrties to perform if the service is unavailable.
+    #    Set to false to disable the retry mechanism. When performing request retries, the
+    #    client will sleep for a number of seconds ({Parse::Client::RETRY_DELAY}) between requests.
+    #    The default value is {Parse::Client::RETRY_COUNT}.
+    # @raise Parse::AuthenticationError when HTTP response status is 401 or 403
+    # @raise Parse::TimeoutError when HTTP response status is 400 or
+    #   408, and the Parse code is 143 or {Parse::Response::ERROR_TIMEOUT}.
+    # @raise Parse::ConnectionError when HTTP response status is 404 is not an object not found error.
+    #  - This will also be raised if after retrying a request a number of times has finally failed.
+    # @raise Parse::ProtocolError when HTTP response status is 405 or 406
+    # @raise Parse::ServiceUnavailableError when HTTP response status is 500 or 503.
+    #   - This may also happen when the Parse Server response code is any
+    #     number less than {Parse::Response::ERROR_SERVICE_UNAVAILABLE}.
+    # @raise Parse::ServerError when the Parse response code is less than 100
+    # @raise Parse::RequestLimitExceededError when the Parse response code is {Parse::Response::ERROR_EXCEEDED_BURST_LIMIT}.
+    #   - This usually means you have exceeded the burst limit on requests, which will mean you will be throttled for the
+    #     next 60 seconds.
+    # @raise Parse::InvalidSessionTokenError when the Parse response code is 209.
+    #   - This means the session token that was sent in the request seems to be invalid.
+    # @return [Parse::Response] the response for this request.
+    # @see Parse::Middleware::BodyBuilder
+    # @see Parse::Middleware::Caching
+    # @see Parse::Middleware::Authentication
+    # @see Parse::Protocol
+    # @see Parse::Request
     def request(method, uri = nil, body: nil, query: nil, headers: nil, opts: {})
       retry_count ||= RETRY_COUNT
+
+      if opts[:retry] == false
+        retry_count = 0
+      elsif opts[:retry].to_i > 0
+        retry_count = opts[:retry]
+      end
+
       headers ||= {}
       # if the first argument is a Parse::Request object, then construct it
       _request = nil
@@ -297,16 +388,13 @@ module Parse
       when 405, 406
         puts "[Parse:ProtocolError] #{response}"
         raise Parse::ProtocolError, response
-      when 500
-        puts "[Parse:ServiceUnavailableError] #{response}"
-        raise Parse::ServiceUnavailableError, response
-      when 503
+      when 500, 503
         puts "[Parse:ServiceUnavailableError] #{response}"
         raise Parse::ServiceUnavailableError, response
       end
 
       if response.error?
-        if response.code <= Parse::Response::ERROR_SERVICE_UNAVAILALBE
+        if response.code <= Parse::Response::ERROR_SERVICE_UNAVAILABLE
           puts "[Parse:ServiceUnavailableError] #{response}"
           raise Parse::ServiceUnavailableError, response
         elsif response.code <= 100
@@ -315,7 +403,7 @@ module Parse
         elsif response.code == Parse::Response::ERROR_EXCEEDED_BURST_LIMIT
           puts "[Parse:RequestLimitExceededError] #{response}"
           raise Parse::RequestLimitExceededError, response
-        elsif response.code == 209 #Error 209: invalid session token
+        elsif response.code == 209 # Error 209: invalid session token
           puts "[Parse:InvalidSessionTokenError] #{response}"
           raise Parse::InvalidSessionTokenError, response
         end
@@ -329,7 +417,7 @@ module Parse
         retry_count -= 1
         retry
       end
-      raise e
+      raise
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
       if retry_count > 0
         puts "[Parse:Retry] Retries remaining #{retry_count} : #{_request}"
@@ -340,26 +428,46 @@ module Parse
       raise Parse::ConnectionError, "#{_request} : #{e.class} - #{e.message}"
     end
 
-    # shorthand for request(:get, uri, query: {})
+    # Send a GET request.
+    # @param uri [String] the uri path for this request.
+    # @param query [Hash] the set of url query parameters.
+    # @param headers [Hash] additional headers to send in this request.
+    # @return (see #request)
     def get(uri, query = nil, headers = {})
       request :get, uri, query: query, headers: headers
     end
 
-    # shorthand for request(:post, uri, body: {})
+    # Send a POST request.
+    # @param uri (see #get)
+    # @param body [Hash] a hash that will be JSON encoded for the body of this request.
+    # @param headers (see #get)
+    # @return (see #request)
     def post(uri, body = nil, headers = {} )
       request :post, uri, body: body, headers: headers
     end
 
-    # shorthand for request(:put, uri, body: {})
+    # Send a PUT request.
+    # @param uri (see #post)
+    # @param body (see #post)
+    # @param headers (see #post)
+    # @return (see #request)
     def put(uri, body = nil, headers = {})
       request :put, uri, body: body, headers: headers
     end
 
-    # shorthand for request(:delete, uri, body: {}, headers: {})
+    # Send a DELETE request.
+    # @param uri (see #post)
+    # @param body (see #post)
+    # @param headers (see #post)
+    # @return (see #request)
     def delete(uri, body = nil, headers = {})
       request :delete, uri, body: body, headers: headers
     end
 
+    # Send a {Parse::Request} object.
+    # @param req [Parse::Request] the request to send
+    # @raise ArgumentError if req is not of type Parse::Request.
+    # @return (see #request)
     def send_request(req) #Parse::Request object
       raise ArgumentError, "Object not of Parse::Request type." unless req.is_a?(Parse::Request)
       request req.method, req.path, req.body, req.headers
@@ -376,12 +484,15 @@ module Parse
       end
 
       module ClassMethods
+
+          # @return [Parse::Client] the current client for :default.
           attr_accessor :client
           def client
             @client ||= Parse::Client.client #defaults to :default tag
           end
       end
 
+      # @return [Parse::Client] the current client defined for the class.
       def client
         self.class.client
       end
@@ -391,6 +502,16 @@ module Parse
 
   # Helper method that users should call to setup the client stack.
   # A block can be passed in order to do additional client configuration.
+  # To connect to a Parse server, you will need a minimum of an application_id,
+  # an api_key and a server_url. To connect to the server endpoint, you use the
+  # {Parse.setup} method below.
+  #
+  # @example (see Parse::Client.setup)
+  # @param opts (see Parse::Client.setup)
+  # @option opts (see Parse::Client.setup)
+  # @yield (see Parse::Client.setup)
+  # @return (see Parse::Client.setup)
+  # @see Parse::Client.setup
   def self.setup(opts = {})
     if block_given?
       Parse::Client.new(opts, &Proc.new)
@@ -399,7 +520,11 @@ module Parse
     end
   end
 
-  # Helper method to call cloud functions and get results
+  # Helper method to trigger cloud jobs and get results.
+  # @param name [String] the name of the cloud code job to trigger.
+  # @param body [Hash] the set of parameters to pass to the job.
+  # @param opts (see Parse.call_function)
+  # @return (see Parse.call_function)
   def self.trigger_job(name, body = {}, **opts)
     conn = opts[:session] || opts[:client] ||  :default
     response = Parse::Client.client(conn).trigger_job(name, body)
@@ -407,7 +532,11 @@ module Parse
     response.error? ? nil : response.result["result"]
   end
 
-  # Helper method to call cloud functions and get results
+  # Helper method to call cloud functions and get results.
+  # @param name [String] the name of the cloud code function to call.
+  # @param body [Hash] the set of parameters to pass to the function.
+  # @param opts [Hash] additional options.
+  # @return [Object] the result data of the response. nil if there was an error.
   def self.call_function(name, body = {}, **opts)
     conn = opts[:session] || opts[:client] ||  :default
     response = Parse::Client.client(conn).call_function(name, body)

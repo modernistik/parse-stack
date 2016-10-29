@@ -14,18 +14,10 @@ require 'active_support/hash_with_indifferent_access'
 require 'time'
 
 
-# This module provides support for handling all the different types of column data types
-# supported in Parse and mapping them between their remote names with their local ruby named attributes.
-# By default, the convention used for naming parameters is that the remote column should be in lower-first-camelcase, (ex. myField, eventAddress), except for
-# a few special columns like "id" and "acl".
-# Properties are defined when creating subclasses of Parse::Object and using the `property` class method.
-#
-# By defining properties, dynamic methods are created in order to allow getters and setters to be used. We will go into detail below.
-#
-# Each class will have a different copy of attribute mapping and field mappings.
-
 module Parse
 
+  # This module provides support for handling all the different types of column data types
+  # supported in Parse and mapping them between their remote names with their local ruby named attributes.
   module Properties
     # This is an exception that is thrown if there is an issue when creating a specific property for a class.
     class DefinitionError < StandardError; end;
@@ -49,7 +41,10 @@ module Parse
     module ClassMethods
 
       # The fields method returns a mapping of all local attribute names and their data type.
-      # if type is passed, we return only the fields that matched that data type
+      # if type is passed, we return only the fields that matched that data type. If `type`
+      # is provided, it will only return the fields that match the data type.
+      # @param type [Symbol] a property type.
+      # @return [Hash] the defined fields for this Parse collection with their data type.
       def fields(type = nil)
         @fields ||= {id: :string, created_at: :date, updated_at: :date, acl: :acl}
         if type.present?
@@ -59,11 +54,12 @@ module Parse
         @fields
       end
 
-      # This returns the mapping of local to remote attribute names.
+      # @return [Hash] the field map for this subclass.
       def field_map
         @field_map ||= BASE_FIELD_MAP.dup
       end
 
+      # @return [Hash] the fields that are marked as enums.
       def enums
         @enums ||= {}
       end
@@ -73,6 +69,7 @@ module Parse
         @attributes = BASE.merge(hash)
       end
 
+      # @return [Hash] the fields that are marked as enums.
       def attributes
         @attributes ||= BASE.dup
       end

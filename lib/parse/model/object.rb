@@ -21,6 +21,7 @@ require_relative "date"
 require_relative "acl"
 require_relative "push"
 require_relative 'core/actions'
+require_relative 'core/fetching'
 require_relative 'core/querying'
 require_relative "core/schema"
 require_relative "core/properties"
@@ -32,7 +33,17 @@ require_relative "associations/has_many"
 module Parse
   # @return [Array] an array of registered Parse::Object subclasses.
   def self.registered_classes
-      Parse::Object.descendants.map { |m| m.parse_class }.uniq
+      Parse::Object.descendants.map(&:parse_class).uniq
+  end
+
+  # Perform a non-destructive upgrade of all your Parse schemas in the backend
+  # based on the property definitions of your local {Parse::Object} subclasses.
+  def self.auto_upgrade!
+    klassModels = Parse::Object.descendants
+    klassModels.sort_by(&:parse_class).each do |klass|
+      yield(klass) if block_given?
+      klass.auto_upgrade!
+    end
   end
 
   # This is the core class for all app specific Parse table subclasses. This class
@@ -53,10 +64,8 @@ module Parse
   # Properties:
   #
   # All columns in a Parse object are considered a type of property (ex. string, numbers, arrays, etc)
-  # except in two cases - Pointers and Relations. For the list of basic supported data types, please see the
-  # Properties module variable Parse::Properties::TYPES . When defining a property,
-  # dynamic methods are created that take advantage of all the ActiveModel
-  # plugins (dirty tracking, callbacks, json, etc).
+  # except in two cases - Pointers and Relations. For a detailed discussion of properties, see
+  # The {https://github.com/modernistik/parse-stack#defining-properties Defining Properties} section.
   #
   # Associations:
   #
@@ -74,27 +83,18 @@ module Parse
   # without requiring an explicit intermediary Parse table or class. This feature
   # is also implemented using the `:has_many` method but passing the option of `:relation`.
   #
-  #
-  # Querying:
-  # The querying module provides all the general methods to be able to find and query a specific
-  # Parse table.
-  #
-  # Fetching:
-  # The fetching modules supports fetching data from Parse (depending on the state of the object),
-  # and providing some autofetching features when traversing relational objects and properties.
-  #
-  # Schema:
-  # The schema module provides methods to modify the Parse table remotely to either add or create
-  # any locally define properties in ruby and have those be reflected in the Parse application.
+  # @see Associations::BelongsTo
+  # @see Associations::HasOne
+  # @see Associations::HasMany
   class Object < Pointer
     include Properties
     include Associations::HasOne
     include Associations::BelongsTo
     include Associations::HasMany
-    include Querying
+    extend Querying
+    extend Schema
     include Fetching
     include Actions
-    include Schema
     BASE_OBJECT_CLASS = "Parse::Object".freeze
 
     # @return [Model::TYPE_OBJECT]
@@ -145,7 +145,7 @@ module Parse
 
       attr_accessor :disable_serialized_string_date, :parse_class, :acl
 
-      # @!attribute [rw] disable_serialized_string_date
+      # @!attribute disable_serialized_string_date
       #  Disables returning a serialized string date properties when encoding to JSON.
       #  This affects created_at and updated_at fields in order to be backwards compatible with old SDKs.
       #  @return [Boolean]
@@ -190,6 +190,12 @@ module Parse
       self.class.parse_class
     end
     alias_method :className, :parse_class
+
+    # @return [Hash] the schema structure for this Parse collection from the server.
+    # @see Parse::Schema
+    def schema
+      self.class.schema
+    end
 
     # @return [Hash] a json-hash representing this object.
     def as_json(*args)

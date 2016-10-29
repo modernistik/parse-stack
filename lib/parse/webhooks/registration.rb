@@ -8,11 +8,11 @@ require 'active_support/core_ext/string'
 require 'active_support/core_ext'
 
 module Parse
-
+  # Interface to the CloudCode webhooks API.
   module Webhook
-
+    # Module to support registering Parse CloudCode webhooks.
     module Registration
-
+      # The set of allowed trigger types.
       ALLOWED_HOOKS = Parse::API::Hooks::TRIGGER_NAMES + [:function]
 
       # removes all registered webhook functions with Parse Server.

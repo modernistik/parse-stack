@@ -18,6 +18,18 @@ module Parse
 
   class Object
 
+    # Register a webhook function for this subclass.
+    # @example
+    #  class Post < Parse::Object
+    #
+    #   webhook_function :helloWorld do
+    #      # ... do something when this function is called ...
+    #   end
+    #  end
+    # @param functionName [String] the literal name of the function to be registered with the server.
+    # @yield (see Parse::Object.webhook)
+    # @param block (see Parse::Object.webhook)
+    # @return (see Parse::Object.webhook)
     def self.webhook_function(functionName, block = nil)
       if block_given?
         Parse::Webhooks.route(:function, functionName, &Proc.new)
@@ -28,6 +40,20 @@ module Parse
       end
     end
 
+    # Register a webhook trigger or function for this subclass.
+    # @example
+    #  class Post < Parse::Object
+    #
+    #   webhook :before_save do
+    #      # ... do something ...
+    #     parse_object
+    #   end
+    #
+    #  end
+    # @param type (see Parse::Webhooks.route)
+    # @yield the body of the function to be evaluated in the scope of a {Parse::Payload} instance.
+    # @param block [Symbol] the name of the method to call, if no block is passed.
+    # @return (see Parse::Webhooks.route)
     def self.webhook(type, block = nil)
 
       if type == :function
@@ -50,28 +76,51 @@ module Parse
   end
 
   class Payload
+    # This method will intentionally raise a {WebhookErrorResponse}, which when used inside
+    # of a registered cloud code webhook function or trigger, will halt processing
+    # and return the proper error response code back to the Parse server.
+    # @param msg [String] the error message
+    # @raise WebhookErrorResponse
+    # @return [WebhookErrorResponse]
     def error!(msg = "")
       raise WebhookErrorResponse, msg
     end
   end
 
+  # The error to be raised in registered trigger or function webhook blocks that
+  # will trigger the Parse::Webhooks application to return the proper error response.
   class WebhookErrorResponse < StandardError; end;
+  # A Rack-based application middlware to handle incoming Parse cloud code webhook
+  # requests.
   class Webhooks
-
-    def self.reload!(args = {})
-
-    end
-
     include Client::Connectable
     extend Webhook::Registration
-
     HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY"
     HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID"
     CONTENT_TYPE = "application/json"
+
+    # @!attribute key
+    # The Parse Webhook Key to be used for authenticating webhook requests.
+    # By default this is taken from the PARSE_WEBHOOK_KEY environment variable if
+    # present.
+    # @return [String]
     attr_accessor :key
+
     class << self
+
+      # Allows support for web frameworks that support auto-reloading of source.
+      # @!visibility private
+      def reload!(args = {})
+      end
+
+      # @return [Boolean] whether to print additional logging information. You may also
+      #  set this to `:debug` for additional verbosity.
       attr_accessor :logging
 
+      # A hash-like structure composing of all the registered webhook
+      # triggers and functions. These are `:before_save`, `:after_save`,
+      # `:before_delete`, `:after_delete` or `:function`.
+      # @return [OpenStruct]
       def routes
         @routes ||= OpenStruct.new( {
           before_save: {}, after_save: {},
@@ -79,6 +128,15 @@ module Parse
           })
       end
 
+      # Internally registers a route for a specific webhook trigger or function.
+      # @param type [Symbol] The type of cloud code webhook to register. This can be any
+      #  of the supported routes. These are `:before_save`, `:after_save`,
+      # `:before_delete`, `:after_delete` or `:function`.
+      # @param className [String] if `type` is not `:function`, then this registers
+      #  a trigger for the given className. Otherwise, className is treated to be the function
+      #  name to register with Parse server.
+      # @yield the block that will handle of the webhook trigger or function.
+      # @return (see routes)
       def route(type, className, block = nil)
         type = type.to_s.underscore.to_sym #support camelcase
         if type != :function && className.respond_to?(:parse_class)
@@ -98,9 +156,12 @@ module Parse
         else
           routes[type][className] = block
         end
-        #puts "Webhook: #{type} -> #{className}..."
+        @routes
       end
 
+      # Run a locally registered webhook function. This bypasses calling a
+      # function through Parse-Server if the method handler is registered locally.
+      # @return [Object] the result of the function.
       def run_function(name, params)
         payload = Payload.new
         payload.function_name = name
@@ -108,6 +169,12 @@ module Parse
         call_route(:function, name, payload)
       end
 
+      # Calls the set of registered webhook trigger blocks or the specific function block.
+      # This method is usually called when an incoming request from Parse Server is received.
+      # @param type (see route)
+      # @param className (see route)
+      # @param payload [Parse::Payload] the payload object received from the server.
+      # @return [Object] the result of the trigger or function.
       def call_route(type, className, payload = nil)
         type = type.to_s.underscore.to_sym #support camelcase
         className = className.parse_class if className.respond_to?(:parse_class)
@@ -138,10 +205,16 @@ module Parse
         result
       end
 
+      # Generates a success response for Parse Server.
+      # @param data [Object] the data to send back with the success.
+      # @return [Hash] a success data payload
       def success(data = true)
         { success: data }.to_json
       end
 
+      # Generates an error response for Parse Server.
+      # @param data [Object] the data to send back with the error.
+      # @return [Hash] a error data payload
       def error(data = false)
         { error: data }.to_json
       end
@@ -150,6 +223,14 @@ module Parse
         @key ||= ENV['PARSE_WEBHOOK_KEY']
       end
 
+      # Standard Rack call method. This method processes an incoming cloud code
+      # webhook request from Parse Server, validates it and executes any registered handlers for it.
+      # The result of the handler for the matching webhook request is sent back to
+      # Parse Server. If the handler raises a {Parse::WebhookErrorResponse},
+      # it will return the proper error response.
+      # @param env [Hash] the environment hash in a Rack request.
+      # @return [Object] the value of calling `finish` on the Rack::Response object.
+      # @todo Create a call! method that takes a dup of this env.
       def call(env)
 
         request = Rack::Request.new env

@@ -11,14 +11,16 @@ require 'rake/dsl_definition'
 module Parse
 
   module Stack
-
+    # Loads and installs all Parse::Stack related tasks in a rake file.
     def self.load_tasks
       Parse::Stack::Tasks.new.install_tasks
     end
 
+    # Defines all the related Rails tasks for Parse.
     class Tasks
       include Rake::DSL if defined? Rake::DSL
 
+      # Installs the rake tasks.
       def install_tasks
 
         if defined?(::Rails)

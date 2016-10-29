@@ -9,19 +9,25 @@ module Parse
   module API
     # REST API methods for fetching CRUD operations on Parse objects.
     module Objects
-
+      # The class prefix for fetching objects.
       CLASS_PATH_PREFIX = "classes/"
+      # The class prefix mapping for fetching objects.
       PREFIX_MAP = { installation: "installations", _installation: "installations",
         user: "users", _user: "users",
         role: "roles", _role: "roles",
         session: "sessions", _session: "sessions"
       }.freeze
 
+      # @!visibility private
       def self.included(base)
         base.extend(ClassMethods)
       end
 
       module ClassMethods
+        # Get the API path for this class.
+        # @param className [String] the name of the Parse collection.
+        # @param id [String] optional objectId to add at the end of the path.
+        # @return [String] the API uri path
         def uri_path(className, id = nil)
           if className.is_a?(Parse::Pointer)
             id = className.id
@@ -37,39 +43,70 @@ module Parse
 
       end
 
+      # Get the API path for this class.
+      # @param className [String] the name of the Parse collection.
+      # @param id [String] optional objectId to add at the end of the path.
+      # @return [String] the API uri path
       def uri_path(className, id = nil)
         self.class.uri_path(className, id)
       end
 
-      # /1/classes/<className>	POST	Creating Objects
+      # Create an object in a collection.
+      # @param className [String] the name of the Parse collection.
+      # @param body [Hash] the body of the request.
+      # @param opts [Hash] additional options to pass to the {Parse::Client} request.
+      # @param headers [Hash] additional HTTP headers to send with the request.
+      # @return [Parse::Response]
       def create_object(className, body = {}, headers: {}, **opts)
         response = request :post, uri_path(className) , body: body, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
-      # /1/classes/<className>/<objectId>	DELETE	Deleting Objects
+      # Delete an object in a collection.
+      # @param className [String] the name of the Parse collection.
+      # @param id [String] The objectId of the record in the collection.
+      # @param opts [Hash] additional options to pass to the {Parse::Client} request.
+      # @param headers [Hash] additional HTTP headers to send with the request.
+      # @return [Parse::Response]
       def delete_object(className, id, headers: {}, **opts)
         response = request :delete, uri_path(className, id), headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
-      # /1/classes/<className>/<objectId>	GET	Retrieving Objects
+      # Fetch a specific object from a collection.
+      # @param className [String] the name of the Parse collection.
+      # @param id [String] The objectId of the record in the collection.
+      # @param opts [Hash] additional options to pass to the {Parse::Client} request.
+      # @param headers [Hash] additional HTTP headers to send with the request.
+      # @return [Parse::Response]
       def fetch_object(className, id, headers: {}, **opts)
         response = request :get, uri_path(className, id), headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
-      # /1/classes/<className>	GET	Queries
+      # Fetch a set of matching objects for a query.
+      # @param className [String] the name of the Parse collection.
+      # @param query [Hash] The set of query constraints.
+      # @param opts [Hash] additional options to pass to the {Parse::Client} request.
+      # @param headers [Hash] additional HTTP headers to send with the request.
+      # @return [Parse::Response]
+      # @see Parse::Query
       def find_objects(className, query = {}, headers: {}, **opts)
         response = request :get, uri_path(className), query: query, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
 
-      # /1/classes/<className>/<objectId>	PUT	Updating Objects
+      # Update an object in a collection.
+      # @param className [String] the name of the Parse collection.
+      # @param id [String] The objectId of the record in the collection.
+      # @param body [Hash] The key value pairs to update.
+      # @param opts [Hash] additional options to pass to the {Parse::Client} request.
+      # @param headers [Hash] additional HTTP headers to send with the request.
+      # @return [Parse::Response]
       def update_object(className, id, body = {}, headers: {}, **opts)
         response = request :put, uri_path(className,id) , body: body, headers: headers, opts: opts
         response.parse_class = className if response.present?

@@ -8,26 +8,34 @@ require 'active_support/core_ext'
 require 'time'
 require 'parallel'
 require_relative '../../client/request'
+require_relative 'fetching'
 
-
-# A Parse::RelationAction is special operation that adds one object to a relational
-# table as to another. Depending on the polarity of the action, the objects are
-# either added or removed from the relation. This class is used to generate the proper
-# hash request format Parse needs in order to modify relational information for classes.
 module Parse
+  # A Parse::RelationAction is special operation that adds one object to a relational
+  # table as to another. Depending on the polarity of the action, the objects are
+  # either added or removed from the relation. This class is used to generate the proper
+  # hash request formats Parse needs in order to modify relational information for classes.
   class RelationAction
     ADD = "AddRelation"
     REMOVE = "RemoveRelation"
+    # @!attribute polarity
+    # @return [Boolean] whether it is an addition (true) or removal (false) action.
+    # @!attribute key
+    # @return [String] the name of the Parse field (column).
+    # @!attribute objects
+    # @return [Array<Parse::Object>] the set of objects in this relation action.
     attr_accessor :polarity, :key, :objects
-    # provide the column name of the field, polarity (true = add, false = remove) and the
-    # list of objects.
+
+    # @param field [String] the name of the Parse field tied to this relation.
+    # @param polarity [Boolean] whether this is an addition (true) or removal (false) action.
+    # @param objects [Array<Parse::Object>] the set of objects tied to this relation action.
     def initialize(field, polarity: true, objects: [])
       @key = field.to_s
       self.polarity = polarity
-      @objects = [objects].flatten.compact
+      @objects = Array.wrap(objects).compact
     end
 
-    # generate the proper Parse hash-format operation
+    # @return [Hash] a hash representing a relation operation.
     def as_json(*args)
       { @key =>
         {
@@ -57,13 +65,36 @@ module Parse
     end
   end
 
+  # Defines some of the save, update and destroy operations for Parse objects.
   module Actions
-
+    # @!visibility private
     def self.included(base)
       base.extend(ClassMethods)
     end
 
+    # Class methods applied to Parse::Object subclasses.
     module ClassMethods
+      # @!attribute raise_on_save_failure
+      # By default, we return `true` or `false` for save and destroy operations.
+      # If you prefer to have `Parse::Object` raise an exception instead, you
+      # can tell to do so either globally or on a per-model basis. When a save
+      # fails, it will raise a {Parse::SaveFailureError}.
+      #
+      # When enabled, if an error is returned by Parse due to saving or
+      # destroying a record, due to your `before_save` or `before_delete`
+      # validation cloud code triggers, `Parse::Object` will return the a
+      # {Parse::SaveFailureError} exception type. This exception has an instance
+      # method of `#object` which contains the object that failed to save.
+      # @example
+      #  # globally across all models
+      #  Parse::Model.raise_on_save_failure = true
+	    #  Song.raise_on_save_failure = true # per-model
+      #
+      #  # or per-instance raise on failure
+      #  song.save!
+      #
+      # @return [Boolean] whether to raise a {Parse::SaveFailureError}
+      #   when an object fails to save.
       attr_accessor :raise_on_save_failure
 
       def raise_on_save_failure
@@ -71,8 +102,14 @@ module Parse
         Parse::Model.raise_on_save_failure
       end
 
+      # Finds the first object matching the query conditions, or creates a new
+      # unsaved object with the attributes.
+      # the provided query attributes, otherwise create
+      # @param query_attrs [Hash] a set of query constraints that also are applied.
+      # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
+      # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
       def first_or_create(query_attrs = {}, resource_attrs = {})
-        # force only one result
+
         query_attrs.symbolize_keys!
         resource_attrs.symbolize_keys!
         obj = query(query_attrs).first
@@ -85,7 +122,20 @@ module Parse
         obj
       end
 
-      # not quite sure if I like the name of this API.
+      # Auto save all objects matching the query constraints. This method is
+      # meant to be used with a block. Any objects that are modified in the block
+      # will be batched for a save operation. This uses the `updated_at` field to
+      # continue to query for all matching objects that have not been updated.
+      # @param constraints [Hash] a set of query constraints.
+      # @yield a block which will iterate through each matching object.
+      # @example
+      #
+      #  post = Post.first
+      #  Comments.save_all( post: post) do |comment|
+      #    # .. modify comment ...
+      #    # it will automatically be saved
+      #  end
+      # @return [Boolean] whether there were any errors.
       def save_all(constraints = {})
         force = false
 
@@ -151,6 +201,15 @@ module Parse
 
     end # ClassMethods
 
+    # Perform an atomic operation on this field. This operation is done on the
+    # Parse server which guarantees the atomicity of the operation. This is the low-level
+    # API on performing atomic operations on properties for classes. These methods do not
+    # update the current instance with any changes the server may have made to satisfy this
+    # operation.
+    #
+    # @param field [String] the name of the field in the Parse collection.
+    # @param op_hash [Hash] The operation hash. It may also be of type {Parse::RelationAction}.
+    # @return [Boolean] whether the operation was successful.
     def operate_field!(field, op_hash)
       field = field.to_sym
       field = self.field_map[field] || field
@@ -167,22 +226,47 @@ module Parse
       response.success?
     end
 
+    # Perform an atomic add operation to the array field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @param objects [Array] the set of items to add to this field.
+    # @return [Boolean] whether it was successful
+    # @see #operate_field!
     def op_add!(field,objects)
       operate_field! field, { __op: :Add, objects: objects }
     end
 
+    # Perform an atomic add unique operation to the array field. The objects will
+    # only be added if they don't already exists in the array for that particular field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @param objects [Array] the set of items to add uniquely to this field.
+    # @return [Boolean] whether it was successful
+    # @see #operate_field!
     def op_add_unique!(field,objects)
       operate_field! field, { __op: :AddUnique, objects: objects }
     end
 
+    # Perform an atomic remove operation to the array field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @param objects [Array] the set of items to remove to this field.
+    # @return [Boolean] whether it was successful
+    # @see #operate_field!
     def op_remove!(field, objects)
       operate_field! field, { __op: :Remove, objects: objects }
     end
 
+    # Perform an atomic delete operation on this field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @return [Boolean] whether it was successful
+    # @see #operate_field!
     def op_destroy!(field)
       operate_field! field, { __op: :Delete }
     end
 
+    # Perform an atomic add operation on this relational field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @param objects [Array<Parse::Object>] the set of objects to add to this relational field.
+    # @return [Boolean] whether it was successful
+    # @see #operate_field!
     def op_add_relation!(field, objects = [])
       objects = [objects] unless objects.is_a?(Array)
       return false if objects.empty?
@@ -190,6 +274,11 @@ module Parse
       operate_field! field, relation_action
     end
 
+    # Perform an atomic remove operation on this relational field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @param objects [Array<Parse::Object>] the set of objects to remove to this relational field.
+    # @return [Boolean] whether it was successful
+    # @see #operate_field!
     def op_remove_relation!(field, objects = [])
       objects = [objects] unless objects.is_a?(Array)
       return false if objects.empty?
@@ -197,7 +286,7 @@ module Parse
       operate_field! field, relation_action
     end
 
-    # This creates a destroy_request for the current object.
+    # @return [Parse::Request] a destroy_request for the current object.
     def destroy_request
       return nil unless @id.present?
       uri = self.uri_path
@@ -206,13 +295,16 @@ module Parse
       r
     end
 
+    # @return [String] the API uri path for this class.
     def uri_path
       self.client.url_prefix.path + Client.uri_path(self)
     end
-    # Creates an array of all possible PUT operations that need to be performed
-    # on this local object. The reason it is a list is because attribute operations,
-    # relational add operations and relational remove operations are treated as separate
-    # Parse requests.
+
+    # Creates an array of all possible operations that need to be performed
+    # on this object. This includes all property and relational operation changes.
+    # @param force [Boolean] whether this object should be saved even if does not have
+    #  pending changes.
+    # @return [Array<Parse::Request>] the list of API requests.
     def change_requests(force = false)
       requests = []
       # get the URI path for this object.
@@ -244,6 +336,9 @@ module Parse
     # information based on its local attributes. The bang implies that it will send
     # the request even though it is possible no changes were performed. This is useful
     # in kicking-off an beforeSave / afterSave hooks
+    # Save the object regardless of whether there are changes. This would call
+    # any beforeSave and afterSave cloud code hooks you have registered for this class.
+    # @return [Boolean] true/false whether it was successful.
     def update!(raw: false)
       if valid? == false
         errors.full_messages.each do |msg|
@@ -262,13 +357,15 @@ module Parse
       response.success?
     end
 
-    # save the updates on the objects, if any
+    # Save all the changes related to this object.
+    # @return [Boolean] true/false whether it was successful.
     def update
       return true unless attribute_changes?
       update!
     end
 
-    # create this object in Parse
+    # Save the object as a new record, running all callbacks.
+    # @return [Boolean] true/false whether it was successful.
     def create
       run_callbacks :create do
         res = client.create_object(parse_class, attribute_updates, session_token: _session_token)
@@ -287,6 +384,7 @@ module Parse
       end
     end
 
+    # @!visibility private
     def _session_token
       if @_session_token.respond_to?(:session_token)
         @_session_token = @_session_token.session_token
@@ -298,6 +396,10 @@ module Parse
     # we will create the object. If the object has an id, we will update the record.
     # You can define before and after :save callbacks
     # autoraise: set to true will automatically raise an exception if the save fails
+    # @raise Parse::SaveFailureError if the save fails
+    # @param autoraise [Boolean] whether to raise an exception if the save fails.
+    # @param session [String] a session token in order to apply ACLs to this operation.
+    # @return [Boolean] whether the save was successful.
     def save(autoraise: false, session: nil)
       return true unless changed?
       success = false
@@ -332,13 +434,19 @@ module Parse
       success
     end
 
-    # shortcut for raising an exception of saving this object failed.
+    # Save this object and raise an exception if it fails.
+    # @raise Parse::SaveFailureError if the save fails
+    # @param session (see #save)
+    # @return (see #save)
     def save!(session: nil)
       save(autoraise: true, session: session)
     end
 
-    # only destroy the object if it has an id. You can setup before and after
-    #callback hooks on :destroy
+
+    # Delete this record from the Parse collection. Only valid if this object has an `id`.
+    # This will run all the `destroy` callbacks.
+    # @param session [String] a session token if you want to apply ACLs for a user in this operation.
+    # @return [Boolean] whether the operation was successful.
     def destroy(session: nil)
       return false if new?
       @_session_token = session
@@ -358,10 +466,12 @@ module Parse
       success
     end
 
+    # Runs all the registered `before_save` related callbacks.
     def prepare_save!
       run_callbacks(:save) { false }
     end
 
+    # @return [Hash] a hash of the list of changes made to this instance.
     def changes_payload
       h = attribute_updates
       if relation_changes?
@@ -371,11 +481,14 @@ module Parse
       h.merge!(className: parse_class) unless h.empty?
       h.as_json
     end
-
     alias_method :update_payload, :changes_payload
 
-    # this method is useful to generate an array of additions and removals to a relational
-    # column.
+    # Generates an array with two entries for addition and removal operations. The first entry
+    # of the array will contain a hash of all the change operations regarding adding new relational
+    # objects. The second entry in the array is a hash of all the change operations regarding removing
+    # relation objects from this field.
+    # @return [Array] an array with two hashes; the first is a hash of all the addition operations and
+    #  the second hash, all the remove operations.
     def relation_change_operations
       return [{},{}] unless relation_changes?
 
@@ -397,7 +510,8 @@ module Parse
       [additions, removals]
     end
 
-    # update relations updates all the relational data that needs to be updated.
+    # Saves and updates all the relational changes for made to this object.
+    # @return [Boolean] whether all the save or update requests were successful.
     def update_relations
       # relational saves require an id
       return false unless @id.present?
@@ -425,6 +539,19 @@ module Parse
       has_error == false
     end
 
+    # Performs mass assignment using a hash with the ability to modify dirty tracking.
+    # This is an internal method used to set properties on the object while controlling
+    # whether they are dirty tracked. Each defined property has a method defined with the
+    # suffix `_set_attribute!` that can will be called if it is contained in the hash.
+    # @example
+    #  object.set_attributes!( {"myField" => value}, false)
+    #
+    #  # equivalent to calling the specific method.
+    #  object.myField_set_attribute!(value, false)
+    # @param hash [Hash] the hash containing all the attribute names and values.
+    # @param dirty_track [Boolean] whether the assignment should be tracked in the change tracking
+    #  system.
+    # @return [Hash]
     def set_attributes!(hash, dirty_track = false)
       return unless hash.is_a?(Hash)
       hash.each do |k,v|
@@ -434,7 +561,7 @@ module Parse
       end
     end
 
-    # clears changes information on all collections (array and relations) and all
+    # Clears changes information on all collections (array and relations) and all
     # local attributes.
     def changes_applied!
       # find all fields that are of type :array
@@ -455,92 +582,5 @@ module Parse
 
 
   end
-
-  module Fetching
-
-    # force fetches the current object with the data contained in Parse.
-    def fetch!(opts = {})
-      response = client.fetch_object(parse_class, id, opts)
-      if response.error?
-        puts "[Fetch Error] #{response.code}: #{response.error}"
-      end
-      # take the result hash and apply it to the attributes.
-      apply_attributes!(response.result, dirty_track: false)
-      clear_changes!
-      self
-    end
-
-    # fetches the object if needed
-    def fetch
-      # if it is a pointer, then let's go fetch the rest of the content
-      pointer? ? fetch! : self
-    end
-
-    # autofetches the object based on a key. If the key is not a Parse standard
-    # key, the current object is a pointer, then fetch the object - but only if
-    # the current object is currently autofetching.
-    def autofetch!(key)
-      key = key.to_sym
-      @fetch_lock ||= false
-      if @fetch_lock != true && pointer? && key != :acl && Parse::Properties::BASE_KEYS.include?(key) == false && respond_to?(:fetch)
-        #puts "AutoFetching Triggerd by: #{self.class}.#{key} (#{id})"
-        @fetch_lock = true
-        send :fetch
-        @fetch_lock = false
-      end
-
-    end
-
-  end
-
-end
-
-class Array
-
-    # Support for threaded operations on array items
-    def threaded_each(threads = 2)
-      Parallel.each(self, {in_threads: threads}, &Proc.new)
-    end
-
-    def threaded_map(threads = 2)
-      Parallel.map(self, {in_threads: threads}, &Proc.new)
-    end
-
-    def self.threaded_select(threads = 2)
-      Parallel.select(self, {in_threads: threads}, &Proc.new)
-    end
-
-    # fetches all the objects in the array (force)
-    # a parameter symbol can be passed indicating the lookup methodology. Default
-    # is parallel which fetches all objects in parallel HTTP requests.
-    # If nil is passed in, then all the fetching happens sequentially.
-    def fetch_objects!(lookup = :parallel)
-      # this gets all valid parse objects from the array
-      items = valid_parse_objects
-
-      # make parallel requests.
-      unless lookup == :parallel
-        # force fetch all objects
-        items.threaded_each { |o| o.fetch! }
-      else
-        # serially fetch each object
-        items.each { |o| o.fetch! }
-      end
-      self #return for chaining.
-    end
-
-    # fetches all pointer objects in the array. You can pass a symbol argument
-    # that provides the lookup methodology, default is :parallel. Objects that have
-    # already been fetched (not in a pointer state) are skipped.
-    def fetch_objects(lookup = :parallel)
-      items = valid_parse_objects
-      if lookup == :parallel
-        items.threaded_each { |o| o.fetch }
-      else
-        items.each { |e| e.fetch }
-      end
-      #self.replace items
-      self
-    end
 
 end

@@ -21,6 +21,105 @@ module Parse
   # The main class representing the _User table in Parse. A user can either be signed up or anonymous.
   # All users need to have a username and a password, with email being optional but globally unique if set.
   # You may add additional properties by redeclaring the class to match your specific schema.
+  #
+  # *Signup*
+  #
+  # You can signup new users in two ways. You can either use a class method
+  # {Parse::User.signup} to create a new user with the minimum fields of username,
+  # password and email, or create a {Parse::User} object can call the {#signup!}
+  # method. If signup fails, it will raise the corresponding exception.
+  #
+  #  user = Parse::User.signup(username, password, email)
+  #
+  #  #or
+  #  user = Parse::User.new username: "user", password: "s3cret"
+  #  user.signup!
+  #
+  # *Login/Logout*
+  #
+  # With the {Parse::User} class, you can also perform login and logout
+  # functionality. The class special accessors for {#session_token} and {#session}
+  # to manage its authentication state. This will allow you to authenticate
+  # users as well as perform Parse queries as a specific user using their session
+  # token. To login a user, use the {Parse::User.login} method by supplying the
+  # corresponding username and password, or if you already have a user record,
+  # use {#login!} with the proper password.
+  #
+  #  user = Parse::User.login(username,password)
+  #  user.session_token # session token from a Parse::Session
+  #  user.session # Parse::Session tied to the token
+  #
+  #  # You can login user records
+  #  user = Parse::User.first
+  #  user.session_token # nil
+  #
+  #  passwd = 'p_n7!-e8' # corresponding password
+  #  user.login!(passwd) # true
+  #
+  #  user.session_token # 'r:pnktnjyb996sj4p156gjtp4im'
+  #
+  #  # logout to delete the session
+  #  user.logout
+  #
+  # If you happen to already have a valid session token, you can use it to
+  # retrieve the corresponding Parse::User.
+  #
+  #  # finds user with session token
+  #  user = Parse::User.session(session_token)
+  #
+  #  user.logout # deletes the corresponding session
+  #
+  # *OAuth-Login*
+  #
+  # You can signup users using third-party services like Facebook and Twitter as
+  # described in {https://parseplatform.github.io/docs/rest/guide/#signing-up-and-logging-in
+  # Signing Up and Logging In}. To do this with Parse-Stack, you can call the
+  # {Parse::User.autologin_service} method by passing the service name and the
+  # corresponding authentication hash data. For a listing of supported third-party
+  # authentication services, see {https://github.com/ParsePlatform/parse-server/wiki/OAuth OAuth}.
+  #
+  #  fb_auth = {}
+  #  fb_auth[:id] = "123456789"
+  #  fb_auth[:access_token] = "SaMpLeAAiZBLR995wxBvSGNoTrEaL"
+  #  fb_auth[:expiration_date] = "2025-02-21T23:49:36.353Z"
+  #
+  #  # signup or login a user with this auth data.
+  #  user = Parse::User.autologin_service(:facebook, fb_auth)
+  #
+  # You may also combine both approaches of signing up a new user with a
+  # third-party service and set additional custom fields. For this, use the
+  # method {Parse::User.create}.
+  #
+  #  # or to signup a user with additional data, but linked to Facebook
+  #  data = {
+  #    username: "johnsmith",
+  #    name: "John",
+  #    email: "user@example.com",
+  #    authData: { facebook: fb_auth }
+  #  }
+  #  user = Parse::User.create data
+  #
+  # *Linking/Unlinking*
+  #
+  # You can link or unlink user accounts with third-party services like
+  # Facebook and Twitter as described in:
+  # {https://parseplatform.github.io/docs/rest/guide/#linking Linking and Unlinking Users}.
+  # To do this, you must first get the corresponding authentication data for the
+  # specific service, and then apply it to the user using the linking and
+  # unlinking methods. Each method returns true or false if the action was
+  # successful. For a listing of supported third-party authentication services,
+  # see {https://github.com/ParsePlatform/parse-server/wiki/OAuth OAuth}.
+  #
+  #  user = Parse::User.first
+  #
+  #  fb_auth = { ... } # Facebook auth data
+  #
+  #  # Link this user's Facebook account with Parse
+  #  user.link_auth_data! :facebook, fb_auth
+  #
+  #  # Unlinks this user's Facebook account from Parse
+  #  user.unlink_auth_data! :facebook
+  #
   class User < Parse::Object
 
     parse_class Parse::Model::CLASS_USER
@@ -101,6 +200,7 @@ module Parse
 
     # Request a password reset for this user
     # @return [Boolean] true if it was successful requested. false otherwise.
+    # @see Parse::User.request_password_reset
     def request_password_reset
       return false if email.nil?
       Parse::User.request_password_reset(email)
@@ -251,6 +351,13 @@ module Parse
     end
 
     # Request a password reset for a registered email.
+    # @example
+    #  user = Parse::User.first
+    #
+    #  # pass a user object
+    #  Parse::User.request_password_reset user
+    #  # or email
+    #  Parse::User.request_password_reset("user@example.com")
     # @param email [String] The user's email address.
     # @return [Boolean] True/false if successful.
     def self.request_password_reset(email)

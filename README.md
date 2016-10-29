@@ -1,9 +1,11 @@
-# Parse-Stack - The Parse Server Ruby Client and ORM
-Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) REST API Client and ORM framework for ruby. It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
+# Parse-Stack - The Parse Server Ruby SDK
+Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for Ruby. It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ### Code Status
 [![Gem Version](https://badge.fury.io/rb/parse-stack.svg)](https://badge.fury.io/rb/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
+[![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](http://www.rubydoc.info/github/modernistik/parse-stack)
+[![Source Code](https://img.shields.io/badge/github-code-orange.svg)](https://github.com/modernistik/parse-stack)
 
 ## Installation
 
@@ -59,7 +61,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
     - [Signup](#signup)
       - [Third-Party Services](#third-party-services)
     - [Login and Sessions](#login-and-sessions)
-    - [Linking and Unlinking Users](#linking-and-unlinking-users)
+    - [Linking and Unlinking](#linking-and-unlinking)
     - [Request Password Reset](#request-password-reset)
 - [Modeling and Subclassing](#modeling-and-subclassing)
   - [Defining Properties](#defining-properties)
@@ -85,12 +87,13 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
       - [Parse Relation](#parse-relation)
       - [Options](#options-1)
         - [`:through`](#through)
+        - [`:scope_only`](#scope_only)
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
   - [Saving](#saving)
     - [Raising an exception when save fails](#raising-an-exception-when-save-fails)
   - [Modifying Associations](#modifying-associations)
-  - [Batch Save Requests](#batch-save-requests)
+  - [Batch Requests](#batch-requests)
   - [Magic `save_all`](#magic-save_all)
   - [Deleting](#deleting)
 - [Fetching, Finding and Counting Records](#fetching-finding-and-counting-records)
@@ -150,7 +153,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
-Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the Parse Platform. If you are familiar with these technologies, the framework should feel familiar to you.
+Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). If you are familiar with these technologies, the framework should feel familiar to you.
 
 ```ruby
 
@@ -223,7 +226,7 @@ result = Parse.call_function :myFunctionName, {param: value}
 The architecture of `Parse::Stack` is broken into four main components.
 
 ### Parse::Client
-This class is the core and low level API for the Parse SDK REST interface that is used by the other components. It can manage multiple sessions, which means you can have multiple client instances pointing to different Parse Applications at the same time. It handles sending raw requests as well as providing Request/Response objects for all API handlers. The connection engine is Faraday, which means it is open to add any additional middleware for features you'd like to implement.
+This class is the core and low level API for the Parse Server REST interface that is used by the other components. It can manage multiple sessions, which means you can have multiple client instances pointing to different Parse Server applications at the same time. It handles sending raw requests as well as providing Request/Response objects for all API handlers. The connection engine is Faraday, which means it is open to add any additional middleware for features you'd like to implement.
 
 ### Parse::Query
 This class implements the [Parse REST Querying](http://parseplatform.github.io/docs/rest/guide/#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
@@ -261,6 +264,7 @@ To connect to a Parse server, you will need a minimum of an `application_id`, an
 ```ruby
   Parse.setup app_id: "YOUR_APP_ID",
               api_key: "YOUR_API_KEY",
+              master_key: "YOUR_MASTER_KEY", # optional
               server_url: 'https://api.parse.com/1/' #default
 ```
 
@@ -275,18 +279,18 @@ If you wish to add additional connection middleware to the stack, you may do so 
   end
 ```
 
-Calling `setup` will create the default `Parse::Client` session object that will be used for all models and requests in the stack. You may retrive this client by calling the class `session()` method. It is possible to create different client connections and have different models point to different Parse applications and endpoints at the same time.
+Calling `setup` will create the default `Parse::Client` session object that will be used for all models and requests in the stack. You may retrive this client by calling the class `client` method. It is possible to create different client connections and have different models point to different Parse applications and endpoints at the same time.
 
 ```ruby
-  default_client = Parse::Client.client(:default)
-                   # alias Parse::Client.client
+  default_client = Parse.client
+                   # alias Parse::Client.client(:default)
 ```
 
 ### Connection Options
 There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
 
 #### `:server_url`
-The server url of your Parse Server if you are not using the hosted Parse.com service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
+The server url of your Parse Server if you are not using the hosted Parse service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
 
 #### `:app_id`
 The Parse application id. By default it will use `PARSE_APP_ID` environment variable if not specified.
@@ -520,19 +524,7 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 For more information about Parse record ACLs, see the documentation at  [Security](https://parseplatform.github.io/docs/rest/guide/#security)
 
 ### Parse::Session
-This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. It is defined as follows:
-
-```ruby
-class Parse::Session < Parse::Object
-  property :created_with, :object
-  property :expires_at, :date
-  property :installation_id
-  property :restricted, :boolean
-  property :session_token
-
-  belongs_to :user
-end
-```
+This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/Session).
 
 You can get a specific `Parse::Session` given a session_token by using the `session` method. You can also find the user tied to a specific Parse session or session token with `Parse::User.session`.
 
@@ -547,52 +539,13 @@ user = Parse::User.session(token)
 ```
 
 ### Parse::Installation
-This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. It is defined as follows:
-
-```ruby
-class Parse::Installation < Parse::Object
-  property :gcm_sender_id, :string, field: :GCMSenderId
-  property :app_identifier
-  property :app_name
-  property :app_version
-  property :badge, :integer
-  property :channels, :array
-  property :device_token
-  property :device_token_last_modified, :integer
-  property :device_type
-  property :installation_id
-  property :locale_identifier
-  property :parse_version
-  property :push_type
-  property :time_zone
-end
-```
+This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. See [Installation API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/Installation).
 
 ### Parse::Role
-This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. It is defined as follows:
-
-```ruby
-class Parse::Role < Parse::Object
-  property :name
-
-  has_many :roles, through: :relation
-  has_many :users, through: :relation
-end
-```
+This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. See [Roles API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/Role).
 
 ### Parse::User
-This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. It is defined as follows:
-
-```ruby
-class Parse::User < Parse::Object
-  property :auth_data, :object
-  property :email
-  property :username
-
-end
-```
-
-While `:password` is a property on the User class, which will generally be empty whenever fetching User records.
+This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. See [User API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/User).
 
 #### Signup
 You can signup new users in two ways. You can either use a class method `Parse::User.signup` to create a new user with the minimum fields of username, password and email, or create a `Parse::User` object can call the `signup!` method. If signup fails, it will raise the corresponding exception.
@@ -661,8 +614,8 @@ user = Parse::User.session(session_token)
 user.logout # deletes the corresponding session
 ```
 
-#### Linking and Unlinking Users
-You can signup or login uses with third-party services like Facebook and Twitter as described in: [Linking and Unlinking Users](https://parseplatform.github.io/docs/rest/guide/#linking). To do this, you must first get the corresponding authentication data for the specific service, and then apply it to the user using the linking and unlinking methods. Each method returns true or false if the action was successful. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
+#### Linking and Unlinking
+You can link or unlink user accounts with third-party services like Facebook and Twitter as described in: [Linking and Unlinking Users](https://parseplatform.github.io/docs/rest/guide/#linking). To do this, you must first get the corresponding authentication data for the specific service, and then apply it to the user using the linking and unlinking methods. Each method returns true or false if the action was successful. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
 
 ```ruby
 
@@ -1341,12 +1294,12 @@ The save operation can handle both creating and updating existing objects. If yo
 By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::SaveFailureError`.
 
 ```ruby
-	Parse::Model.raise_on_save_failure = true # globally across all models
-	Song.raise_on_save_failure = true          # per-model
+ # globally across all models
+ Parse::Model.raise_on_save_failure = true
+ Song.raise_on_save_failure = true  # per-model
 
-  # or per-instance raise on failure
-  song.save!
-
+ # or per-instance raise on failure
+ song.save!
 ```
 
 When enabled, if an error is returned by Parse due to saving or destroying a record, due to your `before_save` or `before_delete` validation cloud code triggers, `Parse::Object` will return the a `Parse::SaveFailureError` exception type. This exception has an instance method of `#object` which contains the object that failed to save.
@@ -1412,8 +1365,8 @@ The `has_many` Parse Relation associations are handled similarly as in the array
 
 ```
 
-### Batch Save Requests
-Batch requests are supported implicitly and intelligently through an extension of array. When an array of `Parse::Object` subclasses is saved, Parse-Stack will batch all possible save operations for the objects in the array that have changed. It will also batch save 50 at a time until all items in the array are saved. *Note: Parse does not allow batch saving Parse::User objects.*
+### Batch Requests
+Batch requests are supported implicitly and intelligently through an extension of Array. When an array of `Parse::Object` subclasses is saved, Parse-Stack will batch all possible save operations for the objects in the array that have changed. It will also batch save 50 at a time until all items in the array are saved. The objects do not have to be of the same collection in order to be supported in the batch request. *Note: Parse does not allow batch saving Parse::User objects.*
 
 ```ruby
 songs = Songs.first 1000 #first 1000 songs
@@ -1423,6 +1376,9 @@ end
 
 # will batch save 50 items at a time until all are saved.
 songs.save
+
+# you can also destroy a set of objects
+songs.destroy
 ```
 
 ### Magic `save_all`
@@ -2199,7 +2155,7 @@ You can register webhooks to handle the different object triggers: `:before_save
 
 For any `after_*` hook, return values are not needed since Parse does not utilize them. You may also register as many `after_save` or `after_delete` handlers as you prefer, all of them will be called.
 
-`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved. However, we recommend modifying the `parse_object` provided since it has dirty tracking, and then returning that same object. This will automatically call your model specific `before_save` callbacks and send the proper payload back to Parse. For more details, see [Cloud Code BeforeSave Webhooks](https://parse.com/docs/cloudcode/guide#cloud-code-advanced-beforesave-webhooks)
+`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved. However, we recommend modifying the `parse_object` provided since it has dirty tracking, and then returning that same object. This will automatically call your model specific `before_save` callbacks and send the proper payload back to Parse. For more details, see [Cloud Code BeforeSave Webhooks](http://parseplatform.github.io/docs/cloudcode/guide/#cloud-code-advanced-beforesave-webhooks)
 
 ```ruby
 # recommended way
@@ -2290,7 +2246,7 @@ However, we have predefined a few rake tasks you can use in your application. Ju
 Then you can see the tasks available by typing `rake -T`.
 
 ## Parse REST API Client
-While in most cases you do not have to work with `Parse::Client` directly, you can still utilize it for any raw requests that are not supported by the framework. We provide support for most of the [Parse REST API](https://parse.com/docs/rest/guide#quick-reference) endpoints as helper methods, however you can use the `request()` method to make your own API requests. Parse::Client will handle header authentication, request/response generation and caching.
+While in most cases you do not have to work with `Parse::Client` directly, you can still utilize it for any raw requests that are not supported by the framework. We provide support for most of the [Parse REST API](http://parseplatform.github.io/docs/rest/guide/#quick-reference) endpoints as helper methods, however you can use the `request()` method to make your own API requests. Parse::Client will handle header authentication, request/response generation and caching.
 
 ```ruby
 client = Parse::Client.new(application_id: <string>, api_key: <string>) do |conn|
@@ -2326,7 +2282,7 @@ If you are already have setup a client that is being used by your defined models
 - **master_key**: The master secret key for the application. If this is provided, `api_key` may be unnecessary.
 - **logging**: A boolean value to add additional logging messages.
 - **cache**: A [Moneta](https://github.com/minad/moneta) cache store that can be used to cache API requests. We recommend use a cache store that supports native expires like [Redis](http://redis.io). For more information see `Parse::Middleware::Caching`. Disabled by default.
-- **expires**: When used with the `cache` option, sets the expiration time of cached API responses. The default is [3 seconds](https://parse.com/docs/cloudcode/guide#cloud-code-timeouts).
+- **expires**: When used with the `cache` option, sets the expiration time of cached API responses. The default is 3 seconds.
 - **adapter**: The connection adapter to use. Defaults to `Faraday.default_adapter`.
 
 ### Request Caching

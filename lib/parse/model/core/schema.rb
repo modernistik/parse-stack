@@ -4,24 +4,12 @@
 require_relative "properties"
 
 module Parse
-  # Upgrade all
-  def self.auto_upgrade!
-    klassModels = Parse::Object.descendants
-    klassModels.sort_by { |c| c.parse_class }.each do |klass|
-      yield(klass) if block_given?
-      klass.auto_upgrade!
-    end
-  end
-
+  # Defines the Schema methods applied to a Parse::Object.
   module Schema
 
-    def self.included(base)
-      base.extend(ClassMethods)
-    end
-
-    module ClassMethods
-
-      # returns the schema of the defined class in the Parse JSON format.
+      # Generate a Parse-server compatible schema hash for performing changes to the
+      # structure of the remote collection.
+      # @return [Hash] the schema for this Parse::Object subclass.
       def schema
         sch = { className: parse_class, fields: {} }
         #first go through all the attributes
@@ -54,25 +42,36 @@ module Parse
         sch
       end
 
-      # updates the remote schema using Parse::Client
+      # Update the remote schema for this Parse collection.
+      # @param schema_updates [Hash] the changes to be made to the schema.
+      # @return [Parse::Response]
       def update_schema(schema_updates = nil)
         schema_updates ||= schema
         client.update_schema parse_class, schema_updates
       end
 
+      # Create a new collection for this model with the schema defined by the local
+      # model.
+      # @return [Parse::Response]
+      # @see Schema.schema
       def create_schema
         client.create_schema parse_class, schema
       end
 
-      # fetches the current schema of this table.
+      # Fetche the current schema for this collection from Parse server.
+      # @return [Parse::Response]
       def fetch_schema
         client.schema parse_class
       end
 
-      # A class method for non-destructive auto upgrading a remote schema based on the properties
-      # and relations you have defined. If the table doesn't exist, we create the schema
-      # from scratch - otherwise we fetched the current schema, calculate the differences
-      # and add the missing columns. WE DO NOT REMOVE any columns.
+      # A class method for non-destructive auto upgrading a remote schema based
+      # on the properties and relations you have defined in your local model. If
+      # the collection doesn't exist, we create the schema. If the collection already
+      # exists, the current schema is fetched, and only add the additional fields
+      # that are missing.
+      # @note No columns or fields are removed, this is a safe non-destructive upgrade.
+      # @return [Parse::Response] if the remote schema was modified.
+      # @return [Boolean] if no changes were made to the schema, it returns true.
       def auto_upgrade!
         response = fetch_schema
         if response.success?
@@ -86,18 +85,9 @@ module Parse
           end
           return true if current_schema[:fields].empty?
           return update_schema( current_schema )
-        else
-          return create_schema
         end
-        #fetch_schema.success? ? update_schema : create_schema
+        create_schema
       end
-    #def diff(h2);self.dup.delete_if { |k, v| h2[k] == v }.merge(h2.dup.delete_if { |k, v| self.has_key?(k) }); end;
-
-    end
-
-    def schema
-      self.class.schema
-    end
 
   end
 end

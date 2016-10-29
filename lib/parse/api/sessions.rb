@@ -4,9 +4,14 @@
 module Parse
 
   module API
+    # Defines the Session class interface for the Parse REST API
     module Sessions
       SESSION_PATH_PREFIX = "sessions"
 
+      # Fetch a session record for a given session token.
+      # @param session_token [String] an active session token.
+      # @param opts [Hash] additional options to pass to the {Parse::Client} request.
+      # @return [Parse::Response]
       def fetch_session(session_token, **opts)
         opts.merge!({use_master_key: false, cache: false})
         headers = {Parse::Protocol::SESSION_TOKEN => session_token}

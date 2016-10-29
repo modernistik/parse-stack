@@ -7,22 +7,37 @@ require 'active_support'
 require 'active_support/core_ext'
 
 require_relative 'protocol'
-# All Parse requests require authentication with specific header values.
-# This middleware takes all outgoing requests and adds the proper header values
-# base on the client configuration.
+
 module Parse
 
   module Middleware
-
+    # This middleware handles sending the proper authentication headers to the
+    # Parse REST API endpoint.
     class Authentication < Faraday::Middleware
       include Parse::Protocol
-      DISABLE_MASTER_KEY = "X-Disable-Parse-Master-Key"
+      DISABLE_MASTER_KEY = "X-Disable-Parse-Master-Key".freeze
+      # @return [String] the application id for this Parse endpoint.
       attr_accessor :application_id
+      # @return [String] the REST API Key for this Parse endpoint.
       attr_accessor :api_key
+      # The Master key API Key for this Parse endpoint. This is optional. If
+      # provided, it will be sent in every request.
+      # @return [String]
       attr_accessor :master_key
-      # The options hash should contain the proper keys to be added to the request.
-      def initialize(app, options = {})
-        super(app)
+
+      #
+      # @param adapter [Faraday::Adapter] An instance of the Faraday adapter
+      #  used for the connection. Defaults Faraday::Adapter::NetHttp.
+      # @param options [Hash] the options containing Parse authentication data.
+      # @option options [String] :application_id the application id.
+      # @option options [String] :api_key the REST API key.
+      # @option options [String] :master_key the Master Key for this application.
+      #  If it is set, it will be sent on every request unless this middleware sees
+      #  {DISABLE_MASTER_KEY} as an entry in the headers section.
+      # @option options [String] :content_type the content type format header. Defaults to
+      #  {Parse::Protocol::CONTENT_TYPE_FORMAT}.
+      def initialize(adapter, options = {})
+        super(adapter)
         @application_id = options[:application_id]
         @api_key = options[:api_key]
         @master_key = options[:master_key]
@@ -30,10 +45,12 @@ module Parse
       end
 
       # we dup the call for thread-safety
+      # @!visibility private
       def call(env)
         dup.call!(env)
       end
 
+      # @!visibility private
       def call!(env)
           # We add the main Parse protocol headers
           headers = {}

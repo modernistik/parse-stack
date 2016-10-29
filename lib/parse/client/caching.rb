@@ -5,13 +5,20 @@ require 'faraday'
 require 'faraday_middleware'
 require 'moneta'
 require_relative 'protocol'
-# This is a caching middleware for Parse queries using Moneta.
+
 module Parse
   module Middleware
     class CachingError < StandardError; end;
+    # This is a caching middleware for Parse queries using Moneta. The caching
+    # middleware will cache all GET requests made to the Parse REST API as long
+    # as the API responds with a successful non-empty result payload.
+    #
+    # Whenever an object is created or updated, the corresponding entry in the cache
+    # when fetching the particular record (using the specific non-Query based API)
+    # will be cleared.
     class Caching < Faraday::Middleware
       include Parse::Protocol
-      # Cache-Control: no-cache
+
       # Internal: List of status codes that can be cached:
          # * 200 - 'OK'
          # * 203 - 'Non-Authoritative Information'
@@ -20,30 +27,53 @@ module Parse
          # * 302 - 'Found'
          # * 404 - 'Not Found' - removed
          # * 410 - 'Gone' - removed
-      CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302]
+
+      CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302].freeze
       CACHE_CONTROL = 'Cache-Control'
-      CONTENT_LENGTH_KEY = "content-length"
-      CACHE_RESPONSE_HEADER = "X-Cache-Response"
+      CONTENT_LENGTH_KEY = 'content-length'
+      CACHE_RESPONSE_HEADER = 'X-Cache-Response'
       CACHE_EXPIRES_DURATION = 'X-Parse-Stack-Cache-Expires'
 
       class << self
-        attr_accessor :enabled, :logging
+        # @!attribute enabled
+        # @return [Boolean] whether the caching middleware should be enabled.
+        attr_accessor :enabled
+
+        # @!attribute logging
+        # @return [Boolean] whether the logging should be enabled.
+        attr_accessor :logging
 
         def enabled
            @enabled = true if @enabled.nil?
            @enabled
         end
 
+        # @return [Boolean] whether caching is enabled.
         def caching?
           @enabled
         end
 
       end
 
-      attr_accessor :store, :expires
+      # @!attribute [rw] store
+      # The internal moneta cache store instance.
+      # @return [Moneta::Transformer]
+      attr_accessor :store
 
-      def initialize(app, store, opts = {})
-        super(app)
+      # @!attribute [rw] expires
+      # The expiration time in seconds for this particular request.
+      # @return [Integer]
+      attr_accessor :expires
+
+      # Creates a new caching middleware.
+      # @param adapter [Faraday::Adapter] An instance of the Faraday adapter
+      #  used for the connection. Defaults Faraday::Adapter::NetHttp.
+      # @param store [Moneta] An instance of the Moneta cache store to use.
+      # @param opts [Hash] additional options.
+      # @option opts [Integer] :expires the default expiration for a cache entry.
+      # @raise Parse::Middleware::CachingError, if `store` is not a Moneta::Transformer instance.
+      def initialize(adapter, store, opts = {})
+        super(adapter)
         @store = store
         @opts = {expires: 0}
         @opts.merge!(opts) if opts.is_a?(Hash)
@@ -55,10 +85,12 @@ module Parse
 
       end
 
+      # @!visibility private
       def call(env)
         dup.call!(env)
       end
 
+      # @!visibility private
       def call!(env)
         @request_headers =  env[:request_headers]
 

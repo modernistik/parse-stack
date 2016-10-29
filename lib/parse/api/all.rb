@@ -14,3 +14,10 @@ require_relative "push"
 require_relative "schemas"
 require_relative "sessions"
 require_relative "users"
+
+module Parse
+  # The module containing most of the REST API requests supported by Parse Server.
+  # Defines all the Parse REST API endpoints.
+  module API
+  end
+end

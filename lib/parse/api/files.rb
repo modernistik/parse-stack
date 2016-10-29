@@ -7,10 +7,15 @@ require 'active_support/core_ext'
 module Parse
 
   module API
-    #object fetch methods
+    # Defines the Parse Files interface for the Parse REST API
     module Files
       FILES_PATH = "files"
-      # /1/classes/<className>	POST	Creating Objects
+
+      # Upload and create a Parse file.
+      # @param fileName [String] the basename of the file.
+      # @param data [Hash] the data related to this file.
+      # @param content_type [String] the mime-type of the file.
+      # @return [Parse::Response]
       def create_file(fileName, data = {}, content_type = nil)
         headers = {}
         headers.merge!( { Parse::Protocol::CONTENT_TYPE => content_type.to_s } ) if content_type.present?

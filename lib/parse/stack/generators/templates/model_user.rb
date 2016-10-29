@@ -1,5 +1,5 @@
 
-# See: https://github.com/modernistik/parse-stack#parseuser
+# The Parse _User collection
 class Parse::User < Parse::Object
   # add additional properties
 
