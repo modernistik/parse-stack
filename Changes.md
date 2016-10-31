@@ -1,5 +1,10 @@
 ## Parse-Stack Changelog
 
+### 1.5.3
+- Several fixes and performance improvements.
+- Major revisions to documentation.
+- Support for increment! and decrement! for Integer and Float properties.
+
 ### 1.5.2
 - FIXES #16: Constraints to `count` were not properly handled.
 - FIXES #15: Incorrect call to `request_password_reset`.

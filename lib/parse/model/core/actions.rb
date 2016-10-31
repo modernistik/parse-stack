@@ -259,7 +259,7 @@ module Parse
     # @return [Boolean] whether it was successful
     # @see #operate_field!
     def op_destroy!(field)
-      operate_field! field, { __op: :Delete }
+      operate_field! field, { __op: :Delete }.freeze
     end
 
     # Perform an atomic add operation on this relational field.
@@ -284,6 +284,17 @@ module Parse
       return false if objects.empty?
       relation_action = Parse::RelationAction.new(field, polarity: false, objects: objects)
       operate_field! field, relation_action
+    end
+
+    # Atomically increment or decrement a specific field.
+    # @param field [String] the name of the field in the Parse collection.
+    # @param amount [Integer] the amoun to increment. Use negative values to decrement.
+    # @see #operate_field!
+    def op_increment!(field, amount = 1)
+      unless amount.is_a?(Numeric)
+        raise ArgumentError, "Amount should be numeric"
+      end
+      operate_field! field, { __op: :Increment, amount: amount.to_i }.freeze
     end
 
     # @return [Parse::Request] a destroy_request for the current object.

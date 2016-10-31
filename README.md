@@ -665,8 +665,8 @@ end
 Properties are considered a literal-type of association. This means that a defined local property maps directly to a column name for that remote Parse class which contain the value. **All properties are implicitly formatted to map to a lower-first camelcase version in Parse (remote).** Therefore a local property defined as `like_count`, would be mapped to the remote column of `likeCount` automatically. The only special behavior to this rule is the `:id` property which maps to `objectId` in Parse. This implicit conversion mapping is the default behavior, but can be changed on a per-property basis. All Parse data types are supported and all Parse::Object subclasses already provide definitions for `:id` (objectId), `:created_at` (createdAt), `:updated_at` (updatedAt) and `:acl` (ACL) properties.
 
 - **:string** (_default_) - a generic string. Can be used as an enum field, see [Enum](#enum).
-- **:integer** (alias **:int**) - basic number.
-- **:float** - a floating numeric value.
+- **:integer** (alias **:int**) - basic number. Will also generate atomic `_increment!` helper method.
+- **:float** - a floating numeric value. Will also generate atomic `_increment!` helper method.
 - **:boolean** (alias **:bool**) - true/false value. This will also generate a class scope helper. See [Query Scopes](#query-scopes).
 - **:date** - a Parse date type. See [Parse::Date](#parsedate).
 - **:array** - a heterogeneous list with dirty tracking. See [Parse::CollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/collection_proxy.rb).
@@ -677,7 +677,11 @@ Properties are considered a literal-type of association. This means that a defin
 
 For completeness, the `:id` and `:acl` data types are also defined in order to handle the Parse `objectId` field and the `ACL` object. Those are special and should not be used in your class (unless you know what you are doing). New data types can be implemented through the internal `typecast` interface. **TODO: discuss `typecast` interface in the future**
 
-In addition, `:boolean` data types create a special method that uses the `?` convention. As an example, if you have a property named `approved`, the normal getter `obj.approved` can return true, false or nil based on the value in Parse. However with the `obj.approved?` method, it will return true if it set to true, false for any other value.
+When declaring a `:boolean` data type, it will also create a special method that uses the `?` convention. As an example, if you have a property named `approved`, the normal getter `obj.approved` can return true, false or nil based on the value in Parse. However with the `obj.approved?` method, it will return true if it set to true, false for any other value.
+
+When declaring an `:integer` or `:float` type, it will also create a special method that performs
+an atomic increment of that field through the `_increment!` and `_decrement!` methods. If you have
+defined a property named `like_count` for one of these numeric types, which would create the normal getter/setter `obj.like_count`; you can now also call `obj.like_count_increment!` or `obj.like_count_decrement!` to perform the atomic operations (done server side) on this field. You may also pass an amount as an argument to these helper methods such as `obj.like_count_increment!(3)`.
 
 Using the example above, we can add the base properties to our classes.
 

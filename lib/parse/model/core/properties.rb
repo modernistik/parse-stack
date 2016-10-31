@@ -300,7 +300,7 @@ module Parse
         # support question mark methods for boolean
         if data_type == :boolean
           if self.method_defined?("#{key}?")
-            puts "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}?."
+            puts "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}_increment!."
           end
 
           # returns true if set to true, false otherwise
@@ -308,6 +308,36 @@ module Parse
           unless opts[:scopes] == false
             scope key, ->(opts = {}){ query( opts.merge(key => true) ) }
           end
+        elsif data_type == :integer || data_type == :float
+          if self.method_defined?("#{key}_increment!")
+            puts "Creating increment helper :#{key}_increment!. Will overwrite existing method #{self}##{key}_increment!."
+          end
+
+          define_method("#{key}_increment!") do |amount = 1|
+            unless amount.is_a?(Numeric)
+              raise ArgumentError, "Amount needs to be an integer"
+            end
+            result = self.op_increment!(key, amount)
+            if result
+              new_value = send(key).to_i + amount
+              # set the updated value, with no dirty tracking
+              self.send set_attribute_method, new_value, false
+            end
+            result
+          end
+
+          if self.method_defined?("#{key}_decrement!")
+            puts "Creating decrement helper :#{key}_decrement!. Will overwrite existing method #{self}##{key}_decrement!."
+          end
+
+          define_method("#{key}_decrement!") do |amount = -1|
+            unless amount.is_a?(Numeric)
+              raise ArgumentError, "Amount needs to be an integer"
+            end
+            amount = -amount if amount > 0
+            send("#{key}_increment!", amount)
+          end
+
         end
 
         # The second method to be defined is a setter method. This is done by
