@@ -1,4 +1,6 @@
-# Parse-Stack - The Parse Server Ruby SDK
+<img src='https://github.com/modernistik/parse-stack/blob/master/.github/parse-ruby-sdk.png' width='500' alt='Ruby Parse SDK'/>
+
+# Parse-Stack - The Parse Ruby SDK
 Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for Ruby. It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ### Code Status
