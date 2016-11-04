@@ -57,23 +57,6 @@ module Parse
       #  A hash mapping of all belongs_to associations for this model.
       #  @return [Hash]
 
-      # @!method key?
-      # A dynamically generated method based on the value of `key` passed to the
-      # belongs_to method, which returns true if this instance has a pointer for
-      # this field.
-      # @example
-      #
-      #  class Post < Parse::Object
-      #  	belongs_to :author # generates 'author?'
-      #  end
-      #
-      #  post = Post.new
-      #  post.author? # => false
-      #  post.author = Author.new
-      #  post.author? # => true
-      # @return [Boolean] true if field contains a Parse::Pointer or subclass.
-
-
       # @!method self.belongs_to(key, opts = {})
       # Creates a one-to-one association with another Parse model.
       # @param [Symbol] key The singularized version of the foreign class and the name of the
@@ -106,6 +89,22 @@ module Parse
       # @return [Parse::Object] a Parse::Object subclass when using the accessor
       #  when fetching the association.
 
+      # @!method key?
+      # A dynamically generated method based on the value of `key` passed to the
+      # belongs_to method, which returns true if this instance has a pointer for
+      # this field.
+      # @example
+      #
+      #  class Post < Parse::Object
+      #  	belongs_to :author # generates 'author?'
+      #  end
+      #
+      #  post = Post.new
+      #  post.author? # => false
+      #  post.author = Author.new
+      #  post.author? # => true
+      # @return [Boolean] true if field contains a Parse::Pointer or subclass.
+      
       # @!visibility private
       def self.included(base)
         base.extend(ClassMethods)

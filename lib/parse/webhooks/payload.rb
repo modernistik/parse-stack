@@ -182,6 +182,17 @@ module Parse
       Parse::Object.build(@object)
     end
 
+    # This method will intentionally raise a {Parse::WebhookErrorResponse} with
+    # a specific message. When used inside of a registered cloud code webhook
+    # function or trigger, will halt processing and return the proper error response
+    # code back to the Parse server.
+    # @param msg [String] the error message to send back.
+    # @raise WebhookErrorResponse
+    # @return [WebhookErrorResponse]
+    def error!(msg = "")
+      raise Parse::WebhookErrorResponse, msg
+    end
+
     end # Payload
 
 end

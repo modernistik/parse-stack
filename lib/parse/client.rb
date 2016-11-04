@@ -169,16 +169,13 @@ module Parse
     # @param opts [Hash] a set of connection options to configure the client.
     # @option opts [String] :server_url The server url of your Parse Server if you
     #   are not using the hosted Parse service. By default it will use
-    #   PARSE_SERVER_URL environment variable available or fall back to
-    #   https://api.parse.com/1/ if not specified.
-    # @option opts [String] :app_id The Parse application id. By default it will
-    #    use PARSE_APP_ID environment variable if not specified.
-    # @option opts [String] :api_key The Parse REST API Key. By default it will
-    #    use PARSE_API_KEY environment variable if not specified.
+    #   ENV["PARSE_SERVER_URL"] if available, otherwise fallback to {Parse::Protocol::SERVER_URL}.
+    # @option opts [String] :app_id The Parse application id. Defaults to
+    #    ENV['PARSE_APP_ID'] or ENV['PARSE_APPLICATION_ID'].
+    # @option opts [String] :api_key The Parse REST API Key. Defaults to ENV['PARSE_REST_API_KEY'].
     # @option opts [String] :master_key The Parse application master key (optional).
     #    If this key is set, it will be sent on every request sent by the client
-    #    and your models. By default it will use PARSE_MASTER_KEY environment
-    #    variable if not specified.
+    #    and your models. Defaults to ENV['PARSE_MASTER_KEY'].
     # @option opts [Boolean] :logging It provides you additional logging information
     #    of requests and responses. If set to the special symbol of *:debug*, it
     #    will provide additional payload data in the log messages. This option affects
@@ -208,13 +205,13 @@ module Parse
     # @see Parse::Protocol
     def initialize(opts = {})
       @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
-      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_SERVER_APPLICATION_ID']
-      @api_key        = opts[:api_key] || opts[:rest_api_key]  || ENV["PARSE_API_KEY"] || ENV["PARSE_REST_API_KEY"]
-      @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"] || ENV['PARSE_SERVER_MASTER_KEY']
+      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_APPLICATION_ID']
+      @api_key        = opts[:api_key] || opts[:rest_api_key]  || ENV["PARSE_REST_API_KEY"] || ENV["PARSE_API_KEY"]
+      @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"]
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
       if @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
-        raise "Please call Parse.setup(application_id:, api_key:) to setup a client"
+        raise "Please call Parse.setup(server_url:, application_id:, api_key:) to setup a client"
       end
       @server_url += '/' unless @server_url.ends_with?('/')
       #Configure Faraday

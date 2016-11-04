@@ -5,18 +5,28 @@
 module Parse
   # Set of Parse protocol constants.
   module Protocol
-      HOST              = 'api.parse.com'
-      SERVER_URL        = 'https://api.parse.com/1/'
-      APP_ID            = 'X-Parse-Application-Id'
-      API_KEY           = 'X-Parse-REST-API-Key'
-      MASTER_KEY        = 'X-Parse-Master-Key'
-      SESSION_TOKEN     = 'X-Parse-Session-Token'
-      REVOCABLE_SESSION = 'X-Parse-Revocable-Session'
-      EMAIL             = 'X-Parse-Email'
-      PASSWORD          = 'X-Parse-Password'
-      INSTALLATION_ID   = 'Parse-Installation-Id'
-      CONTENT_TYPE      = 'Content-Type'
-      CONTENT_TYPE_FORMAT = 'application/json; charset=utf-8'
+    # The default server url, based on the hosted Parse platform.
+    SERVER_URL        = 'https://api.parse.com/1/'
+    # The request header field to send the application Id.
+    APP_ID            = 'X-Parse-Application-Id'
+    # The request header field to send the REST API key.
+    API_KEY           = 'X-Parse-REST-API-Key'
+    # The request header field to send the Master key.
+    MASTER_KEY        = 'X-Parse-Master-Key'
+    # The request header field to send the revocable Session key.
+    SESSION_TOKEN     = 'X-Parse-Session-Token'
+    # The request header field to request a revocable session token.
+    REVOCABLE_SESSION = 'X-Parse-Revocable-Session'
+    # The request header field to send the installation id.
+    INSTALLATION_ID   = 'Parse-Installation-Id'
+    # The request header field to send an email when authenticating with Parse hosted platform.
+    EMAIL             = 'X-Parse-Email'
+    # The request header field to send the password when authenticating with the Parse hosted platform.
+    PASSWORD          = 'X-Parse-Password'
+    # The request header field for the Content type.
+    CONTENT_TYPE      = 'Content-Type'
+    # The default content type format for sending API requests.
+    CONTENT_TYPE_FORMAT = 'application/json; charset=utf-8'
   end
 
   # All Parse error codes.

@@ -21,13 +21,13 @@ module Parse
           # if it is a basic column property, find the right datatype
           case v
           when :integer, :float
-            result[:type] = "Number"
+            result[:type] = Parse::Model::TYPE_NUMBER
           when :geopoint, :geo_point
-            result[:type] = "GeoPoint"
+            result[:type] = Parse::Model::TYPE_GEOPOINT
           when :pointer
-            result = { type: "Pointer", targetClass: references[k] }
+            result = { type: Parse::Model::TYPE_POINTER, targetClass: references[k] }
           when :acl
-            result[:type] = "ACL"
+            result[:type] = Parse::Model::ACL
           else
             result[:type] = v.to_s.camelize
           end
@@ -37,7 +37,7 @@ module Parse
         end
         #then add all the relational column attributes
         relations.each do |k,v|
-          sch[:fields][k] = { type: "Relation", targetClass: relations[k] }
+          sch[:fields][k] = { type: Parse::Model::TYPE_RELATION, targetClass: relations[k] }
         end
         sch
       end

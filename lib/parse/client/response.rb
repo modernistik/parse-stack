@@ -11,22 +11,39 @@ module Parse
   class Response
     include Enumerable
 
+    # Code for an unknown error.
     ERROR_INTERNAL = 1
+    # Code when the server returns a 500 or is non-responsive.
     ERROR_SERVICE_UNAVAILABLE = 2
+    # Code when the request times out.
     ERROR_TIMEOUT = 124
+    # Code when the requests per second limit as been exceeded.
     ERROR_EXCEEDED_BURST_LIMIT = 155
+    # Code when a requested record is not found.
     ERROR_OBJECT_NOT_FOUND = 101
+    # Code when the username is missing in request.
     ERROR_USERNAME_MISSING = 200
+    # Code when the password is missing in request.
     ERROR_PASSWORD_MISSING = 201
+    # Code when the username is already in the system.
     ERROR_USERNAME_TAKEN = 202
+    # Code when the email is already in the system.
     ERROR_EMAIL_TAKEN = 203
+    # Code when the email is not found
     ERROR_EMAIL_NOT_FOUND = 205
+    # Code when the email is invalid
     ERROR_EMAIL_INVALID = 125
 
-    ERROR = "error"
-    CODE = "code"
-    RESULTS = "results"
-    COUNT = "count"
+    # The field name for the error.
+    ERROR = "error".freeze
+    # The field name for the success.
+    SUCCESS = "success".freeze
+    # The field name for the error code.
+    CODE = "code".freeze
+    # The field name for the results of the request.
+    RESULTS = "results".freeze
+    # The field name for the count result in a count response.
+    COUNT = "count".freeze
 
     # @!attribute [rw] parse_class
     #  @return [String] the Parse class for this request
@@ -85,7 +102,7 @@ module Parse
       # if batch response, generate array based on the response hash.
       @result.map do |r|
         next r unless r.is_a?(Hash)
-        hash = r["success"] || r[ERROR]
+        hash = r[SUCCESS] || r[ERROR]
         Parse::Response.new hash
       end
     end

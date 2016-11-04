@@ -30,24 +30,50 @@ module Parse
     extend  ::ActiveModel::Callbacks # callback support on save, update, delete, etc.
     extend  ::ActiveModel::Naming # provides the methods for getting class names from Model classes
 
-    ID = "id".freeze
+    # The name of the field in a hash that contains information about the type
+    # of data the hash represents.
+    TYPE_FIELD = '__type'.freeze
+
+    # The objectId field in Parse Objects.
     OBJECT_ID   = 'objectId'.freeze
+    # @see OBJECT_ID
+    ID = "id".freeze
+
+    # The key field for getting class information.
     KEY_CLASS_NAME  = 'className'.freeze
+    # @deprecated Use OBJECT_ID instead.
     KEY_OBJECT_ID   = 'objectId'.freeze
+    # The key field for getting the created at date of an object hash.
     KEY_CREATED_AT  = 'createdAt'
+    # The key field for getting the updated at date of an object hash.
     KEY_UPDATED_AT  = 'updatedAt'
+    # The collection for Users in Parse. Used by Parse::User.
     CLASS_USER      = '_User'
+    # The collection for Installations in Parse. Used by Parse::Installation.
     CLASS_INSTALLATION = '_Installation'
+    # The collection for revocable Sessions in Parse. Used by Parse::Session.
     CLASS_SESSION = '_Session'
+    # The collection for revocable Roles in Parse. Used by Parse::Role.
     CLASS_ROLE = '_Role'
+    # The type label for hashes containing file data. Used by Parse::File.
     TYPE_FILE = 'File'
+    # The type label for hashes containing geopoints. Used by Parse::GeoPoint.
     TYPE_GEOPOINT = 'GeoPoint'
+    # The type label for hashes containing a Parse object. Used by Parse::Object and subclasses.
     TYPE_OBJECT = 'Object'
+    # The type label for hashes containing a Parse date object. Used by Parse::Date.
     TYPE_DATE = 'Date'
+    # The type label for hashes containing 'byte' data. Used by Parse::Bytes.
     TYPE_BYTES = 'Bytes'
+    # The type label for hashes containing ACL data. Used by Parse::ACL
+    TYPE_ACL = 'ACL'
+    # The type label for hashes storing numeric data.
+    TYPE_NUMBER = 'Number'
+    # The type label for hashes containing a Parse pointer.
     TYPE_POINTER = 'Pointer'
+    # The type label for hashes representing relational data.
     TYPE_RELATION = 'Relation'
-    TYPE_FIELD = '__type'
+
 
     # To support being able to have different ruby class names from the 'table'
     # names used in Parse, we will need to have a dynamic lookup system where
@@ -58,7 +84,9 @@ module Parse
     # @!visibility private
     @@model_cache = {}
 
-    # If set to true, a call to first_or_create will automatically save the object.
+    # @!attribute autosave_on_create
+    # If set to true, a call to {Parse::Object.first_or_create} will automatically save the object.
+    # Default is false.
     # @return [Boolean]
     def self.autosave_on_create
       @@autosave_on_create ||= false
@@ -69,6 +97,7 @@ module Parse
     end
 
     class << self
+      # @!attribute raise_on_save_failure
       # By default, we return `true` or `false` for save and destroy operations.
       # If you prefer to have `Parse::Object` raise an exception instead, you
       # can tell to do so either globally or on a per-model basis. When a save
@@ -88,11 +117,11 @@ module Parse
       # instance method of `#object` which contains the object that failed to save.
       #
       # @return [Boolean]
-      attr_accessor :raise_on_save_failure
 
       def raise_on_save_failure
         @global_raise_on_save_failure ||= false
       end
+
       def raise_on_save_failure=(bool)
         @global_raise_on_save_failure = bool
       end
