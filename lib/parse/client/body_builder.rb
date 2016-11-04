@@ -24,7 +24,7 @@ module Parse
         attr_accessor :logging
       end
 
-      # thread-safety
+      # Thread-safety
       # @!visibility private
       def call(env)
         dup.call!(env)

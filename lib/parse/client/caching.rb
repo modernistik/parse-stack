@@ -85,6 +85,7 @@ module Parse
 
       end
 
+      # Thread-safety
       # @!visibility private
       def call(env)
         dup.call!(env)

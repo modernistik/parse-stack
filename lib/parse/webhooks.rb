@@ -75,18 +75,6 @@ module Parse
 
   end
 
-  class Payload
-    # This method will intentionally raise a {WebhookErrorResponse}, which when used inside
-    # of a registered cloud code webhook function or trigger, will halt processing
-    # and return the proper error response code back to the Parse server.
-    # @param msg [String] the error message
-    # @raise WebhookErrorResponse
-    # @return [WebhookErrorResponse]
-    def error!(msg = "")
-      raise WebhookErrorResponse, msg
-    end
-  end
-
   # The error to be raised in registered trigger or function webhook blocks that
   # will trigger the Parse::Webhooks application to return the proper error response.
   class WebhookErrorResponse < StandardError; end;
@@ -95,7 +83,9 @@ module Parse
   class Webhooks
     include Client::Connectable
     extend Webhook::Registration
+    # The name of the incoming env containing the webhook key.
     HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY"
+    # The name of the incoming env containing the application id key.
     HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID"
     CONTENT_TYPE = "application/json"
 
@@ -220,7 +210,7 @@ module Parse
       end
 
       def key
-        @key ||= ENV['PARSE_WEBHOOK_KEY']
+        @key ||= ENV['PARSE_WEBHOOK_KEY'] || ENV['PARSE_SERVER_WEBHOOK_KEY']
       end
 
       # Standard Rack call method. This method processes an incoming cloud code
@@ -228,10 +218,16 @@ module Parse
       # The result of the handler for the matching webhook request is sent back to
       # Parse Server. If the handler raises a {Parse::WebhookErrorResponse},
       # it will return the proper error response.
+      # @raise Parse::WebhookErrorResponse whenever {Parse::Object}, ActiveModel::ValidationError
       # @param env [Hash] the environment hash in a Rack request.
-      # @return [Object] the value of calling `finish` on the Rack::Response object.
-      # @todo Create a call! method that takes a dup of this env.
+      # @return [Array] the value of calling `finish` on the {http://www.rubydoc.info/github/rack/rack/Rack/Response Rack::Response} object.
       def call(env)
+        # Thraed safety
+        dup.call!(env)
+      end
+
+      # @!visibility private
+      def call!(env)
 
         request = Rack::Request.new env
         response = Rack::Response.new

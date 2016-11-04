@@ -44,7 +44,7 @@ module Parse
         @content_type = options[:content_type] || CONTENT_TYPE_FORMAT
       end
 
-      # we dup the call for thread-safety
+      # Thread-safety
       # @!visibility private
       def call(env)
         dup.call!(env)
