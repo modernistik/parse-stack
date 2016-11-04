@@ -11,6 +11,7 @@ module Parse
 
   # Support for the Bytes type in Parse
   class Bytes < Model
+    # The default attributes in a Parse Bytes hash.
     ATTRIBUTES = {__type: :string, base64: :string }.freeze
     # @return [String] the base64 string representing the content
     attr_accessor :base64
@@ -26,7 +27,9 @@ module Parse
       @base64 = (bytes.is_a?(Bytes) ? bytes.base64 : bytes).dup
     end
 
-    # @return [Hash]
+    # @!attribute attributes
+    # Supports for mass assignment of values and encoding to JSON.
+    # @return [ATTRIBUTES]
     def attributes
       ATTRIBUTES
     end

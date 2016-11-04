@@ -23,6 +23,7 @@ module Parse
   # the Parse ISO hash format for these fields instead, set
   # `Parse::Object.disable_serialized_string_date = true`.
   class Date < ::DateTime
+    # The default attributes in a Parse Date hash.
     ATTRIBUTES = {  __type: :string, iso: :string }.freeze
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON

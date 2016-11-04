@@ -17,6 +17,7 @@ module Parse
     # registered handlers. The payloads are `Parse::Payload` type of objects that
     # represent that data that Parse sends webhook handlers.
     class Payload
+    # The set of keys that can be contained in a Parse hash payload for a webhook.
     ATTRIBUTES = { master: nil, user: nil,
            installationId: nil, params: nil,
              functionName: nil, object: nil,
@@ -74,7 +75,7 @@ module Parse
       @update = hash[:update] || {} #it comes as an update hash
     end
 
-    # @return [Hash]
+    # @return [ATTRIBUTES]
     def attributes
       ATTRIBUTES
     end

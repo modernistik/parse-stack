@@ -65,7 +65,7 @@ module Parse
     #
     # @see Parse::Object
     class Pointer < Model
-      # Attributes of a Pointer.
+      # The default attributes in a Parse Pointer hash.
       ATTRIBUTES = { __type: :string, className: :string, objectId: :string}.freeze
       # @return [String] the name of the Parse class for this pointer.
       attr_accessor :parse_class

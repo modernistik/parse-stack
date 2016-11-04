@@ -24,7 +24,7 @@ module Parse
       # @!attribute [rw] field
       # @return [Symbol] the name of the field
       attr_accessor :field
-      
+
       # @!attribute [rw] direction
       # The direction of the sorting. This is either `:asc` or `:desc`.
       # @return [Symbol]
@@ -59,7 +59,7 @@ module Parse
 
 end
 
-# Add all the operator instance methods to the symbol classes
+# Extension to add all the operator instance methods to the Symbol classe
 class Symbol
   Parse::Order::ORDERING.keys.each do |sym|
     define_method(sym) do

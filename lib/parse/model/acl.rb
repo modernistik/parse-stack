@@ -100,7 +100,7 @@ module Parse
     def permissions
       @permissions ||= {}
     end
-
+    # The key field value for public permissions.
     PUBLIC = "*"
 
     # Create a new ACL with default Public read/write permissions and any

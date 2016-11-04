@@ -26,6 +26,7 @@ module Parse
     # @note The default MIME type for all files is _image/jpeg_. This can be default
     #       can be changed by setting a value to `Parse::File.default_mime_type`.
     class File < Model
+      # The default attributes in a Parse File hash.
       ATTRIBUTES = {  __type: :string, name: :string, url: :string }.freeze
       # @return [String] the name of the file including extension (if any)
       attr_accessor :name

@@ -160,10 +160,10 @@ Parse-Stack is a full stack framework that utilizes several ideas behind [DataMa
 
 require 'parse/stack'
 
-Parse.setup app_id: APP_ID,
+Parse.setup server_url: 'https://localhost:1337/parse',
+            app_id: APP_ID,
             api_key: REST_API_KEY,
-            master_key: YOUR_MASTER_KEY,
-            server_url: 'https://api.parse.com/1/'
+            master_key: YOUR_MASTER_KEY # optional
 
 # login
 user = Parse::User.login(username, passwd)
@@ -1387,8 +1387,7 @@ songs.destroy
 ```
 
 ### Magic `save_all`
-By default, all Parse queries have a maximum fetch limit of 1000. While using the `:max` option, Parse-Stack can increase this up to 11,000. In the cases where you need to update a large number of objects, you can utilize the `Parse::Object#save_all` method
-to fetch, modify and save objects.
+By default, all Parse queries have a maximum fetch limit of 1000. While using the `:max` option, Parse-Stack can increase this up to 11,000. In the cases where you need to update a large number of objects, you can utilize the `Parse::Object#save_all` method to fetch, modify and save objects.
 
 This methodology works by continually fetching and saving older records related to the time you begin a `save_all` request (called an "anchor date"), until there are no records left to update. To enable this to work, you must have confidence that any modifications you make to the records will successfully save through you validations that may be present in your `before_save`. This is important, as saving a record will set its `updated_at` date to one newer than the "anchor date" of when the `save_all` started. This `save_all` process will stop whenever no more records match the provided constraints that are older than the "anchor date", or when an object that was previously updated, is seen again in a future fetch (_which means the object failed to save_). Note that `save_all` will automatically manage the correct `updated_at` constraints in the query, so it is recommended that you do not use it as part of the initial constraints.
 
@@ -1400,6 +1399,8 @@ This methodology works by continually fetching and saving older records related 
   	# do not call save. We will batch objects for saving.
   end
 ```
+
+If you plan on using this feature in a lot of places, we recommend making sure you have set a MongoDB index of at least `{ "_updated_at" : 1 }`.
 
 ### Deleting
 You can destroy a Parse record, just call the `#destroy` method. It will return a boolean value whether it was successful.

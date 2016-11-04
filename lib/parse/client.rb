@@ -210,7 +210,7 @@ module Parse
       @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"]
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
-      if @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
+      if @server_url.nil? || @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
         raise "Please call Parse.setup(server_url:, application_id:, api_key:) to setup a client"
       end
       @server_url += '/' unless @server_url.ends_with?('/')

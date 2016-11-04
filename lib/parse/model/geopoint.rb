@@ -23,18 +23,25 @@ module Parse
   #   place.save
   #
   class GeoPoint < Model
+    # The default attributes in a Parse GeoPoint hash.
     ATTRIBUTES = {  __type: :string, latitude: :float, longitude: :float }.freeze
 
     # @return [Float] latitude value between -90.0 and 90.0
     attr_accessor :latitude
     # @return [Float] longitude value between -180.0 and 180.0
     attr_accessor :longitude
-    FIELD_LAT = "latitude"
-    FIELD_LNG = "longitude"
+    # The key field for latitude
+    FIELD_LAT = "latitude".freeze
+    # The key field for longitude
+    FIELD_LNG = "longitude".freeze
 
+    # The minimum latitude value.
     LAT_MIN = -90.0
+    # The maximum latitude value.
     LAT_MAX = 90.0
+    # The minimum longitude value.
     LNG_MIN = -180.0
+    # The maximum longitude value.
     LNG_MAX = 180.0
 
     alias_method :lat, :latitude

@@ -1,5 +1,10 @@
 ## Parse-Stack Changelog
 
+### 1.6.0.beta1
+- The default server url is now 'http://localhost:1337/parse'.
+- Improves thread-safety of Webhooks middleware.
+- Performance improvements.
+
 ### 1.5.3
 - Several fixes and performance improvements.
 - Major revisions to documentation.
