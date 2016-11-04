@@ -1,7 +1,6 @@
 <img src='https://github.com/modernistik/parse-stack/blob/master/.github/parse-ruby-sdk.png' width='500' alt='Ruby Parse SDK'/>
 
-# Parse-Stack - The Parse Ruby SDK
-Parse-Stack is a [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for Ruby. It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
+Parse-Stack is the [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 ### Code Status
 [![Gem Version](https://badge.fury.io/rb/parse-stack.svg)](https://badge.fury.io/rb/parse-stack)
@@ -33,7 +32,7 @@ Parse-Stack comes with support for Rails by adding additional rake tasks and gen
 
 For a more details on the rails integration see [Parse-Stack Rails Example](https://github.com/modernistik/parse-stack-rails-example).
 
-## Table Of Contents
+# Parse-Stack - The Parse Server Ruby SDK
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
