@@ -4,6 +4,7 @@
 - The default server url is now 'http://localhost:1337/parse'.
 - Improves thread-safety of Webhooks middleware.
 - Performance improvements.
+- BeforeSave change payloads do not include the className field.
 
 ### 1.5.3
 - Several fixes and performance improvements.

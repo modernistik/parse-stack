@@ -489,7 +489,7 @@ module Parse
         r =  relation_change_operations.select { |s| s.present? }.first
         h.merge!(r) if r.present?
       end
-      h.merge!(className: parse_class) unless h.empty?
+      #h.merge!(className: parse_class) unless h.empty?
       h.as_json
     end
     alias_method :update_payload, :changes_payload
