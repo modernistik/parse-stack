@@ -113,6 +113,7 @@ module Parse
       # @!attribute [rw] collection
       #  Set the internal collection of items without dirty tracking or
       #  change notifications.
+      # @return [Array] the collection
       def set_collection!(list)
         @collection = list
       end
@@ -230,6 +231,7 @@ module Parse
         collection.count
       end
 
+      # @return [Hash] a JSON representation
       def as_json(*args)
         collection.as_json(args)
       end
@@ -253,21 +255,25 @@ module Parse
         forward "#{@key}_will_change!"
       end
 
+      # Alias for Array#each
       def each
         return collection.enum_for(:each) unless block_given?
         collection.each &Proc.new
       end
 
+      # Alias for Array#map
       def map
         return collection.enum_for(:map) unless block_given?
         collection.map &Proc.new
       end
 
+      # Alias for Array#select
       def select
         return collection.enum_for(:select) unless block_given?
         collection.select &Proc.new
       end
 
+      # @!visibility private
       def inspect
         "#<#{self.class} changed?=#{changed?} @collection=#{@collection.inspect} >"
       end

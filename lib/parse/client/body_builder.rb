@@ -10,11 +10,26 @@ require 'active_support/core_ext'
 require 'active_model_serializers'
 
 module Parse
+
+  # @!attribute self.logging
+  # Sets {Parse::Middleware::BodyBuilder} logging.
+  # You may specify `:debug` for additional verbosity.
+  # @return (see Parse::Middleware::BodyBuilder.logging)
+  def self.logging
+    Parse::Middleware::BodyBuilder.logging
+  end
+  # @!visibility private
+  def self.logging=(value)
+    Parse::Middleware::BodyBuilder.logging = value
+  end
+  
+  # Namespace for Parse-Stack related middleware.
   module Middleware
     # This middleware takes an incoming Parse response, after an outgoing request,
     # and creates a Parse::Response object.
     class BodyBuilder < Faraday::Middleware
       include Parse::Protocol
+      # Header sent when a GET requests exceeds the limit.
       HTTP_OVERRIDE = 'X-Http-Method-Override'
 
       class << self

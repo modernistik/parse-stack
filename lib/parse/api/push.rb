@@ -6,6 +6,7 @@ module Parse
   module API
     # Defines the Parse Push notification service interface for the Parse REST API
     module Push
+      # @!visibility private
       PUSH_PATH = "push"
 
       # Update the schema for a collection.

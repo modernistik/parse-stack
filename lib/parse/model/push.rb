@@ -89,12 +89,16 @@ module Parse
       @query ||= Parse::Query.new(Parse::Model::CLASS_INSTALLATION)
     end
 
-    # @!attribute [rw] where
-    #   @return [Hash] a hash of 'where' query constraints
+    # Set a hash of conditions for this push query.
+    # @return [Parse::Query]
     def where=(where_clausees)
       query.where where_clauses
     end
 
+    # Apply a set of constraints.
+    # @param constraints [Hash] the set of {Parse::Query} cosntraints
+    # @return [Hash] if no constraints were passed, returns a compiled query.
+    # @return [Parse::Query] if constraints were passed, returns the chainable query.
     def where(constraints = nil)
       return query.compile_where unless constraints.is_a?(Hash)
       query.where constraints

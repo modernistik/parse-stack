@@ -375,6 +375,7 @@ module Parse
 
         end
 
+        # Define a one-to-many or many-to-many association between the local model and a foreign class.
         def has_many(key, scope = nil, **opts)
           opts[:through] ||= :query
 
@@ -545,7 +546,6 @@ module Parse
       end
 
       # @return [Boolean] true if there are pending relational changes for
-      #  associations defined using Parse Relations.
       def relation_changes?
         changed.any? { |key| relations[key.to_sym] }
       end

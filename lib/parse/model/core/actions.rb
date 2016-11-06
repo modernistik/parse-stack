@@ -16,7 +16,9 @@ module Parse
   # either added or removed from the relation. This class is used to generate the proper
   # hash request formats Parse needs in order to modify relational information for classes.
   class RelationAction
+    # @!visibility private
     ADD = "AddRelation"
+    # @!visibility private
     REMOVE = "RemoveRelation"
     # @!attribute polarity
     # @return [Boolean] whether it is an addition (true) or removal (false) action.

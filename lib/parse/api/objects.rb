@@ -10,8 +10,10 @@ module Parse
     # REST API methods for fetching CRUD operations on Parse objects.
     module Objects
       # The class prefix for fetching objects.
+      # @!visibility private
       CLASS_PATH_PREFIX = "classes/"
-      # The class prefix mapping for fetching objects.
+
+      # @!visibility private
       PREFIX_MAP = { installation: "installations", _installation: "installations",
         user: "users", _user: "users",
         role: "roles", _role: "roles",
@@ -23,6 +25,7 @@ module Parse
         base.extend(ClassMethods)
       end
 
+      # Class methods to be applied to {Parse::Client}
       module ClassMethods
         # Get the API path for this class.
         # @param className [String] the name of the Parse collection.

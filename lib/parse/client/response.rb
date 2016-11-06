@@ -3,11 +3,12 @@
 
 require 'active_support'
 require 'active_support/json'
-# This is the model that represents a response from Parse. A Response can also
-# be a set of responses (from a Batch response).
-module Parse
 
+module Parse
+  # An error when a general response error occurs when communicating with Parse server.
   class ResponseError < StandardError; end;
+  # Represents a response from Parse server. A response can also
+  # be a set of responses (from a Batch response).
   class Response
     include Enumerable
 
@@ -162,6 +163,7 @@ module Parse
       self
     end
 
+    # @!visibility private
     def inspect
       if error?
         "#<#{self.class} @code=#{code} @error='#{error}'>"

@@ -9,6 +9,7 @@ module Parse
   module API
     # Defines the Parse Files interface for the Parse REST API
     module Files
+      # @!visibility private
       FILES_PATH = "files"
 
       # Upload and create a Parse file.

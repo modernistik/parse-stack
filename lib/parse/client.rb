@@ -18,14 +18,21 @@ require_relative "client/caching"
 require_relative "api/all"
 
 module Parse
-
+  # An error when a general connection occurs.
   class ConnectionError < StandardError; end;
+  # An error when a connection timeout occurs.
   class TimeoutError < StandardError; end;
+  # An error when there is an Parse REST API protocol error.
   class ProtocolError < StandardError; end;
+  # An error when the Parse server returned invalid code.
   class ServerError < StandardError; end;
+  # An error when a Parse server responds with HTTP 500.
   class ServiceUnavailableError < StandardError; end;
+  # An error when the authentication credentials in the request are invalid.
   class AuthenticationError < StandardError; end;
+  # An error when the burst limit has been exceeded.
   class RequestLimitExceededError < StandardError; end;
+  # An error when the session token provided in the request is invalid.
   class InvalidSessionTokenError < StandardError; end;
 
   # Retrieve the App specific Parse configuration parameters. The configuration
@@ -97,7 +104,9 @@ module Parse
     include Parse::API::Batch
     include Parse::API::Push
     include Parse::API::Schema
+    # @!visibility private
     RETRY_COUNT = 2
+    # @!visibility private
     RETRY_DELAY = 2 #seconds
 
     # @!attribute cache
@@ -476,10 +485,12 @@ module Parse
     # Any subclass can override their `client` methods to provide a different session to use
     module Connectable
 
+      # @!visibility private
       def self.included(baseClass)
         baseClass.extend ClassMethods
       end
-
+      # Class methods to be added to any object that wants to have standard access to
+      # a the default {Parse::Client} instance.
       module ClassMethods
 
           # @return [Parse::Client] the current client for :default.

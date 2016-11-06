@@ -15,6 +15,7 @@ module Parse
     # Parse REST API endpoint.
     class Authentication < Faraday::Middleware
       include Parse::Protocol
+      # @!visibility private
       DISABLE_MASTER_KEY = "X-Disable-Parse-Master-Key".freeze
       # @return [String] the application id for this Parse endpoint.
       attr_accessor :application_id

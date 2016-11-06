@@ -84,7 +84,7 @@ module Parse
     # @!visibility private
     @@model_cache = {}
 
-    # @!attribute autosave_on_create
+    # @!attribute self.autosave_on_create
     # If set to true, a call to {Parse::Object.first_or_create} will automatically save the object.
     # Default is false.
     # @return [Boolean]
@@ -92,12 +92,13 @@ module Parse
       @@autosave_on_create ||= false
     end
 
+    # @!visibility private
     def self.autosave_on_create=(bool)
       @@autosave_on_create = bool
     end
 
     class << self
-      # @!attribute raise_on_save_failure
+      # @!attribute self.raise_on_save_failure
       # By default, we return `true` or `false` for save and destroy operations.
       # If you prefer to have `Parse::Object` raise an exception instead, you
       # can tell to do so either globally or on a per-model basis. When a save
@@ -166,7 +167,7 @@ module Parse
 
 end
 
-
+# Add extensions to the String class.
 class String
   # This method returns a camel-cased version of the string with the first letter
   # of the string in lower case. This is the standard naming convention for Parse columns
@@ -210,6 +211,7 @@ class String
   end
 end
 
+# Add extensions to the Symbol class.
 class Symbol
   # @return [String] a lower-first-camelcased version of the symbol
   # @see String#columnize

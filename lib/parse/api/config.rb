@@ -6,8 +6,12 @@ module Parse
   module API
     # Defines the Config interface for the Parse REST API
     module Config
-      # @return [Hash] the cached config hash for the client.
+
+      # @!attribute config
+      #  @return [Hash] the cached config hash for the client.
       attr_accessor :config
+
+      # @!visibility private
       CONFIG_PATH = "config"
 
       # @return [Hash] force fetch the application configuration hash.

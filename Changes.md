@@ -5,6 +5,7 @@
 - Improves thread-safety of Webhooks middleware.
 - Performance improvements.
 - BeforeSave change payloads do not include the className field.
+- Reaches 100% documentation (will try to keep it up).
 
 ### 1.5.3
 - Several fixes and performance improvements.

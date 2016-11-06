@@ -87,6 +87,7 @@ module Parse
     HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY"
     # The name of the incoming env containing the application id key.
     HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID"
+    # The content type that needs to be sent back to Parse server.
     CONTENT_TYPE = "application/json"
 
     # @!attribute key
@@ -208,9 +209,12 @@ module Parse
       def error(data = false)
         { error: data }.to_json
       end
-
+      
+      # Returns the configured webhook key if available. By default it will use
+      # the value of ENV['PARSE_WEBHOOK_KEY'] if not configured.
+      # @return [String]
       def key
-        @key ||= ENV['PARSE_WEBHOOK_KEY'] || ENV['PARSE_SERVER_WEBHOOK_KEY']
+        @key ||= ENV['PARSE_WEBHOOK_KEY']
       end
 
       # Standard Rack call method. This method processes an incoming cloud code

@@ -6,6 +6,7 @@ module Parse
   module API
     # Defines the Session class interface for the Parse REST API
     module Sessions
+      # @!visibility private
       SESSION_PATH_PREFIX = "sessions"
 
       # Fetch a session record for a given session token.

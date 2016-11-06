@@ -47,7 +47,7 @@ module Parse
   end
 end
 
-
+# Adds extensions to Time class to be compatible with {Parse::Date}.
 class Time
   # @return [Parse::Date] Converts object to Parse::Date
   def parse_date
@@ -55,7 +55,7 @@ class Time
   end
 
 end
-
+# Adds extensions to DateTime class to be compatible with {Parse::Date}.
 class DateTime
   # @return [Parse::Date] Converts object to Parse::Date
   def parse_date
@@ -63,7 +63,9 @@ class DateTime
   end
 end
 
+# Adds extensions to ActiveSupport class to be compatible with {Parse::Date}.
 module ActiveSupport
+  # Adds extensions to ActiveSupport::TimeWithZone class to be compatible with {Parse::Date}.
   class TimeWithZone
     # @return [Parse::Date] Converts object to Parse::Date
     def parse_date

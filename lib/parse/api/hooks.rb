@@ -7,6 +7,7 @@ module Parse
   module API
     # Defines the Parse webhooks interface for the Parse REST API
     module Hooks
+      # @!visibility private
       HOOKS_PREFIX = "hooks/"
       # The allowed set of Parse triggers.
       TRIGGER_NAMES = [:beforeSave, :afterSave, :beforeDelete, :afterDelete].freeze

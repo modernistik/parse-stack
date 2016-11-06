@@ -95,6 +95,7 @@ module Parse
     extend Schema
     include Fetching
     include Actions
+    # @!visibility private
     BASE_OBJECT_CLASS = "Parse::Object".freeze
 
     # @return [Model::TYPE_OBJECT]
@@ -426,11 +427,15 @@ module Parse
     property :updated_at, :date
     property :acl, :acl, field: :ACL
 
+    # Alias to {created_at}
+    # @return (see #created_at)
     def createdAt
       return @created_at if Parse::Object.disable_serialized_string_date.present?
       @created_at.to_time.utc.iso8601(3) if @created_at.present?
     end
 
+    # Alias to {updated_at}
+    # @return (see #updated_at)
     def updatedAt
       return @updated_at if Parse::Object.disable_serialized_string_date.present?
       @updated_at.to_time.utc.iso8601(3) if @updated_at.present?

@@ -8,6 +8,7 @@ require_relative 'protocol'
 
 module Parse
   module Middleware
+    # An error when there was a problem retrieving or caching a specific request.
     class CachingError < StandardError; end;
     # This is a caching middleware for Parse queries using Moneta. The caching
     # middleware will cache all GET requests made to the Parse REST API as long
@@ -19,19 +20,22 @@ module Parse
     class Caching < Faraday::Middleware
       include Parse::Protocol
 
-      # Internal: List of status codes that can be cached:
-         # * 200 - 'OK'
-         # * 203 - 'Non-Authoritative Information'
-         # * 300 - 'Multiple Choices'
-         # * 301 - 'Moved Permanently'
-         # * 302 - 'Found'
-         # * 404 - 'Not Found' - removed
-         # * 410 - 'Gone' - removed
-
+      # List of status codes that can be cached:
+      # * 200 - 'OK'
+      # * 203 - 'Non-Authoritative Information'
+      # * 300 - 'Multiple Choices'
+      # * 301 - 'Moved Permanently'
+      # * 302 - 'Found'
+      # * 404 - 'Not Found' - removed
+      # * 410 - 'Gone' - removed
       CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302].freeze
+      # Cache control header
       CACHE_CONTROL = 'Cache-Control'
+      # Request env key for the content length
       CONTENT_LENGTH_KEY = 'content-length'
+      # Header in response that is sent if this is a cached result
       CACHE_RESPONSE_HEADER = 'X-Cache-Response'
+      # Header in request to set caching information for the middleware.
       CACHE_EXPIRES_DURATION = 'X-Parse-Stack-Cache-Expires'
 
       class << self

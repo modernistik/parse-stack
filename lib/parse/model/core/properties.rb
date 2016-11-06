@@ -21,7 +21,7 @@ module Parse
   module Properties
     # This is an exception that is thrown if there is an issue when creating a specific property for a class.
     class DefinitionError < StandardError; end;
-    class ValueError < StandardError; end;
+    #class ValueError < StandardError; end;
 
     # These are the base types supported by Parse.
     TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl].freeze
@@ -31,13 +31,15 @@ module Parse
     BASE_KEYS = [:id, :created_at, :updated_at].freeze
     # Default hash map of local attribute name to remote column name
     BASE_FIELD_MAP = {id: :objectId, created_at: :createdAt, updated_at: :updatedAt, acl: :ACL}.freeze
-
+    # The delete operation hash.
     DELETE_OP = {"__op"=>"Delete"}.freeze
 
+    # @!visibility private
     def self.included(base)
       base.extend(ClassMethods)
     end
 
+    # The class methods added to Parse::Objects
     module ClassMethods
 
       # The fields method returns a mapping of all local attribute names and their data type.
@@ -64,7 +66,8 @@ module Parse
         @enums ||= {}
       end
 
-      # Keeps track of all the attributes supported by this class.
+      # Set the property fields for this class.
+      # @return [Hash]
       def attributes=(hash)
         @attributes = BASE.merge(hash)
       end
@@ -74,6 +77,7 @@ module Parse
         @attributes ||= BASE.dup
       end
 
+      # @return [Array] the list of fields that have defaults.
       def defaults_list
         @defaults_list ||= []
       end
@@ -406,23 +410,28 @@ module Parse
 
     end #ClassMethods
 
-    # returns the class level stored field map
+    # @return [Hash] a hash mapping of all property fields and their types.
     def field_map
       self.class.field_map
     end
 
-    # returns the list of fields
+    # @return returns the list of fields
     def fields(type = nil)
       self.class.fields(type)
     end
 
     # TODO: We can optimize
+    # @return [Hash] returns the list of property attributes for this class.
     def attributes
       {__type: :string, :className => :string}.merge!(self.class.attributes)
     end
 
     # support for setting a hash of attributes on the object with a given dirty tracking value
     # if dirty_track: is set to false (default), attributes are set without dirty tracking.
+    # Allos mass assignment of properties with a provided hash.
+    # @param hash [Hash] the hash matching the property field names.
+    # @param dirty_track [Boolean] whether dirty tracking be enabled
+    # @return [Hash]
     def apply_attributes!(hash, dirty_track: false)
       return unless hash.is_a?(Hash)
 
@@ -433,8 +442,8 @@ module Parse
       end
     end
 
-    # applies a hash of attributes overriding any current value the object has for those
-    # attributes
+    # Supports mass assignment of attributes
+    # @return (see #apply_attributes!)
     def attributes=(hash)
       return unless hash.is_a?(Hash)
       # - [:id, :objectId]
@@ -442,12 +451,14 @@ module Parse
       apply_attributes!(hash, dirty_track: true)
     end
 
-    # returns a hash of attributes (and their new values) that had been changed.
-    # This will not include any of the base attributes (ex. id, created_at, etc)
-    # If true is passed as an argument, then all attributes will be included.
-    # This method is useful for generating an update hash for the Parse PUT API
-    # TODO: Replace this algorithm with reduce()
+    # Returns a hash of attributes for properties that have changed. This will
+    # not include any of the base attributes (ex. id, created_at, etc).
+    # This method helps generate the change payload that will be sent when saving
+    # objects to Parse.
+    # @param include_all [Boolean] whether to include all {Parse::Properties::BASE_KEYS} attributes.
+    # @return [Hash]
     def attribute_updates(include_all = false)
+      # TODO: Replace this algorithm with reduce()
       h = {}
       changed.each do |key|
         key = key.to_sym
@@ -464,13 +475,19 @@ module Parse
       h
     end
 
-    # determines if any of the attributes have changed.
+    # @return [Boolean] true if any of the attributes have changed.
     def attribute_changes?
       changed.any? do |key|
         fields[key.to_sym].present?
       end
     end
-
+    # Returns a formatted value based on the operation hash and data_type of the property.
+    # For some values in Parse, they are specified as operation hashes which could include
+    # Add, Remove, Delete, AddUnique and Increment.
+    # @param key [Symbol] the name of the property
+    # @param val [Hash] the Parse operation hash value.
+    # @param data_type [Symbol] The data type of the property.
+    # @return [Object]
     def format_operation(key, val, data_type)
       return val unless val.is_a?(Hash) && val["__op"].present?
       op = val["__op"]
@@ -496,6 +513,11 @@ module Parse
 
     # this method takes an input value and transforms it to the proper local format
     # depending on the data type that was set for a particular property key.
+    # Return the internal representation of a property value for a given data type.
+    # @param key [Symbol] the name of the property
+    # @param val [Object] the value to format.
+    # @param data_type [Symbol] provide a hint to the data_type of this value.
+    # @return [Object]
     def format_value(key, val, data_type = nil)
       # if data_type wasn't passed, then get the data_type from the fields hash
       data_type ||= self.fields[key]

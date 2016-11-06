@@ -79,8 +79,8 @@ module Parse
   #  LinkedIdMissing	250	Error code indicating that a user cannot be linked to an account because that account's id could not be found.
   #  InvalidLinkedSession	251	Error code indicating that a user with a linked (e.g. Facebook) account has an invalid session.
   #  UnsupportedService	252	Error code indicating that a service being linked (e.g. Facebook or Twitter) is unsupported.
-  module ErrorCodes
-
-  end
+  # module ErrorCodes
+  #
+  # end
 
 end

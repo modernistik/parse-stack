@@ -35,9 +35,15 @@ module Parse
   # @see Array.save
   # @see Array.destroy
   class BatchOperation
-
-    attr_accessor :requests, :responses
     include Enumerable
+    
+    # @!attribute requests
+    #  @return [Array] the set of requests in this batch.
+
+    # @!attribute responses
+    #  @return [Array] the set of responses from this batch.
+    attr_accessor :requests, :responses
+
 
     # @return [Parse::Client] the client to be used for the request.
     def client

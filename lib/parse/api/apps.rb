@@ -7,6 +7,7 @@ module Parse
     # Defines the Apps interface for the Parse REST API
     module Apps
 
+      # @!visibility private
       APPS_PATH = "apps"
 
       # Fetch the application keys.

@@ -8,10 +8,13 @@ module Parse
   module API
     # Defines the User class interface for the Parse REST API
     module Users
-
+      # @!visibility private
       USER_PATH_PREFIX = "users"
+      # @!visibility private
       LOGOUT_PATH = "logout"
+      # @!visibility private
       LOGIN_PATH = "login"
+      # @!visibility private
       REQUEST_PASSWORD_RESET = "requestPasswordReset"
 
       # Fetch a {Parse::User} for a given objectId.

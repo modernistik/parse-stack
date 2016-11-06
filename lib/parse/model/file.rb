@@ -33,7 +33,7 @@ module Parse
       # @return [String] the url resource of the file.
       attr_accessor :url
 
-      # You may set the contents of the file.
+      # @return [Object] the contents of the file.
       attr_accessor :contents
 
       # @return [String] the mime-type of the file whe
@@ -43,12 +43,16 @@ module Parse
       # @return [Model::TYPE_FILE]
       def parse_class; self.class.parse_class; end;
       alias_method :__type, :parse_class
+      # @!visibility private
       FIELD_NAME = "name"
+      # @!visibility private
       FIELD_URL = "url"
       class << self
 
+        # @return [String] the default mime-type
         attr_accessor :default_mime_type
 
+        # @return [Boolean] whether to force all urls to be https.
         attr_accessor :force_ssl
 
         # @return [String] The default mime type for created instances. Default: _'image/jpeg'_
@@ -136,6 +140,7 @@ module Parse
         @url == u.url
       end
 
+      # Allows mass assignment from a Parse JSON hash.
       def attributes=(h)
         if h.is_a?(String)
           @url = h
@@ -188,7 +193,7 @@ module Parse
 
 end
 
-
+# Adds extensions to Hash class.
 class Hash
   # Determines if the hash contains Parse File json metadata fields. This is determined whether
   # the key `__type` exists and is of type `__File` and whether the `name` field matches the File.basename

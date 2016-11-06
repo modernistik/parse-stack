@@ -6,6 +6,7 @@ module Parse
   module API
     # Defines the Schema interface for the Parse REST API
     module Schema
+      # @!visibility private
       SCHEMAS_PATH = "schemas"
 
       # Get the schema for a collection.
