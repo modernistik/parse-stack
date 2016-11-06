@@ -6,6 +6,8 @@
 - Performance improvements.
 - BeforeSave change payloads do not include the className field.
 - Reaches 100% documentation (will try to keep it up).
+- Retry mechanism now configurable per client.
+- Retry now follows sampling back-off delay algorithm.
 
 ### 1.5.3
 - Several fixes and performance improvements.
