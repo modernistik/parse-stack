@@ -390,7 +390,7 @@ module Parse
     #  to get as many as 11_000 records with the aid if skipping.
     # @return [self]
     def limit(count)
-      if count == :max || count == :all
+      if count == :max
         @limit = 11_000
       elsif count.is_a?(Numeric)
         @limit = [ 0, count.to_i, 11_000].sort[1]
@@ -734,7 +734,7 @@ module Parse
     def compile(encode: true, includeClassName: false)
       run_callbacks :prepare do
         q = {} #query
-        q[:limit] = 11_000 if @limit == :max || @limit == :all
+        q[:limit] = 11_000 if @limit == :max
         q[:limit] = @limit if @limit.is_a?(Numeric) && @limit > 0
         q[:skip] = @skip if @skip > 0
 

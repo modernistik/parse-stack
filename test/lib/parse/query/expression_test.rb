@@ -43,8 +43,6 @@ class TestParseQueryExpressions < Minitest::Test
     assert_equal 100, @query.clause(:limit)
     @query.limit :max
     assert_equal 11_000, @query.clause(:limit)
-    @query.limit :all
-    assert_equal 11_000, @query.clause(:limit)
   end
 
   def test_exp_options
