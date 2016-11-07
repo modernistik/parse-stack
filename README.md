@@ -148,7 +148,6 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
   - [Register Webhooks](#register-webhooks)
 - [Parse REST API Client](#parse-rest-api-client)
   - [Request Caching](#request-caching)
-- [Installation](#installation)
 - [Development](#development)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -2309,20 +2308,6 @@ Parse::Client.client.clear_cache!
 # or through the client accessor of a model
 Song.client.clear_cache!
 
-```
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'parse-stack'
-```
-
-or install it locally
-
-```ruby
-$ gem install parse-stack
 ```
 
 ## Development
