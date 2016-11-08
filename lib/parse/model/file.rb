@@ -26,6 +26,8 @@ module Parse
     # @note The default MIME type for all files is _image/jpeg_. This can be default
     #       can be changed by setting a value to `Parse::File.default_mime_type`.
     class File < Model
+      # Regular expression that matches the old legacy Parse hosted file name
+      LEGACY_FILE_RX = /^tfss-[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}-/
       # The default attributes in a Parse File hash.
       ATTRIBUTES = {  __type: :string, name: :string, url: :string }.freeze
       # @return [String] the name of the file including extension (if any)
@@ -176,6 +178,12 @@ module Parse
           end
         end
         saved?
+      end
+
+      # @return [Boolean] true if this file is hosted by Parse's servers.
+      def parse_hosted_file?
+        return false if @url.blank?
+        ::File.basename(@url).starts_with?('tfss-') || @url.starts_with?('http://files.parsetfss.com')
       end
 
       # @!visibility private
