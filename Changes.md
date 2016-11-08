@@ -8,6 +8,7 @@
 - Reaches 100% documentation (will try to keep it up).
 - Retry mechanism now configurable per client.
 - Retry now follows sampling back-off delay algorithm.
+- Adds `schemas` API to retrieve all schemas for an application.
 
 ### 1.5.3
 - Several fixes and performance improvements.

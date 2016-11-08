@@ -9,6 +9,12 @@ module Parse
       # @!visibility private
       SCHEMAS_PATH = "schemas"
 
+      # Get all the schemas for the application.
+      # @return [Parse::Response]
+      def schemas
+        request :get, SCHEMAS_PATH
+      end
+
       # Get the schema for a collection.
       # @param className [String] the name of the remote Parse collection.
       # @return [Parse::Response]
