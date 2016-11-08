@@ -6,7 +6,7 @@
 - Performance improvements.
 - BeforeSave change payloads do not include the className field.
 - Reaches 100% documentation (will try to keep it up).
-- Retry mechanism now configurable per client.
+- Retry mechanism now configurable per client through `retry_limit`.
 - Retry now follows sampling back-off delay algorithm.
 - Adds `schemas` API to retrieve all schemas for an application.
 

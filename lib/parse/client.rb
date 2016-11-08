@@ -128,11 +128,11 @@ module Parse
     #  The Parse server url that will be receiving these API requests. By default
     #  this will be {Parse::Protocol::SERVER_URL}.
     #  @return [String]
-    # @!attribute retries
+    # @!attribute retry_limit
     #  The default retry count for the client when a specific request timesout or
     #  the service is unavailable. Defaults to {DEFAULT_RETRIES}.
     #  @return [String]
-    attr_accessor :cache, :retries
+    attr_accessor :cache, :retry_limit
     attr_reader :application_id, :api_key, :master_key, :server_url
     alias_method :app_id, :application_id
     # The client can support multiple sessions. The first session created, will be placed
@@ -275,9 +275,9 @@ module Parse
     # If set, returns the current retry count for this instance. Otherwise,
     # returns {DEFAULT_RETRIES}. Set to 0 to disable retry mechanism.
     # @return [Integer] the current retry count for this client.
-    def retries
-      return DEFAULT_RETRIES if @retries.nil?
-      @retries
+    def retry_limit
+      return DEFAULT_RETRIES if @retry_limit.nil?
+      @retry_limit
     end
 
     # @return [String] the url prefix of the Parse Server url.
@@ -338,12 +338,12 @@ module Parse
     # @see Parse::Protocol
     # @see Parse::Request
     def request(method, uri = nil, body: nil, query: nil, headers: nil, opts: {})
-      retries_remaining ||= self.retries
+      _retry_count ||= self.retry_limit
 
       if opts[:retry] == false
-        retries_remaining = 0
+        _retry_count = 0
       elsif opts[:retry].to_i > 0
-        retries_remaining = opts[:retry]
+        _retry_count = opts[:retry]
       end
 
       headers ||= {}
@@ -431,22 +431,22 @@ module Parse
 
       response
     rescue Parse::ServiceUnavailableError => e
-      if retries_remaining > 0
-        puts "[Parse:Retry] Retries remaining #{retries_remaining} : #{response.request}"
-        retries_remaining -= 1
-        backoff_delay = RETRY_DELAY * (self.retries - retries_remaining)
-        retry_delay = [0,RETRY_DELAY, backoff_delay].sample
-        sleep retry_delay if retry_delay > 0
+      if _retry_count > 0
+        puts "[Parse:Retry] Retries remaining #{_retry_count} : #{response.request}"
+        _retry_count -= 1
+        backoff_delay = RETRY_DELAY * (self.retry_limit - _retry_count)
+        _retry_delay = [0,RETRY_DELAY, backoff_delay].sample
+        sleep _retry_delay if _retry_delay > 0
         retry
       end
       raise
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
-      if retries_remaining > 0
-        puts "[Parse:Retry] Retries remaining #{retries_remaining} : #{_request}"
-        retries_remaining -= 1
-        backoff_delay = RETRY_DELAY * (self.retries - retries_remaining)
-        retry_delay = [0,RETRY_DELAY, backoff_delay].sample
-        sleep retry_delay if retry_delay > 0
+      if _retry_count > 0
+        puts "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
+        _retry_count -= 1
+        backoff_delay = RETRY_DELAY * (self.retry_limit - _retry_count)
+        _retry_delay = [0,RETRY_DELAY, backoff_delay].sample
+        sleep _retry_delay if _retry_delay > 0
         retry
       end
       raise Parse::ConnectionError, "#{_request} : #{e.class} - #{e.message}"
