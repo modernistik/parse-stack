@@ -115,7 +115,8 @@ module Parse
 
         # allow :bool for :boolean
         data_type = :boolean if data_type == :bool
-        data_type = :integer if data_type == :int
+        data_type = :geopoint if data_type == :geo_point
+        data_type = :integer if data_type == :int || data_type == :number
 
         # set defaults
         opts = { required: false,

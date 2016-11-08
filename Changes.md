@@ -9,6 +9,8 @@
 - Retry mechanism now configurable per client through `retry_limit`.
 - Retry now follows sampling back-off delay algorithm.
 - Adds `schemas` API to retrieve all schemas for an application.
+- :number can now be used as an alias for the :integer data type.
+- :geo_point can now be used as an alias for the :geo_point data type.
 
 ### 1.5.3
 - Several fixes and performance improvements.
