@@ -1,6 +1,7 @@
 ## Parse-Stack Changelog
 
 ### 1.6.0.beta1
+- NEW: Auto generate models based on your remote schema.
 - The default server url is now 'http://localhost:1337/parse'.
 - Improves thread-safety of Webhooks middleware.
 - Performance improvements.

@@ -1,4 +1,4 @@
-<img src='https://github.com/modernistik/parse-stack/blob/master/.github/parse-ruby-sdk.png' width='500' alt='Ruby Parse SDK'/>
+<img src='http://modernistik.s3.amazonaws.com/parse-stack/parse-ruby-sdk.png' width='500' alt='Ruby Parse SDK'/>
 
 Parse-Stack is the [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
@@ -47,6 +47,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
 - [Connection Setup](#connection-setup)
   - [Connection Options](#connection-options)
 - [Parse Config](#parse-config)
+- [Working With Existing Schemas](#working-with-existing-schemas)
 - [Core Classes](#core-classes)
   - [Parse::Pointer](#parsepointer)
   - [Parse::File](#parsefile)
@@ -164,10 +165,10 @@ Parse.setup server_url: 'https://localhost:1337/parse',
             api_key: REST_API_KEY,
             master_key: YOUR_MASTER_KEY # optional
 
-# login
-user = Parse::User.login(username, passwd)
+# Automatically build models based on your Parse application schemas.
+Parse.auto_generate_models!
 
-# Custom Subclasses
+# or define custom Subclasses (Highly Recommended)
 class Song < Parse::Object
   property :name
   property :play, :integer
@@ -190,6 +191,9 @@ end
 
 # updates schemas for your Parse app based on your models (non-destructive)
 Parse.auto_upgrade!
+
+# login
+user = Parse::User.login(username, passwd)
 
 artist = Artist.new(name: "Frank Sinatra", genres: ["swing", "jazz"])
 artist.fans << user
@@ -334,6 +338,19 @@ Getting your configuration variables once you have a default client setup can be
   # Force fetch of config!
   val = Parse.config!["myKey"]
 
+```
+
+## Working With Existing Schemas
+If you already have a Parse application with defined schemas and collections, you can have Parse-Stack automatically generate the ruby Parse::Object subclasses instead of writing them on your own. Through this process, the framework will download all the defined schemas of all your collections, and infer the properties and associations defined. While this method is useful for getting started with the framework with an existing app, we highly recommend definiting your own models. This would allow you to customize and utilize all the features availabling in Parse::Stack.
+
+```ruby
+  # after you have called Parse.setup
+  # Assume you have a Song and Artist collections defined remotely
+  Parse.auto_generate_models!
+
+  # You can now use them as if you defined them
+  artist = Artist.first
+  Song.all(artist: artist)
 ```
 
 ## Core Classes

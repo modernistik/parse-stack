@@ -11,29 +11,43 @@ require 'active_model_serializers'
 require 'time'
 require 'open-uri'
 
-require_relative "../client"
-require_relative "model"
-require_relative "pointer"
-require_relative "geopoint"
-require_relative "file"
-require_relative "bytes"
-require_relative "date"
-require_relative "acl"
-require_relative "push"
+require_relative '../client'
+require_relative 'model'
+require_relative 'pointer'
+require_relative 'geopoint'
+require_relative 'file'
+require_relative 'bytes'
+require_relative 'date'
+require_relative 'acl'
+require_relative 'push'
 require_relative 'core/actions'
 require_relative 'core/fetching'
 require_relative 'core/querying'
-require_relative "core/schema"
-require_relative "core/properties"
-require_relative "associations/has_one"
-require_relative "associations/belongs_to"
-require_relative "associations/has_many"
+require_relative 'core/schema'
+require_relative 'core/properties'
+require_relative 'core/builder'
+require_relative 'associations/has_one'
+require_relative 'associations/belongs_to'
+require_relative 'associations/has_many'
 
 
 module Parse
   # @return [Array] an array of registered Parse::Object subclasses.
   def self.registered_classes
       Parse::Object.descendants.map(&:parse_class).uniq
+  end
+
+  # @return [Array<Hash>] the list of all schemas for this application.
+  def self.schemas
+    client.schemas.results
+  end
+
+  # Fetch the schema for a specific collection name.
+  # @param className [String] the name collection
+  # @return [Hash] the schema document of this collection.
+  # @see Parse::ClassBuilder.build!
+  def self.schema(className)
+    client.schema(className).result
   end
 
   # Perform a non-destructive upgrade of all your Parse schemas in the backend
