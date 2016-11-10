@@ -269,7 +269,10 @@ module Parse
     end # initialize
 
     # Add a set of query expressions and constraints.
-    # @param expressions
+    # @example
+    #  query.conditions({:field.gt => value})
+    # @param expressions [Hash] containing key value pairs of Parse::Operations
+    #   and their value.
     # @return [self]
     def conditions(expressions = {})
       expressions.each do |expression, value|
@@ -713,6 +716,19 @@ module Parse
       @results
     end
     alias_method :result, :results
+
+    # Similar to {#results} but takes an additional set of conditions to apply. This
+    # method helps support the use of class and instance level scopes.
+    # @param expressions (see #conditions)
+    # @yield (see #results)
+    # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
+    # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
+    # @see #results
+    def all(expressions = {limit: :max})
+      conditions(expressions)
+      return results(&Proc.new) if block_given?
+      results
+    end
 
     # Builds objects based on the set of Parse JSON hashes in an array.
     # @param list [Array<Hash>] a list of Parse JSON hashes
