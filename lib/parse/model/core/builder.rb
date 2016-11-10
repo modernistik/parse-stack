@@ -51,7 +51,7 @@ module Parse
       end
 
       base_fields = Parse::Properties::BASE.keys
-      class_fields = klass.field_map.values
+      class_fields = klass.field_map.values + [:className]
       fields.each do |field, type|
         field = field.to_sym
         key = field.to_s.underscore.to_sym
