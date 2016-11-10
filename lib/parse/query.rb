@@ -475,10 +475,19 @@ module Parse
       self #chaining
     end
 
-    # @return [Array<Parse::Constraint>] an array of constraints
+    # @param raw [Boolean] whether to return the hash form of the constraints.
+    # @return [Array<Parse::Constraint>] if raw is false, an array of constraints
     #  composing the :where clause for this query.
-    def constraints
-      @where
+    # @return [Hash] if raw i strue, an hash representing the constraints.
+    def constraints(raw = false)
+      raw ? where_constraints : @where
+    end
+
+    # Formats the current set of Parse::Constraint instances in the where clause
+    # as an expression hash.
+    # @return [Hash] the set of constraints
+    def where_constraints
+      @where.reduce({}) { |memo, constraint| memo[constraint.operation] = constraint.value; memo }
     end
 
     # Add additional query constraints to the `where` clause. The `where` clause
