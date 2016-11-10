@@ -10,7 +10,48 @@ require 'parallel'
 require_relative '../../client/request'
 require_relative 'fetching'
 
+
 module Parse
+
+  class Query
+
+
+    # Supporting the `all` class method to be used in scope chaining with queries.
+    # @!visibility private
+    def all(expressions = {limit: :max})
+      conditions(expressions)
+      return results(&Proc.new) if block_given?
+      results
+    end
+
+    # Supporting the `first_or_create` class method to be used in scope chaining with queries.
+    # @!visibility private
+    def first_or_create(query_attrs = {}, resource_attrs = {})
+      conditions(query_attrs)
+      klass = Parse::Model.find_class self.table
+      if klass.blank?
+        raise ArgumentError, "Parse model with class name #{self.table} is not registered."
+      end
+      hash_constraints = constraints(true)
+      klass.first_or_create(hash_constraints, resource_attrs)
+    end
+
+    # Supporting the `save_all` method to be used in scope chaining with queries.
+    # @!visibility private
+    def save_all(expressions = {})
+      conditions(expressions)
+      klass = Parse::Model.find_class self.table
+      if klass.blank?
+        raise ArgumentError, "Parse model with class name #{self.table} is not registered."
+      end
+      hash_constraints = constraints(true)
+
+      klass.save_all(hash_constraints, &Proc.new) if block_given?
+      klass.save_all(hash_constraints)
+    end
+
+  end
+
   # A Parse::RelationAction is special operation that adds one object to a relational
   # table as to another. Depending on the polarity of the action, the objects are
   # either added or removed from the relation. This class is used to generate the proper
@@ -105,11 +146,14 @@ module Parse
       end
 
       # Finds the first object matching the query conditions, or creates a new
-      # unsaved object with the attributes.
-      # the provided query attributes, otherwise create
+      # unsaved object with the attributes. This method takes the possibility of two hashes,
+      # therefore make sure you properly wrap the contents of the input with `{}`.
+      #   Parse::User.first_or_create({ ..query conditions..})
+      #   Parse::User.first_or_create({ ..query conditions..}, {.. resrouce_attrs ..})
       # @param query_attrs [Hash] a set of query constraints that also are applied.
       # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
       # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
+      # @see Parse::Model.autosave_on_create
       def first_or_create(query_attrs = {}, resource_attrs = {})
 
         query_attrs.symbolize_keys!
