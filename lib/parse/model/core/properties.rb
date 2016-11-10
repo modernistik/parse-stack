@@ -19,8 +19,6 @@ module Parse
   # This module provides support for handling all the different types of column data types
   # supported in Parse and mapping them between their remote names with their local ruby named attributes.
   module Properties
-    # This is an exception that is thrown if there is an issue when creating a specific property for a class.
-    class DefinitionError < StandardError; end;
     #class ValueError < StandardError; end;
 
     # These are the base types supported by Parse.
@@ -132,11 +130,11 @@ module Parse
         # it can be overriden by the :field parameter
         parse_field = opts[:field].to_sym
         if self.fields[key].present? && BASE_FIELD_MAP[key].nil?
-          raise DefinitionError, "Property #{self}##{key} already defined with data type #{data_type}"
+          raise ArgumentError, "Property #{self}##{key} already defined with data type #{data_type}"
         end
         # We keep the list of fields that are on the remote Parse store
         if self.fields[parse_field].present?
-          raise DefinitionError, "Alias property #{self}##{parse_field} conflicts with previously defined property."
+          raise ArgumentError, "Alias property #{self}##{parse_field} conflicts with previously defined property."
         end
         #dirty tracking. It is declared to use with ActiveModel DirtyTracking
         define_attribute_methods key
@@ -166,12 +164,12 @@ module Parse
         if is_enum_type
 
           unless data_type == :string
-            raise DefinitionError, "Property #{self}##{parse_field} :enum option is only supported on :string data types."
+            raise ArgumentError, "Property #{self}##{parse_field} :enum option is only supported on :string data types."
           end
 
           enum_values = opts[:enum]
           unless enum_values.is_a?(Array) && enum_values.empty? == false
-            raise DefinitionError, "Property #{self}##{parse_field} :enum option must be an Array type of symbols."
+            raise ArgumentError, "Property #{self}##{parse_field} :enum option must be an Array type of symbols."
           end
           opts[:symbolize] = true
 
@@ -186,11 +184,11 @@ module Parse
             # If the passed value is true, the methods are prefixed/suffixed with the name of the enum. It is also possible to supply a custom value:
             prefix = opts[:_prefix]
             unless opts[:_prefix].nil? || prefix.is_a?(Symbol) || prefix.is_a?(String)
-              raise DefinitionError, "Enumeration option :_prefix must either be a symbol or string for #{self}##{key}."
+              raise ArgumentError, "Enumeration option :_prefix must either be a symbol or string for #{self}##{key}."
             end
 
             unless opts[:_suffix].is_a?(TrueClass) || opts[:_suffix].is_a?(FalseClass)
-              raise DefinitionError, "Enumeration option :_suffix must either be true or false for #{self}##{key}."
+              raise ArgumentError, "Enumeration option :_suffix must either be true or false for #{self}##{key}."
             end
 
             add_suffix = opts[:_suffix] == true
@@ -198,7 +196,7 @@ module Parse
 
             class_method_name = prefix_or_key.to_s.pluralize.to_sym
             if singleton_class.method_defined?(class_method_name)
-              raise DefinitionError, "You tried to define an enum named `#{key}` for #{self} " + \
+              raise ArgumentError, "You tried to define an enum named `#{key}` for #{self} " + \
               "but this will generate a method  `#{self}.#{class_method_name}` " + \
               " which is already defined. Try using :_suffix or :_prefix options."
             end
@@ -234,7 +232,7 @@ module Parse
 
         #only support symbolization of string data types
         if symbolize_value && (data_type == :string || data_type == :array) == false
-          raise DefinitionError, "Tried to symbolize #{self}##{key}, but it is only supported on :string or :array data types."
+          raise ArgumentError, "Tried to symbolize #{self}##{key}, but it is only supported on :string or :array data types."
         end
 
         # Here is the where the 'magic' begins. For each property defined, we will

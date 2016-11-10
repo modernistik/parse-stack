@@ -399,10 +399,10 @@ module Parse
 
           # verify that the user did not duplicate properties or defined different properties with the same name
           if self.fields[key].present? && Parse::Properties::BASE_FIELD_MAP[key].nil?
-            raise Parse::Properties::DefinitionError, "Has_many property #{self}##{key} already defined with type #{klassName}"
+            raise ArgumentError, "Has_many property #{self}##{key} already defined with type #{klassName}"
           end
           if self.fields[parse_field].present?
-            raise Parse::Properties::DefinitionError, "Alias has_many #{self}##{parse_field} conflicts with previously defined property."
+            raise ArgumentError, "Alias has_many #{self}##{parse_field} conflicts with previously defined property."
           end
           # validations
           validates_presence_of(key) if opts[:required]

@@ -104,7 +104,7 @@ module Parse
       #  post.author = Author.new
       #  post.author? # => true
       # @return [Boolean] true if field contains a Parse::Pointer or subclass.
-      
+
       # @!visibility private
       def self.included(base)
         base.extend(ClassMethods)
@@ -129,10 +129,10 @@ module Parse
           set_attribute_method = :"#{key}_set_attribute!"
 
           if self.fields[key].present? && Parse::Properties::BASE_FIELD_MAP[key].nil?
-            raise Parse::Properties::DefinitionError, "Belongs relation #{self}##{key} already defined with type #{klassName}"
+            raise ArgumentError, "Belongs relation #{self}##{key} already defined with type #{klassName}"
           end
           if self.fields[parse_field].present?
-            raise Parse::Properties::DefinitionError, "Alias belongs_to #{self}##{parse_field} conflicts with previously defined property."
+            raise ArgumentError, "Alias belongs_to #{self}##{parse_field} conflicts with previously defined property."
           end
           # store this attribute in the attributes hash with the proper remote column name.
           # we know the type is pointer.
