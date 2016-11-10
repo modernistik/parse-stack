@@ -8,8 +8,6 @@ require_relative 'protocol'
 
 module Parse
   module Middleware
-    # An error when there was a problem retrieving or caching a specific request.
-    class CachingError < StandardError; end;
     # This is a caching middleware for Parse queries using Moneta. The caching
     # middleware will cache all GET requests made to the Parse REST API as long
     # as the API responds with a successful non-empty result payload.
@@ -75,7 +73,7 @@ module Parse
       # @param store [Moneta] An instance of the Moneta cache store to use.
       # @param opts [Hash] additional options.
       # @option opts [Integer] :expires the default expiration for a cache entry.
-      # @raise Parse::Middleware::CachingError, if `store` is not a Moneta::Transformer instance.
+      # @raise ArgumentError, if `store` is not a Moneta::Transformer instance.
       def initialize(adapter, store, opts = {})
         super(adapter)
         @store = store
@@ -84,7 +82,7 @@ module Parse
         @expires = @opts[:expires]
 
         unless @store.is_a?(Moneta::Transformer)
-          raise Parse::Middleware::CachingError, "Caching store object must a Moneta key/value store (Moneta::Transformer)."
+          raise ArgumentError, "Caching store object must a Moneta key/value store (Moneta::Transformer)."
         end
 
       end
