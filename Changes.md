@@ -1,6 +1,6 @@
 ## Parse-Stack Changelog
 
-### 1.6.0.beta1
+### 1.6.0.beta2
 - NEW: Auto generate models based on your remote schema.
 - The default server url is now 'http://localhost:1337/parse'.
 - Improves thread-safety of Webhooks middleware.
@@ -12,6 +12,8 @@
 - Adds `schemas` API to retrieve all schemas for an application.
 - :number can now be used as an alias for the :integer data type.
 - :geo_point can now be used as an alias for the :geo_point data type.
+- Support accessing properties of Parse::Object subclasses through the [] operator.
+- Support setting properties of Parse::Object subclasses through the []= operator.
 
 ### 1.5.3
 - Several fixes and performance improvements.

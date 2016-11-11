@@ -456,6 +456,27 @@ module Parse
       @updated_at.to_time.utc.iso8601(3) if @updated_at.present?
     end
 
+    # Access the value for a defined property through hash accessor. This method
+    # returns nil if the key is not one of the defined properties for this Parse::Object
+    # subclass.
+    # @param key [String] the name of the property. This key must be in the {field_map}
+    # @return [Object] the value for this key.
+    def [](key)
+      return nil unless self.class.field_map[key.to_sym].present?
+      send(key)
+    end
+
+    # Set the value for a specific property through a hash accessor. This method
+    # does nothing if key is not one of the defined properties for this Parse::Object
+    # subclass.
+    # @param key (see Parse::Object#[])
+    # @param value [Object] the value to set this property.
+    # @return [Object] the value passed in.
+    def []=(key,value)
+      return unless self.class.field_map[key.to_sym].present?
+      send("#{key}=",value)
+    end
+
   end
 
 

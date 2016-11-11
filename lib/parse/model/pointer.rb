@@ -155,6 +155,27 @@ module Parse
       def present?
         parse_class.present? && @id.present?
       end
+
+      # Access the pointer properties through hash accessor. This is done for
+      # compatibility with the hash access of a Parse::Object. This method
+      # returns nil if the key is not one of: :id, :objectId, or :className.
+      # @param key [String] the name of the property.
+      # @return [Object] the value for this key.
+      def [](key)
+        return nil unless [:id,:objectId,:className].include?(key.to_sym)
+        send(key)
+      end
+
+      # Set the pointer properties through hash accessor. This is done for
+      # compatibility with the hash access of a Parse::Object. This method
+      # does nothing if the key is not one of: :id, :objectId, or :className.
+      # @param key (see #[])
+      # @return [Object]
+      def []=(key,value)
+        return unless [:id,:objectId,:className].include?(key.to_sym)
+        send("#{key}=",value)
+      end
+
     end
 
 end
