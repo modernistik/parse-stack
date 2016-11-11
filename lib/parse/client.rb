@@ -104,7 +104,9 @@ module Parse
     include Parse::API::Batch
     include Parse::API::Push
     include Parse::API::Schema
+    # The user agent header key.
     USER_AGENT_HEADER = "User-Agent".freeze
+    # The value for the User-Agent header.
     USER_AGENT_VERSION = "Parse-Stack v#{Parse::Stack::VERSION}".freeze
     # The default retry count
     DEFAULT_RETRIES = 2

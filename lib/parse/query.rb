@@ -150,13 +150,24 @@ module Parse
     # if you do not want any field formatting to be performed.
 
     @field_formatter = :columnize
+    @allow_scope_introspection = false
     class << self
+
+      # @!attribute allow_scope_introspection
+      # The attribute will prevent automatically fetching results of a scope when
+      # using the console. This is useful when you want to see the queries of scopes
+      # instead of automatically returning the results.
+      # @return [Boolean] true to have scopes return query objects instead of results when
+      #  running in the console.
+
+      # @!attribute field_formatter
       # The method to use when converting field names to Parse column names. Default is {String#columnize}.
       # By convention Parse uses lowercase-first camelcase syntax for field/column names, but ruby
       # uses snakecase. To support this methodology we process all field constraints through the method
       # defined by the field formatter. You may set this to nil to turn off this functionality.
       # @return [Symbol] The filter method to process column and field names. Default {String#columnize}.
-      attr_accessor :field_formatter
+
+      attr_accessor :field_formatter, :allow_scope_introspection
 
       # @param str [String] the string to format
       # @return [String] formatted string using {Parse::Query.field_formatter}.
@@ -193,6 +204,16 @@ module Parse
 
           clause.deep_merge!( subclause.as_json || {} )
           clause
+        end
+      end
+
+      # Applies special singleton methods to a query instance in order to
+      # automatically fetch results when using any ruby console.
+      # @!visibility private
+      def apply_auto_introspection!(query)
+        unless @allow_scope_introspection
+          query.define_singleton_method(:to_s) { self.results.to_s }
+          query.define_singleton_method(:inspect) { self.results.to_a.inspect }
         end
       end
 

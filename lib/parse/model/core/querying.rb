@@ -100,6 +100,9 @@ module Parse
               return results.send(m, *args, &chained_block)
             end
           end
+
+          Parse::Query.apply_auto_introspection!(_q)
+
           return _q if block.nil?
           _q.results(&block)
         end
