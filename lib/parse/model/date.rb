@@ -44,6 +44,11 @@ module Parse
       to_time.utc.iso8601(3)
     end
 
+    # @return (see #iso)
+    def to_s(*args)
+      args.empty? ? iso : super(*args)
+    end
+
   end
 end
 

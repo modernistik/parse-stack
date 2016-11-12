@@ -14,6 +14,7 @@
 - :geo_point can now be used as an alias for the :geo_point data type.
 - Support accessing properties of Parse::Object subclasses through the [] operator.
 - Support setting properties of Parse::Object subclasses through the []= operator.
+- :to_s method of Parse::Date returns the iso8601(3) by default, if no arguments are provided.
 
 ### 1.5.3
 - Several fixes and performance improvements.
