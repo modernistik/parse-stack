@@ -459,10 +459,10 @@ module Parse
     # Access the value for a defined property through hash accessor. This method
     # returns nil if the key is not one of the defined properties for this Parse::Object
     # subclass.
-    # @param key [String] the name of the property. This key must be in the {field_map}
+    # @param key [String] the name of the property. This key must be in the {fields} hash.
     # @return [Object] the value for this key.
     def [](key)
-      return nil unless self.class.field_map[key.to_sym].present?
+      return nil unless self.class.fields[key.to_sym].present?
       send(key)
     end
 
@@ -473,7 +473,7 @@ module Parse
     # @param value [Object] the value to set this property.
     # @return [Object] the value passed in.
     def []=(key,value)
-      return unless self.class.field_map[key.to_sym].present?
+      return unless self.class.fields[key.to_sym].present?
       send("#{key}=",value)
     end
 
