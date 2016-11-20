@@ -9,7 +9,7 @@ require 'active_support/core_ext'
 
 module Parse
   # Interface to the CloudCode webhooks API.
-  module Webhook
+  class Webhooks
     # Module to support registering Parse CloudCode webhooks.
     module Registration
       # The set of allowed trigger types.

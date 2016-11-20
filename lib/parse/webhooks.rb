@@ -51,7 +51,7 @@ module Parse
     #
     #  end
     # @param type (see Parse::Webhooks.route)
-    # @yield the body of the function to be evaluated in the scope of a {Parse::Payload} instance.
+    # @yield the body of the function to be evaluated in the scope of a {Parse::Webhooks::Payload} instance.
     # @param block [Symbol] the name of the method to call, if no block is passed.
     # @return (see Parse::Webhooks.route)
     def self.webhook(type, block = nil)
@@ -75,14 +75,15 @@ module Parse
 
   end
 
-  # The error to be raised in registered trigger or function webhook blocks that
-  # will trigger the Parse::Webhooks application to return the proper error response.
-  class WebhookErrorResponse < StandardError; end;
   # A Rack-based application middlware to handle incoming Parse cloud code webhook
   # requests.
   class Webhooks
+    # The error to be raised in registered trigger or function webhook blocks that
+    # will trigger the Parse::Webhooks application to return the proper error response.
+    class ResponseError < StandardError; end;
+
     include Client::Connectable
-    extend Webhook::Registration
+    extend Parse::Webhooks::Registration
     # The name of the incoming env containing the webhook key.
     HTTP_PARSE_WEBHOOK = "HTTP_X_PARSE_WEBHOOK_KEY"
     # The name of the incoming env containing the application id key.
@@ -164,7 +165,7 @@ module Parse
       # This method is usually called when an incoming request from Parse Server is received.
       # @param type (see route)
       # @param className (see route)
-      # @param payload [Parse::Payload] the payload object received from the server.
+      # @param payload [Parse::Webhooks::Payload] the payload object received from the server.
       # @return [Object] the result of the trigger or function.
       def call_route(type, className, payload = nil)
         type = type.to_s.underscore.to_sym #support camelcase
@@ -209,7 +210,7 @@ module Parse
       def error(data = false)
         { error: data }.to_json
       end
-      
+
       # Returns the configured webhook key if available. By default it will use
       # the value of ENV['PARSE_WEBHOOK_KEY'] if not configured.
       # @return [String]
@@ -220,9 +221,9 @@ module Parse
       # Standard Rack call method. This method processes an incoming cloud code
       # webhook request from Parse Server, validates it and executes any registered handlers for it.
       # The result of the handler for the matching webhook request is sent back to
-      # Parse Server. If the handler raises a {Parse::WebhookErrorResponse},
+      # Parse Server. If the handler raises a {Parse::Webhooks::ResponseError},
       # it will return the proper error response.
-      # @raise Parse::WebhookErrorResponse whenever {Parse::Object}, ActiveModel::ValidationError
+      # @raise Parse::Webhooks::ResponseError whenever {Parse::Object}, ActiveModel::ValidationError
       # @param env [Hash] the environment hash in a Rack request.
       # @return [Array] the value of calling `finish` on the {http://www.rubydoc.info/github/rack/rack/Rack/Response Rack::Response} object.
       def call(env)
@@ -248,7 +249,7 @@ module Parse
 
         request.body.rewind
         begin
-          payload = Parse::Payload.new request.body.read
+          payload = Parse::Webhooks::Payload.new request.body.read
         rescue => e
           warn "Invalid webhook payload format: #{e}"
           response.write error("Invalid payload format. Should be valid JSON.")
@@ -291,7 +292,7 @@ module Parse
           end
           response.write success(result)
           return response.finish
-        rescue Parse::WebhookErrorResponse, ActiveModel::ValidationError => e
+        rescue Parse::Webhooks::ResponseError, ActiveModel::ValidationError => e
           if payload.trigger?
             puts "[Webhook ResponseError] >> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}: #{e}"
           elsif payload.function?

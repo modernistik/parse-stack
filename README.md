@@ -2102,7 +2102,7 @@ Push notifications are implemented through the `Parse::Push` class. To send push
 ```
 
 ## Cloud Code Webhooks
-Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks.
+Parse Parse allows you to receive Cloud Code webhooks on your own hosted server. The `Parse::Webhooks` class is a lightweight Rack application that routes incoming Cloud Code webhook requests and payloads to locally registered handlers. The payloads are `Parse::Webhooks::Payload` type of objects that represent that data that Parse sends webhook handlers. You can register any of the Cloud Code webhook trigger hooks (`beforeSave`, `afterSave`, `beforeDelete`, `afterDelete`) and function hooks.
 
 ### Cloud Code Functions
 You can use the `route()` method to register handler blocks. The last value returned by the block will be returned back to the client in a success response. If `error!(value)` is called inside the block, we will return the correct Parse error response with the value you provided.
@@ -2110,7 +2110,7 @@ You can use the `route()` method to register handler blocks. The last value retu
 ```ruby
 # Register handling the 'helloWorld' function.
 Parse::Webhooks.route(:function, :helloWorld) do
-  #  use the Parse::Payload instance methods in this block
+  #  use the Parse::Webhooks::Payload instance methods in this block
   name = params['name'].to_s #function params
   puts "CloudCode Webhook helloWorld called in Ruby!"
   # will return proper error response
@@ -2151,7 +2151,7 @@ end
 ```
 
 ### Cloud Code Triggers
-You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete` and `:after_delete`. The `payload` object, which is an instance of `Parse::Payload`, contains several properties that represent the payload. One of the most important ones is `parse_object`, which will provide you with the instance of your specific Parse object. In `:before_save` triggers, this object already contains dirty tracking information of what has been changed.
+You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete` and `:after_delete`. The `payload` object, which is an instance of `Parse::Webhooks::Payload`, contains several properties that represent the payload. One of the most important ones is `parse_object`, which will provide you with the instance of your specific Parse object. In `:before_save` triggers, this object already contains dirty tracking information of what has been changed.
 
 ```ruby
   # recommended way

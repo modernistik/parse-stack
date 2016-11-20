@@ -16,6 +16,8 @@
 - Support setting properties of Parse::Object subclasses through the []= operator.
 - :to_s method of Parse::Date returns the iso8601(3) by default, if no arguments are provided.
 - Parse::ConstraintError has been removed in favor of ArgumentError.
+- Parse::Payload has been placed under Parse::Webhooks::Payload for clarity.
+- Parse::WebhookErrorResponse has been moved to Parse::Webhooks::ResponseError.
 
 ### 1.5.3
 - Several fixes and performance improvements.
@@ -119,7 +121,7 @@
 ### 1.3.0
 - **IMPORTANT**: __Raising an error no longer sends an error response back to
 the client in a Webhook trigger. You must now call `error!('...')` instead of
-calling `raise '...'`.__ The webhook block is now binded to the Parse::Payload
+calling `raise '...'`.__ The webhook block is now binded to the Parse::Webhooks::Payload
 instance, removing the need to pass `payload` object; use the instance methods directly.
 See updated README.md for more details.
 - **Parse-Stack will throw new exceptions** depending on the error code returned by Parse. These
