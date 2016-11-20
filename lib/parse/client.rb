@@ -18,22 +18,24 @@ require_relative "client/caching"
 require_relative "api/all"
 
 module Parse
-  # An error when a general connection occurs.
-  class ConnectionError < StandardError; end;
-  # An error when a connection timeout occurs.
-  class TimeoutError < StandardError; end;
-  # An error when there is an Parse REST API protocol error.
-  class ProtocolError < StandardError; end;
-  # An error when the Parse server returned invalid code.
-  class ServerError < StandardError; end;
-  # An error when a Parse server responds with HTTP 500.
-  class ServiceUnavailableError < StandardError; end;
-  # An error when the authentication credentials in the request are invalid.
-  class AuthenticationError < StandardError; end;
-  # An error when the burst limit has been exceeded.
-  class RequestLimitExceededError < StandardError; end;
-  # An error when the session token provided in the request is invalid.
-  class InvalidSessionTokenError < StandardError; end;
+  class Error < StandardError
+    # An error when a general connection occurs.
+    class ConnectionError < StandardError; end;
+    # An error when a connection timeout occurs.
+    class TimeoutError < StandardError; end;
+    # An error when there is an Parse REST API protocol error.
+    class ProtocolError < StandardError; end;
+    # An error when the Parse server returned invalid code.
+    class ServerError < StandardError; end;
+    # An error when a Parse server responds with HTTP 500.
+    class ServiceUnavailableError < StandardError; end;
+    # An error when the authentication credentials in the request are invalid.
+    class AuthenticationError < StandardError; end;
+    # An error when the burst limit has been exceeded.
+    class RequestLimitExceededError < StandardError; end;
+    # An error when the session token provided in the request is invalid.
+    class InvalidSessionTokenError < StandardError; end;
+  end
 
   # Retrieve the App specific Parse configuration parameters. The configuration
   # for a connection is cached after the first request. Use the bang version to
@@ -215,6 +217,7 @@ module Parse
     #    cache using the clear_cache! method on your Parse::Client instance.
     # @option opts [Hash] :faraday You may pass a hash of options that will be
     #    passed to the Faraday constructor.
+    # @raise Parse::Error::ConnectionError if the client was not properly configured with required keys or url.
     # @raise ArgumentError if the cache instance passed to the :cache option is not of Moneta::Transformer.
     # @see Parse::Middleware::BodyBuilder
     # @see Parse::Middleware::Caching
@@ -228,7 +231,7 @@ module Parse
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
       if @server_url.nil? || @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
-        raise "Please call Parse.setup(server_url:, application_id:, api_key:) to setup a client"
+        raise Parse::Error::ConnectionError, "Please call Parse.setup(server_url:, application_id:, api_key:) to setup a client"
       end
       @server_url += '/' unless @server_url.ends_with?('/')
       #Configure Faraday
@@ -318,20 +321,20 @@ module Parse
     #    Set to false to disable the retry mechanism. When performing request retries, the
     #    client will sleep for a number of seconds ({Parse::Client::RETRY_DELAY}) between requests.
     #    The default value is {Parse::Client::DEFAULT_RETRIES}.
-    # @raise Parse::AuthenticationError when HTTP response status is 401 or 403
-    # @raise Parse::TimeoutError when HTTP response status is 400 or
+    # @raise Parse::Error::AuthenticationError when HTTP response status is 401 or 403
+    # @raise Parse::Error::TimeoutError when HTTP response status is 400 or
     #   408, and the Parse code is 143 or {Parse::Response::ERROR_TIMEOUT}.
-    # @raise Parse::ConnectionError when HTTP response status is 404 is not an object not found error.
+    # @raise Parse::Error::ConnectionError when HTTP response status is 404 is not an object not found error.
     #  - This will also be raised if after retrying a request a number of times has finally failed.
-    # @raise Parse::ProtocolError when HTTP response status is 405 or 406
-    # @raise Parse::ServiceUnavailableError when HTTP response status is 500 or 503.
+    # @raise Parse::Error::ProtocolError when HTTP response status is 405 or 406
+    # @raise Parse::Error::ServiceUnavailableError when HTTP response status is 500 or 503.
     #   - This may also happen when the Parse Server response code is any
     #     number less than {Parse::Response::ERROR_SERVICE_UNAVAILABLE}.
-    # @raise Parse::ServerError when the Parse response code is less than 100
-    # @raise Parse::RequestLimitExceededError when the Parse response code is {Parse::Response::ERROR_EXCEEDED_BURST_LIMIT}.
+    # @raise Parse::Error::ServerError when the Parse response code is less than 100
+    # @raise Parse::Error::RequestLimitExceededError when the Parse response code is {Parse::Response::ERROR_EXCEEDED_BURST_LIMIT}.
     #   - This usually means you have exceeded the burst limit on requests, which will mean you will be throttled for the
     #     next 60 seconds.
-    # @raise Parse::InvalidSessionTokenError when the Parse response code is 209.
+    # @raise Parse::Error::InvalidSessionTokenError when the Parse response code is 209.
     #   - This means the session token that was sent in the request seems to be invalid.
     # @return [Parse::Response] the response for this request.
     # @see Parse::Middleware::BodyBuilder
@@ -396,43 +399,43 @@ module Parse
       case response.http_status
       when 401, 403
         puts "[Parse:AuthenticationError] #{response}"
-        raise Parse::AuthenticationError, response
+        raise Parse::Error::AuthenticationError, response
       when 400, 408
         if response.code == Parse::Response::ERROR_TIMEOUT || response.code == 143 #"net/http: timeout awaiting response headers"
           puts "[Parse:TimeoutError] #{response}"
-          raise Parse::TimeoutError, response
+          raise Parse::Error::TimeoutError, response
         end
       when 404
         unless response.object_not_found?
           puts "[Parse:ConnectionError] #{response}"
-          raise Parse::ConnectionError, response
+          raise Parse::Error::ConnectionError, response
         end
       when 405, 406
         puts "[Parse:ProtocolError] #{response}"
-        raise Parse::ProtocolError, response
+        raise Parse::Error::ProtocolError, response
       when 500, 503
         puts "[Parse:ServiceUnavailableError] #{response}"
-        raise Parse::ServiceUnavailableError, response
+        raise Parse::Error::ServiceUnavailableError, response
       end
 
       if response.error?
         if response.code <= Parse::Response::ERROR_SERVICE_UNAVAILABLE
           puts "[Parse:ServiceUnavailableError] #{response}"
-          raise Parse::ServiceUnavailableError, response
+          raise Parse::Error::ServiceUnavailableError, response
         elsif response.code <= 100
           puts "[Parse:ServerError] #{response}"
-          raise Parse::ServerError, response
+          raise Parse::Error::ServerError, response
         elsif response.code == Parse::Response::ERROR_EXCEEDED_BURST_LIMIT
           puts "[Parse:RequestLimitExceededError] #{response}"
-          raise Parse::RequestLimitExceededError, response
+          raise Parse::Error::RequestLimitExceededError, response
         elsif response.code == 209 # Error 209: invalid session token
           puts "[Parse:InvalidSessionTokenError] #{response}"
-          raise Parse::InvalidSessionTokenError, response
+          raise Parse::Error::InvalidSessionTokenError, response
         end
       end
 
       response
-    rescue Parse::ServiceUnavailableError => e
+    rescue Parse::Error::ServiceUnavailableError => e
       if _retry_count > 0
         puts "[Parse:Retry] Retries remaining #{_retry_count} : #{response.request}"
         _retry_count -= 1
@@ -451,7 +454,7 @@ module Parse
         sleep _retry_delay if _retry_delay > 0
         retry
       end
-      raise Parse::ConnectionError, "#{_request} : #{e.class} - #{e.message}"
+      raise Parse::Error::ConnectionError, "#{_request} : #{e.class} - #{e.message}"
     end
 
     # Send a GET request.

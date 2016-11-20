@@ -3,20 +3,22 @@
 
 require_relative '../object'
 module Parse
-  # 200	Error code indicating that the username is missing or empty.
-  class UsernameMissingError < StandardError; end;
-  # 201	Error code indicating that the password is missing or empty.
-  class PasswordMissingError < StandardError; end;
-  # Error code 202: indicating that the username has already been taken.
-  class UsernameTakenError < StandardError; end;
-  # 203	Error code indicating that the email has already been taken.
-  class EmailTakenError < StandardError; end;
-  # 204	Error code indicating that the email is missing, but must be specified.
-  class EmailMissing < StandardError; end;
-  # 205	Error code indicating that a user with the specified email was not found.
-  class EmailNotFound < StandardError; end;
-  # 125	Error code indicating that the email address was invalid.
-  class InvalidEmailAddress < StandardError; end;
+  class Error
+    # 200	Error code indicating that the username is missing or empty.
+    class UsernameMissingError < StandardError; end;
+    # 201	Error code indicating that the password is missing or empty.
+    class PasswordMissingError < StandardError; end;
+    # Error code 202: indicating that the username has already been taken.
+    class UsernameTakenError < StandardError; end;
+    # 203	Error code indicating that the email has already been taken.
+    class EmailTakenError < StandardError; end;
+    # 204	Error code indicating that the email is missing, but must be specified.
+    class EmailMissing < StandardError; end;
+    # 205	Error code indicating that a user with the specified email was not found.
+    class EmailNotFound < StandardError; end;
+    # 125	Error code indicating that the email address was invalid.
+    class InvalidEmailAddress < StandardError; end;
+  end
 
   # The main class representing the _User table in Parse. A user can either be signed up or anonymous.
   # All users need to have a username and a password, with email being optional but globally unique if set.
@@ -218,11 +220,11 @@ module Parse
     def signup!(passwd = nil)
       self.password = passwd || password
       if username.blank?
-        raise Parse::UsernameMissingError, "Signup requires a username."
+        raise Parse::Error::UsernameMissingError, "Signup requires a username."
       end
 
       if password.blank?
-        raise Parse::PasswordMissingError, "Signup requires a password."
+        raise Parse::Error::PasswordMissingError, "Signup requires a password."
       end
 
       signup_attrs = attribute_updates
@@ -238,15 +240,15 @@ module Parse
 
       case response.code
       when Parse::Response::ERROR_USERNAME_MISSING
-        raise Parse::UsernameMissingError, response
+        raise Parse::Error::UsernameMissingError, response
       when Parse::Response::ERROR_PASSWORD_MISSING
-        raise Parse::PasswordMissingError, response
+        raise Parse::Error::PasswordMissingError, response
       when Parse::Response::ERROR_USERNAME_TAKEN
-        raise Parse::UsernameTakenError, response
+        raise Parse::Error::UsernameTakenError, response
       when Parse::Response::ERROR_EMAIL_TAKEN
-        raise Parse::EmailTakenError, response
+        raise Parse::Error::EmailTakenError, response
       when Parse::Response::ERROR_EMAIL_INVALID
-        raise Parse::InvalidEmailAddress, response
+        raise Parse::Error::InvalidEmailAddress, response
       end
       raise Parse::ResponseError, response
     end
@@ -305,13 +307,13 @@ module Parse
 
       case response.code
       when Parse::Response::ERROR_USERNAME_MISSING
-        raise Parse::UsernameMissingError, response
+        raise Parse::Error::UsernameMissingError, response
       when Parse::Response::ERROR_PASSWORD_MISSING
-        raise Parse::PasswordMissingError, response
+        raise Parse::Error::PasswordMissingError, response
       when Parse::Response::ERROR_USERNAME_TAKEN
-        raise Parse::UsernameTakenError, response
+        raise Parse::Error::UsernameTakenError, response
       when Parse::Response::ERROR_EMAIL_TAKEN
-        raise Parse::EmailTakenError, response
+        raise Parse::Error::EmailTakenError, response
       end
       raise  Parse::ResponseError, response
     end
@@ -372,7 +374,7 @@ module Parse
     # @see #session!
     def self.session(token, opts = {})
       self.session! token, opts
-    rescue InvalidSessionTokenError => e
+    rescue Parse::Error::InvalidSessionTokenError => e
       nil
     end
 
