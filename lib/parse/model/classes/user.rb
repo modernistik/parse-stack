@@ -170,20 +170,20 @@ module Parse
     # Adds the third-party authentication data to for a given service.
     # @param service_name [Symbol] The name of the service (ex. :facebook)
     # @param data [Hash] The body of the OAuth data. Dependent on each service.
-    # @raise [ResponseError] If user was not successfully linked
+    # @raise [Parse::Client::ResponseError] If user was not successfully linked
     def link_auth_data!(service_name, **data)
       response = client.set_service_auth_data(id, service_name, data)
-      raise Parse::ResponseError, response if response.error?
+      raise Parse::Client::ResponseError, response if response.error?
       apply_attributes!(response.result)
     end
 
     # Removes third-party authentication data for this user
     # @param service_name [Symbol] The name of the third-party service (ex. :facebook)
-    # @raise [ResponseError] If user was not successfully unlinked
+    # @raise [Parse::Client::ResponseError] If user was not successfully unlinked
     # @return [Boolean] True/false if successful.
     def unlink_auth_data!(service_name)
       response = client.set_service_auth_data(id, service_name, nil)
-      raise Parse::ResponseError, response if response.error?
+      raise Parse::Client::ResponseError, response if response.error?
       apply_attributes!(response.result)
     end
 
@@ -210,12 +210,12 @@ module Parse
 
     # You may set a password for this user when you are creating them. Parse never returns a
     # @param passwd The user's password to be used for signing up.
-    # @raise [Parse::UsernameMissingError] If username is missing.
-    # @raise [Parse::PasswordMissingError] If password is missing.
-    # @raise [Parse::UsernameTakenError] If the username has already been taken.
-    # @raise [Parse::EmailTakenError] If the email has already been taken (or exists in the system).
-    # @raise [Parse::InvalidEmailAddress] If the email is invalid.
-    # @raise [Parse::ResponseError] An unknown error occurred.
+    # @raise [Parse::Error::UsernameMissingError] If username is missing.
+    # @raise [Parse::Error::PasswordMissingError] If password is missing.
+    # @raise [Parse::Error::UsernameTakenError] If the username has already been taken.
+    # @raise [Parse::Error::EmailTakenError] If the email has already been taken (or exists in the system).
+    # @raise [Parse::Error::InvalidEmailAddress] If the email is invalid.
+    # @raise [Parse::Client::ResponseError] An unknown error occurred.
     # @return [Boolean] True if signup it was successful. If it fails an exception is thrown.
     def signup!(passwd = nil)
       self.password = passwd || password
@@ -250,7 +250,7 @@ module Parse
       when Parse::Response::ERROR_EMAIL_INVALID
         raise Parse::Error::InvalidEmailAddress, response
       end
-      raise Parse::ResponseError, response
+      raise Parse::Client::ResponseError, response
     end
 
     # Login and get a session token for this user.
@@ -292,12 +292,12 @@ module Parse
     # Creates a new Parse::User given a hash that maps to the fields defined in your Parse::User collection.
     # @param body [Hash] The hash containing the Parse::User fields. The field `username` and `password` are required.
     # @option opts [Boolean] :master_key Whether the master key should be used for this request.
-    # @raise [UsernameMissingError] If username is missing.
-    # @raise [PasswordMissingError] If password is missing.
-    # @raise [UsernameTakenError] If the username has already been taken.
-    # @raise [EmailTakenError] If the email has already been taken (or exists in the system).
-    # @raise [InvalidEmailAddress] If the email is invalid.
-    # @raise [ResponseError] An unknown error occurred.
+    # @raise [Parse::Error::UsernameMissingError] If username is missing.
+    # @raise [Parse::Error::PasswordMissingError] If password is missing.
+    # @raise [Parse::Error::UsernameTakenError] If the username has already been taken.
+    # @raise [Parse::Error::EmailTakenError] If the email has already been taken (or exists in the system).
+    # @raise [Parse::Error::InvalidEmailAddress] If the email is invalid.
+    # @raise [Parse::Client::ResponseError] An unknown error occurred.
     # @return [User] Returns a successfully created Parse::User.
     def self.create(body, **opts)
       response = client.create_user(body, opts: opts)
@@ -315,7 +315,7 @@ module Parse
       when Parse::Response::ERROR_EMAIL_TAKEN
         raise Parse::Error::EmailTakenError, response
       end
-      raise  Parse::ResponseError, response
+      raise  Parse::Client::ResponseError, response
     end
 
     # Automatically and implicitly signup a user if it did not already exists and

@@ -258,12 +258,12 @@ module Parse
 
         if self.logging.present?
           if payload.trigger?
-            puts "[ParseWebhooks Request] --> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}"
+            puts "[Webhooks::Request] --> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}"
           elsif payload.function?
             puts "[ParseWebhooks Request] --> Function #{payload.function_name}"
           end
           if self.logging == :debug
-            puts "[ParseWebhooks Payload] ----------------------------"
+            puts "[Webhooks::Payload] ----------------------------"
             puts payload.as_json
             puts "----------------------------------------------------\n"
           end
@@ -281,12 +281,12 @@ module Parse
             generic_result = Parse::Webhooks.call_route(payload.trigger_name, "*", payload)
             result = generic_result if generic_result.present? && result.nil?
           else
-            puts "[ParseWebhooks] --> Could not find mapping route for #{payload.to_json}"
+            puts "[Webhooks] --> Could not find mapping route for #{payload.to_json}"
           end
 
           result = true if result.nil?
           if self.logging.present?
-            puts "[ParseWebhooks Response] ----------------------------"
+            puts "[Webhooks::Response] ----------------------------"
             puts success(result)
             puts "----------------------------------------------------\n"
           end
@@ -294,9 +294,9 @@ module Parse
           return response.finish
         rescue Parse::Webhooks::ResponseError, ActiveModel::ValidationError => e
           if payload.trigger?
-            puts "[Webhook ResponseError] >> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}: #{e}"
+            puts "[Webhooks::ResponseError] >> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}: #{e}"
           elsif payload.function?
-            puts "[Webhook ResponseError] >> #{payload.function_name}: #{e}"
+            puts "[Webhooks::ResponseError] >> #{payload.function_name}: #{e}"
           end
           response.write error( e.to_s )
           return response.finish

@@ -5,8 +5,7 @@ require 'active_support'
 require 'active_support/json'
 
 module Parse
-  # An error when a general response error occurs when communicating with Parse server.
-  class ResponseError < StandardError; end;
+
   # Represents a response from Parse server. A response can also
   # be a set of responses (from a Batch response).
   class Response

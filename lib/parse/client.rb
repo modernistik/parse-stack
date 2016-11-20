@@ -115,6 +115,9 @@ module Parse
     # The wait time in seconds between retries
     RETRY_DELAY = 1.5
 
+    # An error when a general response error occurs when communicating with Parse server.
+    class ResponseError < StandardError; end;
+
     # @!attribute cache
     #  The underlying cache store for caching API requests.
     #  @return [Moneta::Transformer]
