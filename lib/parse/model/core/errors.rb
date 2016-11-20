@@ -3,7 +3,7 @@
 
 # The set of all Parse errors.
 module Parse
-
+  # An abstract parent class for all Parse::Error types.
   class Error < StandardError; end
 
 end

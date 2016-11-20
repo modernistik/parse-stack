@@ -107,537 +107,539 @@ module Parse
       @object = object
     end
   end
-
-  # Defines some of the save, update and destroy operations for Parse objects.
-  module Actions
-    # @!visibility private
-    def self.included(base)
-      base.extend(ClassMethods)
-    end
-
-    # Class methods applied to Parse::Object subclasses.
-    module ClassMethods
-      # @!attribute raise_on_save_failure
-      # By default, we return `true` or `false` for save and destroy operations.
-      # If you prefer to have `Parse::Object` raise an exception instead, you
-      # can tell to do so either globally or on a per-model basis. When a save
-      # fails, it will raise a {Parse::SaveFailureError}.
-      #
-      # When enabled, if an error is returned by Parse due to saving or
-      # destroying a record, due to your `before_save` or `before_delete`
-      # validation cloud code triggers, `Parse::Object` will return the a
-      # {Parse::SaveFailureError} exception type. This exception has an instance
-      # method of `#object` which contains the object that failed to save.
-      # @example
-      #  # globally across all models
-      #  Parse::Model.raise_on_save_failure = true
-	    #  Song.raise_on_save_failure = true # per-model
-      #
-      #  # or per-instance raise on failure
-      #  song.save!
-      #
-      # @return [Boolean] whether to raise a {Parse::SaveFailureError}
-      #   when an object fails to save.
-      attr_accessor :raise_on_save_failure
-
-      def raise_on_save_failure
-        return @raise_on_save_failure unless @raise_on_save_failure.nil?
-        Parse::Model.raise_on_save_failure
+  
+  module Core
+    # Defines some of the save, update and destroy operations for Parse objects.
+    module Actions
+      # @!visibility private
+      def self.included(base)
+        base.extend(ClassMethods)
       end
 
-      # Finds the first object matching the query conditions, or creates a new
-      # unsaved object with the attributes. This method takes the possibility of two hashes,
-      # therefore make sure you properly wrap the contents of the input with `{}`.
-      #   Parse::User.first_or_create({ ..query conditions..})
-      #   Parse::User.first_or_create({ ..query conditions..}, {.. resrouce_attrs ..})
-      # @param query_attrs [Hash] a set of query constraints that also are applied.
-      # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
-      # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
-      # @see Parse::Model.autosave_on_create
-      def first_or_create(query_attrs = {}, resource_attrs = {})
+      # Class methods applied to Parse::Object subclasses.
+      module ClassMethods
+        # @!attribute raise_on_save_failure
+        # By default, we return `true` or `false` for save and destroy operations.
+        # If you prefer to have `Parse::Object` raise an exception instead, you
+        # can tell to do so either globally or on a per-model basis. When a save
+        # fails, it will raise a {Parse::SaveFailureError}.
+        #
+        # When enabled, if an error is returned by Parse due to saving or
+        # destroying a record, due to your `before_save` or `before_delete`
+        # validation cloud code triggers, `Parse::Object` will return the a
+        # {Parse::SaveFailureError} exception type. This exception has an instance
+        # method of `#object` which contains the object that failed to save.
+        # @example
+        #  # globally across all models
+        #  Parse::Model.raise_on_save_failure = true
+  	    #  Song.raise_on_save_failure = true # per-model
+        #
+        #  # or per-instance raise on failure
+        #  song.save!
+        #
+        # @return [Boolean] whether to raise a {Parse::SaveFailureError}
+        #   when an object fails to save.
+        attr_accessor :raise_on_save_failure
 
-        query_attrs.symbolize_keys!
-        resource_attrs.symbolize_keys!
-        obj = query(query_attrs).first
-
-        if obj.blank?
-          obj = self.new query_attrs
-          obj.apply_attributes!(resource_attrs, dirty_track: false)
+        def raise_on_save_failure
+          return @raise_on_save_failure unless @raise_on_save_failure.nil?
+          Parse::Model.raise_on_save_failure
         end
-        obj.save if obj.new? && Parse::Model.autosave_on_create
-        obj
-      end
 
-      # Auto save all objects matching the query constraints. This method is
-      # meant to be used with a block. Any objects that are modified in the block
-      # will be batched for a save operation. This uses the `updated_at` field to
-      # continue to query for all matching objects that have not been updated.
-      # @param constraints [Hash] a set of query constraints.
-      # @yield a block which will iterate through each matching object.
-      # @example
-      #
-      #  post = Post.first
-      #  Comments.save_all( post: post) do |comment|
-      #    # .. modify comment ...
-      #    # it will automatically be saved
-      #  end
-      # @return [Boolean] whether there were any errors.
-      def save_all(constraints = {})
-        force = false
+        # Finds the first object matching the query conditions, or creates a new
+        # unsaved object with the attributes. This method takes the possibility of two hashes,
+        # therefore make sure you properly wrap the contents of the input with `{}`.
+        #   Parse::User.first_or_create({ ..query conditions..})
+        #   Parse::User.first_or_create({ ..query conditions..}, {.. resrouce_attrs ..})
+        # @param query_attrs [Hash] a set of query constraints that also are applied.
+        # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
+        # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
+        # @see Parse::Model.autosave_on_create
+        def first_or_create(query_attrs = {}, resource_attrs = {})
 
-        iterator_block = nil
-        if block_given?
-          iterator_block = Proc.new
-          force ||= false
-        else
-          # if no block given, assume you want to just save all objects
-          # regardless of modification.
-          force = true
-        end
-        # Only generate the comparison block once.
-        # updated_comparison_block = Proc.new { |x| x.updated_at }
+          query_attrs.symbolize_keys!
+          resource_attrs.symbolize_keys!
+          obj = query(query_attrs).first
 
-        anchor_date = Parse::Date.now
-        constraints.merge! :updated_at.on_or_before => anchor_date
-        constraints.merge! cache: false
-        # oldest first, so we create a reduction-cycle
-        constraints.merge! order: :updated_at.asc, limit: 100
-        update_query = query(constraints)
-        #puts "Setting Anchor Date: #{anchor_date}"
-        cursor = nil
-        has_errors = false
-        loop do
-          results = update_query.results
-
-          break if results.empty?
-
-          # verify we didn't get duplicates fetches
-          if cursor.is_a?(Parse::Object) && results.any? { |x| x.id == cursor.id }
-            warn "[Parse::SaveAll] Unbounded update detected with id #{cursor.id}."
-            has_errors = true
-            break cursor
+          if obj.blank?
+            obj = self.new query_attrs
+            obj.apply_attributes!(resource_attrs, dirty_track: false)
           end
+          obj.save if obj.new? && Parse::Model.autosave_on_create
+          obj
+        end
 
-          results.each(&iterator_block) if iterator_block.present?
-          # we don't need to refresh the objects in the array with the results
-          # since we will be throwing them away. Force determines whether
-          # to save these objects regardless of whether they are dirty.
-          batch = results.save(merge: false, force: force)
+        # Auto save all objects matching the query constraints. This method is
+        # meant to be used with a block. Any objects that are modified in the block
+        # will be batched for a save operation. This uses the `updated_at` field to
+        # continue to query for all matching objects that have not been updated.
+        # @param constraints [Hash] a set of query constraints.
+        # @yield a block which will iterate through each matching object.
+        # @example
+        #
+        #  post = Post.first
+        #  Comments.save_all( post: post) do |comment|
+        #    # .. modify comment ...
+        #    # it will automatically be saved
+        #  end
+        # @return [Boolean] whether there were any errors.
+        def save_all(constraints = {})
+          force = false
 
-          # faster version assuming sorting order wasn't messed up
-          cursor = results.last
-          # slower version, but more accurate
-          # cursor_item = results.max_by(&updated_comparison_block).updated_at
-          # puts "[Parse::SaveAll] Updated #{results.count} records updated <= #{cursor.updated_at}"
+          iterator_block = nil
+          if block_given?
+            iterator_block = Proc.new
+            force ||= false
+          else
+            # if no block given, assume you want to just save all objects
+            # regardless of modification.
+            force = true
+          end
+          # Only generate the comparison block once.
+          # updated_comparison_block = Proc.new { |x| x.updated_at }
 
-          if cursor.is_a?(Parse::Object)
-            update_query.where :updated_at.gte => cursor.updated_at
+          anchor_date = Parse::Date.now
+          constraints.merge! :updated_at.on_or_before => anchor_date
+          constraints.merge! cache: false
+          # oldest first, so we create a reduction-cycle
+          constraints.merge! order: :updated_at.asc, limit: 100
+          update_query = query(constraints)
+          #puts "Setting Anchor Date: #{anchor_date}"
+          cursor = nil
+          has_errors = false
+          loop do
+            results = update_query.results
 
-            if cursor.updated_at.present? && cursor.updated_at > anchor_date
-              warn "[Parse::SaveAll] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
+            break if results.empty?
+
+            # verify we didn't get duplicates fetches
+            if cursor.is_a?(Parse::Object) && results.any? { |x| x.id == cursor.id }
+              warn "[Parse::SaveAll] Unbounded update detected with id #{cursor.id}."
+              has_errors = true
               break cursor
             end
 
+            results.each(&iterator_block) if iterator_block.present?
+            # we don't need to refresh the objects in the array with the results
+            # since we will be throwing them away. Force determines whether
+            # to save these objects regardless of whether they are dirty.
+            batch = results.save(merge: false, force: force)
+
+            # faster version assuming sorting order wasn't messed up
+            cursor = results.last
+            # slower version, but more accurate
+            # cursor_item = results.max_by(&updated_comparison_block).updated_at
+            # puts "[Parse::SaveAll] Updated #{results.count} records updated <= #{cursor.updated_at}"
+
+            if cursor.is_a?(Parse::Object)
+              update_query.where :updated_at.gte => cursor.updated_at
+
+              if cursor.updated_at.present? && cursor.updated_at > anchor_date
+                warn "[Parse::SaveAll] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
+                break cursor
+              end
+
+            end
+
+            has_errors ||= batch.error?
           end
-
-          has_errors ||= batch.error?
+          has_errors
         end
-        has_errors
+
+      end # ClassMethods
+
+      # Perform an atomic operation on this field. This operation is done on the
+      # Parse server which guarantees the atomicity of the operation. This is the low-level
+      # API on performing atomic operations on properties for classes. These methods do not
+      # update the current instance with any changes the server may have made to satisfy this
+      # operation.
+      #
+      # @param field [String] the name of the field in the Parse collection.
+      # @param op_hash [Hash] The operation hash. It may also be of type {Parse::RelationAction}.
+      # @return [Boolean] whether the operation was successful.
+      def operate_field!(field, op_hash)
+        field = field.to_sym
+        field = self.field_map[field] || field
+        if op_hash.is_a?(Parse::RelationAction)
+          op_hash = op_hash.as_json
+        else
+          op_hash = { field => op_hash }.as_json
+        end
+
+        response = client.update_object(parse_class, id, op_hash, session_token: _session_token )
+        if response.error?
+          puts "[#{parse_class}:#{field} Operation] #{response.error}"
+        end
+        response.success?
       end
 
-    end # ClassMethods
-
-    # Perform an atomic operation on this field. This operation is done on the
-    # Parse server which guarantees the atomicity of the operation. This is the low-level
-    # API on performing atomic operations on properties for classes. These methods do not
-    # update the current instance with any changes the server may have made to satisfy this
-    # operation.
-    #
-    # @param field [String] the name of the field in the Parse collection.
-    # @param op_hash [Hash] The operation hash. It may also be of type {Parse::RelationAction}.
-    # @return [Boolean] whether the operation was successful.
-    def operate_field!(field, op_hash)
-      field = field.to_sym
-      field = self.field_map[field] || field
-      if op_hash.is_a?(Parse::RelationAction)
-        op_hash = op_hash.as_json
-      else
-        op_hash = { field => op_hash }.as_json
+      # Perform an atomic add operation to the array field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @param objects [Array] the set of items to add to this field.
+      # @return [Boolean] whether it was successful
+      # @see #operate_field!
+      def op_add!(field,objects)
+        operate_field! field, { __op: :Add, objects: objects }
       end
 
-      response = client.update_object(parse_class, id, op_hash, session_token: _session_token )
-      if response.error?
-        puts "[#{parse_class}:#{field} Operation] #{response.error}"
+      # Perform an atomic add unique operation to the array field. The objects will
+      # only be added if they don't already exists in the array for that particular field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @param objects [Array] the set of items to add uniquely to this field.
+      # @return [Boolean] whether it was successful
+      # @see #operate_field!
+      def op_add_unique!(field,objects)
+        operate_field! field, { __op: :AddUnique, objects: objects }
       end
-      response.success?
-    end
 
-    # Perform an atomic add operation to the array field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @param objects [Array] the set of items to add to this field.
-    # @return [Boolean] whether it was successful
-    # @see #operate_field!
-    def op_add!(field,objects)
-      operate_field! field, { __op: :Add, objects: objects }
-    end
-
-    # Perform an atomic add unique operation to the array field. The objects will
-    # only be added if they don't already exists in the array for that particular field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @param objects [Array] the set of items to add uniquely to this field.
-    # @return [Boolean] whether it was successful
-    # @see #operate_field!
-    def op_add_unique!(field,objects)
-      operate_field! field, { __op: :AddUnique, objects: objects }
-    end
-
-    # Perform an atomic remove operation to the array field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @param objects [Array] the set of items to remove to this field.
-    # @return [Boolean] whether it was successful
-    # @see #operate_field!
-    def op_remove!(field, objects)
-      operate_field! field, { __op: :Remove, objects: objects }
-    end
-
-    # Perform an atomic delete operation on this field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @return [Boolean] whether it was successful
-    # @see #operate_field!
-    def op_destroy!(field)
-      operate_field! field, { __op: :Delete }.freeze
-    end
-
-    # Perform an atomic add operation on this relational field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @param objects [Array<Parse::Object>] the set of objects to add to this relational field.
-    # @return [Boolean] whether it was successful
-    # @see #operate_field!
-    def op_add_relation!(field, objects = [])
-      objects = [objects] unless objects.is_a?(Array)
-      return false if objects.empty?
-      relation_action = Parse::RelationAction.new(field, polarity: true, objects: objects)
-      operate_field! field, relation_action
-    end
-
-    # Perform an atomic remove operation on this relational field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @param objects [Array<Parse::Object>] the set of objects to remove to this relational field.
-    # @return [Boolean] whether it was successful
-    # @see #operate_field!
-    def op_remove_relation!(field, objects = [])
-      objects = [objects] unless objects.is_a?(Array)
-      return false if objects.empty?
-      relation_action = Parse::RelationAction.new(field, polarity: false, objects: objects)
-      operate_field! field, relation_action
-    end
-
-    # Atomically increment or decrement a specific field.
-    # @param field [String] the name of the field in the Parse collection.
-    # @param amount [Integer] the amoun to increment. Use negative values to decrement.
-    # @see #operate_field!
-    def op_increment!(field, amount = 1)
-      unless amount.is_a?(Numeric)
-        raise ArgumentError, "Amount should be numeric"
+      # Perform an atomic remove operation to the array field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @param objects [Array] the set of items to remove to this field.
+      # @return [Boolean] whether it was successful
+      # @see #operate_field!
+      def op_remove!(field, objects)
+        operate_field! field, { __op: :Remove, objects: objects }
       end
-      operate_field! field, { __op: :Increment, amount: amount.to_i }.freeze
-    end
 
-    # @return [Parse::Request] a destroy_request for the current object.
-    def destroy_request
-      return nil unless @id.present?
-      uri = self.uri_path
-      r = Request.new( :delete, uri )
-      r.tag = object_id
-      r
-    end
+      # Perform an atomic delete operation on this field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @return [Boolean] whether it was successful
+      # @see #operate_field!
+      def op_destroy!(field)
+        operate_field! field, { __op: :Delete }.freeze
+      end
 
-    # @return [String] the API uri path for this class.
-    def uri_path
-      self.client.url_prefix.path + Client.uri_path(self)
-    end
+      # Perform an atomic add operation on this relational field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @param objects [Array<Parse::Object>] the set of objects to add to this relational field.
+      # @return [Boolean] whether it was successful
+      # @see #operate_field!
+      def op_add_relation!(field, objects = [])
+        objects = [objects] unless objects.is_a?(Array)
+        return false if objects.empty?
+        relation_action = Parse::RelationAction.new(field, polarity: true, objects: objects)
+        operate_field! field, relation_action
+      end
 
-    # Creates an array of all possible operations that need to be performed
-    # on this object. This includes all property and relational operation changes.
-    # @param force [Boolean] whether this object should be saved even if does not have
-    #  pending changes.
-    # @return [Array<Parse::Request>] the list of API requests.
-    def change_requests(force = false)
-      requests = []
-      # get the URI path for this object.
-      uri = self.uri_path
+      # Perform an atomic remove operation on this relational field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @param objects [Array<Parse::Object>] the set of objects to remove to this relational field.
+      # @return [Boolean] whether it was successful
+      # @see #operate_field!
+      def op_remove_relation!(field, objects = [])
+        objects = [objects] unless objects.is_a?(Array)
+        return false if objects.empty?
+        relation_action = Parse::RelationAction.new(field, polarity: false, objects: objects)
+        operate_field! field, relation_action
+      end
 
-      # generate the request to update the object (PUT)
-      if attribute_changes? || force
-        # if it's new, then we should call :post for creating the object.
-        method = new? ? :post : :put
-        r = Request.new( method, uri, body: attribute_updates)
+      # Atomically increment or decrement a specific field.
+      # @param field [String] the name of the field in the Parse collection.
+      # @param amount [Integer] the amoun to increment. Use negative values to decrement.
+      # @see #operate_field!
+      def op_increment!(field, amount = 1)
+        unless amount.is_a?(Numeric)
+          raise ArgumentError, "Amount should be numeric"
+        end
+        operate_field! field, { __op: :Increment, amount: amount.to_i }.freeze
+      end
+
+      # @return [Parse::Request] a destroy_request for the current object.
+      def destroy_request
+        return nil unless @id.present?
+        uri = self.uri_path
+        r = Request.new( :delete, uri )
         r.tag = object_id
-        requests << r
+        r
       end
 
-      # if the object is not new, then we can also add all the relational changes
-      # we need to perform.
-      if @id.present? && relation_changes?
-        relation_change_operations.each do |ops|
-          next if ops.empty?
-          r = Request.new( :put, uri, body: ops)
+      # @return [String] the API uri path for this class.
+      def uri_path
+        self.client.url_prefix.path + Client.uri_path(self)
+      end
+
+      # Creates an array of all possible operations that need to be performed
+      # on this object. This includes all property and relational operation changes.
+      # @param force [Boolean] whether this object should be saved even if does not have
+      #  pending changes.
+      # @return [Array<Parse::Request>] the list of API requests.
+      def change_requests(force = false)
+        requests = []
+        # get the URI path for this object.
+        uri = self.uri_path
+
+        # generate the request to update the object (PUT)
+        if attribute_changes? || force
+          # if it's new, then we should call :post for creating the object.
+          method = new? ? :post : :put
+          r = Request.new( method, uri, body: attribute_updates)
           r.tag = object_id
           requests << r
         end
-      end
-      requests
-    end
 
-    # This methods sends an update request for this object with the any change
-    # information based on its local attributes. The bang implies that it will send
-    # the request even though it is possible no changes were performed. This is useful
-    # in kicking-off an beforeSave / afterSave hooks
-    # Save the object regardless of whether there are changes. This would call
-    # any beforeSave and afterSave cloud code hooks you have registered for this class.
-    # @return [Boolean] true/false whether it was successful.
-    def update!(raw: false)
-      if valid? == false
-        errors.full_messages.each do |msg|
-          warn "[#{parse_class}] warning: #{msg}"
+        # if the object is not new, then we can also add all the relational changes
+        # we need to perform.
+        if @id.present? && relation_changes?
+          relation_change_operations.each do |ops|
+            next if ops.empty?
+            r = Request.new( :put, uri, body: ops)
+            r.tag = object_id
+            requests << r
+          end
         end
+        requests
       end
-      response = client.update_object(parse_class, id, attribute_updates, session_token: _session_token)
-      if response.success?
-        result = response.result
-        # Because beforeSave hooks can change the fields we are saving, any items that were
-        # changed, are returned to us and we should apply those locally to be in sync.
-        set_attributes!(result)
-      end
-      puts "Error updating #{self.parse_class}: #{response.error}" if response.error?
-      return response if raw
-      response.success?
-    end
 
-    # Save all the changes related to this object.
-    # @return [Boolean] true/false whether it was successful.
-    def update
-      return true unless attribute_changes?
-      update!
-    end
-
-    # Save the object as a new record, running all callbacks.
-    # @return [Boolean] true/false whether it was successful.
-    def create
-      run_callbacks :create do
-        res = client.create_object(parse_class, attribute_updates, session_token: _session_token)
-        unless res.error?
-          result = res.result
-          @id = result[Parse::Model::OBJECT_ID] || @id
-          @created_at = result["createdAt"] || @created_at
-          #if the object is created, updatedAt == createdAt
-          @updated_at = result["updatedAt"] || result["createdAt"] || @updated_at
+      # This methods sends an update request for this object with the any change
+      # information based on its local attributes. The bang implies that it will send
+      # the request even though it is possible no changes were performed. This is useful
+      # in kicking-off an beforeSave / afterSave hooks
+      # Save the object regardless of whether there are changes. This would call
+      # any beforeSave and afterSave cloud code hooks you have registered for this class.
+      # @return [Boolean] true/false whether it was successful.
+      def update!(raw: false)
+        if valid? == false
+          errors.full_messages.each do |msg|
+            warn "[#{parse_class}] warning: #{msg}"
+          end
+        end
+        response = client.update_object(parse_class, id, attribute_updates, session_token: _session_token)
+        if response.success?
+          result = response.result
           # Because beforeSave hooks can change the fields we are saving, any items that were
           # changed, are returned to us and we should apply those locally to be in sync.
           set_attributes!(result)
         end
-        puts "Error creating #{self.parse_class}: #{res.error}" if res.error?
-        res.success?
+        puts "Error updating #{self.parse_class}: #{response.error}" if response.error?
+        return response if raw
+        response.success?
       end
-    end
 
-    # @!visibility private
-    def _session_token
-      if @_session_token.respond_to?(:session_token)
-        @_session_token = @_session_token.session_token
+      # Save all the changes related to this object.
+      # @return [Boolean] true/false whether it was successful.
+      def update
+        return true unless attribute_changes?
+        update!
       end
-      @_session_token
-    end
 
-    # saves the object. If the object has not changed, it is a noop. If it is new,
-    # we will create the object. If the object has an id, we will update the record.
-    # You can define before and after :save callbacks
-    # autoraise: set to true will automatically raise an exception if the save fails
-    # @raise Parse::SaveFailureError if the save fails
-    # @param autoraise [Boolean] whether to raise an exception if the save fails.
-    # @param session [String] a session token in order to apply ACLs to this operation.
-    # @return [Boolean] whether the save was successful.
-    def save(autoraise: false, session: nil)
-      return true unless changed?
-      success = false
-      @_session_token = session
-      run_callbacks :save do
-        #first process the create/update action if any
-        #then perform any relation changes that need to be performed
-        success = new? ? create : update
-
-        # if the save was successful and we have relational changes
-        # let's update send those next.
-        if success
-          if relation_changes?
-            # get the list of changed keys
-            changed_attribute_keys = changed - relations.keys.map(&:to_s)
-            clear_attribute_changes( changed_attribute_keys )
-            success = update_relations
-            if success
-              changes_applied!
-            elsif self.class.raise_on_save_failure || autoraise.present?
-              raise Parse::SaveFailureError.new(self), "Failed updating relations. #{self.parse_class} partially saved."
-            end
-          else
-            changes_applied!
+      # Save the object as a new record, running all callbacks.
+      # @return [Boolean] true/false whether it was successful.
+      def create
+        run_callbacks :create do
+          res = client.create_object(parse_class, attribute_updates, session_token: _session_token)
+          unless res.error?
+            result = res.result
+            @id = result[Parse::Model::OBJECT_ID] || @id
+            @created_at = result["createdAt"] || @created_at
+            #if the object is created, updatedAt == createdAt
+            @updated_at = result["updatedAt"] || result["createdAt"] || @updated_at
+            # Because beforeSave hooks can change the fields we are saving, any items that were
+            # changed, are returned to us and we should apply those locally to be in sync.
+            set_attributes!(result)
           end
-        elsif self.class.raise_on_save_failure || autoraise.present?
-          raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
-        end
-
-      end #callbacks
-      @_session_token = nil
-      success
-    end
-
-    # Save this object and raise an exception if it fails.
-    # @raise Parse::SaveFailureError if the save fails
-    # @param session (see #save)
-    # @return (see #save)
-    def save!(session: nil)
-      save(autoraise: true, session: session)
-    end
-
-
-    # Delete this record from the Parse collection. Only valid if this object has an `id`.
-    # This will run all the `destroy` callbacks.
-    # @param session [String] a session token if you want to apply ACLs for a user in this operation.
-    # @return [Boolean] whether the operation was successful.
-    def destroy(session: nil)
-      return false if new?
-      @_session_token = session
-      success = false
-      run_callbacks :destroy do
-        res = client.delete_object parse_class, id, session_token: _session_token
-        success = res.success?
-        if success
-          @id = nil
-          changes_applied!
-        elsif self.class.raise_on_save_failure
-          raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
-        end
-        # Your create action methods here
-      end
-      @_session_token = nil
-      success
-    end
-
-    # Runs all the registered `before_save` related callbacks.
-    def prepare_save!
-      run_callbacks(:save) { false }
-    end
-
-    # @return [Hash] a hash of the list of changes made to this instance.
-    def changes_payload
-      h = attribute_updates
-      if relation_changes?
-        r =  relation_change_operations.select { |s| s.present? }.first
-        h.merge!(r) if r.present?
-      end
-      #h.merge!(className: parse_class) unless h.empty?
-      h.as_json
-    end
-    alias_method :update_payload, :changes_payload
-
-    # Generates an array with two entries for addition and removal operations. The first entry
-    # of the array will contain a hash of all the change operations regarding adding new relational
-    # objects. The second entry in the array is a hash of all the change operations regarding removing
-    # relation objects from this field.
-    # @return [Array] an array with two hashes; the first is a hash of all the addition operations and
-    #  the second hash, all the remove operations.
-    def relation_change_operations
-      return [{},{}] unless relation_changes?
-
-      additions = []
-      removals = []
-      # go through all the additions of a collection and generate an action to add.
-      relation_updates.each do |field,collection|
-        if collection.additions.count > 0
-          additions.push Parse::RelationAction.new(field, objects: collection.additions, polarity: true)
-        end
-        # go through all the additions of a collection and generate an action to remove.
-        if collection.removals.count > 0
-          removals.push Parse::RelationAction.new(field, objects: collection.removals, polarity: false)
+          puts "Error creating #{self.parse_class}: #{res.error}" if res.error?
+          res.success?
         end
       end
-      # merge all additions and removals into one large hash
-      additions = additions.reduce({}) { |m,v| m.merge! v.as_json }
-      removals = removals.reduce({}) { |m,v| m.merge! v.as_json }
-      [additions, removals]
-    end
 
-    # Saves and updates all the relational changes for made to this object.
-    # @return [Boolean] whether all the save or update requests were successful.
-    def update_relations
-      # relational saves require an id
-      return false unless @id.present?
-      # verify we have relational changes before we do work.
-      return true unless relation_changes?
-      raise "Unable to update relations for a new object." if new?
-      # get all the relational changes (both additions and removals)
-      additions, removals = relation_change_operations
-
-      responses = []
-      # Send parallel Parse requests for each of the items to update.
-      # since we will have multiple responses, we will track it in array
-      [removals, additions].threaded_each do |ops|
-        next if ops.empty? #if no operations to be performed, then we are done
-        responses << client.update_object(parse_class, @id, ops, session_token: _session_token)
-      end
-      # check if any of them ended up in error
-      has_error = responses.any? { |response| response.error? }
-      # if everything was ok, find the last response to be returned and update
-      #their fields in case beforeSave made any changes.
-      unless has_error || responses.empty?
-        result = responses.last.result #last result to come back
-        set_attributes!(result)
-      end #unless
-      has_error == false
-    end
-
-    # Performs mass assignment using a hash with the ability to modify dirty tracking.
-    # This is an internal method used to set properties on the object while controlling
-    # whether they are dirty tracked. Each defined property has a method defined with the
-    # suffix `_set_attribute!` that can will be called if it is contained in the hash.
-    # @example
-    #  object.set_attributes!( {"myField" => value}, false)
-    #
-    #  # equivalent to calling the specific method.
-    #  object.myField_set_attribute!(value, false)
-    # @param hash [Hash] the hash containing all the attribute names and values.
-    # @param dirty_track [Boolean] whether the assignment should be tracked in the change tracking
-    #  system.
-    # @return [Hash]
-    def set_attributes!(hash, dirty_track = false)
-      return unless hash.is_a?(Hash)
-      hash.each do |k,v|
-        next if k == Parse::Model::OBJECT_ID || k == Parse::Model::ID
-        method = "#{k}_set_attribute!"
-        send(method, v, dirty_track) if respond_to?(method)
-      end
-    end
-
-    # Clears changes information on all collections (array and relations) and all
-    # local attributes.
-    def changes_applied!
-      # find all fields that are of type :array
-      fields(:array) do |key,v|
-        proxy = send(key)
-        # clear changes
-        proxy.changes_applied! if proxy.respond_to?(:changes_applied!)
+      # @!visibility private
+      def _session_token
+        if @_session_token.respond_to?(:session_token)
+          @_session_token = @_session_token.session_token
+        end
+        @_session_token
       end
 
-      # for all relational fields,
-      relations.each do |key,v|
-        proxy = send(key)
-        # clear changes if they support the method.
-        proxy.changes_applied! if proxy.respond_to?(:changes_applied!)
+      # saves the object. If the object has not changed, it is a noop. If it is new,
+      # we will create the object. If the object has an id, we will update the record.
+      # You can define before and after :save callbacks
+      # autoraise: set to true will automatically raise an exception if the save fails
+      # @raise Parse::SaveFailureError if the save fails
+      # @param autoraise [Boolean] whether to raise an exception if the save fails.
+      # @param session [String] a session token in order to apply ACLs to this operation.
+      # @return [Boolean] whether the save was successful.
+      def save(autoraise: false, session: nil)
+        return true unless changed?
+        success = false
+        @_session_token = session
+        run_callbacks :save do
+          #first process the create/update action if any
+          #then perform any relation changes that need to be performed
+          success = new? ? create : update
+
+          # if the save was successful and we have relational changes
+          # let's update send those next.
+          if success
+            if relation_changes?
+              # get the list of changed keys
+              changed_attribute_keys = changed - relations.keys.map(&:to_s)
+              clear_attribute_changes( changed_attribute_keys )
+              success = update_relations
+              if success
+                changes_applied!
+              elsif self.class.raise_on_save_failure || autoraise.present?
+                raise Parse::SaveFailureError.new(self), "Failed updating relations. #{self.parse_class} partially saved."
+              end
+            else
+              changes_applied!
+            end
+          elsif self.class.raise_on_save_failure || autoraise.present?
+            raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
+          end
+
+        end #callbacks
+        @_session_token = nil
+        success
       end
-      changes_applied
+
+      # Save this object and raise an exception if it fails.
+      # @raise Parse::SaveFailureError if the save fails
+      # @param session (see #save)
+      # @return (see #save)
+      def save!(session: nil)
+        save(autoraise: true, session: session)
+      end
+
+
+      # Delete this record from the Parse collection. Only valid if this object has an `id`.
+      # This will run all the `destroy` callbacks.
+      # @param session [String] a session token if you want to apply ACLs for a user in this operation.
+      # @return [Boolean] whether the operation was successful.
+      def destroy(session: nil)
+        return false if new?
+        @_session_token = session
+        success = false
+        run_callbacks :destroy do
+          res = client.delete_object parse_class, id, session_token: _session_token
+          success = res.success?
+          if success
+            @id = nil
+            changes_applied!
+          elsif self.class.raise_on_save_failure
+            raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
+          end
+          # Your create action methods here
+        end
+        @_session_token = nil
+        success
+      end
+
+      # Runs all the registered `before_save` related callbacks.
+      def prepare_save!
+        run_callbacks(:save) { false }
+      end
+
+      # @return [Hash] a hash of the list of changes made to this instance.
+      def changes_payload
+        h = attribute_updates
+        if relation_changes?
+          r =  relation_change_operations.select { |s| s.present? }.first
+          h.merge!(r) if r.present?
+        end
+        #h.merge!(className: parse_class) unless h.empty?
+        h.as_json
+      end
+      alias_method :update_payload, :changes_payload
+
+      # Generates an array with two entries for addition and removal operations. The first entry
+      # of the array will contain a hash of all the change operations regarding adding new relational
+      # objects. The second entry in the array is a hash of all the change operations regarding removing
+      # relation objects from this field.
+      # @return [Array] an array with two hashes; the first is a hash of all the addition operations and
+      #  the second hash, all the remove operations.
+      def relation_change_operations
+        return [{},{}] unless relation_changes?
+
+        additions = []
+        removals = []
+        # go through all the additions of a collection and generate an action to add.
+        relation_updates.each do |field,collection|
+          if collection.additions.count > 0
+            additions.push Parse::RelationAction.new(field, objects: collection.additions, polarity: true)
+          end
+          # go through all the additions of a collection and generate an action to remove.
+          if collection.removals.count > 0
+            removals.push Parse::RelationAction.new(field, objects: collection.removals, polarity: false)
+          end
+        end
+        # merge all additions and removals into one large hash
+        additions = additions.reduce({}) { |m,v| m.merge! v.as_json }
+        removals = removals.reduce({}) { |m,v| m.merge! v.as_json }
+        [additions, removals]
+      end
+
+      # Saves and updates all the relational changes for made to this object.
+      # @return [Boolean] whether all the save or update requests were successful.
+      def update_relations
+        # relational saves require an id
+        return false unless @id.present?
+        # verify we have relational changes before we do work.
+        return true unless relation_changes?
+        raise "Unable to update relations for a new object." if new?
+        # get all the relational changes (both additions and removals)
+        additions, removals = relation_change_operations
+
+        responses = []
+        # Send parallel Parse requests for each of the items to update.
+        # since we will have multiple responses, we will track it in array
+        [removals, additions].threaded_each do |ops|
+          next if ops.empty? #if no operations to be performed, then we are done
+          responses << client.update_object(parse_class, @id, ops, session_token: _session_token)
+        end
+        # check if any of them ended up in error
+        has_error = responses.any? { |response| response.error? }
+        # if everything was ok, find the last response to be returned and update
+        #their fields in case beforeSave made any changes.
+        unless has_error || responses.empty?
+          result = responses.last.result #last result to come back
+          set_attributes!(result)
+        end #unless
+        has_error == false
+      end
+
+      # Performs mass assignment using a hash with the ability to modify dirty tracking.
+      # This is an internal method used to set properties on the object while controlling
+      # whether they are dirty tracked. Each defined property has a method defined with the
+      # suffix `_set_attribute!` that can will be called if it is contained in the hash.
+      # @example
+      #  object.set_attributes!( {"myField" => value}, false)
+      #
+      #  # equivalent to calling the specific method.
+      #  object.myField_set_attribute!(value, false)
+      # @param hash [Hash] the hash containing all the attribute names and values.
+      # @param dirty_track [Boolean] whether the assignment should be tracked in the change tracking
+      #  system.
+      # @return [Hash]
+      def set_attributes!(hash, dirty_track = false)
+        return unless hash.is_a?(Hash)
+        hash.each do |k,v|
+          next if k == Parse::Model::OBJECT_ID || k == Parse::Model::ID
+          method = "#{k}_set_attribute!"
+          send(method, v, dirty_track) if respond_to?(method)
+        end
+      end
+
+      # Clears changes information on all collections (array and relations) and all
+      # local attributes.
+      def changes_applied!
+        # find all fields that are of type :array
+        fields(:array) do |key,v|
+          proxy = send(key)
+          # clear changes
+          proxy.changes_applied! if proxy.respond_to?(:changes_applied!)
+        end
+
+        # for all relational fields,
+        relations.each do |key,v|
+          proxy = send(key)
+          # clear changes if they support the method.
+          proxy.changes_applied! if proxy.respond_to?(:changes_applied!)
+        end
+        changes_applied
+      end
+
+
     end
-
-
   end
 
 end

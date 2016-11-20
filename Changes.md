@@ -18,7 +18,9 @@
 - Parse::ConstraintError has been removed in favor of ArgumentError.
 - Parse::Payload has been placed under Parse::Webhooks::Payload for clarity.
 - Parse::WebhookErrorResponse has been moved to Parse::Webhooks::ResponseError.
-
+- Moves Parse::Object modular functionality under Core namespace
+- Renames ClassBuilder to Parse::Model::Builder
+- 
 ### 1.5.3
 - Several fixes and performance improvements.
 - Major revisions to documentation.

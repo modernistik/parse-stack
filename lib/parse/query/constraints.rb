@@ -12,38 +12,37 @@ require_relative 'constraint'
 # that inspired this, see http://datamapper.org/docs/find.html
 
 module Parse
-
-  # A constraint for matching by a specific objectId value.
-  #
-  #  # where this Parse object equals the object in the column `field`.
-  #  q.where :field => Parse::Pointer("Field", "someObjectId")
-  #  # alias, shorthand when we infer `:field` maps to `Field` parse class.
-  #  q.where :field.id => "someObjectId"
-  #  # "field":{"__type":"Pointer","className":"Field","objectId":"someObjectId"}}
-  #
-  #  class Artist < Parse::Object
-  #  end
-  #
-  #  class Song < Parse::Object
-  #    belongs_to :artist
-  #  end
-  #
-  #  artist = Artist.first # get any artist
-  #  artist_id = artist.id # ex. artist.id
-  #
-  #  # find all songs for this artist object
-  #  Song.all :artist => artist
-  # In some cases, you do not have the Parse object, but you have its `objectId`.
-  # You can use the objectId in the query as follows:
-  #
-  #  # shorthand if you are using convention. Will infer class `Artist`
-  #  Song.all :artist.id => artist_id
-  #
-  #  # other approaches, same result
-  #  Song.all :artist => Artist.pointer(artist_id)
-  #  Song.all :artist => Parse::Pointer.new("Artist", artist_id)
-  #
   class Constraint
+    # A constraint for matching by a specific objectId value.
+    #
+    #  # where this Parse object equals the object in the column `field`.
+    #  q.where :field => Parse::Pointer("Field", "someObjectId")
+    #  # alias, shorthand when we infer `:field` maps to `Field` parse class.
+    #  q.where :field.id => "someObjectId"
+    #  # "field":{"__type":"Pointer","className":"Field","objectId":"someObjectId"}}
+    #
+    #  class Artist < Parse::Object
+    #  end
+    #
+    #  class Song < Parse::Object
+    #    belongs_to :artist
+    #  end
+    #
+    #  artist = Artist.first # get any artist
+    #  artist_id = artist.id # ex. artist.id
+    #
+    #  # find all songs for this artist object
+    #  Song.all :artist => artist
+    # In some cases, you do not have the Parse object, but you have its `objectId`.
+    # You can use the objectId in the query as follows:
+    #
+    #  # shorthand if you are using convention. Will infer class `Artist`
+    #  Song.all :artist.id => artist_id
+    #
+    #  # other approaches, same result
+    #  Song.all :artist => Artist.pointer(artist_id)
+    #  Song.all :artist => Parse::Pointer.new("Artist", artist_id)
+    #
     class ObjectIdConstraint < Constraint
       # @!method id
       # A registered method on a symbol to create the constraint.

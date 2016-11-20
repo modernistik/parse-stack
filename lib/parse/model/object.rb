@@ -46,7 +46,7 @@ module Parse
   # Fetch the schema for a specific collection name.
   # @param className [String] the name collection
   # @return [Hash] the schema document of this collection.
-  # @see Parse::ClassBuilder.build!
+  # @see Parse::Core::ClassBuilder.build!
   def self.schema(className)
     client.schema(className).result
   end
@@ -106,10 +106,10 @@ module Parse
     include Associations::HasOne
     include Associations::BelongsTo
     include Associations::HasMany
-    extend Querying
-    extend Schema
-    include Fetching
-    include Actions
+    extend Core::Querying
+    extend Core::Schema
+    include Core::Fetching
+    include Core::Actions
     # @!visibility private
     BASE_OBJECT_CLASS = "Parse::Object".freeze
 
@@ -208,7 +208,7 @@ module Parse
     alias_method :className, :parse_class
 
     # @return [Hash] the schema structure for this Parse collection from the server.
-    # @see Parse::Schema
+    # @see Parse::Core::Schema
     def schema
       self.class.schema
     end
