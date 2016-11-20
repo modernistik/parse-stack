@@ -102,7 +102,7 @@ module Parse
       # By default, we return `true` or `false` for save and destroy operations.
       # If you prefer to have `Parse::Object` raise an exception instead, you
       # can tell to do so either globally or on a per-model basis. When a save
-      # fails, it will raise a `Parse::SaveFailureError`.
+      # fails, it will raise a `Parse::RecordNotSaved`.
       #
       # @example
       #   Parse::Model.raise_on_save_failure = true # globally across all models
@@ -114,7 +114,7 @@ module Parse
       # When enabled, if an error is returned by Parse due to saving or
       # destroying a record, due to your `before_save` or `before_delete`
       # validation cloud code triggers, `Parse::Object` will return the a
-      # `Parse::SaveFailureError` exception type. This exception has an
+      # `Parse::RecordNotSaved` exception type. This exception has an
       # instance method of `#object` which contains the object that failed to save.
       #
       # @return [Boolean]

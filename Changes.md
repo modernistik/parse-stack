@@ -20,7 +20,8 @@
 - Parse::WebhookErrorResponse has been moved to Parse::Webhooks::ResponseError.
 - Moves Parse::Object modular functionality under Core namespace
 - Renames ClassBuilder to Parse::Model::Builder
-- 
+- Renamed SaveFailureError to RecordNotSaved for ActiveRecord similarity.
+
 ### 1.5.3
 - Several fixes and performance improvements.
 - Major revisions to documentation.

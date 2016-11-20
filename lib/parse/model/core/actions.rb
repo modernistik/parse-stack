@@ -98,7 +98,7 @@ end
 module Parse
 
   # An error raised when a save failure occurs.
-  class SaveFailureError < StandardError
+  class RecordNotSaved < StandardError
     # @return [Parse::Object] the Parse::Object that failed to save.
     attr_reader :object
 
@@ -107,7 +107,7 @@ module Parse
       @object = object
     end
   end
-  
+
   module Core
     # Defines some of the save, update and destroy operations for Parse objects.
     module Actions
@@ -122,12 +122,12 @@ module Parse
         # By default, we return `true` or `false` for save and destroy operations.
         # If you prefer to have `Parse::Object` raise an exception instead, you
         # can tell to do so either globally or on a per-model basis. When a save
-        # fails, it will raise a {Parse::SaveFailureError}.
+        # fails, it will raise a {Parse::RecordNotSaved}.
         #
         # When enabled, if an error is returned by Parse due to saving or
         # destroying a record, due to your `before_save` or `before_delete`
         # validation cloud code triggers, `Parse::Object` will return the a
-        # {Parse::SaveFailureError} exception type. This exception has an instance
+        # {Parse::RecordNotSaved} exception type. This exception has an instance
         # method of `#object` which contains the object that failed to save.
         # @example
         #  # globally across all models
@@ -137,7 +137,7 @@ module Parse
         #  # or per-instance raise on failure
         #  song.save!
         #
-        # @return [Boolean] whether to raise a {Parse::SaveFailureError}
+        # @return [Boolean] whether to raise a {Parse::RecordNotSaved}
         #   when an object fails to save.
         attr_accessor :raise_on_save_failure
 
@@ -454,7 +454,7 @@ module Parse
       # we will create the object. If the object has an id, we will update the record.
       # You can define before and after :save callbacks
       # autoraise: set to true will automatically raise an exception if the save fails
-      # @raise Parse::SaveFailureError if the save fails
+      # @raise Parse::RecordNotSaved if the save fails
       # @param autoraise [Boolean] whether to raise an exception if the save fails.
       # @param session [String] a session token in order to apply ACLs to this operation.
       # @return [Boolean] whether the save was successful.
@@ -478,13 +478,13 @@ module Parse
               if success
                 changes_applied!
               elsif self.class.raise_on_save_failure || autoraise.present?
-                raise Parse::SaveFailureError.new(self), "Failed updating relations. #{self.parse_class} partially saved."
+                raise Parse::RecordNotSaved.new(self), "Failed updating relations. #{self.parse_class} partially saved."
               end
             else
               changes_applied!
             end
           elsif self.class.raise_on_save_failure || autoraise.present?
-            raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
+            raise Parse::RecordNotSaved.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
           end
 
         end #callbacks
@@ -493,7 +493,7 @@ module Parse
       end
 
       # Save this object and raise an exception if it fails.
-      # @raise Parse::SaveFailureError if the save fails
+      # @raise Parse::RecordNotSaved if the save fails
       # @param session (see #save)
       # @return (see #save)
       def save!(session: nil)
@@ -516,7 +516,7 @@ module Parse
             @id = nil
             changes_applied!
           elsif self.class.raise_on_save_failure
-            raise Parse::SaveFailureError.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
+            raise Parse::RecordNotSaved.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
           end
           # Your create action methods here
         end

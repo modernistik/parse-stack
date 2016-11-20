@@ -1312,7 +1312,7 @@ To commit a new record or changes to an existing record to Parse, use the `#save
 The save operation can handle both creating and updating existing objects. If you do not want to update the association data of a changed object, you may use the `#update` method to only save the changed property values. In the case where you want to force update an object even though it has not changed, to possibly trigger your `before_save` hooks, you can use the `#update!` method. In addition, just like with other ActiveModel objects, you may call `reload!` to fetch the current record again from the data store.
 
 #### Raising an exception when save fails
-By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::SaveFailureError`.
+By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::RecordNotSaved`.
 
 ```ruby
  # globally across all models
@@ -1323,7 +1323,7 @@ By default, we return `true` or `false` for save and destroy operations. If you 
  song.save!
 ```
 
-When enabled, if an error is returned by Parse due to saving or destroying a record, due to your `before_save` or `before_delete` validation cloud code triggers, `Parse::Object` will return the a `Parse::SaveFailureError` exception type. This exception has an instance method of `#object` which contains the object that failed to save.
+When enabled, if an error is returned by Parse due to saving or destroying a record, due to your `before_save` or `before_delete` validation cloud code triggers, `Parse::Object` will return the a `Parse::RecordNotSaved` exception type. This exception has an instance method of `#object` which contains the object that failed to save.
 
 ### Modifying Associations
 Similar to `:array` types of properties, a `has_many` association is backed by a collection proxy class and requires the use of `#add` and `#remove` to modify the contents of the association in order for it to correctly manage changes and updates with Parse. Using `has_many` for associations has the additional functionality that we will only add items to the association if they are of a `Parse::Pointer` or `Parse::Object` type. By default, these associations are fetched with only pointer data. To fetch all the objects in the association, you can call `#fetch` or `#fetch!` on the collection. Note that because the framework supports chaining, it is better to only request the objects you need by utilizing their accessors.
