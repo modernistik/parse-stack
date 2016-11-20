@@ -5,7 +5,7 @@ class TestNotContainedInConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::NotContainedInConstraint
+    @klass = Parse::Constraint::NotContainedInConstraint
     @key = :$nin
     @operand = :not_in
     @keys = [:not_in, :nin, :not_contained_in]

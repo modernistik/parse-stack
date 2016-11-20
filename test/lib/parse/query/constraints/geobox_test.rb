@@ -5,7 +5,7 @@ class TestWithinGeoBoxQueryConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::WithinGeoBoxQueryConstraint
+    @klass = Parse::Constraint::WithinGeoBoxQueryConstraint
     @key = :$within
     @operand = :within_box
     @keys = [:within_box]

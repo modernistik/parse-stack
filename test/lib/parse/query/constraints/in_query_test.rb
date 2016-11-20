@@ -5,7 +5,7 @@ class TestInQueryConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::InQueryConstraint
+    @klass = Parse::Constraint::InQueryConstraint
     @key = :$inQuery
     @operand = :matches
     @keys = [:matches, :in_query]

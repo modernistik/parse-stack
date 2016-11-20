@@ -5,7 +5,7 @@ class TestNearSphereQueryConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::NearSphereQueryConstraint
+    @klass = Parse::Constraint::NearSphereQueryConstraint
     @key = :$nearSphere
     @operand = :near
     @keys = [:near]

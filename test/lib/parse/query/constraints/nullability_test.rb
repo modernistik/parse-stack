@@ -5,7 +5,7 @@ class TestNullabilityConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::NullabilityConstraint
+    @klass = Parse::Constraint::NullabilityConstraint
     @key = :$exists
     @operand = :null
     @keys = [:null]
@@ -16,7 +16,7 @@ class TestNullabilityConstraint < Minitest::Test
     if value == true
       {"field" => { @key => false } }
     else
-      {"field" => { Parse::NotEqualConstraint.key => nil } }
+      {"field" => { Parse::Constraint::NotEqualConstraint.key => nil } }
     end
   end
 
@@ -29,7 +29,7 @@ class TestNullabilityConstraint < Minitest::Test
 
     ["true", 1, nil].each do |value|
       constraint = @klass.new(:field, value)
-      assert_raises(Parse::ConstraintError) do
+      assert_raises(ArgumentError) do
         expected = build(value).as_json
         constraint.build.as_json
       end

@@ -5,7 +5,7 @@ class TestLessThanConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::LessThanConstraint
+    @klass = Parse::Constraint::LessThanConstraint
     @key = :$lt
     @operand = :lt
     @keys = [:lt, :less_than, :before]

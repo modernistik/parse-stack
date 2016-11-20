@@ -2,7 +2,8 @@
 # frozen_string_literal: true
 
 # The set of all Parse errors.
-module ParseErrors
+module Parse
 
+  class Error < StandardError; end
 
 end

@@ -5,7 +5,7 @@ class TestNotInQueryConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::NotInQueryConstraint
+    @klass = Parse::Constraint::NotInQueryConstraint
     @key = :$notInQuery
     @operand = :excludes
     @keys = [:excludes, :not_in_query]

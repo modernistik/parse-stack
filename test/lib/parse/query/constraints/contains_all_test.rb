@@ -5,7 +5,7 @@ class TestContainsAllConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::ContainsAllConstraint
+    @klass = Parse::Constraint::ContainsAllConstraint
     @key = :$all
     @operand = :all
     @keys = [:all, :contains_all]
@@ -14,5 +14,5 @@ class TestContainsAllConstraint < Minitest::Test
   def build(value)
     {"field" =>  { @key.to_s  => [Parse::Constraint.formatted_value(value)].flatten.compact } }
   end
-  
+
 end

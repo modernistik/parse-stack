@@ -5,7 +5,7 @@ class TestExistsConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::ExistsConstraint
+    @klass = Parse::Constraint::ExistsConstraint
     @key = :$exists
     @operand = :exists
     @keys = [:exists]
@@ -27,7 +27,7 @@ class TestExistsConstraint < Minitest::Test
 
   ["true", 1, nil].each do |value|
     constraint = @klass.new(:field, value)
-    assert_raises(Parse::ConstraintError) do
+    assert_raises(ArgumentError) do
       constraint.build.as_json
     end
   end

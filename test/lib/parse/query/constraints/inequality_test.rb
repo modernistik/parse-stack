@@ -5,7 +5,7 @@ class TestNotEqualConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::NotEqualConstraint
+    @klass = Parse::Constraint::NotEqualConstraint
     @key = :$ne
     @operand = :not
     @keys = [:not, :ne]

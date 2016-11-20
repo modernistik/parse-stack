@@ -9,6 +9,7 @@ require_relative 'webhooks'
 
 
 module Parse
+  class Error < StandardError; end;
   module Stack
 
     # Your code goes here...

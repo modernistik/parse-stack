@@ -5,7 +5,7 @@ class TestGreaterThanOrEqualConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::GreaterThanOrEqualConstraint
+    @klass = Parse::Constraint::GreaterThanOrEqualConstraint
     @key = :$gte
     @operand = :gte
     @keys = [:gte, :greater_than_or_equal, :on_or_after]

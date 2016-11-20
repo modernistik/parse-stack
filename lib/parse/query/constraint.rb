@@ -12,6 +12,7 @@ module Parse
   # be combined by merging different constraints (since they are multiple hashes)
   # and some constraints may have higher precedence than others (ex. equality is higher
   # precedence than an "in" query).
+  #
   # All constraints should inherit from Parse::Constraint and should
   # register their specific Operation method (ex. :eq or :lte)
   # For more information about the query design pattern from DataMapper
@@ -162,6 +163,8 @@ module Parse
     # Builds the JSON hash representation of this constraint for a Parse query.
     # This method should be overriden by subclasses. The default implementation
     # implements buildling the equality constraint.
+    # @raise ArgumentError if the constraint could be be build due to a bad parameter.
+    #  This will be different depending on the constraint subclass.
     # @return [Hash]
     def build
       return { @operation.operand => formatted_value } if @operation.operator == :eq || key.nil?

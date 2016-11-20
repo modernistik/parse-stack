@@ -5,7 +5,7 @@ class TestContainedInConstraint < Minitest::Test
   include ConstraintTests
 
   def setup
-    @klass = Parse::ContainedInConstraint
+    @klass = Parse::Constraint::ContainedInConstraint
     @key = :$in
     @operand = :in
     @keys = [:in, :contained_in]

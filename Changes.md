@@ -1,6 +1,6 @@
 ## Parse-Stack Changelog
 
-### 1.6.0.beta2
+### 1.6.0.beta3
 - NEW: Auto generate models based on your remote schema.
 - The default server url is now 'http://localhost:1337/parse'.
 - Improves thread-safety of Webhooks middleware.
@@ -15,6 +15,7 @@
 - Support accessing properties of Parse::Object subclasses through the [] operator.
 - Support setting properties of Parse::Object subclasses through the []= operator.
 - :to_s method of Parse::Date returns the iso8601(3) by default, if no arguments are provided.
+- Parse::ConstraintError has been removed in favor of ArgumentError.
 
 ### 1.5.3
 - Several fixes and performance improvements.
@@ -34,6 +35,7 @@
 - Parse::File now has a `force_ssl` option that makes sure all urls returned are `https`.
 - Documentation
 - ParseConstraintError is now Parse::ConstraintError.
+- All constraint subclasses are under the Constraint namespace.
 
 ### 1.5.1
 - BREAKING CHANGE: The default `has_many` implementation is `:query` instead of `:array`.
