@@ -560,17 +560,17 @@ module Parse
       return self if where_clauses.blank?
       # we can only have one compound query constraint. If we need to add another OR clause
       # let's find the one we have (if any)
-      compound = @where.find { |f| f.is_a?(Parse::CompoundQueryConstraint) }
+      compound = @where.find { |f| f.is_a?(Parse::Constraint::CompoundQueryConstraint) }
       # create a set of clauses that are not an OR clause.
-      remaining_clauses = @where.select { |f| f.is_a?(Parse::CompoundQueryConstraint) == false }
+      remaining_clauses = @where.select { |f| f.is_a?(Parse::Constraint::CompoundQueryConstraint) == false }
       # if we don't have a OR clause to reuse, then create a new one with then
       # current set of constraints
       if compound.blank?
-        compound = Parse::CompoundQueryConstraint.new :or, [ Parse::Query.compile_where(remaining_clauses) ]
+        compound = Parse::Constraint::CompoundQueryConstraint.new :or, [ Parse::Query.compile_where(remaining_clauses) ]
       end
       # then take the where clauses from the second query and append them.
       compound.value.push Parse::Query.compile_where(where_clauses)
-      #compound = Parse::CompoundQueryConstraint.new :or, [remaining_clauses, or_where_query.where]
+      #compound = Parse::Constraint::CompoundQueryConstraint.new :or, [remaining_clauses, or_where_query.where]
       @where = [compound]
       self #chaining
     end
