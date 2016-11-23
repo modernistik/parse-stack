@@ -20,21 +20,21 @@ require_relative "api/all"
 module Parse
   class Error < StandardError
     # An error when a general connection occurs.
-    class ConnectionError < StandardError; end;
+    class ConnectionError < Error; end;
     # An error when a connection timeout occurs.
-    class TimeoutError < StandardError; end;
+    class TimeoutError < Error; end;
     # An error when there is an Parse REST API protocol error.
-    class ProtocolError < StandardError; end;
+    class ProtocolError < Error; end;
     # An error when the Parse server returned invalid code.
-    class ServerError < StandardError; end;
+    class ServerError < Error; end;
     # An error when a Parse server responds with HTTP 500.
-    class ServiceUnavailableError < StandardError; end;
+    class ServiceUnavailableError < Error; end;
     # An error when the authentication credentials in the request are invalid.
-    class AuthenticationError < StandardError; end;
+    class AuthenticationError < Error; end;
     # An error when the burst limit has been exceeded.
-    class RequestLimitExceededError < StandardError; end;
+    class RequestLimitExceededError < Error; end;
     # An error when the session token provided in the request is invalid.
-    class InvalidSessionTokenError < StandardError; end;
+    class InvalidSessionTokenError < Error; end;
   end
 
   # Retrieve the App specific Parse configuration parameters. The configuration
@@ -116,7 +116,7 @@ module Parse
     RETRY_DELAY = 1.5
 
     # An error when a general response error occurs when communicating with Parse server.
-    class ResponseError < StandardError; end;
+    class ResponseError < Parse::Error; end;
 
     # @!attribute cache
     #  The underlying cache store for caching API requests.
@@ -401,38 +401,38 @@ module Parse
 
       case response.http_status
       when 401, 403
-        puts "[Parse:AuthenticationError] #{response}"
+        warn "[Parse:AuthenticationError] #{response}"
         raise Parse::Error::AuthenticationError, response
       when 400, 408
         if response.code == Parse::Response::ERROR_TIMEOUT || response.code == 143 #"net/http: timeout awaiting response headers"
-          puts "[Parse:TimeoutError] #{response}"
+          warn "[Parse:TimeoutError] #{response}"
           raise Parse::Error::TimeoutError, response
         end
       when 404
         unless response.object_not_found?
-          puts "[Parse:ConnectionError] #{response}"
+          warn "[Parse:ConnectionError] #{response}"
           raise Parse::Error::ConnectionError, response
         end
       when 405, 406
-        puts "[Parse:ProtocolError] #{response}"
+        warn "[Parse:ProtocolError] #{response}"
         raise Parse::Error::ProtocolError, response
       when 500, 503
-        puts "[Parse:ServiceUnavailableError] #{response}"
+        warn "[Parse:ServiceUnavailableError] #{response}"
         raise Parse::Error::ServiceUnavailableError, response
       end
 
       if response.error?
         if response.code <= Parse::Response::ERROR_SERVICE_UNAVAILABLE
-          puts "[Parse:ServiceUnavailableError] #{response}"
+          warn "[Parse:ServiceUnavailableError] #{response}"
           raise Parse::Error::ServiceUnavailableError, response
         elsif response.code <= 100
-          puts "[Parse:ServerError] #{response}"
+          warn "[Parse:ServerError] #{response}"
           raise Parse::Error::ServerError, response
         elsif response.code == Parse::Response::ERROR_EXCEEDED_BURST_LIMIT
-          puts "[Parse:RequestLimitExceededError] #{response}"
+          warn "[Parse:RequestLimitExceededError] #{response}"
           raise Parse::Error::RequestLimitExceededError, response
         elsif response.code == 209 # Error 209: invalid session token
-          puts "[Parse:InvalidSessionTokenError] #{response}"
+          warn "[Parse:InvalidSessionTokenError] #{response}"
           raise Parse::Error::InvalidSessionTokenError, response
         end
       end
@@ -440,7 +440,7 @@ module Parse
       response
     rescue Parse::Error::ServiceUnavailableError => e
       if _retry_count > 0
-        puts "[Parse:Retry] Retries remaining #{_retry_count} : #{response.request}"
+        warn "[Parse:Retry] Retries remaining #{_retry_count} : #{response.request}"
         _retry_count -= 1
         backoff_delay = RETRY_DELAY * (self.retry_limit - _retry_count)
         _retry_delay = [0,RETRY_DELAY, backoff_delay].sample
@@ -450,7 +450,7 @@ module Parse
       raise
     rescue Faraday::Error::ClientError, Net::OpenTimeout => e
       if _retry_count > 0
-        puts "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
+        warn "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
         _retry_count -= 1
         backoff_delay = RETRY_DELAY * (self.retry_limit - _retry_count)
         _retry_delay = [0,RETRY_DELAY, backoff_delay].sample

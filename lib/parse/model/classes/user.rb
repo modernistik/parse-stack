@@ -5,19 +5,19 @@ require_relative '../object'
 module Parse
   class Error
     # 200	Error code indicating that the username is missing or empty.
-    class UsernameMissingError < StandardError; end;
+    class UsernameMissingError < Error; end;
     # 201	Error code indicating that the password is missing or empty.
-    class PasswordMissingError < StandardError; end;
+    class PasswordMissingError < Error; end;
     # Error code 202: indicating that the username has already been taken.
-    class UsernameTakenError < StandardError; end;
+    class UsernameTakenError < Error; end;
     # 203	Error code indicating that the email has already been taken.
-    class EmailTakenError < StandardError; end;
+    class EmailTakenError < Error; end;
     # 204	Error code indicating that the email is missing, but must be specified.
-    class EmailMissing < StandardError; end;
+    class EmailMissing < Error; end;
     # 205	Error code indicating that a user with the specified email was not found.
-    class EmailNotFound < StandardError; end;
+    class EmailNotFound < Error; end;
     # 125	Error code indicating that the email address was invalid.
-    class InvalidEmailAddress < StandardError; end;
+    class InvalidEmailAddress < Error; end;
   end
 
   # The main class representing the _User table in Parse. A user can either be signed up or anonymous.

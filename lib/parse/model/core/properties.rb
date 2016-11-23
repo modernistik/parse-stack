@@ -19,8 +19,6 @@ module Parse
   # This module provides support for handling all the different types of column data types
   # supported in Parse and mapping them between their remote names with their local ruby named attributes.
   module Properties
-    #class ValueError < StandardError; end;
-
     # These are the base types supported by Parse.
     TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl].freeze
     # These are the base mappings of the remote field name types.
@@ -303,7 +301,7 @@ module Parse
         # support question mark methods for boolean
         if data_type == :boolean
           if self.method_defined?("#{key}?")
-            puts "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}_increment!."
+            puts "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}?."
           end
 
           # returns true if set to true, false otherwise

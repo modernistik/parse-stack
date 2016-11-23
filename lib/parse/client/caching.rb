@@ -156,7 +156,6 @@ module Parse
           puts "[Parse::Cache] Error: #{e}"
         end
 
-        puts("[Parse::Cache::Miss] !! #{url}") if self.class.logging.present?
         @app.call(env).on_complete do |response_env|
           # Only cache GET requests with valid HTTP status codes whose content-length
           # is greater than 20. Otherwise they could be errors, successes and empty result sets.
