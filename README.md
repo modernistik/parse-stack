@@ -2,6 +2,8 @@
 
 Parse-Stack is the [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
+Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full [API Reference](http://www.rubydoc.info/github/modernistik/parse-stack) for more detailed information about our Parse Server SDK.
+
 ### Code Status
 [![Gem Version](https://badge.fury.io/rb/parse-stack.svg)](https://badge.fury.io/rb/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
