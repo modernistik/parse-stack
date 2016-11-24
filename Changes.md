@@ -1,6 +1,6 @@
 ## Parse-Stack Changelog
 
-### 1.6.0.beta3
+### 1.6.0
 - NEW: Auto generate models based on your remote schema.
 - The default server url is now 'http://localhost:1337/parse'.
 - Improves thread-safety of Webhooks middleware.
@@ -11,7 +11,7 @@
 - Retry now follows sampling back-off delay algorithm.
 - Adds `schemas` API to retrieve all schemas for an application.
 - :number can now be used as an alias for the :integer data type.
-- :geo_point can now be used as an alias for the :geo_point data type.
+- :geo_point can now be used as an alias for the :geopoint data type.
 - Support accessing properties of Parse::Object subclasses through the [] operator.
 - Support setting properties of Parse::Object subclasses through the []= operator.
 - :to_s method of Parse::Date returns the iso8601(3) by default, if no arguments are provided.
@@ -21,6 +21,7 @@
 - Moves Parse::Object modular functionality under Core namespace
 - Renames ClassBuilder to Parse::Model::Builder
 - Renamed SaveFailureError to RecordNotSaved for ActiveRecord similarity.
+- All Parse errors inherit from Parse::Error.
 
 ### 1.5.3
 - Several fixes and performance improvements.
