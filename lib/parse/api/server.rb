@@ -21,7 +21,8 @@ module Parse
       def server_info
         return @server_info if @server_info.present?
         response = request :get, SERVER_INFO_PATH
-        @server_info ||= response.result&.with_indifferent_access
+        @server_info = response.error? ? nil :
+                       response.result.with_indifferent_access
       end
 
       # Force fetches the server information.
