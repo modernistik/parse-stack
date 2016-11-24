@@ -95,17 +95,19 @@ module Parse
   # Faraday, which means it is open to add any additional middleware for
   # features you'd like to implement.
   class Client
-    include Parse::API::Objects
-    include Parse::API::Config
-    include Parse::API::Files
-    include Parse::API::CloudFunctions
-    include Parse::API::Users
-    include Parse::API::Sessions
-    include Parse::API::Hooks
+    include Parse::API::Analytics
     include Parse::API::Apps
     include Parse::API::Batch
+    include Parse::API::CloudFunctions
+    include Parse::API::Config
+    include Parse::API::Files
+    include Parse::API::Hooks
+    include Parse::API::Objects
     include Parse::API::Push
     include Parse::API::Schema
+    include Parse::API::Server
+    include Parse::API::Sessions
+    include Parse::API::Users
     # The user agent header key.
     USER_AGENT_HEADER = "User-Agent".freeze
     # The value for the User-Agent header.
