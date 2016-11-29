@@ -1,5 +1,8 @@
 ## Parse-Stack Changelog
 
+### 1.6.1
+- NEW: Batch requests are now parallelized.
+
 ### 1.6.0
 - NEW: Auto generate models based on your remote schema.
 - The default server url is now 'http://localhost:1337/parse'.

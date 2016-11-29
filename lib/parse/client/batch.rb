@@ -36,7 +36,7 @@ module Parse
   # @see Array.destroy
   class BatchOperation
     include Enumerable
-    
+
     # @!attribute requests
     #  @return [Array] the set of requests in this batch.
 
@@ -130,10 +130,8 @@ module Parse
     def submit(segment = 50)
       @responses = []
       @requests.uniq!(&:signature)
-      @requests.each_slice(segment) do |slice|
-        @responses << client.batch_request( BatchOperation.new(slice) )
-        #throttle
-        # sleep (slice.count.to_f / MAX_REQ_SEC.to_f )
+      @responses = @requests.each_slice(segment).to_a.threaded_map(2) do |slice|
+         client.batch_request( BatchOperation.new(slice) )
       end
       @responses.flatten!
       #puts "Requests: #{@requests.count} == Response: #{@responses.count}"
