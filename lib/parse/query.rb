@@ -412,10 +412,10 @@ module Parse
     #  to get as many as 11_000 records with the aid if skipping.
     # @return [self]
     def limit(count)
-      if count == :max
-        @limit = 11_000
-      elsif count.is_a?(Numeric)
-        @limit = [ 0, count.to_i, 11_000].sort[1]
+      if count.is_a?(Numeric)
+        @limit = [ 0, count.to_i ].max
+      elsif count == :max
+        @limit = :max
       else
         @limit = nil
       end
@@ -643,19 +643,28 @@ module Parse
     # @!visibility private
     def max_results(raw: false)
       compiled_query = compile
-      query_limit = compiled_query[:limit] ||= 1_000
-      query_skip =  compiled_query[:skip] ||= 0
-      compiled_query[:limit] = 1_000
-      iterations = (query_limit/1000.0).ceil
+      batch_size = 1_000
       results = []
+      # determine if there is a user provided hard limit
+      _limit = (@limit.is_a?(Numeric) && @limit > 0) ? @limit : nil
+      compiled_query[:skip] ||= 0
 
-      iterations.times do |idx|
+      loop do
+        # always reset the batch size
+        compiled_query[:limit] = batch_size
+
+        # if a hard limit was set by the user, then if the remaining amount
+        # is less than the batch size, set the new limit to the remaining amount.
+        unless _limit.nil?
+          compiled_query[:limit] = _limit if _limit < batch_size
+        end
+
         response = fetch!( compiled_query )
         break if response.error? || response.results.empty?
 
         items = response.results
         items = decode(items) unless raw
-
+        # if a block is provided, we do not keep the results after processing.
         if block_given?
           items.each(&Proc.new)
         else
@@ -664,8 +673,16 @@ module Parse
         # if we get less than the maximum set of results, most likely the next
         # query will return emtpy results - no need to perform it.
         break if items.count < compiled_query[:limit]
+
+        # if we have a set limit, then subtract from the total amount the user requested
+        # from the total in the current result set. Break if we've reached our limit.
+        unless _limit.nil?
+          _limit -= items.count
+          break if _limit < 1
+        end
+
         # add to the skip count for the next iteration
-        compiled_query[:skip] += 1_000
+        compiled_query[:skip] += batch_size
       end
       results
     end
@@ -719,14 +736,14 @@ module Parse
     # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
     def results(raw: false)
       if @results.nil?
-        if @limit.nil? || @limit.to_i <= 1_000
+        if block_given?
+          max_results(raw: raw, &Proc.new)
+        elsif @limit.is_a?(Numeric)
           response = fetch!( compile )
           return [] if response.error?
           items = raw ? response.results : decode(response.results)
           return items.each(&Proc.new) if block_given?
           @results = items
-        elsif block_given?
-          return max_results(raw: raw, &Proc.new)
         else
           @results = max_results(raw: raw)
         end
@@ -777,7 +794,6 @@ module Parse
     def compile(encode: true, includeClassName: false)
       run_callbacks :prepare do
         q = {} #query
-        q[:limit] = 11_000 if @limit == :max
         q[:limit] = @limit if @limit.is_a?(Numeric) && @limit > 0
         q[:skip] = @skip if @skip > 0
 

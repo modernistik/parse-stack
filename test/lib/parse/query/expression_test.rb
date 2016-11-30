@@ -35,14 +35,18 @@ class TestParseQueryExpressions < Minitest::Test
     assert_equal 0, @query.clause(:skip)
     @query.skip 100
     assert_equal 100, @query.clause(:skip)
+    @query.skip 15_000 # allow skips over 10k
+    assert_equal 15_000, @query.clause(:skip)
   end
 
   def test_exp_limit
     assert_nil @query.clause(:limit)
     @query.limit 100
     assert_equal 100, @query.clause(:limit)
+    @query.limit 5000 # allow limits over 1k
+    assert_equal 5000, @query.clause(:limit)
     @query.limit :max
-    assert_equal 11_000, @query.clause(:limit)
+    assert_equal :max, @query.clause(:limit)
   end
 
   def test_exp_options
