@@ -148,7 +148,7 @@ module Parse
             @store.delete "mk:#{url.to_s}" # master key cache-key
             @store.delete @cache_key # final key
           end
-        rescue Errno::EINVAL, Redis::CannotConnectError => e
+        rescue Errno::EINVAL, Redis::CannotConnectError, Redis::TimeoutError => e
           # if the cache store fails to connect, catch the exception but proceed
           # with the regular request, but turn off caching for this request. It is possible
           # that the cache connection resumes at a later point, so this is temporary.
