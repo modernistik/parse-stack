@@ -202,7 +202,8 @@ module Parse
             break cursor if results.empty? # break if no results
             results.each(&block)
             next_cursor = results.last
-
+            # break if we got less than the maximum requested
+            break next_cursor if results.count < 250
             # break if the next object is the same as the current object.
             break next_cursor if cursor.id == next_cursor.id
             # The exclusion set is used in the case where multiple records have the exact
