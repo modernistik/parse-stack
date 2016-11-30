@@ -386,16 +386,14 @@ module Parse
       self #chaining
     end #order
 
-    # Use with limit to paginate through results. Default is 0 with
-    # maximum value being 10,000.
+    # Use with limit to paginate through results. Default is 0.
     # @example
     #  # get the next 3 songs after the first 10
     #  Song.all :limit => 3, :skip => 10
-    # @param count [Integer] The number of records to skip.
+    # @param amount [Integer] The number of records to skip.
     # @return [self]
-    def skip(count)
-      #  min <= count <= max
-      @skip = [ 0, count.to_i, 10_000].sort[1]
+    def skip(amount)
+      @skip = [0,amount.to_i].max
       @results = nil
       self #chaining
     end
@@ -668,7 +666,6 @@ module Parse
         break if items.count < compiled_query[:limit]
         # add to the skip count for the next iteration
         compiled_query[:skip] += 1_000
-        break if compiled_query[:skip] > 10_000
       end
       results
     end
