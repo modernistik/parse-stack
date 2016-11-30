@@ -641,7 +641,7 @@ module Parse
     # max_results is used to iterate through as many API requests as possible using
     # :skip and :limit paramter.
     # @!visibility private
-    def max_results(raw: false)
+    def max_results(raw: false, on_batch: nil, discard_results: false)
       compiled_query = compile
       batch_size = 1_000
       results = []
@@ -668,8 +668,11 @@ module Parse
         if block_given?
           items.each(&Proc.new)
         else
-          results += items
+          # concat results unless discard_results is true
+          results += items unless discard_results
         end
+
+        on_batch.call(items) if on_batch.present?
         # if we get less than the maximum set of results, most likely the next
         # query will return emtpy results - no need to perform it.
         break if items.count < compiled_query[:limit]

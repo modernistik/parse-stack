@@ -232,8 +232,9 @@ module Parse
         # @return [Boolean] whether there were any errors.
         def save_all(constraints = {})
           force = false
-
+          has_errors = false
           iterator_block = nil
+
           if block_given?
             iterator_block = Proc.new
             force ||= false
@@ -242,56 +243,19 @@ module Parse
             # regardless of modification.
             force = true
           end
-          # Only generate the comparison block once.
-          # updated_comparison_block = Proc.new { |x| x.updated_at }
-          batch_size = 250
-          anchor_date = Parse::Date.now
-          constraints.merge! :updated_at.on_or_before => anchor_date
+
           constraints.merge! cache: false
-          # oldest first, so we create a reduction-cycle
-          constraints.merge! order: :updated_at.asc, limit: batch_size
-          update_query = query(constraints)
-          #puts "Setting Anchor Date: #{anchor_date}"
-          cursor = nil
-          has_errors = false
-          loop do
-            results = update_query.results
+          _q = query(constraints)
 
-            break if results.empty?
-
-            # verify we didn't get duplicates fetches
-            if cursor.is_a?(Parse::Object) && results.any? { |x| x.id == cursor.id }
-              warn "[Parse::SaveAll] Unbounded update detected with id #{cursor.id}."
-              has_errors = true
-              break cursor
-            end
-
-            results.each(&iterator_block) if iterator_block.present?
-            # we don't need to refresh the objects in the array with the results
-            # since we will be throwing them away. Force determines whether
-            # to save these objects regardless of whether they are dirty.
+          batch_proc = Proc.new do |results|
             batch = results.save(merge: false, force: force)
-
-            # faster version assuming sorting order wasn't messed up
-            cursor = results.last
-
-            # break out of loop if we got results less than the batch_size. This means
-            # that the next query will yield 0 results.
-            break cursor if results.count < batch_size
-
-            if cursor.is_a?(Parse::Object)
-              update_query.where :updated_at.gte => cursor.updated_at
-
-              if cursor.updated_at.present? && cursor.updated_at > anchor_date
-                warn "[Parse::SaveAll] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
-                break cursor
-              end
-
-            end
-
-
-
             has_errors ||= batch.error?
+          end
+
+          if iterator_block.present?
+            _q.max_results(on_batch: batch_proc, &iterator_block)
+          else
+            _q.max_results(on_batch: batch_proc, discard_results: true)
           end
           has_errors
         end

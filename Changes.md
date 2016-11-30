@@ -2,6 +2,10 @@
 
 ### 1.6.1
 - NEW: Batch requests are now parallelized.
+- `skip` in queries no longer capped to 10,000.
+- `limit`  in queries no longer capped at 1000.
+- `all()` queries can now return as many results as possible.
+- `save_all()` queries now don't require the use of `updated_at` to be modified.
 
 ### 1.6.0
 - NEW: Auto generate models based on your remote schema.
