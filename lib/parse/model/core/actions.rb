@@ -244,12 +244,12 @@ module Parse
           end
           # Only generate the comparison block once.
           # updated_comparison_block = Proc.new { |x| x.updated_at }
-
+          batch_size = 250
           anchor_date = Parse::Date.now
           constraints.merge! :updated_at.on_or_before => anchor_date
           constraints.merge! cache: false
           # oldest first, so we create a reduction-cycle
-          constraints.merge! order: :updated_at.asc, limit: 250
+          constraints.merge! order: :updated_at.asc, limit: batch_size
           update_query = query(constraints)
           #puts "Setting Anchor Date: #{anchor_date}"
           cursor = nil
@@ -274,9 +274,10 @@ module Parse
 
             # faster version assuming sorting order wasn't messed up
             cursor = results.last
-            # slower version, but more accurate
-            # cursor_item = results.max_by(&updated_comparison_block).updated_at
-            # puts "[Parse::SaveAll] Updated #{results.count} records updated <= #{cursor.updated_at}"
+
+            # break out of loop if we got results less than the batch_size. This means
+            # that the next query will yield 0 results.
+            break cursor if results.count < batch_size
 
             if cursor.is_a?(Parse::Object)
               update_query.where :updated_at.gte => cursor.updated_at
@@ -287,6 +288,8 @@ module Parse
               end
 
             end
+
+
 
             has_errors ||= batch.error?
           end
