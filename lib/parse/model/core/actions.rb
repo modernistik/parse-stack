@@ -169,6 +169,52 @@ module Parse
           obj
         end
 
+        # This methods allow you to efficiently iterate over all the records in the collection
+        # (lower memory cost) at a minor cost of performance. This method utilizes
+        # the `created_at` field of Parse records to order and iterate over all records,
+        # therefore you should not use this method if you want to perform a query
+        # with constraints against `created_at` field or need specific type of ordering.
+        # @param constraints [Hash] a set of query constraints.
+        # @yield a block which will iterate through each matching record.
+        # @example
+        #
+        #  post = Post.first
+        #  # iterate over all comments matching conditions
+        #  Comments.each( post: post) do |comment|
+        #    # ...
+        #  end
+        # @return [Parse::Object] the last Parse::Object record processed.
+        def each(constraints = {}, **opts, &block)
+          #anchor_date = opts[:anchor_date] || Parse::Date.now
+          start_cursor = first( order: :created_at.asc, keys: :created_at )
+          constraints.merge! cache: false, limit: 250, order: :created_at.asc
+          all_query = query(constraints)
+          cursor = start_cursor
+          # the exclusion set is a set of ids not to include the next query.
+          exclusion_set = []
+          loop do
+            _q = query(constraints.dup)
+            _q.where(:created_at.on_or_after => cursor.created_at)
+            # set of ids not to include in the next query. non-performant, but accurate.
+            _q.where(:id.nin => exclusion_set) unless exclusion_set.empty?
+            results = _q.results # get results
+
+            break cursor if results.empty? # break if no results
+            results.each(&block)
+            next_cursor = results.last
+
+            # break if the next object is the same as the current object.
+            break next_cursor if cursor.id == next_cursor.id
+            # The exclusion set is used in the case where multiple records have the exact
+            # same created_at date (down to the microsecond). This prevents getting the same
+            # record in the next query request.
+            exclusion_set = results.select { |r| r.created_at == next_cursor.created_at }.map(&:id)
+            results = nil
+            cursor = next_cursor
+          end
+
+        end
+
         # Auto save all objects matching the query constraints. This method is
         # meant to be used with a block. Any objects that are modified in the block
         # will be batched for a save operation. This uses the `updated_at` field to
