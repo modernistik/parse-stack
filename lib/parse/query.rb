@@ -401,13 +401,13 @@ module Parse
     # Limit the number of objects returned by the query. The default is 100, with
     # Parse allowing a maximum of 1000. The framework also allows a value of
     # `:max`. Utilizing this will have the framework continually intelligently
-    # utilize `:skip` to continue to paginate through results until an empty
-    # result set is received or the `:skip` limit is reached (10,000). When
-    # utilizing `all()`, `:max` is the default option for `:limit`.
+    # utilize `:skip` to continue to paginate through results until no more results
+    # match the query criteria. When utilizing `all()`, `:max` is the default
+    # option for `:limit`.
     # @example
     #  Song.all :limit => 1 # same as Song.first
-    #  Song.all :limit => 1000 # maximum allowed by Parse
-    #  Song.all :limit => :max # up to 11,000 records (theoretical).
+    #  Song.all :limit => 2025 # large limits supported.
+    #  Song.all :limit => :max # as many records as possible.
     # @param count [Integer,Symbol] The number of records to return. You may pass :max
     #  to get as many as 11_000 records with the aid if skipping.
     # @return [self]

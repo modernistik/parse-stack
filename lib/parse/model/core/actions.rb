@@ -186,8 +186,9 @@ module Parse
         # @return [Parse::Object] the last Parse::Object record processed.
         def each(constraints = {}, **opts, &block)
           #anchor_date = opts[:anchor_date] || Parse::Date.now
+          batch_size = 250
           start_cursor = first( order: :created_at.asc, keys: :created_at )
-          constraints.merge! cache: false, limit: 250, order: :created_at.asc
+          constraints.merge! cache: false, limit: batch_size, order: :created_at.asc
           all_query = query(constraints)
           cursor = start_cursor
           # the exclusion set is a set of ids not to include the next query.
@@ -203,7 +204,7 @@ module Parse
             results.each(&block)
             next_cursor = results.last
             # break if we got less than the maximum requested
-            break next_cursor if results.count < 250
+            break next_cursor if results.count < batch_size
             # break if the next object is the same as the current object.
             break next_cursor if cursor.id == next_cursor.id
             # The exclusion set is used in the case where multiple records have the exact
@@ -232,9 +233,8 @@ module Parse
         # @return [Boolean] whether there were any errors.
         def save_all(constraints = {})
           force = false
-          has_errors = false
+          batch_size = 250
           iterator_block = nil
-
           if block_given?
             iterator_block = Proc.new
             force ||= false
@@ -243,19 +243,54 @@ module Parse
             # regardless of modification.
             force = true
           end
+          # Only generate the comparison block once.
+          # updated_comparison_block = Proc.new { |x| x.updated_at }
 
+          anchor_date = Parse::Date.now
+          constraints.merge! :updated_at.on_or_before => anchor_date
           constraints.merge! cache: false
-          _q = query(constraints)
+          # oldest first, so we create a reduction-cycle
+          constraints.merge! order: :updated_at.asc, limit: batch_size
+          update_query = query(constraints)
+          #puts "Setting Anchor Date: #{anchor_date}"
+          cursor = nil
+          has_errors = false
+          loop do
+            results = update_query.results
 
-          batch_proc = Proc.new do |results|
+            break if results.empty?
+
+            # verify we didn't get duplicates fetches
+            if cursor.is_a?(Parse::Object) && results.any? { |x| x.id == cursor.id }
+              warn "[Parse::SaveAll] Unbounded update detected with id #{cursor.id}."
+              has_errors = true
+              break cursor
+            end
+
+            results.each(&iterator_block) if iterator_block.present?
+            # we don't need to refresh the objects in the array with the results
+            # since we will be throwing them away. Force determines whether
+            # to save these objects regardless of whether they are dirty.
             batch = results.save(merge: false, force: force)
-            has_errors ||= batch.error?
-          end
 
-          if iterator_block.present?
-            _q.max_results(on_batch: batch_proc, &iterator_block)
-          else
-            _q.max_results(on_batch: batch_proc, discard_results: true)
+            # faster version assuming sorting order wasn't messed up
+            cursor = results.last
+            # slower version, but more accurate
+            # cursor_item = results.max_by(&updated_comparison_block).updated_at
+            # puts "[Parse::SaveAll] Updated #{results.count} records updated <= #{cursor.updated_at}"
+
+            break if results.count < batch_size # we didn't hit a cap on results.
+            if cursor.is_a?(Parse::Object)
+              update_query.where :updated_at.gte => cursor.updated_at
+
+              if cursor.updated_at.present? && cursor.updated_at > anchor_date
+                warn "[Parse::SaveAll] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
+                break cursor
+              end
+
+            end
+
+            has_errors ||= batch.error?
           end
           has_errors
         end
