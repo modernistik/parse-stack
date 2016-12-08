@@ -113,7 +113,7 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
     - [:skip](#skip)
     - [:cache](#cache)
     - [:use_master_key](#use_master_key)
-    - [:session_token](#session_token)
+    - [:session](#session)
     - [:where](#where)
 - [Query Constraints](#query-constraints)
     - [Equals](#equals)
@@ -1652,13 +1652,15 @@ A true/false value. If you provided a master key as part of `Parse.setup()`, it 
 Song.all limit: 3, use_master_key: false
 ```
 
-#### :session_token
-A Parse session token string. If you would like to perform a query as a particular user, you may pass their session token in the query. This will make sure that the query is performed on behalf (and with the privileges) of that user which will cause record ACLs to be enforced. If a session token is provided, caching will be disabled for this request.
+#### :session
+This will make sure that the query is performed on behalf (and with the privileges) of an authenticated user which will cause record ACLs to be enforced. If a session token is provided, caching will be disabled for this request. You may pass a string representing the session token, an authenticated `Parse::User` instance or a `Parse::Session` instance.
 
 ```ruby
 # disable sending the master key in the request if configured
 # and perform this request as a Parse user represented by this token
-Song.all limit: 3, session_token: "<session_token>"
+Song.all limit: 3, session: "<session_token>"
+Song.all limit: 3, session: user # a logged-in Parse::User
+Song.all limit: 3, session: session # Parse::Session
 ```
 
 #### :where

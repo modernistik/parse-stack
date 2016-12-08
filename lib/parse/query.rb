@@ -132,9 +132,15 @@ module Parse
     #  Set the session token to send with this API request. A session token is tied to
     #  a logged in {Parse::User}. When sending a session_token in the request,
     #  this performs the query on behalf of the user (with their allowed priviledges).
+    #  Using the short hand (inline) form, you can also pass an authenticated {Parse::User} instance
+    #  or a {Parse::Session} instance.
     #  @example
     #   # perform this query as user represented by session_token
-    #   query = Parse::Query.new("_User", :name => "Bob", :session_token => "r:XyX123...")
+
+    #   query = Parse::Query.new("_User", :name => "Bob")
+    #   query.session_token = "r:XyX123..."
+    #   # or inline
+    #   query = Parse::Query.new("_User", :name => "Bob", :session => "r:XyX123...")
     #  @note Using a session_token automatically disables sending the master key in the request.
     #  @return [String] the session token to send with this API request.
     attr_accessor :table, :client, :key, :cache, :use_master_key, :session_token
