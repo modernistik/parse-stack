@@ -132,10 +132,22 @@ module Parse
           if method == :get && @cache_key.present? && @store.key?(@cache_key)
             puts("[Parse::Cache::Hit] >> #{url}") if self.class.logging.present?
             response = Faraday::Response.new
-            res_env = @store[@cache_key] # previous cached response
-            body = res_env.respond_to?(:body) ? res_env.body : nil
+            cache_data = @store[@cache_key] # previous cached response
+
+            # check if the store was from a legacy parse-stack cache value which
+            # is stored as Faraday::Env. T\he new system stores less content in a simple hash
+            # for improved interoperability and access time.
+            if cache_data.is_a?(Faraday::Env)
+              body = cache_data.respond_to?(:body) ? cache_data.body : nil
+              response_headers = cache_data.response_headers || {}
+            else
+              body = cache_data[:body]
+              response_headers = cache_data[:headers] || {}
+            end
+
             if body.present?
-              response.finish({status: 200, response_headers: { CACHE_RESPONSE_HEADER => "true" }, body: body })
+              response_headers[CACHE_RESPONSE_HEADER] = 'true'
+              response.finish({status: 200, response_headers: response_headers, body: body })
               return response
             else
               @store.delete @cache_key
@@ -161,9 +173,11 @@ module Parse
           # is between 20 bytes and 1MB. Otherwise they could be errors, successes and empty result sets.
 
           if @enabled && method == :get &&  CACHEABLE_HTTP_CODES.include?(response_env.status) &&
-              response_env.present? && response_env.response_headers[CONTENT_LENGTH_KEY].to_i.between?(20,1_000_000)
+              response_env.body.present? && response_env.response_headers[CONTENT_LENGTH_KEY].to_i.between?(20,1_250_000)
               begin
-                @store.store(@cache_key, response_env, expires: @expires) # ||= response_env.body
+                @store.store(@cache_key,
+                            { headers: response_env.response_headers, body: response_env.body },
+                            expires: @expires)
               rescue => e
                 puts "[Parse::Cache] Store Error: #{e}"
               end

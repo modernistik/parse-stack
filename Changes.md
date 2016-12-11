@@ -2,6 +2,8 @@
 
 ### 1.6.2
 - Fixes #20: All temporary headers values are strings.
+- Reduced cache storage consumption by only storing response body and headers.
+- Increased maximum cache content length size to 1.25 MB.
 
 ### 1.6.1
 - NEW: Batch requests are now parallelized.

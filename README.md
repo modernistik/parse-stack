@@ -316,6 +316,12 @@ The connection adapter. By default it uses the `Faraday.default_adapter` which i
 #### `:cache`
 A caching adapter of type `Moneta::Transformer`. Caching queries and object fetches can help improve the performance of your application, even if it is for a few seconds. Only successful `GET` object fetches and queries (non-empty) will be cached. You may set the default expiration time with the `expires` option. See related: [Moneta](https://github.com/minad/moneta). At any point in time you may clear the cache by calling the `clear_cache!` method on the client connection.
 
+```ruby
+  store = Moneta.new :Redis, url: 'redis://localhost:6379'
+   # use a Redis cache store with an automatic expire of 10 seconds.
+  Parse.setup(cache: store, expires: 10, ...)
+```
+
 #### `:expires`
 Sets the default cache expiration time (in seconds) for successful non-empty `GET` requests when using the caching middleware. The default value is 3 seconds. If `:expires` is set to 0, caching will be disabled. You can always clear the current state of the cache using the `clear_cache!` method on your `Parse::Client` instance.
 
