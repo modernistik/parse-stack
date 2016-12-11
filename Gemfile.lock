@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parse-stack (1.6.1)
+    parse-stack (1.6.2)
       active_model_serializers (>= 0.9, < 1)
       activemodel (>= 4.2.1, < 6)
       activesupport (>= 4.2.1, < 6)
@@ -64,7 +64,7 @@ GEM
     multipart-post (2.0.0)
     nokogiri (1.6.8.1)
       mini_portile2 (~> 2.1.0)
-    parallel (1.9.0)
+    parallel (1.10.0)
     pry (0.10.4)
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
@@ -102,4 +102,4 @@ DEPENDENCIES
   rake
 
 BUNDLED WITH
-   1.13.3
+   1.13.6

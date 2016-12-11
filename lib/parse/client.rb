@@ -379,7 +379,7 @@ module Parse
         headers[Parse::Middleware::Caching::CACHE_CONTROL] = "no-cache"
       elsif opts[:cache].is_a?(Numeric)
         # specify the cache duration of this request
-        headers[Parse::Middleware::Caching::CACHE_EXPIRES_DURATION] = opts[:cache].to_i
+        headers[Parse::Middleware::Caching::CACHE_EXPIRES_DURATION] = opts[:cache].to_s
       end
 
       if opts[:use_master_key] == false

@@ -135,7 +135,7 @@ module Parse
             res_env = @store[@cache_key] # previous cached response
             body = res_env.respond_to?(:body) ? res_env.body : nil
             if body.present?
-              response.finish({status: 200, response_headers: { CACHE_RESPONSE_HEADER => true }, body: body })
+              response.finish({status: 200, response_headers: { CACHE_RESPONSE_HEADER => "true" }, body: body })
               return response
             else
               @store.delete @cache_key

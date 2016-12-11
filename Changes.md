@@ -1,5 +1,8 @@
 ## Parse-Stack Changelog
 
+### 1.6.2
+- Fixes #20: All temporary headers values are strings.
+
 ### 1.6.1
 - NEW: Batch requests are now parallelized.
 - `skip` in queries no longer capped to 10,000.
