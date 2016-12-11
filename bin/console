@@ -6,7 +6,7 @@ require 'dotenv'
 require 'byebug'
 Dotenv.load
 
-Parse.setup
+Parse.setup # cache: 'redis://localhost:6379'
 
 puts "[ParseServerURL] #{Parse.client.server_url}"
 puts "[ParseAppID]     #{Parse.client.app_id}"

@@ -1,6 +1,7 @@
 require 'faraday'
 require 'faraday_middleware'
 require 'active_support'
+require 'moneta'
 require 'active_model_serializers'
 require 'active_support/inflector'
 require 'active_support/core_ext/object'
@@ -267,6 +268,16 @@ module Parse
         end
 
         if opts[:cache].present? && opts[:expires].to_i > 0
+          # advanced: provide a REDIS url, we'll configure a Moneta Redis store.
+          if opts[:cache].is_a?(String) && opts[:cache].starts_with?("redis://")
+            begin
+              opts[:cache] = Moneta.new(:Redis, url: opts[:cache])
+            rescue LoadError
+              puts "[Parse::Middleware::Caching] Did you forget to load the redis gem (Gemfile)?"
+              raise
+            end
+          end
+
           unless opts[:cache].is_a?(Moneta::Transformer)
             raise ArgumentError, "Parse::Client option :cache needs to be a type of Moneta::Transformer store."
           end

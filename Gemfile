@@ -3,10 +3,10 @@ source 'https://rubygems.org'
 # Specify your gem's dependencies in parse-stack.gemspec
 gemspec
 
-gem 'dotenv'
-gem 'rake'
-
 group :test, :development do
+  gem 'dotenv'
+  gem 'redis'
+  gem 'rake'
   gem 'byebug'
   gem 'minitest'
   gem 'pry'
