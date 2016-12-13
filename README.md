@@ -317,7 +317,6 @@ The connection adapter. By default it uses the `Faraday.default_adapter` which i
 A caching adapter of type `Moneta::Transformer`. Caching queries and object fetches can help improve the performance of your application, even if it is for a few seconds. Only successful `GET` object fetches and queries (non-empty) will be cached. You may set the default expiration time with the `expires` option. See related: [Moneta](https://github.com/minad/moneta). At any point in time you may clear the cache by calling the `clear_cache!` method on the client connection.
 
 ```ruby
-  require 'redis'
   store = Moneta.new :Redis, url: 'redis://localhost:6379'
    # use a Redis cache store with an automatic expire of 10 seconds.
   Parse.setup(cache: store, expires: 10, ...)
@@ -326,7 +325,7 @@ A caching adapter of type `Moneta::Transformer`. Caching queries and object fetc
 As a shortcut, if you are planning on using REDIS and have configured the use of `redis` in your `Gemfile`, you can just pass the redis connection string directly to the cache option.
 
 ```ruby
-  Parse.setup(cache: 'redis://localhost:6379', expires: 10, ...)
+  Parse.setup(cache: 'redis://localhost:6379', ...)
 ```
 
 #### `:expires`
