@@ -1,6 +1,6 @@
 ## Parse-Stack Changelog
 
-### 1.6.2
+### 1.6.3
 - Fixes #20: All temporary headers values are strings.
 - Reduced cache storage consumption by only storing response body and headers.
 - Increased maximum cache content length size to 1.25 MB.

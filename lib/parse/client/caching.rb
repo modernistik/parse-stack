@@ -140,12 +140,12 @@ module Parse
             if cache_data.is_a?(Faraday::Env)
               body = cache_data.respond_to?(:body) ? cache_data.body : nil
               response_headers = cache_data.response_headers || {}
-            else
+            elsif cache_data.is_a?(Hash)
               body = cache_data[:body]
               response_headers = cache_data[:headers] || {}
             end
 
-            if body.present?
+            if cache_data.present? && body.present?
               response_headers[CACHE_RESPONSE_HEADER] = 'true'
               response.finish({status: 200, response_headers: response_headers, body: body })
               return response
