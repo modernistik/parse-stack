@@ -130,9 +130,14 @@ module Parse
 
         begin
           if method == :get && @cache_key.present? && @store.key?(@cache_key)
-            puts("[Parse::Cache::Hit] >> #{url}") if self.class.logging.present?
+            puts("[Parse::Cache] Hit >> #{url}") if self.class.logging.present?
             response = Faraday::Response.new
-            cache_data = @store[@cache_key] # previous cached response
+            begin
+              cache_data = @store[@cache_key] # previous cached response
+            rescue => e
+              puts "[Parse::Cache] Error: #{e}"
+              cache_data = nil
+            end
 
             # check if the store was from a legacy parse-stack cache value which
             # is stored as Faraday::Env. T\he new system stores less content in a simple hash
@@ -160,7 +165,7 @@ module Parse
             @store.delete "mk:#{url.to_s}" # master key cache-key
             @store.delete @cache_key # final key
           end
-        rescue Errno::EINVAL, Redis::CannotConnectError, Redis::TimeoutError => e
+        rescue ::TypeError, Errno::EINVAL, Redis::CannotConnectError, Redis::TimeoutError => e
           # if the cache store fails to connect, catch the exception but proceed
           # with the regular request, but turn off caching for this request. It is possible
           # that the cache connection resumes at a later point, so this is temporary.

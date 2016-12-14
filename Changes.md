@@ -1,10 +1,11 @@
 ## Parse-Stack Changelog
 
-### 1.6.3
+### 1.6.4
 - Fixes #20: All temporary headers values are strings.
 - Reduced cache storage consumption by only storing response body and headers.
 - Increased maximum cache content length size to 1.25 MB.
 - You may pass a redis url to the :cache option of setup.
+- Fixes issue with invalid struct size of Faraday::Env with old caching keys.
 
 ### 1.6.1
 - NEW: Batch requests are now parallelized.
