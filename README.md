@@ -1,6 +1,8 @@
 <img src='https://raw.githubusercontent.com/modernistik/parse-stack/master/.github/parse-ruby-sdk.png?raw=true' width='500' alt='Ruby Parse SDK'/>
 
-Parse-Stack is the [Parse Server](https://github.com/ParsePlatform/parse-server) SDK and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
+# Parse-Stack - The Parse Ruby Client SDK
+
+Parse-Stack is the [Parse Server](https://github.com/ParsePlatform/parse-server) SDK, REST Client and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full [API Reference](http://www.rubydoc.info/github/modernistik/parse-stack) for more detailed information about our Parse Server SDK.
 
@@ -34,10 +36,82 @@ Parse-Stack comes with support for Rails by adding additional rake tasks and gen
 
 For a more details on the rails integration see [Parse-Stack Rails Example](https://github.com/modernistik/parse-stack-rails-example).
 
-# Parse-Stack - The Parse Server Ruby SDK
+## Overview
+Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). If you are familiar with these technologies, the framework should feel familiar to you.
+
+```ruby
+
+require 'parse/stack'
+
+Parse.setup server_url: 'https://localhost:1337/parse',
+            app_id: APP_ID,
+            api_key: REST_API_KEY,
+            master_key: YOUR_MASTER_KEY # optional
+
+# Automatically build models based on your Parse application schemas.
+Parse.auto_generate_models!
+
+# or define custom Subclasses (Highly Recommended)
+class Song < Parse::Object
+  property :name
+  property :play, :integer
+  property :audio_file, :file
+  property :tags, :array
+  property :released, :date
+  belongs_to :artist
+  # `like` is a Parse Relation to User class
+  has_many :likes, as: :user, through: :relation
+end
+
+class Artist < Parse::Object
+  property :name
+  property :genres, :array
+  has_many :fans, as: :user
+  has_one :manager, as: :user
+
+  scope :recent, ->(x) { query(:created_at.after => x) }
+end
+
+# updates schemas for your Parse app based on your models (non-destructive)
+Parse.auto_upgrade!
+
+# login
+user = Parse::User.login(username, passwd)
+
+artist = Artist.new(name: "Frank Sinatra", genres: ["swing", "jazz"])
+artist.fans << user
+artist.save
+
+# Query
+artist = Artist.first(:name.like => /Sinatra/, :genres.in => ['swing'])
+
+# more examples
+song = Song.new name: "Fly Me to the Moon"
+song.artist = artist
+# Parse files - upload a file and attach to object
+song.audio_file = Parse::File.create("http://path_to.mp3")
+
+# relations - find a User matching username and add it to relation.
+song.likes.add Parse::User.first(username: "persaud")
+
+# saves both attributes and relations
+song.save
+
+# find songs
+songs = Song.all(artist: artist, :plays.gt => 100, :released.on_or_after => 30.days.ago)
+
+songs.each { |s| s.tags.add "awesome" }
+# batch saves
+songs.save
+
+# Call Cloud Code functions
+result = Parse.call_function :myFunctionName, {param: value}
+
+```
+## Table of Contents
+
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
 
 - [Overview](#overview)
 - [Architecture](#architecture)
@@ -154,79 +228,6 @@ For a more details on the rails integration see [Parse-Stack Rails Example](http
 - [Development](#development)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-## Overview
-Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). If you are familiar with these technologies, the framework should feel familiar to you.
-
-```ruby
-
-require 'parse/stack'
-
-Parse.setup server_url: 'https://localhost:1337/parse',
-            app_id: APP_ID,
-            api_key: REST_API_KEY,
-            master_key: YOUR_MASTER_KEY # optional
-
-# Automatically build models based on your Parse application schemas.
-Parse.auto_generate_models!
-
-# or define custom Subclasses (Highly Recommended)
-class Song < Parse::Object
-  property :name
-  property :play, :integer
-  property :audio_file, :file
-  property :tags, :array
-  property :released, :date
-  belongs_to :artist
-  # `like` is a Parse Relation to User class
-  has_many :likes, as: :user, through: :relation
-end
-
-class Artist < Parse::Object
-  property :name
-  property :genres, :array
-  has_many :fans, as: :user
-  has_one :manager, as: :user
-
-  scope :recent, ->(x) { query(:created_at.after => x) }
-end
-
-# updates schemas for your Parse app based on your models (non-destructive)
-Parse.auto_upgrade!
-
-# login
-user = Parse::User.login(username, passwd)
-
-artist = Artist.new(name: "Frank Sinatra", genres: ["swing", "jazz"])
-artist.fans << user
-artist.save
-
-# Query
-artist = Artist.first(:name.like => /Sinatra/, :genres.in => ['swing'])
-
-# more examples
-song = Song.new name: "Fly Me to the Moon"
-song.artist = artist
-# Parse files - upload a file and attach to object
-song.audio_file = Parse::File.create("http://path_to.mp3")
-
-# relations - find a User matching username and add it to relation.
-song.likes.add Parse::User.first(username: "persaud")
-
-# saves both attributes and relations
-song.save
-
-# find songs
-songs = Song.all(artist: artist, :plays.gt => 100, :released.on_or_after => 30.days.ago)
-
-songs.each { |s| s.tags.add "awesome" }
-# batch saves
-songs.save
-
-# Call Cloud Code functions
-result = Parse.call_function :myFunctionName, {param: value}
-
-```
 
 ## Architecture
 The architecture of `Parse::Stack` is broken into four main components.
