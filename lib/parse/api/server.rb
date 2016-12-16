@@ -13,7 +13,7 @@ module Parse
 
       # @!visibility private
       SERVER_INFO_PATH = 'serverInfo'
-
+      SERVER_HEALTH_PATH = 'health'
       # Fetch and cache information about the Parse server configuration. This
       # hash contains information specifically to the configuration of the running
       # parse server.
@@ -23,6 +23,13 @@ module Parse
         response = request :get, SERVER_INFO_PATH
         @server_info = response.error? ? nil :
                        response.result.with_indifferent_access
+      end
+
+      # Fetches the status of the server based on the health check.
+      # @return [Boolean] whether the server is 'OK'.
+      def server_health
+        response = request :get, SERVER_HEALTH_PATH
+        response.success?
       end
 
       # Force fetches the server information.

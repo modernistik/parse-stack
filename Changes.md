@@ -6,6 +6,8 @@
 - Increased maximum cache content length size to 1.25 MB.
 - You may pass a redis url to the :cache option of setup.
 - Fixes issue with invalid struct size of Faraday::Env with old caching keys.
+- Added server_info and health check APIs for Parse-Server +2.2.25.
+- Updated test to validate against MT6.
 
 ### 1.6.1
 - NEW: Batch requests are now parallelized.

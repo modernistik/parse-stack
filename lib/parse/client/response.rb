@@ -73,7 +73,8 @@ module Parse
       @batch_response = false # by default, not a batch response
       @result = nil
       # If a string is used for initializing, treat it as JSON
-      res = JSON.parse(res) if res.is_a?(String)
+      # check for string to not be 'OK' since that is the health check API response
+      res = JSON.parse(res) if res.is_a?(String) && res != "OK".freeze
       # If it is a hash (or parsed JSON), then parse the result.
       parse_result!(res) if res.is_a?(Hash)
       # if the result is an Array, then most likely it is a set of responses
