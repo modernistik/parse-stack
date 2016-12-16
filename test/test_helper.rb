@@ -13,17 +13,29 @@ module ConstraintTests
   def build(value)
     {"field" => { @key.to_s  => Parse::Constraint.formatted_value(value) } }
   end
-  
+
   def test_operator
     assert_equal @operand, @klass.operand
-    assert_equal @key, @klass.key
+    # Some constraint classes are macros and do not have operator keys.
+    # The reason for putting them in this block is because in MT6 (mini-test),
+    # assert_equal will fail if we are comparing nil.
+    if @key.nil? # for Parse::Constraint, Parse::Constraint::ObjectIdConstraint
+      assert_nil @klass.key
+    else
+      assert_equal @key, @klass.key
+    end
+
 
     @keys.each do |o|
       assert_respond_to(:field, o)
       op = :field.send(o)
       assert_instance_of(Parse::Operation, op)
       assert_instance_of( @klass, op.constraint)
-      assert_equal(@key, op.constraint.key)
+      if @key.nil?
+        assert_nil op.constraint.key
+      else
+        assert_equal @key, op.constraint.key
+      end
       value = {"operand"=>"field", "operator"=> o.to_s }
       assert_equal value, op.as_json
     end
