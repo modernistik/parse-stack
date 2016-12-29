@@ -429,6 +429,9 @@ module Parse
       when 405, 406
         warn "[Parse:ProtocolError] #{response}"
         raise Parse::Error::ProtocolError, response
+      when 429 # Request over the throttle limit
+        warn "[Parse:RequestLimitExceededError] #{response}"
+        raise Parse::Error::RequestLimitExceededError, response
       when 500, 503
         warn "[Parse:ServiceUnavailableError] #{response}"
         raise Parse::Error::ServiceUnavailableError, response
@@ -451,7 +454,7 @@ module Parse
       end
 
       response
-    rescue Parse::Error::ServiceUnavailableError => e
+    rescue Parse::Error::RequestLimitExceededError, Parse::Error::ServiceUnavailableError => e
       if _retry_count > 0
         warn "[Parse:Retry] Retries remaining #{_retry_count} : #{response.request}"
         _retry_count -= 1
