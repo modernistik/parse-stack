@@ -6,6 +6,8 @@ Parse-Stack is the [Parse Server](https://github.com/ParsePlatform/parse-server)
 
 Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full [API Reference](http://www.rubydoc.info/github/modernistik/parse-stack) for more detailed information about our Parse Server SDK.
 
+Watch Getting Started: https://youtu.be/zoYSGmciDlQ
+
 ### Parse File Migration Tool
 **If you are looking for a tool to migrate your hosted Parse Files to an Amazon S3 bucket, see our [Parse File Migration tool here](https://github.com/modernistik/parse-file-migration). This should be done before January 28th, 2017**
 

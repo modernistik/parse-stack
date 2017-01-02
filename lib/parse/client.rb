@@ -173,7 +173,7 @@ module Parse
       # options.
       # @example
       #   Parse.setup app_id: "YOUR_APP_ID",
-      #               api_key: "YOUR_API_KEY",
+      #               api_key: "YOUR_REST_API_KEY",
       #               master_key: "YOUR_MASTER_KEY", # optional
       #               server_url: 'https://api.parse.com/1/' #default
       # @param opts (see Parse::Client#initialize)
@@ -197,7 +197,7 @@ module Parse
     #   ENV["PARSE_SERVER_URL"] if available, otherwise fallback to {Parse::Protocol::SERVER_URL}.
     # @option opts [String] :app_id The Parse application id. Defaults to
     #    ENV['PARSE_APP_ID'] or ENV['PARSE_APPLICATION_ID'].
-    # @option opts [String] :api_key The Parse REST API Key. Defaults to ENV['PARSE_REST_API_KEY'].
+    # @option opts [String] :api_key Your Parse REST API Key. Defaults to ENV['PARSE_REST_API_KEY'].
     # @option opts [String] :master_key The Parse application master key (optional).
     #    If this key is set, it will be sent on every request sent by the client
     #    and your models. Defaults to ENV['PARSE_MASTER_KEY'].
