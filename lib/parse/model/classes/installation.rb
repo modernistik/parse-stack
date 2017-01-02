@@ -14,6 +14,7 @@ module Parse
   class Installation < Parse::Object
 
     parse_class Parse::Model::CLASS_INSTALLATION
+    # @!attribute gcm_sender_id
     # This field only has meaning for Android installations that use the GCM
     # push type. It is reserved for directing Parse to send pushes to this
     # installation with an alternate GCM sender ID. This field should generally
@@ -22,49 +23,75 @@ module Parse
     # corresponding to this GCM sender ID in your Parse application’s push settings.
     # @return [String]
     property :gcm_sender_id, :string, field: :GCMSenderId
+
+    # @!attribute app_identifier
     # A unique identifier for this installation’s client application. In iOS, this is the Bundle Identifier.
     # @return [String]
     property :app_identifier
+
+    # @!attribute app_name
     # The display name of the client application to which this installation belongs.
     # @return [String]
     property :app_name
+
+    # @!attribute app_version
     # The version string of the client application to which this installation belongs.
     # @return [String]
     property :app_version
+
+    # @!attribute badge
     # A number field representing the last known application badge for iOS installations.
     # @return [Integer]
     property :badge, :integer
+
+    # @!attribute channels
     # An array of the channels to which a device is currently subscribed.
     # Note that **channelUris** (the Microsoft-generated push URIs for Windows devices) is
     # not supported at this time.
     # @return [Array]
     property :channels, :array
+
+    # @!attribute device_token
     # The Apple or Google generated token used to deliver messages to the APNs
     # or GCM push networks respectively.
     # @return [String]
     property :device_token
-    # @return [Integer]
+
+    # @!attribute device_token_last_modified
+    # @return [Integer] number of seconds since token modified
     property :device_token_last_modified, :integer
+
+    # @!attribute device_type
     # The type of device, “ios”, “android”, “winrt”, “winphone”, or “dotnet” (readonly).
     # This property is implemented as a Parse::Stack enumeration.
     # @return [String]
     property :device_type, enum: [:ios, :android, :winrt, :winphone, :dotnet]
+
+    # @!attribute installation_id
     # Universally Unique Identifier (UUID) for the device used by Parse. It
     # must be unique across all of an app’s installations. (readonly).
     # @return [String]
     property :installation_id
+
+    # @!attribute locale_identifier
     # The locale for this device.
     # @return [String]
     property :locale_identifier
+
+    # @!attribute parse_version
     # The version of the Parse SDK which this installation uses.
     # @return [String]
     property :parse_version
+
+    # @!attribute push_type
     # This field is reserved for directing Parse to the push delivery network
     # to be used. If the device is registered to receive pushes via GCM, this
     # field will be marked “gcm”. If this device is not using GCM, and is
     # using Parse’s push notification service, it will be blank (readonly).
     # @return [String]
     property :push_type
+
+    # @!attribute time_zone
     # The current time zone where the target device is located. This should be an IANA time zone identifier.
     # @return [String]
     property :time_zone

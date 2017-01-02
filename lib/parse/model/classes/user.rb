@@ -128,12 +128,14 @@ module Parse
     # @return [String] The session token if this user is logged in.
     attr_accessor :session_token
 
+    # @!attribute auth_data
     # The auth data for this Parse::User. Depending on how this user is authenticated or
     # logged in, the contents may be different, especially if you are using another third-party
     # authentication mechanism like Facebook/Twitter.
     # @return [Hash] Auth data hash object.
     property :auth_data, :object
 
+    # @!attribute email
     # Emails are optional in Parse, but if set, they must be unique.
     # @return [String] The email field.
     property :email
@@ -146,6 +148,7 @@ module Parse
     # @return [String] The password you set.
     property :password
 
+    # @!attribute username
     # All Parse users have a username and must be globally unique.
     # @return [String] The user's username.
     property :username
@@ -155,7 +158,7 @@ module Parse
       self.clear_attribute_change!(:acl)
     end
 
-    # True if this user is anonymous.
+    # @return [Boolean] true if this user is anonymous.
     def anonymous?
       anonymous_id.nil?
     end

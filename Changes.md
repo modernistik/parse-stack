@@ -1,5 +1,12 @@
 ## Parse-Stack Changelog
 
+### 1.6.5
+- Client handles HTTP Status 429 (RetryLimitExceeded)
+- Role class does not automatically set default ACLs for Roles. You can restore
+previous behavior by using `before_save :apply_default_acls`.
+- Fixed minor issue to Parse::User.signup when merging username into response.
+- NEW: Adds Parse::Product core class.
+
 ### 1.6.4
 - Fixes #20: All temporary headers values are strings.
 - Reduced cache storage consumption by only storing response body and headers.

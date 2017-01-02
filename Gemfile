@@ -12,4 +12,7 @@ group :test, :development do
   gem 'pry'
   gem 'pry-stack_explorer'
   gem 'pry-nav'
+  gem 'yard'
+  gem 'redcarpet'
+  gem 'thin'
 end

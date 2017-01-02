@@ -426,20 +426,20 @@ module Parse
     #   puts "Parse::Object.build error: #{e}"
     end
 
-    # @!attribute [rw] id
+    # @!attribute id
     #  @return [String] the value of Parse "objectId" field.
+    property :id, field: :objectId
 
     # @!attribute [r] created_at
     #  @return [Date] the created_at date of the record in UTC Zulu iso 8601 with 3 millisecond format.
+    property :created_at, :date
 
     # @!attribute [r] updated_at
     #  @return [Date] the updated_at date of the record in UTC Zulu iso 8601 with 3 millisecond format.
-
-    # @!attribute [rw] acl
-    #  @return [ACL] the access control list (permissions) object for this record.
-    property :id, field: :objectId
-    property :created_at, :date
     property :updated_at, :date
+
+    # @!attribute acl
+    #  @return [ACL] the access control list (permissions) object for this record.
     property :acl, :acl, field: :ACL
 
     # Alias to {created_at}
@@ -509,6 +509,7 @@ end
 
 # Load all the core classes.
 require_relative 'classes/installation'
+require_relative 'classes/product'
 require_relative 'classes/role'
 require_relative 'classes/session'
 require_relative 'classes/user'

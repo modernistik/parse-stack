@@ -53,8 +53,10 @@ module Parse
     CLASS_INSTALLATION = '_Installation'
     # The collection for revocable Sessions in Parse. Used by Parse::Session.
     CLASS_SESSION = '_Session'
-    # The collection for revocable Roles in Parse. Used by Parse::Role.
+    # The collection for Roles in Parse. Used by Parse::Role.
     CLASS_ROLE = '_Role'
+    # The collection for to store Products (in-App purchases) in Parse. Used by Parse::Product.
+    CLASS_PRODUCT = '_Product'
     # The type label for hashes containing file data. Used by Parse::File.
     TYPE_FILE = 'File'
     # The type label for hashes containing geopoints. Used by Parse::GeoPoint.

@@ -12,15 +12,24 @@ module Parse
   class Session < Parse::Object
 
     parse_class Parse::Model::CLASS_SESSION
+
+    # @!attribute created_with
     # @return [Hash] data on how this Session was created.
     property :created_with, :object
+
+    # @!attribute expires_at
     # @return [Parse::Date] when the session token expires.
     property :expires_at, :date
+
+    # @!attribute installation_id
     # @return [String] The installation id from the Installation table.
     # @see Installation#installation_id
     property :installation_id
+
+    # @!attribute [r] restricted
     # @return [Boolean] whether this session token is restricted.
     property :restricted, :boolean
+
     # @!attribute [r] session_token
     #  @return [String] the session token for this installation and user pair.
     property :session_token

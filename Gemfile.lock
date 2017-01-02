@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parse-stack (1.6.4)
+    parse-stack (1.6.5)
       active_model_serializers (>= 0.9, < 1)
       activemodel (>= 4.2.1, < 6)
       activesupport (>= 4.2.1, < 6)
@@ -14,15 +14,15 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    actionpack (5.0.0.1)
-      actionview (= 5.0.0.1)
-      activesupport (= 5.0.0.1)
+    actionpack (5.0.1)
+      actionview (= 5.0.1)
+      activesupport (= 5.0.1)
       rack (~> 2.0)
       rack-test (~> 0.6.3)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
-    actionview (5.0.0.1)
-      activesupport (= 5.0.0.1)
+    actionview (5.0.1)
+      activesupport (= 5.0.1)
       builder (~> 3.1)
       erubis (~> 2.7.0)
       rails-dom-testing (~> 2.0)
@@ -31,9 +31,9 @@ GEM
       actionpack (>= 4.1, < 6)
       activemodel (>= 4.1, < 6)
       jsonapi (= 0.1.1.beta2)
-    activemodel (5.0.0.1)
-      activesupport (= 5.0.0.1)
-    activesupport (5.0.0.1)
+    activemodel (5.0.1)
+      activesupport (= 5.0.1)
+    activesupport (5.0.1)
       concurrent-ruby (~> 1.0, >= 1.0.2)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -43,11 +43,13 @@ GEM
     builder (3.2.2)
     byebug (9.0.6)
     coderay (1.1.1)
-    concurrent-ruby (1.0.2)
+    concurrent-ruby (1.0.4)
+    daemons (1.2.4)
     debug_inspector (0.0.2)
     dotenv (2.1.1)
     erubis (2.7.0)
-    faraday (0.10.0)
+    eventmachine (1.2.1)
+    faraday (0.10.1)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.10.1)
       faraday (>= 0.7.4, < 1.0)
@@ -62,7 +64,7 @@ GEM
     minitest (5.10.1)
     moneta (0.8.1)
     multipart-post (2.0.0)
-    nokogiri (1.6.8.1)
+    nokogiri (1.7.0)
       mini_portile2 (~> 2.1.0)
     parallel (1.10.0)
     pry (0.10.4)
@@ -77,17 +79,23 @@ GEM
     rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails-dom-testing (2.0.1)
+    rails-dom-testing (2.0.2)
       activesupport (>= 4.2.0, < 6.0)
-      nokogiri (~> 1.6.0)
+      nokogiri (~> 1.6)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
     rake (12.0.0)
+    redcarpet (3.4.0)
     redis (3.3.2)
     slop (3.6.0)
+    thin (1.7.0)
+      daemons (~> 1.0, >= 1.0.9)
+      eventmachine (~> 1.0, >= 1.0.4)
+      rack (>= 1, < 3)
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
+    yard (0.9.5)
 
 PLATFORMS
   ruby
@@ -101,7 +109,10 @@ DEPENDENCIES
   pry-nav
   pry-stack_explorer
   rake
+  redcarpet
   redis
+  thin
+  yard
 
 BUNDLED WITH
    1.13.6

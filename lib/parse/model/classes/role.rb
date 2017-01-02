@@ -10,6 +10,7 @@ module Parse
   class Role < Parse::Object
 
     parse_class Parse::Model::CLASS_ROLE
+    # @!attribute name
     # @return [String] the name of this role.
     property :name
     # This attribute is mapped as a `has_many` Parse relation association with the {Parse::Role} class,
@@ -22,7 +23,7 @@ module Parse
     # @return [RelationCollectionProxy<User>] a Parse relation of users belonging to this role.
     has_many :users, through: :relation
 
-    before_save do
+    def apply_default_acls
       acl.everyone true, false
     end
 
