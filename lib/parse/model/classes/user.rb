@@ -302,7 +302,8 @@ module Parse
     def self.create(body, **opts)
       response = client.create_user(body, opts: opts)
       if response.success?
-        return Parse::User.build response.result
+        body.delete :password # clear password before merging
+        return Parse::User.build body.merge(response.result)
       end
 
       case response.code
