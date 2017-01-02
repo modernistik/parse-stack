@@ -192,6 +192,9 @@ module Parse
             result.run_callbacks(:destroy) { false }
             result = true
           end
+        elsif type == :before_save && ( result == true || result.nil? )
+          # Open Source Parse server does not accept true results on before_save hooks.
+          result = {}
         end
 
         result

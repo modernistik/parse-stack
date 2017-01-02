@@ -11,6 +11,7 @@ previous behavior by using `before_save :apply_default_acls`.
 yet fully available in open source Parse Server.
 - Removes HTTPS requirement on webhooks.
 - FIXES: Issue with WEBHOOK_KEY not being properly validated when set.
+- beforeSaves now return empty hash instead of true on noop changes.
 
 ### 1.6.4
 - Fixes #20: All temporary headers values are strings.
