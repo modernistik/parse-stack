@@ -23,6 +23,8 @@ module Parse
              installationId: nil, params: nil,
                functionName: nil, object: nil,
                    original: nil, update: nil,
+                      query: nil, log: nil,
+                      objects: nil,
                    triggerName: nil }.freeze
       include ::ActiveModel::Serializers::JSON
       # @!attribute [rw] master
@@ -50,8 +52,17 @@ module Parse
       #   @return [Hash] the raw payload from Parse server.
       # @!attribute [rw] update
       #   @return [Hash] the update payload in the request.
+      # @!attribute [r] query
+      # The query request in a beforeFind trigger. Available in Parse Server 2.3.1 or later.
+      #   @return [Parse::Query]
+      # @!attribute [r] objects
+      # The set of matching objects in an afterFind trigger. Available in Parse Server 2.3.1 or later.
+      #   @return [<Parse::Object>]
+      # @!attribute [r] log
+      # Logging information if available. Available in Parse Server 2.3.1 or later.
+      #   @return [Hash] the set of matching objects in an afterFind trigger.
       attr_accessor :master, :user, :installation_id, :params, :function_name, :object, :trigger_name
-
+      attr_accessor :query, :log, :objects
       attr_accessor :original, :update, :raw
       # @!visibility private
       attr_accessor :webhook_class
@@ -76,6 +87,10 @@ module Parse
         @trigger_name = hash[:trigger_name]
         @original = hash[:original]
         @update = hash[:update] || {} #it comes as an update hash
+        # Added for beforeFind and afterFind triggers
+        @query = hash[:query]
+        @objects = hash[:objects] || []
+        @log = hash[:log]
       end
 
       # @return [ATTRIBUTES]
@@ -108,12 +123,12 @@ module Parse
 
       # true if this is a beforeSave or beforeDelete webhook trigger request.
       def before_trigger?
-        before_save? || before_delete?
+        before_save? || before_delete? || before_find?
       end
 
       # true if this is a afterSave or afterDelete webhook trigger request.
       def after_trigger?
-        after_save? || after_delete?
+        after_save? || after_delete? || after_find?
       end
 
       # true if this is a beforeSave webhook trigger request.
@@ -134,6 +149,16 @@ module Parse
       # true if this is a afterDelete webhook trigger request.
       def after_delete?
         trigger? && @trigger_name.to_sym == :afterDelete
+      end
+
+      # true if this is a beforeFind webhook trigger request.
+      def before_find?
+        trigger? && @trigger_name.to_sym == :beforeFind
+      end
+
+      # true if this is a afterFind webhook trigger request.
+      def after_find?
+        trigger? && @trigger_name.to_sym == :afterFind
       end
 
       # true if this request is a trigger that contains an object.
@@ -196,6 +221,13 @@ module Parse
       # @return [Parse::Webhooks::ResponseError] the raised exception
       def error!(msg = "")
         raise Parse::Webhooks::ResponseError, msg
+      end
+
+
+      # @return [Parse::Query] the Parse query for a beforeFind trigger.
+      def parse_query
+        return nil unless parse_class.present? && @query.is_a?(Hash)
+        Parse::Query.new parse_class, @query
       end
 
       end # Payload
