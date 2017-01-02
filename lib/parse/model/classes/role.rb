@@ -22,7 +22,8 @@ module Parse
     # This attribute is mapped as a `has_many` Parse relation association with the {Parse::User} class.
     # @return [RelationCollectionProxy<User>] a Parse relation of users belonging to this role.
     has_many :users, through: :relation
-
+    
+    # A method to set acls for Roles to public read, and deny public write.
     def apply_default_acls
       acl.everyone true, false
     end

@@ -13,6 +13,16 @@ end
 task :default => :test
 
 task :console do
-  exec("./bin/console")
+  exec './bin/console'
 end
 task :c => :console
+
+desc 'List undocumented methods'
+task 'doc:stats' do
+  exec 'yard stats --list-undoc'
+end
+
+desc 'Start the yard server'
+task 'doc:server' do
+  exec 'rm -rf ./yard && yard server --reload'
+end

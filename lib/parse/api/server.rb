@@ -13,6 +13,7 @@ module Parse
 
       # @!visibility private
       SERVER_INFO_PATH = 'serverInfo'
+      # @!visibility private
       SERVER_HEALTH_PATH = 'health'
       # Fetch and cache information about the Parse server configuration. This
       # hash contains information specifically to the configuration of the running
