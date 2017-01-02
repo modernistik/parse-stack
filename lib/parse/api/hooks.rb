@@ -10,8 +10,8 @@ module Parse
       # @!visibility private
       HOOKS_PREFIX = "hooks/"
       # The allowed set of Parse triggers.
-      TRIGGER_NAMES = [:beforeSave, :afterSave, :beforeDelete, :afterDelete].freeze
-
+      TRIGGER_NAMES = [:afterDelete, :afterSave, :beforeDelete, :beforeSave].freeze
+      TRIGGER_NAMES_LOCAL = [:after_delete, :after_save, :before_delete, :before_save].freeze
       # @!visibility private
       def _verify_trigger(triggerName)
         triggerName = triggerName.to_s.camelize(:lower).to_sym

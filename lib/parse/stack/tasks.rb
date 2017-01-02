@@ -78,10 +78,42 @@ module Parse
             Rake::Task['parse:webhooks:register:triggers'].invoke
           end
 
-          desc "Remove all locally registered webhooks from the Parse Application"
+          desc "List all webhooks and triggers registered with the Parse Server"
+          task :list => :verify_env do
+            Rake::Task['parse:webhooks:list:functions'].invoke
+            Rake::Task['parse:webhooks:list:triggers'].invoke
+          end
+
+          desc "Remove all locally registered webhooks from the Parse Application."
           task :remove => :verify_env do
             Rake::Task['parse:webhooks:remove:functions'].invoke
             Rake::Task['parse:webhooks:remove:triggers'].invoke
+          end
+
+          namespace :list do
+            task :functions => :verify_env do
+              endpoint = ENV['HOOKS_URL'] || '-'
+              Parse.client.functions.each do |r|
+                name = r['functionName']
+                url = r['url']
+                star = url.starts_with?(endpoint) ? '*' : ' '
+                puts "[#{star}] #{name} -> #{url}"
+              end
+            end
+
+            task :triggers => :verify_env do
+              endpoint = ENV['HOOKS_URL'] || '-'
+              triggers = Parse.client.triggers.results
+              triggers.sort! { |x,y| [x['className'],x['triggerName']] <=> [y['className'], y['triggerName'] ] }
+              triggers.each do |r|
+                name = r['className']
+                trigger = r['triggerName']
+                url = r['url']
+                star = url.starts_with?(endpoint) ? '*' : ' '
+                puts "[#{star}] #{name}##{trigger} -> #{url}"
+              end
+            end
+
           end
 
           namespace :register do

@@ -74,13 +74,10 @@ module Parse
           raise ArgumentError, "The HOOKS_URL must be https: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')
+        all_triggers = Parse::API::Hooks::TRIGGER_LOCAL_NAMES
 
-        current_triggers = {
-          after_save: {},
-          after_delete: {},
-          before_delete: {},
-          before_save: {}
-        }
+        current_triggers = {}
+        all_triggers.each { |t| current_triggers[t] = {} }
 
         client.triggers.each do |t|
           next unless t["url"].present?
@@ -89,7 +86,7 @@ module Parse
           current_triggers[trigger_name][ t["className"] ] = t["url"]
         end
 
-        [:after_delete, :after_save, :before_delete, :before_save].each do |trigger|
+        all_triggers.each do |trigger|
           classNames = routes[trigger].keys.dup
           if include_wildcard && classNames.include?('*') #then create the list for all classes
             classNames.delete '*' #delete the wildcard before we expand it
