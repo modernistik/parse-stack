@@ -114,10 +114,9 @@ module Parse
       # `:before_delete`, `:after_delete` or `:function`.
       # @return [OpenStruct]
       def routes
-        @routes ||= OpenStruct.new( {
-          before_save: {}, after_save: {},
-          before_delete: {}, after_delete: {}, function: {}
-          })
+        return @routes unless @routes.nil?
+        r = Parse::API::Hooks::TRIGGER_NAMES_LOCAL + [:function]
+        @routes = OpenStruct.new( r.reduce({}) { |h,t| h[t] = {}; h; } )
       end
 
       # Internally registers a route for a specific webhook trigger or function.

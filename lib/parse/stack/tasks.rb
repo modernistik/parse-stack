@@ -54,8 +54,8 @@ module Parse
             end
 
             endpoint = ENV['HOOKS_URL'] || ''
-            unless endpoint.empty? || endpoint.starts_with?('https://')
-              raise "The ENV variable HOOKS_URL must be a <https> url : '#{endpoint}'. Ex. https://12345678.ngrok.io/webhooks"
+            unless endpoint.starts_with?('http://') || endpoint.starts_with?('https://')
+              raise "The ENV variable HOOKS_URL must be a <http/s> url : '#{endpoint}'. Ex. https://12345678.ngrok.io/webhooks"
             end
 
           end
@@ -110,7 +110,7 @@ module Parse
                 trigger = r['triggerName']
                 url = r['url']
                 star = url.starts_with?(endpoint) ? '*' : ' '
-                puts "[#{star}] #{name}##{trigger} -> #{url}"
+                puts "[#{star}] #{name}.#{trigger} -> #{url}"
               end
             end
 

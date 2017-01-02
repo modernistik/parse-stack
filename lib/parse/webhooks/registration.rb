@@ -42,8 +42,8 @@ module Parse
       # @param endpoint [String] a https url that points to the webhook server.
       def register_functions!(endpoint)
 
-        unless endpoint.present? && endpoint.starts_with?('https://')
-          raise ArgumentError, "The HOOKS_URL must be https: '#{endpoint}''"
+        unless endpoint.present? && (endpoint.starts_with?('http://') || endpoint.starts_with?('https://') )
+          raise ArgumentError, "The HOOKS_URL must be http/s: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')
         functionsMap = {}
@@ -70,11 +70,11 @@ module Parse
       # @param include_wildcard [Boolean] Allow wildcard registrations
       def register_triggers!(endpoint, include_wildcard: false)
 
-        unless endpoint.present? && endpoint.starts_with?('https://')
-          raise ArgumentError, "The HOOKS_URL must be https: '#{endpoint}''"
+        unless endpoint.present? && (endpoint.starts_with?('http://') || endpoint.starts_with?('https://') )
+          raise ArgumentError, "The HOOKS_URL must be http/s: '#{endpoint}''"
         end
         endpoint += '/' unless endpoint.ends_with?('/')
-        all_triggers = Parse::API::Hooks::TRIGGER_LOCAL_NAMES
+        all_triggers = Parse::API::Hooks::TRIGGER_NAMES_LOCAL
 
         current_triggers = {}
         all_triggers.each { |t| current_triggers[t] = {} }
