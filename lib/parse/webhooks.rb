@@ -91,12 +91,13 @@ module Parse
     # The content type that needs to be sent back to Parse server.
     CONTENT_TYPE = "application/json"
 
-    # @!attribute key
+
     # The Parse Webhook Key to be used for authenticating webhook requests.
-    # By default this is taken from the PARSE_WEBHOOK_KEY environment variable if
-    # present.
+    # See {Parse::Webhooks.key} on setting this value.
     # @return [String]
-    attr_accessor :key
+    def key
+      self.class.key
+    end
 
     class << self
 
@@ -210,9 +211,11 @@ module Parse
         { error: data }.to_json
       end
 
+      # @!attribute key
       # Returns the configured webhook key if available. By default it will use
       # the value of ENV['PARSE_WEBHOOK_KEY'] if not configured.
       # @return [String]
+      attr_accessor :key
       def key
         @key ||= ENV['PARSE_WEBHOOK_KEY']
       end
@@ -236,8 +239,9 @@ module Parse
         request = Rack::Request.new env
         response = Rack::Response.new
 
-        if @key.present? && @key =! request.env[HTTP_PARSE_WEBHOOK]
-          response.write error("Invalid Parse-Webhook Key")
+        if self.key.present? && self.key != request.env[HTTP_PARSE_WEBHOOK]
+          puts "[Parse::Webhooks] Invalid Parse-Webhook Key: #{request.env[HTTP_PARSE_WEBHOOK]}"
+          response.write error("Invalid Parse Webhook Key")
           return response.finish
         end
 

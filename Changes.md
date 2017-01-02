@@ -7,6 +7,10 @@ previous behavior by using `before_save :apply_default_acls`.
 - Fixed minor issue to Parse::User.signup when merging username into response.
 - NEW: Adds Parse::Product core class.
 - NEW: Rake task to list registered webhooks. `rake parse:webhooks:list`
+- Experimental support for beforeFind and afterFind - though webhook support not
+yet fully available in open source Parse Server.
+- Removes HTTPS requirement on webhooks.
+- FIXES: Issue with WEBHOOK_KEY not being properly validated when set.
 
 ### 1.6.4
 - Fixes #20: All temporary headers values are strings.
