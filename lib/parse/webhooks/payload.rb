@@ -53,6 +53,8 @@ module Parse
       attr_accessor :master, :user, :installation_id, :params, :function_name, :object, :trigger_name
 
       attr_accessor :original, :update, :raw
+      # @!visibility private
+      attr_accessor :webhook_class
       alias_method :installationId, :installation_id
       alias_method :functionName, :function_name
       alias_method :triggerName, :trigger_name
@@ -88,6 +90,7 @@ module Parse
 
       # @return [String] the name of the Parse class for this request.
       def parse_class
+        return @webhook_class if @webhook_class.present?
         return nil unless @object.present?
         @object[Parse::Model::KEY_CLASS_NAME] || @object[:className]
       end
