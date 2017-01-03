@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/parse/stack"
+require 'optparse'
+require 'json'
+
+opts = { verbose: false }
+opt_parser = OptionParser.new do |o|
+  o.banner =   "Usage: pstack [options]"
+  o.separator  ""
+  o.separator  "Example:"
+  o.separator  "#{File.basename($0)} -a APP_ID -k REST_API_KEY -s http://your-parser-server-url"
+  o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY   -s http://localhost:1337/parse"
+  o.separator  ""
+  o.separator  "Using v#{Parse::Stack::VERSION}"
+  o.separator  "Options"
+  o.on('-a APP_ID', '--app_id APP_ID','Parse App ID (required)') { |a| opts[:app_id] = a }
+  o.on('-k REST_API_KEY', '--api_key REST_API_KEY','Parse REST API Key') { |a| opts[:api_key] = a }
+  o.on("-l", "--use_legacy_url", "Connect to Parse.com servers") { opts[:server_url] = 'https://api.parse.com/1/' }
+  o.on('-m MASTER_KEY', '--master_key MASTER_KEY', "Parse Master Key") { |a| opts[:master_key] = a }
+  o.on('-s SERVER_URL', '--server_url SERVER_URL',"The Parse server url.", "Defaults to http://localhost:1337/parse") { |a| opts[:server_url] = a }
+  o.on("-v","--[no-]verbose", "Run verbosely") { |v| opts[:verbose] ||= v }
+  o.on("--version", 'Parse Stack version') do |v|
+    puts "Parse-Stack : #{Parse::Stack::VERSION}"
+    exit 1
+  end
+  o.on('-c','--config CONFIG_JSON', "Load config from a parse-dashboard json compatible file.") do |filepath|
+    begin
+      file = File.read(filepath)
+      config = JSON.parse file
+      app = config["apps"].is_a?(Array) ?  config["apps"].first : config["apps"]
+      opts[:server_url] ||= app["serverURL"]
+      opts[:app_id] ||= app["appId"]
+      opts[:api_key] ||= app["restAPIKey"]
+      opts[:master_key] ||= app["masterKey"]
+    rescue Exception => e
+      $stderr.puts "Error: Incompatible JSON format for #{filepath}"
+      exit 1
+    end
+
+  end
+end
+opt_parser.parse!
+
+opts[:server_url] ||= 'http://localhost:1337/parse'
+
+unless opts[:app_id].present?
+  $stderr.puts "Error: Option --app_id missing\n"
+  $stderr.puts opt_parser
+  exit 1
+end
+
+unless opts[:api_key].present? || opts[:master_key].present?
+  $stderr.puts "Error: You must supply either --api_key (REST API Key) or --master_key (Parse Master key).\n"
+  $stderr.puts opt_parser
+  exit 1
+end
+
+Parse.setup server_url: opts[:server_url],
+            app_id: opts[:app_id],
+            api_key: opts[:api_key],
+            master_key: opts[:master_key]
+Parse.logging = true if opts[:verbose]
+puts "Parse Server: #{Parse.client.server_url}"
+puts "Parse App Id: #{Parse.client.app_id}"
+
+Parse.auto_generate_models!.each do |model|
+  puts "Generated #{model}" if opts[:verbose]
+end
+
+begin
+  require "pry"
+  Pry.start
+rescue Exception => e
+  require "irb"
+  IRB.start
+end

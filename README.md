@@ -15,10 +15,11 @@ Below is a [quick start guide](https://github.com/modernistik/parse-stack#overvi
 **If you are looking for a tool to migrate your hosted Parse Files to an Amazon S3 bucket, see our [Parse File Migration tool here](https://github.com/modernistik/parse-file-migration). This should be done before January 28th, 2017**
 
 ### Code Status
-[![Gem Version](https://badge.fury.io/rb/parse-stack.svg)](https://badge.fury.io/rb/parse-stack)
+[![Gitter](https://badges.gitter.im/modernistik/parse-stack.svg)](https://gitter.im/modernistik/parse-stack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+[![Gem Version](https://img.shields.io/gem/v/parse-stack.svg)](https://github.com/modernistik/parse-stack)
+[![Downloads](https://img.shields.io/gem/dt/parse-stack.svg)](https://rubygems.org/gems/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
 [![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](http://www.rubydoc.info/github/modernistik/parse-stack)
-[![Source Code](https://img.shields.io/badge/github-code-orange.svg)](https://github.com/modernistik/parse-stack)
 
 ## Installation
 
@@ -354,6 +355,25 @@ If you already have a Parse application with defined schemas and collections, yo
   # You can now use them as if you defined them
   artist = Artist.first
   Song.all(artist: artist)
+```
+
+You can always combine both approaches by defining special attributes before you auto generate your models:
+
+```ruby
+  # create a Song class, but only create the artist array pointer association.
+  class Song < Parse::Object
+    has_many :artists, through: :array
+  end
+
+  # Now let Parse Stack generate the rest of the properties and associations
+  # based on your remote schema. Assume there is a `title` field for the `Song`
+  # collection.
+  Parse.auto_generate_models!
+
+  song = Song.first
+  song.artists # created with our definition above
+  song.title # auto-generated property
+
 ```
 
 ## Parse Config
