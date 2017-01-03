@@ -1,5 +1,7 @@
 ## Parse-Stack Changelog
 
+### 1.6.6
+- Default SERVER_URL changed to http://localhost:1337/parse
 ### 1.6.5
 - Client handles HTTP Status 429 (RetryLimitExceeded)
 - Role class does not automatically set default ACLs for Roles. You can restore

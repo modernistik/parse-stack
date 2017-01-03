@@ -6,9 +6,7 @@ module Parse
   # Set of Parse protocol constants.
   module Protocol
     # The default server url, based on the hosted Parse platform.
-    SERVER_URL        = 'https://api.parse.com/1/'.freeze
-    # The default legacy server url, based on the hosted Parse platform.
-    LEGACY_SERVER_URL = 'https://api.parse.com/1/'.freeze
+    SERVER_URL        = 'http://localhost:1337/parse'.freeze
     # The request header field to send the application Id.
     APP_ID            = 'X-Parse-Application-Id'
     # The request header field to send the REST API key.
