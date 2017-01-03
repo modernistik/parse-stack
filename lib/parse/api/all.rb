@@ -3,7 +3,6 @@
 
 require_relative '../client'
 require_relative "analytics"
-require_relative "apps"
 require_relative "batch"
 require_relative "config"
 require_relative "files"

@@ -97,7 +97,6 @@ module Parse
   # features you'd like to implement.
   class Client
     include Parse::API::Analytics
-    include Parse::API::Apps
     include Parse::API::Batch
     include Parse::API::CloudFunctions
     include Parse::API::Config
