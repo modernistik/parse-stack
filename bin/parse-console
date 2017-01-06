@@ -1,18 +1,17 @@
 #!/usr/bin/env ruby
 
-require_relative "../lib/parse/stack"
 require 'optparse'
 require 'json'
 
 opts = { verbose: false }
 opt_parser = OptionParser.new do |o|
+
   o.banner =   "Usage: pstack [options]"
   o.separator  ""
   o.separator  "Example:"
   o.separator  "#{File.basename($0)} -a APP_ID -k REST_API_KEY -s http://your-parser-server-url"
   o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY   -s http://localhost:1337/parse"
   o.separator  ""
-  o.separator  "Using v#{Parse::Stack::VERSION}"
   o.separator  "Options"
   o.on('-a APP_ID', '--app_id APP_ID','Parse App ID (required)') { |a| opts[:app_id] = a }
   o.on('-k REST_API_KEY', '--api_key REST_API_KEY','Parse REST API Key') { |a| opts[:api_key] = a }
@@ -44,18 +43,20 @@ opt_parser.parse!
 
 opts[:server_url] ||= 'http://localhost:1337/parse'
 
-unless opts[:app_id].present?
+if opts[:app_id].nil?
   $stderr.puts "Error: Option --app_id missing\n"
   $stderr.puts opt_parser
   exit 1
 end
 
-unless opts[:api_key].present? || opts[:master_key].present?
+if opts[:api_key].nil? && opts[:master_key].nil?
   $stderr.puts "Error: You must supply either --api_key (REST API Key) or --master_key (Parse Master key).\n"
   $stderr.puts opt_parser
   exit 1
 end
 
+# lazy loading
+require_relative "../lib/parse/stack"
 Parse.setup server_url: opts[:server_url],
             app_id: opts[:app_id],
             api_key: opts[:api_key],
