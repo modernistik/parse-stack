@@ -6,11 +6,11 @@ require 'json'
 opts = { verbose: false }
 opt_parser = OptionParser.new do |o|
 
-  o.banner =   "Usage: pstack [options]"
+  o.banner =   "Usage: #{File.basename($0)} [options] SERVER_URL"
   o.separator  ""
   o.separator  "Example:"
-  o.separator  "#{File.basename($0)} -a APP_ID -k REST_API_KEY -s http://your-parser-server-url"
-  o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY   -s http://localhost:1337/parse"
+  o.separator  "#{File.basename($0)} -a APP_ID -k REST_API_KEY http://your-parser-server-url"
+  o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY   http://localhost:1337/parse"
   o.separator  ""
   o.separator  "Options"
   o.on('-a APP_ID', '--app_id APP_ID','Parse App ID (required)') { |a| opts[:app_id] = a }
@@ -41,7 +41,7 @@ opt_parser = OptionParser.new do |o|
 end
 opt_parser.parse!
 
-opts[:server_url] ||= 'http://localhost:1337/parse'
+opts[:server_url] ||= ARGV[0] || 'http://localhost:1337/parse'
 
 if opts[:app_id].nil?
   $stderr.puts "Error: Option --app_id missing\n"
