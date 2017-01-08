@@ -9,8 +9,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Anthony Persaud"]
   spec.email         = ["persaud@modernistik.com"]
 
-  spec.summary       = %q{Parse-Server Ruby Client and Relational Mapper}
-  spec.description   = %q{Parse-Server Ruby Client, Active Model based Data Mapper, and Query engine to manage larger scale Parse server applications}
+  spec.summary       = %q{Parse Server Ruby Client SDK}
+  spec.description   = %q{Parse Server Ruby Client, ActiveRecord-like ORM, and Cloud Code Webhooks framework}
   spec.homepage      = "https://github.com/modernistik/parse-stack"
   spec.license       = "MIT"
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
