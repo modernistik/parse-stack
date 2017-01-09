@@ -40,3 +40,4 @@ bin/config.json
 .byebug_history
 /.env
 /node_modules
+/bin/parse-dashboard-config.json

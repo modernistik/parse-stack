@@ -13,15 +13,14 @@ opt_parser = OptionParser.new do |o|
   o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY   http://localhost:1337/parse"
   o.separator  ""
   o.separator  "Options"
-  o.on('-a APP_ID', '--app_id APP_ID','Parse App ID (required)') { |a| opts[:app_id] = a }
-  o.on('-k REST_API_KEY', '--api_key REST_API_KEY','Parse REST API Key') { |a| opts[:api_key] = a }
-  o.on("-l", "--use_legacy_url", "Connect to Parse.com servers") { opts[:server_url] = 'https://api.parse.com/1/' }
-  o.on('-m MASTER_KEY', '--master_key MASTER_KEY', "Parse Master Key") { |a| opts[:master_key] = a }
-  o.on('-s SERVER_URL', '--server_url SERVER_URL',"The Parse server url.", "Defaults to http://localhost:1337/parse") { |a| opts[:server_url] = a }
-  o.on("-v","--[no-]verbose", "Run verbosely") { |v| opts[:verbose] ||= v }
-  o.on("--pry", "Use Pry instead of IRB") { |v| opts[:pry] = v }
-  o.on("--version", 'Parse Stack version') do |v|
-    puts "Parse-Stack : #{Parse::Stack::VERSION}"
+  o.on('-a APP_ID', '--appId APP_ID', 'Parse App ID (required)') { |a| opts[:app_id] = a }
+  o.on('-k REST_API_KEY', '--restAPIKey REST_API_KEY', 'Parse REST API Key') { |a| opts[:api_key] = a }
+  o.on('-m MASTER_KEY', '--masterKey MASTER_KEY', 'Parse Master Key') { |a| opts[:master_key] = a }
+  o.on('-s SERVER_URL', '--serverURL SERVER_URL', 'The Parse server url.', 'Defaults to http://localhost:1337/parse') { |a| opts[:server_url] = a }
+  o.on('-v','--[no-]verbose', 'Run verbosely') { |v| opts[:verbose] ||= v }
+  o.on('--pry', 'Use Pry instead of IRB') { |v| opts[:pry] = v }
+  o.on('--version', 'Parse Stack version') do |v|
+    puts "Parse Stack : #{Parse::Stack::VERSION}"
     exit 1
   end
   o.on('-c','--config CONFIG_JSON', "Load config from a parse-dashboard json compatible file.") do |filepath|
