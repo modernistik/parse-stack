@@ -45,6 +45,14 @@ Parse-Stack comes with support for Rails by adding additional rake tasks and gen
 
 For a more details on the rails integration see [Parse-Stack Rails Example](https://github.com/modernistik/parse-stack-rails-example).
 
+### Interactive Command Line
+You can also used the bundled `parse-console` command line to connect and interact with your Parse Server and its data in an irb-like console:
+
+```bash
+    $ parse-console -h # see all options
+    $ parse-console -a appId -k restAPIKey http://localhost:1337/parse
+```
+
 ## Overview
 Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). If you are familiar with these technologies, the framework should feel familiar to you.
 
