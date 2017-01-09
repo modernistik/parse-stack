@@ -20,6 +20,7 @@ opt_parser = OptionParser.new do |o|
   o.on('-v','--[no-]verbose', 'Run verbosely') { |v| opts[:verbose] ||= v }
   o.on('--pry', 'Use Pry instead of IRB') { |v| opts[:pry] = v }
   o.on('--version', 'Parse Stack version') do |v|
+    require_relative '../lib/parse/stack/version'
     puts "Parse Stack : #{Parse::Stack::VERSION}"
     exit 1
   end

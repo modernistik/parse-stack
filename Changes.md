@@ -1,6 +1,6 @@
 ## Parse-Stack Changelog
 
-### 1.6.6
+### 1.6.7
 - Default SERVER_URL changed to http://localhost:1337/parse
 - NEW: Command line tool `parse-console` to do interactive Parse development with parse-stack.
 - REMOVED: Deprecated parse.com specific APIs under the `/apps/` path.
