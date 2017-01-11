@@ -164,6 +164,7 @@ class Array
     batch.submit
     batch
   end
+  alias_method :delete, :destroy
 
   # Submit a batch request for deleting a set of Parse::Objects.
   # Batch requests are supported implicitly and intelligently through an

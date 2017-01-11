@@ -2,6 +2,7 @@
 
 ### 1.6.8
 - NEW: Parse::Object#sig method to get quick information about an instance.
+- Adds :delete as an alias method to :destroy
 - FIXES: Typo fix when using Array#objectIds.
 - Additional tests.
 
