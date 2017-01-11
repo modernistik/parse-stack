@@ -18,11 +18,11 @@ end
 task :c => :console
 
 desc 'List undocumented methods'
-task 'doc:stats' do
+task 'yard:stats' do
   exec 'yard stats --list-undoc'
 end
 
 desc 'Start the yard server'
-task 'doc:server' do
+task 'yard' do
   exec 'rm -rf ./yard && yard server --reload'
 end

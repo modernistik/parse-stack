@@ -14,5 +14,5 @@ group :test, :development do
   gem 'pry-nav'
   gem 'yard'
   gem 'redcarpet'
-  gem 'thin'
+  gem 'thin' # for yard server
 end
