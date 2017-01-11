@@ -1,5 +1,10 @@
 ## Parse-Stack Changelog
 
+### 1.6.8
+- NEW: Parse::Object#sig method to get quick information about an instance.
+- FIXES: Typo fix when using Array#objectIds.
+- Additional tests.
+
 ### 1.6.7
 - Default SERVER_URL changed to http://localhost:1337/parse
 - NEW: Command line tool `parse-console` to do interactive Parse development with parse-stack.

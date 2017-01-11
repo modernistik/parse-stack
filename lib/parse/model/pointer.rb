@@ -93,6 +93,11 @@ module Parse
         @parse_class
       end
 
+      # @return [String] a string representing the class and id of this instance.
+      def sig
+        "#{@parse_class}##{id || 'new'}"
+      end
+
       # @return [Hash]
       def attributes
         ATTRIBUTES
@@ -185,7 +190,7 @@ class Array
   # This method maps all the ids (String) of all Parse::Objects in the array.
   # @return [Array<String>] an array of strings of ids.
   def objectIds
-    map { |m| m.is_?(Parse::Pointer) ? m.id : nil }.compact
+    map { |m| m.is_a?(Parse::Pointer) ? m.id : nil }.compact
   end
 
   # Filter all objects in the array that do not inherit from Parse::Pointer or
