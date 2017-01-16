@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 require_relative '../object'
 require_relative 'user'
+
 module Parse
   # This class represents the data and columns contained in the standard Parse `_Product` collection.
   # These records are usually used when implementing in-app purchases in mobile applications.

@@ -128,11 +128,14 @@ module Parse
         # it can be overriden by the :field parameter
         parse_field = opts[:field].to_sym
         if self.fields[key].present? && BASE_FIELD_MAP[key].nil?
-          raise ArgumentError, "Property #{self}##{key} already defined with data type #{data_type}"
+          warn "Property #{self}##{key} already defined with data type #{data_type}. Will be ignored."
+          return
         end
         # We keep the list of fields that are on the remote Parse store
         if self.fields[parse_field].present?
-          raise ArgumentError, "Alias property #{self}##{parse_field} conflicts with previously defined property."
+          warn "Alias property #{self}##{parse_field} conflicts with previously defined property. Will be ignored."
+          return
+          # raise ArgumentError
         end
         #dirty tracking. It is declared to use with ActiveModel DirtyTracking
         define_attribute_methods key
@@ -301,7 +304,7 @@ module Parse
         # support question mark methods for boolean
         if data_type == :boolean
           if self.method_defined?("#{key}?")
-            puts "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}?."
+            warn "Creating boolean helper :#{key}?. Will overwrite existing method #{self}##{key}?."
           end
 
           # returns true if set to true, false otherwise
@@ -311,7 +314,7 @@ module Parse
           end
         elsif data_type == :integer || data_type == :float
           if self.method_defined?("#{key}_increment!")
-            puts "Creating increment helper :#{key}_increment!. Will overwrite existing method #{self}##{key}_increment!."
+            warn "Creating increment helper :#{key}_increment!. Will overwrite existing method #{self}##{key}_increment!."
           end
 
           define_method("#{key}_increment!") do |amount = 1|
