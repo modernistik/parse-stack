@@ -1,9 +1,9 @@
 ## Parse-Stack Changelog
 
-### 1.6.8
+### 1.6.10
 - NEW: Parse::Object#sig method to get quick information about an instance.
-- Adds :delete as an alias method to :destroy
 - FIXES: Typo fix when using Array#objectIds.
+- Exceptions will not be raised on property redefinitions, only warning messages.
 - Additional tests.
 
 ### 1.6.7
