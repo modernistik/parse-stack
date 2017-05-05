@@ -2,6 +2,17 @@
 
 require 'optparse'
 require 'json'
+DEFAULT_CONFIG_FILE = 'config.json'
+DEFAULT_CONFIG_CONTENTS = {
+  "apps": [{
+    "serverURL": "http://localhost:1337/parse",
+    "appId": "myAppId",
+    "masterKey": "myMasterKey",
+    "restAPIKey": "myRestAPIKey",
+    "javascriptKey": "myJavascriptKey",
+    "appName": "Parse Server App"
+  }]
+}.freeze
 
 opts = { verbose: false, pry: false }
 opt_parser = OptionParser.new do |o|
@@ -9,8 +20,11 @@ opt_parser = OptionParser.new do |o|
   o.banner =   "Usage: #{File.basename($0)} [options] SERVER_URL"
   o.separator  ""
   o.separator  "Example:"
-  o.separator  "#{File.basename($0)} -a APP_ID -k REST_API_KEY http://your-parser-server-url"
-  o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY   http://localhost:1337/parse"
+  o.separator  "#{File.basename($0)} -a APP_ID -m MASTER_KEY https://your-parse-server-url"
+  o.separator  "#{File.basename($0)} -c ./config.json"
+  o.separator  ""
+  o.separator  "If you use the -m option, parse-console will automatically"
+  o.separator  "import your schema as ruby models."
   o.separator  ""
   o.separator  "Options"
   o.on('-a APP_ID', '--appId APP_ID', 'Parse App ID (required)') { |a| opts[:app_id] = a }
@@ -24,8 +38,23 @@ opt_parser = OptionParser.new do |o|
     puts "Parse Stack : #{Parse::Stack::VERSION}"
     exit 1
   end
-  o.on('-c','--config CONFIG_JSON', "Load config from a parse-dashboard json compatible file.") do |filepath|
+  o.on('--config-sample', "Create a sample config file to use. See --config.") do
+    contents = JSON.pretty_generate(DEFAULT_CONFIG_CONTENTS)
+    File.open(DEFAULT_CONFIG_FILE, 'w') { |f| f.write(contents) }
+    puts "Created #{DEFAULT_CONFIG_FILE} : \n"
+    puts contents
+    puts "Edit #{DEFAULT_CONFIG_FILE} with your information and run: \n"
+    puts "\n\tparse-console -c ./#{DEFAULT_CONFIG_FILE}\n\n"
+    exit 1
+  end
+  o.on('-c','--config CONFIG_JSON', "Load config from a parse-dashboard.json compatible file.") do |filepath|
+    unless File.exists?(filepath)
+      $stderr.puts "File #{filepath} does not exist."
+      exit 1
+    end
+
     begin
+      puts "Loading config: #{filepath}"
       file = File.read(filepath)
       config = JSON.parse file
       app = config["apps"].is_a?(Array) ?  config["apps"].first : config["apps"]
@@ -34,7 +63,7 @@ opt_parser = OptionParser.new do |o|
       opts[:api_key] ||= app["restAPIKey"]
       opts[:master_key] ||= app["masterKey"]
     rescue Exception => e
-      $stderr.puts "Error: Incompatible JSON format for #{filepath}"
+      $stderr.puts "Error: Incompatible JSON format for #{filepath} (#{e})"
       exit 1
     end
 
