@@ -70,6 +70,12 @@ puts "Master : #{opts[:master_key].present?}"
 Parse.auto_generate_models!.each do |model|
   puts "Generated #{model}" if opts[:verbose]
 end
+# Create shortnames
+User = Parse::User
+Installation = Parse::Installation
+Session = Parse::Session
+Role = Parse::Role
+Product = Parse::Product
 
 if opts[:pry]
   require "pry"
