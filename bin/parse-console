@@ -42,7 +42,7 @@ opt_parser = OptionParser.new do |o|
 end
 opt_parser.parse!
 
-opts[:server_url] ||= ARGV[0] || 'http://localhost:1337/parse'
+opts[:server_url] ||= ARGV.shift || 'http://localhost:1337/parse'
 
 if opts[:app_id].nil?
   $stderr.puts "Error: Option --app_id missing\n"
