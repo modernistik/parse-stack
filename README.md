@@ -11,15 +11,14 @@ Below is a [quick start guide](https://github.com/modernistik/parse-stack#overvi
 2. Custom Classes and Relations: https://youtu.be/tfSesotfU7w
 3. Working with Existing Schemas: https://youtu.be/EJGPT7YWyXA
 
-### Parse File Migration Tool
-**If you are looking for a tool to migrate your hosted Parse Files to an Amazon S3 bucket, see our [Parse File Migration tool here](https://github.com/modernistik/parse-file-migration). This should be done before January 28th, 2017**
-
 ### Code Status
-[![Gitter](https://badges.gitter.im/modernistik/parse-stack.svg)](https://gitter.im/modernistik/parse-stack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 [![Gem Version](https://img.shields.io/gem/v/parse-stack.svg)](https://github.com/modernistik/parse-stack)
 [![Downloads](https://img.shields.io/gem/dt/parse-stack.svg)](https://rubygems.org/gems/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
 [![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](http://www.rubydoc.info/github/modernistik/parse-stack)
+
+### Questions?
+[![Gitter](https://badges.gitter.im/modernistik/parse-stack.svg)](https://gitter.im/modernistik/parse-stack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Installation
 
@@ -45,12 +44,16 @@ Parse-Stack comes with support for Rails by adding additional rake tasks and gen
 
 For a more details on the rails integration see [Parse-Stack Rails Example](https://github.com/modernistik/parse-stack-rails-example).
 
-### Interactive Command Line
-You can also used the bundled `parse-console` command line to connect and interact with your Parse Server and its data in an irb-like console:
+### Interactive Command Line Playground
+You can also used the bundled `parse-console` command line to connect and interact with your Parse Server and its data in an IRB-like console. This is useful for trying concepts and debugging as it will automatically connect to your Parse Server, and if provided the master key, automatically generate all the models entities.
 
 ```bash
     $ parse-console -h # see all options
-    $ parse-console -a appId -k restAPIKey http://localhost:1337/parse
+    $ parse-console -v -a myAppId -m myMasterKey http://localhost:1337/parse
+    Server : http://localhost:1337/parse
+    App Id : myAppId
+    Master : true
+    2.4.0 > Parse::User.first
 ```
 
 ## Overview

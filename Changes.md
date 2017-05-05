@@ -2,9 +2,11 @@
 
 ### 1.6.10
 - NEW: Parse::Object#sig method to get quick information about an instance.
-- FIXES: Typo fix when using Array#objectIds.
+- FIX: Typo fix when using Array#objectIds.
+- FIX: Passing server url in parse-console without the `-s` option when using IRB.
 - Exceptions will not be raised on property redefinitions, only warning messages.
 - Additional tests.
+- Short name classes are generated when using parse-console. Ex. Parse::User -> User
 
 ### 1.6.7
 - Default SERVER_URL changed to http://localhost:1337/parse
