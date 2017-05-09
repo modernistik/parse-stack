@@ -1,5 +1,9 @@
 ## Parse-Stack Changelog
 
+### 1.6.12
+- NEW: Parse.use_shortnames! to utilize shorter class methods. (optional)
+- NEW: parse-console supports `--url` option to load config from JSON url.
+
 ### 1.6.11
 - NEW: Parse::Object#sig method to get quick information about an instance.
 - FIX: Typo fix when using Array#objectIds.
