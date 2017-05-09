@@ -111,9 +111,9 @@ Parse.setup server_url: opts[:server_url],
 Parse.logging = true if opts[:verbose]
 puts "Server : #{Parse.client.server_url}"
 puts "App Id : #{Parse.client.app_id}"
-puts "Master : #{opts[:master_key].present?}"
+puts "Master : #{Parse.client.master_key.present?}"
 
-if opts[:master_key].present?
+if Parse.client.master_key.present?
   puts "Schema : imported"
   Parse.auto_generate_models!.each do |model|
     puts "Generated #{model}" if opts[:verbose]
@@ -122,11 +122,7 @@ else
   puts "Schema : skipped (requires master key)"
 end
 # Create shortnames
-User = Parse::User
-Installation = Parse::Installation
-Session = Parse::Session
-Role = Parse::Role
-Product = Parse::Product
+Parse.use_shortnames!
 
 if opts[:pry]
   require "pry"

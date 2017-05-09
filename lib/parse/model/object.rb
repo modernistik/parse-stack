@@ -61,6 +61,12 @@ module Parse
     end
   end
 
+  # Alias shorter names of core Parse class names.
+  # Ex, alias Parse::User to User, Parse::Installation to Installation, etc.
+  def self.use_shortnames!
+    require_relative 'shortnames'
+  end
+
   # This is the core class for all app specific Parse table subclasses. This class
   # in herits from Parse::Pointer since an Object is a Parse::Pointer with additional fields,
   # at a minimum, created_at, updated_at and ACLs.
