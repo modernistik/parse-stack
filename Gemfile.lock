@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    parse-stack (1.6.12)
+    parse-stack (1.6.12beta1)
       active_model_serializers (>= 0.9, < 1)
       activemodel (>= 4.2.1, < 6)
       activesupport (>= 4.2.1, < 6)
@@ -65,7 +65,7 @@ GEM
     minitest (5.10.1)
     moneta (0.8.1)
     multipart-post (2.0.0)
-    nokogiri (1.7.1)
+    nokogiri (1.7.2)
       mini_portile2 (~> 2.1.0)
     parallel (1.11.2)
     pry (0.10.4)
@@ -80,9 +80,9 @@ GEM
     rack (2.0.2)
     rack-test (0.6.3)
       rack (>= 1.0)
-    rails-dom-testing (2.0.2)
-      activesupport (>= 4.2.0, < 6.0)
-      nokogiri (~> 1.6)
+    rails-dom-testing (2.0.3)
+      activesupport (>= 4.2.0)
+      nokogiri (>= 1.6)
     rails-html-sanitizer (1.0.3)
       loofah (~> 2.0)
     rake (12.0.0)
