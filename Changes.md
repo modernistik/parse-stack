@@ -3,6 +3,9 @@
 ### 1.6.12
 - NEW: Parse.use_shortnames! to utilize shorter class methods. (optional)
 - NEW: parse-console supports `--url` option to load config from JSON url.
+- FIXES: Issue #27 where core classes could not be auto-upgraded if they were missing.
+- Warnings are now printed if auto_upgrade! is called without the master key.
+- Use `Parse.use_shortnames!` to use short name class names Ex. Parse::User -> User
 
 ### 1.6.11
 - NEW: Parse::Object#sig method to get quick information about an instance.
