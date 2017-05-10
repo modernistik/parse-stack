@@ -1,6 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
-exit # don't use master branch
+
+exit if ENV['MERCURY_URL'] # don't use master branch
 require_relative "stack/version"
 require_relative 'client'
 require_relative 'query'

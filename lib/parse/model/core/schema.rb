@@ -70,14 +70,34 @@ module Parse
         # the collection doesn't exist, we create the schema. If the collection already
         # exists, the current schema is fetched, and only add the additional fields
         # that are missing.
-        # @note No columns or fields are removed, this is a safe non-destructive upgrade.
+        # @note This feature requires use of the master_key. No columns or fields are removed, this is a safe non-destructive upgrade.
         # @return [Parse::Response] if the remote schema was modified.
         # @return [Boolean] if no changes were made to the schema, it returns true.
         def auto_upgrade!
+
+          unless client.master_key.present?
+            warn "[Parse] Schema changes for #{parse_class} is only available with the master key!"
+            return false
+          end
+          # fetch the current schema (requires master key)
           response = fetch_schema
+
+          # if it's a core class that doesn't exist, then create the collection without any fields,
+          # since parse-server will automatically create the collection with the set of core fields.
+          # then fetch the schema again, to add the missing fields.
+          if response.error? && self.to_s.start_with?('Parse::') #is it a core class?
+            client.create_schema parse_class, {}
+            response = fetch_schema
+            # if it still wasn't able to be created, raise an error.
+            if response.error?
+              warn "[Parse] Schema error: unable to create class #{parse_class}"
+              return response
+            end
+          end
+
           if response.success?
             #let's figure out the diff fields
-            remote_fields = response.result["fields"]
+            remote_fields = response.result['fields']
             current_schema = schema
             current_schema[:fields] = current_schema[:fields].reduce({}) do |h,(k,v)|
               #if the field does not exist in Parse, then add it to the update list
@@ -87,7 +107,7 @@ module Parse
             return true if current_schema[:fields].empty?
             return update_schema( current_schema )
           end
-          create_schema
+            create_schema
         end
 
     end
