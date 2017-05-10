@@ -256,7 +256,7 @@ The architecture of `Parse::Stack` is broken into four main components.
 This class is the core and low level API for the Parse Server REST interface that is used by the other components. It can manage multiple sessions, which means you can have multiple client instances pointing to different Parse Server applications at the same time. It handles sending raw requests as well as providing Request/Response objects for all API handlers. The connection engine is Faraday, which means it is open to add any additional middleware for features you'd like to implement.
 
 ### Parse::Query
-This class implements the [Parse REST Querying](http://parseplatform.github.io/docs/rest/guide/#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
+This class implements the [Parse REST Querying](http://docs.parseplatform.org/rest/guide/#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
 
 ### Parse::Object
 This component is main class for all object relational mapping subclasses for your application. It provides features in order to map your remote Parse records to a local ruby object. It implements the Active::Model interface to provide a lot of additional features, CRUD operations, querying, including dirty tracking, JSON serialization, save/destroy callbacks and others. While we are overlooking some functionality, for simplicity, you will mainly be working with Parse::Object as your superclass. While not required, it is highly recommended that you define a model (Parse::Object subclass) for all the Parse classes in your application.
@@ -592,10 +592,10 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
   artist.save
 ```
 
-For more information about Parse record ACLs, see the documentation at  [Security](https://parseplatform.github.io/docs/rest/guide/#security)
+For more information about Parse record ACLs, see the documentation at  [Security](http://docs.parseplatform.org/rest/guide/#security)
 
 ### Parse::Session
-This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/Session).
+This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Session). You may call `Parse.use_shortnames!` to use `Session` in addition to `Parse::Session`.
 
 You can get a specific `Parse::Session` given a session_token by using the `session` method. You can also find the user tied to a specific Parse session or session token with `Parse::User.session`.
 
@@ -610,13 +610,16 @@ user = Parse::User.session(token)
 ```
 
 ### Parse::Installation
-This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. See [Installation API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/Installation).
+This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. See [Installation API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Installation). You may call `Parse.use_shortnames!` to use `Installation` in addition to `Parse::Installation`.
+
+### Parse::Product
+This class represents the data and columns contained in the standard Parse `_Product` collection. You may add additional properties and methods to this class. See [Product API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Product). You may call `Parse.use_shortnames!` to use `Product` in addition to `Parse::Product`.
 
 ### Parse::Role
-This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. See [Roles API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/Role).
+This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. See [Roles API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Role). You may call `Parse.use_shortnames!` to use `Role` in addition to `Parse::Role`.
 
 ### Parse::User
-This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. See [User API Reference](http://www.rubydoc.info/github/modernistik/parse-stack/Parse/User).
+This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. See [User API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/User). You may call `Parse.use_shortnames!` to use `User` in addition to `Parse::User`.
 
 #### Signup
 You can signup new users in two ways. You can either use a class method `Parse::User.signup` to create a new user with the minimum fields of username, password and email, or create a `Parse::User` object can call the `signup!` method. If signup fails, it will raise the corresponding exception.
@@ -630,7 +633,7 @@ user.signup!
 ```
 
 ##### Third-Party Services
-You can signup users using third-party services like Facebook and Twitter as described in: [Signing Up and Logging In](https://parseplatform.github.io/docs/rest/guide/#signing-up-and-logging-in). To do this with Parse-Stack, you can call the `Parse::User.autologin_service` method by passing the service name and the corresponding authentication hash data. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
+You can signup users using third-party services like Facebook and Twitter as described in: [Signing Up and Logging In](http://docs.parseplatform.org/rest/guide/#signing-up). To do this with Parse-Stack, you can call the `Parse::User.autologin_service` method by passing the service name and the corresponding authentication hash data. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
 
 ```ruby
 fb_auth = {}
@@ -686,7 +689,7 @@ user.logout # deletes the corresponding session
 ```
 
 #### Linking and Unlinking
-You can link or unlink user accounts with third-party services like Facebook and Twitter as described in: [Linking and Unlinking Users](https://parseplatform.github.io/docs/rest/guide/#linking). To do this, you must first get the corresponding authentication data for the specific service, and then apply it to the user using the linking and unlinking methods. Each method returns true or false if the action was successful. For a listing of supported third-party authentication services, see [OAuth](https://github.com/ParsePlatform/parse-server/wiki/OAuth).
+You can link or unlink user accounts with third-party services like Facebook and Twitter as described in: [Linking and Unlinking Users](http://docs.parseplatform.org/rest/guide/#linking-users). To do this, you must first get the corresponding authentication data for the specific service, and then apply it to the user using the linking and unlinking methods. Each method returns true or false if the action was successful. For a listing of supported third-party authentication services, see [OAuth](http://docs.parseplatform.org/parse-server/guide/#oauth-and-3rd-party-authentication).
 
 ```ruby
 
@@ -1055,7 +1058,7 @@ user.band_by_status(false)
 ```
 
 #### Has Many
-Parse has many ways to implement one-to-many and many-to-many associations: `Array`, `Parse Relation` or through a `Query`. How you decide to implement your associations, will affect how `has_many` works in Parse-Stack. Parse natively supports one-to-many and many-to-many relationships using `Array` and `Relations`, as described in [Relational Data](https://parseplatform.github.io/docs/js/guide/#relational-data). Both of these methods require you define a specific column type in your Parse table that will be used to store information about the association.
+Parse has many ways to implement one-to-many and many-to-many associations: `Array`, `Parse Relation` or through a `Query`. How you decide to implement your associations, will affect how `has_many` works in Parse-Stack. Parse natively supports one-to-many and many-to-many relationships using `Array` and `Relations`, as described in [Relational Data](http://docs.parseplatform.org/js/guide/#relational-data). Both of these methods require you define a specific column type in your Parse table that will be used to store information about the association.
 
 In addition to `Array` and `Relation`, Parse-Stack also implements the standard `has_many` behavior prevalent in other frameworks through a query where the associated class contains a foreign pointer to the local class, usually the inverse of a `belongs_to`. This requires that the associated class has a defined column
 that contains a pointer the refers to the defining class.
@@ -1170,13 +1173,13 @@ band.save
 ```
 
 ##### Parse Relation
-Other than the use of arrays, Parse supports native one-to-many and many-to-many associations through what is referred to as a [Parse Relation](https://parseplatform.github.io/docs/js/guide/#many-to-many-relationships). This is implemented by defining a column to be of type `Relation` which refers to a foreign class. Parse-Stack supports this by passing the `through: :relation` option to the `has_many` method. Designating a column as a Parse relation to another class type, will create a one-way intermediate "join-list" between the local class and the foreign class. One important distinction of this compared to other types of data stores (ex. PostgresSQL) is that:
+Other than the use of arrays, Parse supports native one-to-many and many-to-many associations through what is referred to as a [Parse Relation](http://docs.parseplatform.org/js/guide/#many-to-many-relationships). This is implemented by defining a column to be of type `Relation` which refers to a foreign class. Parse-Stack supports this by passing the `through: :relation` option to the `has_many` method. Designating a column as a Parse relation to another class type, will create a one-way intermediate "join-list" between the local class and the foreign class. One important distinction of this compared to other types of data stores (ex. PostgresSQL) is that:
 
 1. The inverse relationship association is not available automatically. Therefore, having a column of `artists` in a `Band` class that relates to members of the band (as `Artist` class), does not automatically make a set of `Band` records available to `Artist` records for which they have been related. If you need to maintain both the inverse relationship between a foreign class to its associations, you will need to manually manage that by adding two Parse relation columns in each class, or by creating a separate class (ex. `ArtistBands`) that is used as a join table.
 2. Querying the relation is actually performed against the implicit join table, not the local one.
 3. Applying query constraints for a set of records within a relation is performed against the foreign table class, not the class having the relational column.
 
-The Parse documentation provides more details on associations, see [Parse Relations Guide](http://parseplatform.github.io/docs/ios/guide/#relations). Parse-Stack will handle the work for (2) and (3) automatically.
+The Parse documentation provides more details on associations, see [Parse Relations Guide](http://docs.parseplatform.org/ios/guide/#relations). Parse-Stack will handle the work for (2) and (3) automatically.
 
 In the example below, a `Band` can have thousands of `Fans`. We setup a `Relation<Fan>` column in the `Band` class that references the `Fan` class. Parse-Stack provides methods to manage the relationship under the [Parse::RelationCollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/relation_collection_proxy.rb) class.
 
@@ -1724,7 +1727,7 @@ The `where` clause is based on utilizing a set of constraints on the defined col
 ```
 
 ## Query Constraints
-Most of the constraints supported by Parse are available to `Parse::Query`. Assuming you have a column named `field`, here are some examples. For an explanation of the constraints, please see [Parse Query Constraints documentation](http://parseplatform.github.io/docs/rest/guide/#queries). You can build your own custom query constraints by creating a `Parse::Constraint` subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
+Most of the constraints supported by Parse are available to `Parse::Query`. Assuming you have a column named `field`, here are some examples. For an explanation of the constraints, please see [Parse Query Constraints documentation](http://docs.parseplatform.org/rest/guide/#queries). You can build your own custom query constraints by creating a `Parse::Constraint` subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
 
 #### Equals
 Default query constraint for matching a field to a single value.
@@ -2118,9 +2121,10 @@ puts song.name # 'My Title'
 There are also a special `:create` callback. A `before_create` will be called whenever a unsaved object will be saved, and `after_create` will be called when a previously unsaved object successfully saved for the first time.
 
 ## Schema Upgrades and Migrations
-You may change your local Parse ruby classes by adding new properties. To easily propagate the changes to your Parse application (MongoDB), you can call `auto_upgrade!` on the class to perform an non-destructive additive schema change. This will create the new columns in Parse for the properties you have defined in your models. Parse Stack will calculate the changes and only modify the tables which need new columns to be added. *It will not destroy columns or data*
+You may change your local Parse ruby classes by adding new properties. To easily propagate the changes to your Parse Server application (MongoDB), you can call `auto_upgrade!` on the class to perform an non-destructive additive schema change. This will create the new columns in Parse for the properties you have defined in your models. Parse Stack will calculate the changes and only modify the tables which need new columns to be added.  This feature does require the use of the master key when configuring the client. *It will NOT destroy columns or data.*
 
 ```ruby
+  # auto_upgrade! requires use of master key
   # upgrade the a class individually
   Song.auto_upgrade!
 
@@ -2233,7 +2237,7 @@ You can register webhooks to handle the different object triggers: `:before_save
 
 For any `after_*` hook, return values are not needed since Parse does not utilize them. You may also register as many `after_save` or `after_delete` handlers as you prefer, all of them will be called.
 
-`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved. However, we recommend modifying the `parse_object` provided since it has dirty tracking, and then returning that same object. This will automatically call your model specific `before_save` callbacks and send the proper payload back to Parse. For more details, see [Cloud Code BeforeSave Webhooks](http://parseplatform.github.io/docs/cloudcode/guide/#cloud-code-advanced-beforesave-webhooks)
+`before_save` and `before_delete` hooks have special functionality. When the `error!` method is called by the provided block, the framework will return the correct error response to Parse with value provided. Returning an error will prevent Parse from saving the object in the case of `before_save` and will prevent Parse from deleting the object when in a `before_delete`. In addition, for a `before_save`, the last value returned by the block will be the value returned in the success response. If the block returns nil or an `empty?` value, it will return `true` as the default response. You can also return a JSON object in a hash format to override the values that will be saved. However, we recommend modifying the `parse_object` provided since it has dirty tracking, and then returning that same object. This will automatically call your model specific `before_save` callbacks and send the proper payload back to Parse. For more details, see [Cloud Code BeforeSave Webhooks](http://docs.parseplatform.org/cloudcode/guide/#beforesave-triggers)
 
 ```ruby
 # recommended way
@@ -2324,7 +2328,7 @@ However, we have predefined a few rake tasks you can use in your application. Ju
 Then you can see the tasks available by typing `rake -T`.
 
 ## Parse REST API Client
-While in most cases you do not have to work with `Parse::Client` directly, you can still utilize it for any raw requests that are not supported by the framework. We provide support for most of the [Parse REST API](http://parseplatform.github.io/docs/rest/guide/#quick-reference) endpoints as helper methods, however you can use the `request()` method to make your own API requests. Parse::Client will handle header authentication, request/response generation and caching.
+While in most cases you do not have to work with `Parse::Client` directly, you can still utilize it for any raw requests that are not supported by the framework. We provide support for most of the [Parse REST API](http://docs.parseplatform.org/rest/guide/#quick-reference) endpoints as helper methods, however you can use the `request()` method to make your own API requests. Parse::Client will handle header authentication, request/response generation and caching.
 
 ```ruby
 client = Parse::Client.new(application_id: <string>, api_key: <string>) do |conn|
