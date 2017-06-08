@@ -1,6 +1,6 @@
 #!/usr/bin/env rake
 require "bundler/gem_tasks"
-
+require 'yard'
 require 'rake/testtask'
 
 Rake::TestTask.new do |t|
@@ -23,6 +23,12 @@ task 'yard:stats' do
 end
 
 desc 'Start the yard server'
-task 'yard' do
+task 'docs' do
   exec 'rm -rf ./yard && yard server --reload'
+end
+
+YARD::Rake::YardocTask.new do |t|
+ t.files   = ['lib/**/*.rb']   # optional
+ # t.options = ['--any', '--extra', '--opts'] # optional
+ t.stats_options = ['--list-undoc']         # optional
 end

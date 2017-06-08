@@ -4,7 +4,7 @@
 
 [Parse Stack](https://github.com/modernistik/parse-stack) is the [Parse Server](https://github.com/ParsePlatform/parse-server) SDK, REST Client and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
-Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full [API Reference](http://www.rubydoc.info/github/modernistik/parse-stack) for more detailed information about our Parse Server SDK.
+Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full *[API Reference](https://www.modernistik.com/gems/parse-stack/)* for more detailed information about our Parse Server SDK.
 
 #### Tutorial Videos
 1. Getting Started: https://youtu.be/zoYSGmciDlQ
@@ -15,7 +15,7 @@ Below is a [quick start guide](https://github.com/modernistik/parse-stack#overvi
 [![Gem Version](https://img.shields.io/gem/v/parse-stack.svg)](https://github.com/modernistik/parse-stack)
 [![Downloads](https://img.shields.io/gem/dt/parse-stack.svg)](https://rubygems.org/gems/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
-[![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](http://www.rubydoc.info/github/modernistik/parse-stack)
+[![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](https://www.modernistik.com/gems/parse-stack/)
 
 ### Questions?
 [![Gitter](https://badges.gitter.im/modernistik/parse-stack.svg)](https://gitter.im/modernistik/parse-stack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
@@ -595,7 +595,7 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 For more information about Parse record ACLs, see the documentation at  [Security](http://docs.parseplatform.org/rest/guide/#security)
 
 ### Parse::Session
-This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Session). You may call `Parse.use_shortnames!` to use `Session` in addition to `Parse::Session`.
+This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Session). You may call `Parse.use_shortnames!` to use `Session` in addition to `Parse::Session`.
 
 You can get a specific `Parse::Session` given a session_token by using the `session` method. You can also find the user tied to a specific Parse session or session token with `Parse::User.session`.
 
@@ -607,19 +607,25 @@ session.user # the Parse user for this session
 # or fetch user with a session token
 user = Parse::User.session(token)
 
+# save an object with the priviledges (ACLs) of this user
+some_object.save( session: user.session_token )
+
+# delete an object with the priviledges of this user
+some_object.destroy( session: user.session_token )
+
 ```
 
 ### Parse::Installation
-This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. See [Installation API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Installation). You may call `Parse.use_shortnames!` to use `Installation` in addition to `Parse::Installation`.
+This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. See [Installation API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Installation). You may call `Parse.use_shortnames!` to use `Installation` in addition to `Parse::Installation`.
 
 ### Parse::Product
-This class represents the data and columns contained in the standard Parse `_Product` collection. You may add additional properties and methods to this class. See [Product API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Product). You may call `Parse.use_shortnames!` to use `Product` in addition to `Parse::Product`.
+This class represents the data and columns contained in the standard Parse `_Product` collection. You may add additional properties and methods to this class. See [Product API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Product). You may call `Parse.use_shortnames!` to use `Product` in addition to `Parse::Product`.
 
 ### Parse::Role
-This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. See [Roles API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/Role). You may call `Parse.use_shortnames!` to use `Role` in addition to `Parse::Role`.
+This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. See [Roles API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Role). You may call `Parse.use_shortnames!` to use `Role` in addition to `Parse::Role`.
 
 ### Parse::User
-This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. See [User API Reference](http://www.rubydoc.info/gems/parse-stack/Parse/User). You may call `Parse.use_shortnames!` to use `User` in addition to `Parse::User`.
+This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. See [User API Reference](https://www.modernistik.com/gems/parse-stack/Parse/User). You may call `Parse.use_shortnames!` to use `User` in addition to `Parse::User`.
 
 #### Signup
 You can signup new users in two ways. You can either use a class method `Parse::User.signup` to create a new user with the minimum fields of username, password and email, or create a `Parse::User` object can call the `signup!` method. If signup fails, it will raise the corresponding exception.
@@ -1367,6 +1373,20 @@ To commit a new record or changes to an existing record to Parse, use the `#save
 ```
 
 The save operation can handle both creating and updating existing objects. If you do not want to update the association data of a changed object, you may use the `#update` method to only save the changed property values. In the case where you want to force update an object even though it has not changed, to possibly trigger your `before_save` hooks, you can use the `#update!` method. In addition, just like with other ActiveModel objects, you may call `reload!` to fetch the current record again from the data store.
+
+### Saving applying User ACLs
+You may save and delete objects from Parse on behalf of a logged in user by passing the session token to the call to `save` or `destroy`. Doing so will allow Parse to apply the ACLs of this user against the record to see if the user is authorized to read or write the record. See [Parse::Actions](https://www.modernistik.com/gems/parse-stack/Parse/Actions).
+
+```ruby
+  user = Parse::User.login('myuser','pass')
+
+  song = Song.first
+  song.title = "My New Title"
+  # save this song as if you were this user.
+  # If the user does not have access rights, it will fail
+  song.save session: user.session_token
+  # shorthand: song.save session: user
+```
 
 #### Raising an exception when save fails
 By default, we return `true` or `false` for save and destroy operations. If you prefer to have `Parse::Object` raise an exception instead, you can tell to do so either globally or on a per-model basis. When a save fails, it will raise a `Parse::RecordNotSaved`.

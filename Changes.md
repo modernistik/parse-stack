@@ -6,6 +6,8 @@
 - FIXES: Issue #27 where core classes could not be auto-upgraded if they were missing.
 - Warnings are now printed if auto_upgrade! is called without the master key.
 - Use `Parse.use_shortnames!` to use short name class names Ex. Parse::User -> User
+- Hosting documentation on https://www.modernistik.com/gems/parse-stack/ since rubydoc.info doesn't
+  use latest yard features.
 
 ### 1.6.11
 - NEW: Parse::Object#sig method to get quick information about an instance.

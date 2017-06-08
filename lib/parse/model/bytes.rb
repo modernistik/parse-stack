@@ -35,8 +35,9 @@ module Parse
     end
 
     # Base64 encode and set the instance contents
-    def encode(s)
-      @base64 = Base64.encode64(s)
+    # @param str the string to encode
+    def encode(str)
+      @base64 = Base64.encode64(str)
     end
 
     # Get the content as decoded base64 bytes
