@@ -252,16 +252,16 @@ result = Parse.call_function :myFunctionName, {param: value}
 ## Architecture
 The architecture of `Parse::Stack` is broken into four main components.
 
-### Parse::Client
+### [Parse::Client](https://www.modernistik.com/gems/parse-stack/Parse/Client.html)
 This class is the core and low level API for the Parse Server REST interface that is used by the other components. It can manage multiple sessions, which means you can have multiple client instances pointing to different Parse Server applications at the same time. It handles sending raw requests as well as providing Request/Response objects for all API handlers. The connection engine is Faraday, which means it is open to add any additional middleware for features you'd like to implement.
 
-### Parse::Query
+### [Parse::Query](https://www.modernistik.com/gems/parse-stack/Parse/Query.html)
 This class implements the [Parse REST Querying](http://docs.parseplatform.org/rest/guide/#queries) interface in the [DataMapper finder syntax style](http://datamapper.org/docs/find.html). It compiles a set of query constraints and utilizes `Parse::Client` to send the request and provide the raw results. This class can be used without the need to define models.
 
-### Parse::Object
+### [Parse::Object](https://www.modernistik.com/gems/parse-stack/Parse/Object.html)
 This component is main class for all object relational mapping subclasses for your application. It provides features in order to map your remote Parse records to a local ruby object. It implements the Active::Model interface to provide a lot of additional features, CRUD operations, querying, including dirty tracking, JSON serialization, save/destroy callbacks and others. While we are overlooking some functionality, for simplicity, you will mainly be working with Parse::Object as your superclass. While not required, it is highly recommended that you define a model (Parse::Object subclass) for all the Parse classes in your application.
 
-### Parse::Webhooks
+### [Parse::Webhooks](https://www.modernistik.com/gems/parse-stack/Parse/Webhooks.html)
 Parse provides a feature called [Cloud Code Webhooks](http://blog.parse.com/announcements/introducing-cloud-code-webhooks/). For most applications, save/delete triggers and cloud functions tend to be implemented by Parse's own hosted Javascript solution called Cloud Code. However, Parse provides the ability to have these hooks utilize your hosted solution instead of their own, since their environment is limited in terms of resources and tools.
 
 ## Field Naming Conventions
@@ -387,7 +387,7 @@ You can always combine both approaches by defining special attributes before you
 
 ```
 
-## Parse Config
+## [Parse Config](https://www.modernistik.com/gems/parse-stack/Parse/API/Config.html)
 Getting your configuration variables once you have a default client setup can be done with `Parse.config`. The first time this method is called, Parse-Stack will get the configuration from Parse Server, and cache it. To force a reload of the config, use `config!`. You
 
 ```ruby
@@ -410,7 +410,7 @@ Getting your configuration variables once you have a default client setup can be
 ## Core Classes
 While some native data types are similar to the ones supported by Ruby natively, other ones are more complex and require their dedicated classes.
 
-### Parse::Pointer
+### [Parse::Pointer](https://www.modernistik.com/gems/parse-stack/Parse/Pointer.html)
 An important concept is the `Parse::Pointer` class. This is the superclass of `Parse::Object` and represents the pointer type in Parse. A `Parse::Pointer` only contains data about the specific Parse class and the `id` for the object. Therefore, creating an instance of any Parse::Object subclass with only the `:id` field set will be considered in "pointer" state even though its specific class is not `Parse::Pointer` type. The only case that you may have a Parse::Pointer is in the case where an object was received for one of your classes and the framework has no registered class handler for it. Using the example above, assume you have the tables `Post`, `Comment` and `Author` defined in your remote Parse application, but have only defined `Post` and `Commentary` locally.
 
 ```ruby
@@ -446,7 +446,7 @@ comment.post.pointer? # false, it is now a full object.
 
 The effect is that for any unknown classes that the framework encounters, it will generate Parse::Pointer instances until you define those classes with valid properties and associations. While this might be ok for some classes you do not use, we still recommend defining all your Parse classes locally in the framework.
 
-### Parse::File
+### [Parse::File](https://www.modernistik.com/gems/parse-stack/Parse/File.html)
 This class represents a Parse file pointer. `Parse::File` has helper methods to upload Parse files directly to Parse and manage file associations with your classes. Using our Song class example:
 
 ```ruby
@@ -500,7 +500,7 @@ file.url # => https://www.example.com/file.png
 
 ```
 
-### Parse::Date
+### [Parse::Date](https://www.modernistik.com/gems/parse-stack/Parse/Date.html)
 This class manages dates in the special JSON format it requires for properties of type `:date`. `Parse::Date` subclasses `DateTime`, which allows you to use any features or methods available to `DateTime` with `Parse::Date`. While the conversion between `Time` and `DateTime` objects to a `Parse::Date` object is done implicitly for you, you can use the added special methods, `DateTime#parse_date` and `Time#parse_date`, for special occasions.
 
 ```ruby
@@ -543,7 +543,7 @@ We include helper methods to calculate distances between GeoPoints: `distance_in
 	# ~180.793 km
 ```
 
-### Parse::Bytes
+### [Parse::Bytes](https://www.modernistik.com/gems/parse-stack/Parse/Bytes.html)
 The `Bytes` data type represents the storage format for binary content in a Parse column. The content is needs to be encoded into a base64 string.
 
 ```ruby
@@ -555,7 +555,7 @@ The `Bytes` data type represents the storage format for binary content in a Pars
   decoded = bytes.decoded # same as Base64.decode64
 ```
 
-### Parse::ACL
+### [Parse::ACL](https://www.modernistik.com/gems/parse-stack/Parse/ACL.html)
 The `ACL` class represents the access control lists for each record. An ACL is represented by a JSON object with the keys being `Parse::User` object ids or the special key of `*`, which indicates the public access permissions.
 The value of each key in the hash is a `Parse::ACL::Permission` object which defines the boolean permission state for `read` and `write`.
 
@@ -594,7 +594,7 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 
 For more information about Parse record ACLs, see the documentation at  [Security](http://docs.parseplatform.org/rest/guide/#security)
 
-### Parse::Session
+### [Parse::Session](https://www.modernistik.com/gems/parse-stack/Parse/Session.html)
 This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Session). You may call `Parse.use_shortnames!` to use `Session` in addition to `Parse::Session`.
 
 You can get a specific `Parse::Session` given a session_token by using the `session` method. You can also find the user tied to a specific Parse session or session token with `Parse::User.session`.
@@ -615,16 +615,16 @@ some_object.destroy( session: user.session_token )
 
 ```
 
-### Parse::Installation
+### [Parse::Installation](https://www.modernistik.com/gems/parse-stack/Parse/Installation)
 This class represents the data and columns contained in the standard Parse `_Installation` collection. You may add additional properties and methods to this class. See [Installation API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Installation). You may call `Parse.use_shortnames!` to use `Installation` in addition to `Parse::Installation`.
 
-### Parse::Product
+### [Parse::Product](https://www.modernistik.com/gems/parse-stack/Parse/Product)
 This class represents the data and columns contained in the standard Parse `_Product` collection. You may add additional properties and methods to this class. See [Product API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Product). You may call `Parse.use_shortnames!` to use `Product` in addition to `Parse::Product`.
 
-### Parse::Role
+### [Parse::Role](https://www.modernistik.com/gems/parse-stack/Parse/Role)
 This class represents the data and columns contained in the standard Parse `_Role` collection. You may add additional properties and methods to this class. See [Roles API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Role). You may call `Parse.use_shortnames!` to use `Role` in addition to `Parse::Role`.
 
-### Parse::User
+### [Parse::User](https://www.modernistik.com/gems/parse-stack/Parse/User)
 This class represents the data and columns contained in the standard Parse `_User` collection. You may add additional properties and methods to this class. See [User API Reference](https://www.modernistik.com/gems/parse-stack/Parse/User). You may call `Parse.use_shortnames!` to use `User` in addition to `Parse::User`.
 
 #### Signup
@@ -1004,7 +1004,7 @@ band.drummer # Artist object
 ###### `:field`
 This option allows you to set the name of the remote Parse column for this property. Using this will explicitly set the remote property name to the value of this option. The value provided for this option will affect the name of the alias method that is generated when `alias` option is used. **By default, the name of the remote column is the lower-first camel case version of the property name. As an example, for a property with key `:my_property_name`, the framework will implicitly assume that the remote column is `myPropertyName`.**
 
-#### Has One
+#### [Has One](https://www.modernistik.com/gems/parse-stack/Parse/Associations/HasOne.html)
 The `has_one` creates a one-to-one association with another Parse class. This association says that the other class in the association contains a foreign pointer column which references instances of this class. If your model contains a column that is a Parse pointer to another class, you should use `belongs_to` for that association instead.
 
 Defining a `has_one` property generates a helper query method to fetch a particular record from a foreign class. This is useful for setting up the inverse relationship accessors of a `belongs_to`. In the case of the `has_one` relationship, the `:field` option represents the name of the column of the foreign class where the Parse pointer is stored. By default, the lower-first camel case version of the Parse class name is used.
@@ -1063,7 +1063,7 @@ user.band_by_status(false)
 
 ```
 
-#### Has Many
+#### [Has Many](https://www.modernistik.com/gems/parse-stack/Parse/Associations/HasMany.html)
 Parse has many ways to implement one-to-many and many-to-many associations: `Array`, `Parse Relation` or through a `Query`. How you decide to implement your associations, will affect how `has_many` works in Parse-Stack. Parse natively supports one-to-many and many-to-many relationships using `Array` and `Relations`, as described in [Relational Data](http://docs.parseplatform.org/js/guide/#relational-data). Both of these methods require you define a specific column type in your Parse table that will be used to store information about the association.
 
 In addition to `Array` and `Relation`, Parse-Stack also implements the standard `has_many` behavior prevalent in other frameworks through a query where the associated class contains a foreign pointer to the local class, usually the inverse of a `belongs_to`. This requires that the associated class has a defined column
@@ -1270,7 +1270,7 @@ author.posts # => Posts where author's name is a tag
 ```
 
 ## Creating, Saving and Deleting Records
-This section provides some of the basic methods when creating, updating and deleting objects from Parse. To illustrate the various methods available for saving Parse records, we use this example class:
+This section provides some of the basic methods when creating, updating and deleting objects from Parse. Additional documentation for these APIs can be found under [Parse::Core::Actions](https://www.modernistik.com/gems/parse-stack/Parse/Core/Actions.html). To illustrate the various methods available for saving Parse records, we use this example class:
 
 ```ruby
 
@@ -1651,7 +1651,7 @@ If you only need to know the result count for a query, provide count a non-zero 
 ```
 
 ### Query Expressions
-The set of supported expressions based on what is available through the Parse REST API. _For those who don't prefer the DataMapper style syntax, we have provided method accessors for each of the expressions._
+The set of supported expressions based on what is available through the Parse REST API. _For those who don't prefer the DataMapper style syntax, we have provided method accessors for each of the expressions._ A full description of supported query  operations, please refer to the [`Parse::Query`](https://www.modernistik.com/gems/parse-stack/Parse/Query.html) API reference.
 
 #### :order
 Specify a field to sort by.
