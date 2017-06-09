@@ -6,6 +6,6 @@ module Parse
   # The Parse Server SDK for Ruby
   module Stack
     # The current version.
-    VERSION = "1.6.12beta1"
+    VERSION = "1.6.12"
   end
 end

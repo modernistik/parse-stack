@@ -22,45 +22,44 @@ Below is a [quick start guide](https://github.com/modernistik/parse-stack#overvi
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-    gem 'parse-stack'
-
+Add this line to your application's `Gemfile`:
+```ruby
+gem 'parse-stack'
+```
 And then execute:
-
-    $ bundle
-
+```bash
+$ bundle
+```
 Or install it yourself as:
-
-    $ gem install parse-stack
-
+```bash
+$ gem install parse-stack
+```
 ### Rack / Sinatra
 Parse-Stack API, models and webhooks easily integrate in your existing Rack/Sinatra based applications. For more details see [Parse-Stack Rack Example](https://github.com/modernistik/parse-stack-example).
 
 ### Rails
 Parse-Stack comes with support for Rails by adding additional rake tasks and generators. After adding `parse-stack` as a gem dependency in your Gemfile and running `bundle`, you should run the install script:
-
-    $ rails g parse_stack:install
-
+```bash
+$ rails g parse_stack:install
+```
 For a more details on the rails integration see [Parse-Stack Rails Example](https://github.com/modernistik/parse-stack-rails-example).
 
 ### Interactive Command Line Playground
 You can also used the bundled `parse-console` command line to connect and interact with your Parse Server and its data in an IRB-like console. This is useful for trying concepts and debugging as it will automatically connect to your Parse Server, and if provided the master key, automatically generate all the models entities.
 
 ```bash
-    $ parse-console -h # see all options
-    $ parse-console -v -a myAppId -m myMasterKey http://localhost:1337/parse
-    Server : http://localhost:1337/parse
-    App Id : myAppId
-    Master : true
-    2.4.0 > Parse::User.first
+$ parse-console -h # see all options
+$ parse-console -v -a myAppId -m myMasterKey http://localhost:1337/parse
+Server : http://localhost:1337/parse
+App Id : myAppId
+Master : true
+2.4.0 > Parse::User.first
 ```
 
 ## Overview
 Parse-Stack is a full stack framework that utilizes several ideas behind [DataMapper](http://datamapper.org/docs/find.html) and [ActiveModel](https://github.com/rails/rails/tree/master/activemodel) to manage and maintain larger scale ruby applications and tools that utilize the [Parse Server Platform](https://github.com/ParsePlatform/parse-server). If you are familiar with these technologies, the framework should feel familiar to you.
 
 ```ruby
-
 require 'parse/stack'
 
 Parse.setup server_url: 'https://localhost:1337/parse',
