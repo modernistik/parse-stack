@@ -8,6 +8,11 @@
 - Use `Parse.use_shortnames!` to use short name class names Ex. Parse::User -> User
 - Hosting documentation on https://www.modernistik.com/gems/parse-stack/ since rubydoc.info doesn't
   use latest yard features.
+- Parse::Query will raise an exception if a non-nil value is passed to `:session` that
+  does not provide a valid session token string.
+- `save` and `destroy` will raise an exception if a non-nil `session` argument is passed
+ that does not provide a valid session token string.
+- Additional documentation changes and tests.
 
 ### 1.6.11
 - NEW: Parse::Object#sig method to get quick information about an instance.

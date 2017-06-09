@@ -499,6 +499,14 @@ module Parse
         @_session_token
       end
 
+      # @!visibility private
+      def _validate_session_token!(token, action = :save)
+        return nil if token.nil? # user explicitly requests no session token
+        token = token.session_token if token.respond_to?(:session_token)
+        return token if token.is_a?(String) && token.present?
+        raise ArgumentError, "#{self.class}##{action} error: Invalid session token passed (#{token})"
+      end
+
       # saves the object. If the object has not changed, it is a noop. If it is new,
       # we will create the object. If the object has an id, we will update the record.
       #
@@ -508,13 +516,14 @@ module Parse
       # You can define before and after :save callbacks
       # autoraise: set to true will automatically raise an exception if the save fails
       # @raise Parse::RecordNotSaved if the save fails
-      # @param autoraise [Boolean] whether to raise an exception if the save fails.
+      # @raise ArgumentError if a non-nil value is passed to `session` that doesn't provide a session token string.
       # @param session [String] a session token in order to apply ACLs to this operation.
+      # @param autoraise [Boolean] whether to raise an exception if the save fails.
       # @return [Boolean] whether the save was successful.
-      def save(autoraise: false, session: nil)
+      def save(session: nil, autoraise: false)
+        @_session_token = _validate_session_token! session, :save
         return true unless changed?
         success = false
-        @_session_token = session
         run_callbacks :save do
           #first process the create/update action if any
           #then perform any relation changes that need to be performed
@@ -547,6 +556,7 @@ module Parse
 
       # Save this object and raise an exception if it fails.
       # @raise Parse::RecordNotSaved if the save fails
+      # @raise ArgumentError if a non-nil value is passed to `session` that doesn't provide a session token string.
       # @param session (see #save)
       # @return (see #save)
       def save!(session: nil)
@@ -557,10 +567,11 @@ module Parse
       # Delete this record from the Parse collection. Only valid if this object has an `id`.
       # This will run all the `destroy` callbacks.
       # @param session [String] a session token if you want to apply ACLs for a user in this operation.
+      # @raise ArgumentError if a non-nil value is passed to `session` that doesn't provide a session token string.
       # @return [Boolean] whether the operation was successful.
       def destroy(session: nil)
+        @_session_token = _validate_session_token! session, :destroy
         return false if new?
-        @_session_token = session
         success = false
         run_callbacks :destroy do
           res = client.delete_object parse_class, id, session_token: _session_token
