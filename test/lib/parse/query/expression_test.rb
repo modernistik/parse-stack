@@ -49,6 +49,31 @@ class TestParseQueryExpressions < Minitest::Test
     assert_equal :max, @query.clause(:limit)
   end
 
+  def test_exp_session
+    assert_nil @query.clause(:session)
+    assert_nil @query.session_token
+
+    user = Parse::User.new
+    session = Parse::Session.new
+
+    assert_raises(ArgumentError) { @query.session_token = 123456 }
+    assert_raises(ArgumentError) { @query.session_token = user }
+    assert_raises(ArgumentError) { @query.session_token = session }
+    assert_raises(ArgumentError) { @query.conditions(session: 123456) }
+    assert_raises(ArgumentError) { @query.conditions(session: user) }
+    assert_raises(ArgumentError) { @query.conditions(session: session) }
+
+    session.session_token = user.session_token = "r:123456"
+
+    refute_raises(ArgumentError) { @query.session_token = nil }
+    refute_raises(ArgumentError) { @query.session_token = user }
+    refute_raises(ArgumentError) { @query.session_token = session }
+    refute_raises(ArgumentError) { @query.conditions(session: nil) }
+    refute_raises(ArgumentError) { @query.conditions(session: user) }
+    refute_raises(ArgumentError) { @query.conditions(session: session) }
+
+  end
+
   def test_exp_options
     # cache
     # session token

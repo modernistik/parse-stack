@@ -136,11 +136,17 @@ module Parse
     #  or a {Parse::Session} instance.
     #  @example
     #   # perform this query as user represented by session_token
-
     #   query = Parse::Query.new("_User", :name => "Bob")
     #   query.session_token = "r:XyX123..."
+    #
     #   # or inline
     #   query = Parse::Query.new("_User", :name => "Bob", :session => "r:XyX123...")
+    #
+    #   # or with a logged in user object
+    #   user = Parse::User.login('user','pass') # => logged in user'
+    #   user.session_token # => "r:XyZ1234...."
+    #   query = Parse::Query.new("_User", :name => "Bob", :session => user)
+    #  @raise ArgumentError if a non-nil value is passed that doesn't provide a session token string.
     #  @note Using a session_token automatically disables sending the master key in the request.
     #  @return [String] the session token to send with this API request.
     attr_accessor :table, :client, :key, :cache, :use_master_key, :session_token
@@ -321,7 +327,6 @@ module Parse
           self.use_master_key = value
         elsif expression == :session
           # you can pass a session token or a Parse::Session
-          value = value.respond_to?(:session_token) ? value.session_token : value
           self.session_token = value
         else
           add_constraint(expression, value)
@@ -332,6 +337,18 @@ module Parse
 
     def table=(t)
       @table = t.to_s.camelize
+    end
+
+    def session_token=(value)
+      if value.respond_to?(:session_token) && value.session_token.is_a?(String)
+        value = value.session_token
+      end
+
+      if value.nil? || (value.is_a?(String) && value.present?)
+        @session_token = value
+      else
+        raise ArgumentError, "Invalid session token passed to query."
+      end
     end
 
     # returns the query clause for the particular clause
