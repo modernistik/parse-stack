@@ -83,7 +83,7 @@ module Parse
   #
   #  artist.save
   # For more information about Parse record ACLs, see the documentation on
-  # {https://parseplatform.github.io/docs/rest/guide/#security Security}.
+  # {http://docs.parseplatform.org/rest/guide/#security Security}.
   class ACL < DataType
 
     # @!attribute permissions

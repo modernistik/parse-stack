@@ -74,11 +74,11 @@ module Parse
   # *OAuth-Login*
   #
   # You can signup users using third-party services like Facebook and Twitter as
-  # described in {https://parseplatform.github.io/docs/rest/guide/#signing-up-and-logging-in
+  # described in {http://docs.parseplatform.org/rest/guide/#signing-up
   # Signing Up and Logging In}. To do this with Parse-Stack, you can call the
   # {Parse::User.autologin_service} method by passing the service name and the
   # corresponding authentication hash data. For a listing of supported third-party
-  # authentication services, see {https://github.com/ParsePlatform/parse-server/wiki/OAuth OAuth}.
+  # authentication services, see {http://docs.parseplatform.org/parse-server/guide/#oauth-and-3rd-party-authentication OAuth}.
   #
   #  fb_auth = {}
   #  fb_auth[:id] = "123456789"
@@ -105,12 +105,12 @@ module Parse
   #
   # You can link or unlink user accounts with third-party services like
   # Facebook and Twitter as described in:
-  # {https://parseplatform.github.io/docs/rest/guide/#linking Linking and Unlinking Users}.
+  # {http://docs.parseplatform.org/rest/guide/#linking-users Linking and Unlinking Users}.
   # To do this, you must first get the corresponding authentication data for the
   # specific service, and then apply it to the user using the linking and
   # unlinking methods. Each method returns true or false if the action was
   # successful. For a listing of supported third-party authentication services,
-  # see {https://github.com/ParsePlatform/parse-server/wiki/OAuth OAuth}.
+  # see {http://docs.parseplatform.org/parse-server/guide/#oauth-and-3rd-party-authentication OAuth}.
   #
   #  user = Parse::User.first
   #

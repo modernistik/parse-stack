@@ -13,7 +13,7 @@ require 'active_support/core_ext'
 
 module Parse
   # The {Parse::Query} class provides the lower-level querying interface for
-  # your Parse collections by utilizing the {http://parseplatform.github.io/docs/rest/guide/#queries
+  # your Parse collections by utilizing the {http://docs.parseplatform.org/rest/guide/#queries
   # REST Querying interface}. This is the main engine behind making Parse queries
   # on remote collections. It takes a set of constraints and generates the
   # proper hash parameters that are passed to an API request in order to retrive
@@ -58,7 +58,7 @@ module Parse
   # Most of the constraints supported by Parse are available to `Parse::Query`.
   # Assuming you have a column named `field`, here are some examples. For an
   # explanation of the constraints, please see
-  # {http://parseplatform.github.io/docs/rest/guide/#queries Parse Query Constraints documentation}.
+  # {http://docs.parseplatform.org/rest/guide/#queries Parse Query Constraints documentation}.
   # You can build your own custom query constraints by creating a `Parse::Constraint`
   # subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
   class Query

@@ -10,7 +10,7 @@ module Parse
       # Send analytics data.
       # @param event_name [String] the name of the event.
       # @param metrics [Hash] the metrics to attach to event.
-      # @see https://parseplatform.github.io/docs/rest/guide/#analytics-app-open-analytics Parse Analytics
+      # @see http://docs.parseplatform.org/rest/guide/#analytics Parse Analytics
       def send_analytics(event_name, metrics = {})
         request :post, "events/#{event_name}", body: metrics
       end

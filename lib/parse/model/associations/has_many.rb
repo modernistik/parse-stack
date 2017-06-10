@@ -15,7 +15,7 @@ module Parse
     # to implement your associations, will affect how `has_many` works in
     # Parse-Stack. Parse natively supports one-to-many and many-to-many
     # relationships using `Array` and `Relations`, as described in
-    # {https://parseplatform.github.io/docs/js/guide/#relational-data Parse Relational Data}.
+    # {http://docs.parseplatform.org/js/guide/#relations Parse Relational Data}.
     # Both of these methods require you define a specific column type in your
     # Parse table that will be used to store information about the association.
     #
@@ -169,7 +169,7 @@ module Parse
     # *ParseRelation-Approach*
     #
     # Other than the use of arrays, Parse supports native one-to-many and many-to-many
-    # associations through what is referred to as a {https://parseplatform.github.io/docs/js/guide/#many-to-many-relationships Parse Relation}.
+    # associations through what is referred to as a {http://docs.parseplatform.org/js/guide/#many-to-many Parse Relation}.
     # This is implemented by defining a column to be of type `Relation` which
     # refers to a foreign class. Parse-Stack supports this by passing the
     # `through: :relation` option to the `has_many` method. Designating a column
@@ -183,7 +183,7 @@ module Parse
     #
     # *3*. Applying query constraints for a set of records within a relation is performed against the foreign table class, not the class having the relational column.
     #
-    # The Parse documentation provides more details on associations, see {http://parseplatform.github.io/docs/ios/guide/#relations Parse Relations Guide}.
+    # The Parse documentation provides more details on associations, see {http://docs.parseplatform.org/ios/guide/#relations Parse Relations Guide}.
     # Parse-Stack will handle the work for (2) and (3) automatically.
     #
     # In the example below, a `Band` can have thousands of `Fans`. We setup a

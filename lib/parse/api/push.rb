@@ -12,7 +12,7 @@ module Parse
       # Update the schema for a collection.
       # @param payload [Hash] the paylod for the Push notification.
       # @return [Parse::Response]
-      # @see https://parseplatform.github.io/docs/rest/guide/#sending-pushes Sending Pushes
+      # @see http://docs.parseplatform.org/rest/guide/#sending-pushes Sending Pushes
       def push(payload = {})
         request :post, PUSH_PATH, body: payload.as_json
       end
