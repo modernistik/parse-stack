@@ -82,6 +82,24 @@ module Parse
   #  artist.acl.apply_role "Admins", true, true
   #
   #  artist.save
+  #
+  # You may also set default ACLs for your subclasses by using {Parse::Object.set_default_acl}.
+  # These will be get applied for newly created instances. All subclasses have
+  # public read and write enabled by default.
+  #
+  #  class AdminData < Parse::Object
+  #
+  #    # Disable public read and write
+  #    set_default_acl :public, read: true, write: false
+  #
+  #    # Allow Admin roles to read/write
+  #    set_default_acl 'Admin', role: true, read: true, write: true
+  #
+  #  end
+  #
+  #  data = AdminData.new
+  #  data.acl # => ACL({"role:Admin"=>{"read"=>true, "write"=>true}})
+  #
   # For more information about Parse record ACLs, see the documentation on
   # {http://docs.parseplatform.org/rest/guide/#security Security}.
   class ACL < DataType
@@ -101,20 +119,27 @@ module Parse
       @permissions ||= {}
     end
     # The key field value for public permissions.
-    PUBLIC = "*"
+    PUBLIC = "*".freeze
 
     # Create a new ACL with default Public read/write permissions and any
     # overrides from the input hash format.
     # @param acls [Hash] a Parse-compatible hash acl format.
     # @param owner [Parse::Object] a delegate to receive notifications of acl changes.
     #  This delegate must support receiving `acl_will_change!` method.
-    def initialize(acls = {}, owner: nil)
-      everyone(true, true) # sets Public read/write
+    def initialize(acls = nil, owner: nil)
+      acls = acls.as_json if acls.is_a?(ACL)
+      self.attributes = acls if acls.is_a?(Hash)
       @delegate = owner
-      if acls.is_a?(Hash)
-        self.attributes = acls
-      end
+    end
 
+    # Create a new ACL with default Public read/write permissions and any
+    # overrides from the input hash format.
+    # @param read [Boolean] the read permissions for PUBLIC (default: true)
+    # @param write [Boolean] the write permissions for PUBLIC (default: true)
+    def self.everyone(read = true, write = true)
+      acl = Parse::ACL.new
+      acl.everyone(read, write)
+      acl
     end
 
     # Create a new ACL::Permission instance with the supplied read and write values.
@@ -162,7 +187,7 @@ module Parse
       end
     end
 
-    # Apply a new permission with a given objectId (or tag)
+    # Apply a new permission with a given objectId, tag or :public.
     # @overload apply(user, read = nil, write = nil)
     #  Set the read and write permissions for this user on this ACL.
     #  @param user [Parse::User] the user object.
@@ -175,7 +200,8 @@ module Parse
     #  @param write [Boolean] the write permission.
     # @overload apply(id, read = nil, write = nil)
     #  Set the read and write permissions for this objectId on this ACL.
-    #  @param id [String] the objectId for a {Parse::User}.
+    #  @param id [String|:public] the objectId for a {Parse::User}. If :public is passed,
+    #      then the {Parse::ACL::PUBLIC} read and write permissions will be modified.
     #  @param read [Boolean] the read permission.
     #  @param write [Boolean] the write permission.
     # @return [Hash] the current set of permissions.
@@ -183,12 +209,14 @@ module Parse
     def apply(id, read = nil, write = nil)
       return apply_role(id,read,write) if id.is_a?(Parse::Role)
       id = id.id if id.is_a?(Parse::Pointer)
-      return unless id.present?
+      unless id.present?
+        raise ArgumentError, "Invalid argument applying ACLs: must be either objectId, role or :public"
+      end
+      id = PUBLIC if id.to_sym == :public
       # create a new Permissions
       permission = ACL.permission(read, write)
       # if the input is already an Permission object, then set it directly
       permission = read if read.is_a?(Parse::ACL::Permission)
-
       if permission.is_a?(ACL::Permission)
         if permissions[id.to_s] != permission
           will_change! # dirty track
@@ -215,6 +243,8 @@ module Parse
 
     # Used for object conversion when formatting the input/output value in
     # Parse::Object properties
+    # @param value [Hash] a Parse ACL hash to construct a Parse::ACL instance.
+    # @param delegate [Object] any object that would need to be notified of changes.
     # @return [ACL]
     # @see Parse::DataType
     def self.typecast(value, delegate = nil)
@@ -225,7 +255,6 @@ module Parse
     # in the Permissions hash, since omission means denial of priviledge. If the
     # permission value has neither read or write, then the entire record has been denied
     # all priviledges
-
     # @return [Hash]
     def attributes
       permissions.select {|k,v| v.present? }.as_json

@@ -165,12 +165,12 @@ module Parse
     # to set it to something different.
     class << self
 
-      attr_accessor :disable_serialized_string_date, :parse_class, :acl
-
+      attr_accessor :disable_serialized_string_date, :parse_class
+      attr_reader :default_acls
       # @!attribute disable_serialized_string_date
       #  Disables returning a serialized string date properties when encoding to JSON.
       #  This affects created_at and updated_at fields in order to be backwards compatible with old SDKs.
-      #  @return [Boolean]
+      #  @return [Boolean] the disabled status of whether string dates should be serialized.
 
       # The class method to override the implicitly assumed Parse collection name
       # in your Parse database. The default Parse collection name is the singular form
@@ -195,16 +195,50 @@ module Parse
         @parse_class
       end
 
-      # A method to override the default ACLs for new objects for this particular
-      # subclass.
-      # @param acls [Hash] a hash with key value pairs of ACLs permissions.
-      # @return [ACL] the default ACLs for this class.
-      def acl(acls = {}, owner: nil)
-        acls = {"*" => {read: true, write: false} }.merge( acls ).symbolize_keys
-        @acl ||= Parse::ACL.new(acls, owner: owner)
+      # The set of default ACLs to be applied on newly created instances of this class.
+      # By default, public read and write are enabled.
+      # @see Parse::ACL.everyone
+      # @return [Parse::ACL] the current default ACLs for this class.
+      def default_acls
+        @default_acls ||= Parse::ACL.everyone # default public read/write
       end
 
-    end
+      # A method to set default ACLs to be applied for newly created
+      # instances of this class. All subclasses have public read and write enabled
+      # by default.
+      # @example
+      #  class AdminData < Parse::Object
+      #
+      #    # Disable public read and write
+      #    set_default_acl :public, read: false, write: false
+      #
+      #    # but allow members of the Admin role to read and write
+      #    set_default_acl 'Admin', role: true, read: true, write: true
+      #
+      #  end
+      #
+      #  data = AdminData.new
+      #  data.acl # => ACL({"role:Admin"=>{"read"=>true, "write"=>true}})
+      #
+      # @param id [String|:public] The name for ACL entry. This can be an objectId, a role name or :public.
+      # @param read [Boolean] Whether to allow read permissions (default: false).
+      # @param write [Boolean] Whether to allow write permissions (default: false).
+      # @param role [Boolean] Whether the `id` argument should be applied as a role name.
+      # @see Parse::ACL#apply_role
+      # @see Parse::ACL#apply
+      def set_default_acl(id, read: false, write: false, role: false)
+        unless id.present?
+          raise ArgumentError, "Invalid argument applying #{self}.default_acls : must be either objectId, role or :public"
+        end
+        role ? default_acls.apply_role(id, read, write) : default_acls.apply(id, read, write)
+      end
+
+      # @!visibility private
+      def acl(acls, owner: nil)
+        raise "[#{self}.acl DEPRECATED] - Use `#{self}.default_acl` instead."
+      end
+
+    end # << self
 
     # @return [String] the Parse class for this object.
     # @see Parse::Object.parse_class
@@ -255,9 +289,10 @@ module Parse
         apply_attributes!(opts, dirty_track: !dirty_track)
       end
 
-      if self.acl.blank?
-        self.acl = self.class.acl({}, owner: self) || Parse::ACL.new(owner: self)
-      end
+      # if no ACLs, then apply the class default acls
+      # ACL.typecast will auto convert of Parse::ACL
+      self.acl = self.class.default_acls.as_json if self.acl.nil?
+
       clear_changes! if @id.present? #then it was an import
 
       # do not apply defaults on a pointer because it will stop it from being

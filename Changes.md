@@ -1,5 +1,11 @@
 ## Parse-Stack Changelog
 
+### 1.7.0
+- NEW: You can use `set_default_acl` to set default ACLs for your subclasses.
+- Refactoring of the default ACL system and deprecation of `Parse::Object.acl`
+- Parse::ACL.everyone returns an ACL instance with public read and writes.
+- Documentation updates.
+
 ### 1.6.12
 - NEW: Parse.use_shortnames! to utilize shorter class methods. (optional)
 - NEW: parse-console supports `--url` option to load config from JSON url.

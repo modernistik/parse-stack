@@ -590,6 +590,22 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 
   artist.save
 ```
+You may also set default ACLs for newly created insatnces of your subclasses using `set_default_acl`:
+
+```ruby
+class AdminData < Parse::Object
+
+  # Disable public read and write
+  set_default_acl :public, read: false, write: false
+
+  # but allow members of the Admin role to read and write
+  set_default_acl 'Admin', role: true, read: true, write: true
+
+end
+
+data = AdminData.new
+data.acl # => ACL({"role:Admin"=>{"read"=>true, "write"=>true}})
+```
 
 For more information about Parse record ACLs, see the documentation at  [Security](http://docs.parseplatform.org/rest/guide/#security)
 
