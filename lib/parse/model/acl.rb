@@ -153,9 +153,8 @@ module Parse
 
     # @return [Boolean] whether two ACLs have the same set of priviledges.
     def ==(other_acl)
-      return false unless other_acl.is_a?(self.class)
-      return false if permissions.keys != other_acl.permissions.keys
-      permissions.keys.all? { |per| permissions[per] == other_acl.permissions[per] }
+      return false unless other_acl.is_a?(self.class) || other_acl.is_a?(Hash)
+      as_json == other_acl.as_json
     end
 
     # Set the public read and write permissions.
