@@ -131,7 +131,7 @@ module Parse
     # @!attribute [rw] session_token
     #  Set the session token to send with this API request. A session token is tied to
     #  a logged in {Parse::User}. When sending a session_token in the request,
-    #  this performs the query on behalf of the user (with their allowed priviledges).
+    #  this performs the query on behalf of the user (with their allowed privileges).
     #  Using the short hand (inline) form, you can also pass an authenticated {Parse::User} instance
     #  or a {Parse::Session} instance.
     #  @example

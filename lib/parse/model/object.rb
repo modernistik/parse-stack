@@ -226,6 +226,7 @@ module Parse
       # @param role [Boolean] Whether the `id` argument should be applied as a role name.
       # @see Parse::ACL#apply_role
       # @see Parse::ACL#apply
+      # @version 1.7.0
       def set_default_acl(id, read: false, write: false, role: false)
         unless id.present?
           raise ArgumentError, "Invalid argument applying #{self}.default_acls : must be either objectId, role or :public"

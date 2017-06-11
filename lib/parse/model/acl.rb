@@ -39,10 +39,10 @@ module Parse
   # An ACL represents the dirty-trackable Parse Permissions object used for
   # each record. In Parse, it is composed a hash-like object that represent
   # {Parse::User} objectIds and/or a set of {Parse::Role} names. For each entity
-  # (ex. User/Role/Public), you can define read/write priviledges on a particular
+  # (ex. User/Role/Public), you can define read/write privileges on a particular
   # record through a {Parse::ACL::Permission} instance.
   #
-  # If you want to give priviledges for an action (ex. read/write),
+  # If you want to give privileges for an action (ex. read/write),
   # you set that particular permission it to true. If you want to deny a
   # permission, then you set it to false. Any denied permissions will not be
   # part of the final hash structure that is sent to parse, as omission of a permission
@@ -136,6 +136,7 @@ module Parse
     # overrides from the input hash format.
     # @param read [Boolean] the read permissions for PUBLIC (default: true)
     # @param write [Boolean] the write permissions for PUBLIC (default: true)
+    # @version 1.7.0
     def self.everyone(read = true, write = true)
       acl = Parse::ACL.new
       acl.everyone(read, write)
@@ -150,8 +151,24 @@ module Parse
     def self.permission(read, write = nil)
         ACL::Permission.new(read, write)
     end
-
-    # @return [Boolean] whether two ACLs have the same set of priviledges.
+    # Determines whether two ACLs or a Parse-ACL hash is equivalent to this object.
+    # @example
+    #  acl = Parse::ACL.new
+    #  # create a public read-only ACL
+    #  acl.apply :public, true, false
+    #  acl.as_json # => {'*' => { "read" => true }}
+    #
+    #  create a second instance with similar privileges
+    #  acl2 = Parse::ACL.everyone(true, false)
+    #  acl2.as_json # => {'*' => { "read" => true }}
+    #
+    #  acl == acl2 # => true
+    #  acl == {'*' => { "read" => true }} # hash ok too
+    #
+    #  acl2.apply_role 'Admin', true, true # rw for Admins
+    #  acl == acl2 # => false
+    #
+    # @return [Boolean] whether two ACLs have the same set of privileges.
     def ==(other_acl)
       return false unless other_acl.is_a?(self.class) || other_acl.is_a?(Hash)
       as_json == other_acl.as_json
@@ -253,7 +270,7 @@ module Parse
     # Used for JSON serialization. Only if an attribute is non-nil, do we allow it
     # in the Permissions hash, since omission means denial of priviledge. If the
     # permission value has neither read or write, then the entire record has been denied
-    # all priviledges
+    # all privileges
     # @return [Hash]
     def attributes
       permissions.select {|k,v| v.present? }.as_json
@@ -308,7 +325,7 @@ module Parse
       # @return [Boolean] whether this permission is allowed.
       attr_reader :write
 
-      # Create a new permission with the given read and write priviledges.
+      # Create a new permission with the given read and write privileges.
       # @overload new(read = nil, write = nil)
       #  @param read [Boolean] whether reading is allowed.
       #  @param write [Boolean] whether writing is allowed.

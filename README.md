@@ -622,10 +622,10 @@ session.user # the Parse user for this session
 # or fetch user with a session token
 user = Parse::User.session(token)
 
-# save an object with the priviledges (ACLs) of this user
+# save an object with the privileges (ACLs) of this user
 some_object.save( session: user.session_token )
 
-# delete an object with the priviledges of this user
+# delete an object with the privileges of this user
 some_object.destroy( session: user.session_token )
 
 ```

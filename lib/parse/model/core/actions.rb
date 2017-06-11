@@ -511,7 +511,7 @@ module Parse
       # we will create the object. If the object has an id, we will update the record.
       #
       # You may pass a session token to the `session` argument to perform this actions
-      # with the priviledges of a certain user.
+      # with the privileges of a certain user.
       #
       # You can define before and after :save callbacks
       # autoraise: set to true will automatically raise an exception if the save fails
