@@ -322,7 +322,7 @@ module Parse
       #
       def initialize(r_perm = nil, w_perm = nil)
         if r_perm.is_a?(Hash)
-          r_perm.symbolize_keys!
+          r_perm = r_perm.symbolize_keys
           @read = r_perm[:read].present?
           @write = r_perm[:write].present?
         else

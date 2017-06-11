@@ -157,8 +157,8 @@ module Parse
         # @see Parse::Model.autosave_on_create
         def first_or_create(query_attrs = {}, resource_attrs = {})
 
-          query_attrs.symbolize_keys!
-          resource_attrs.symbolize_keys!
+          query_attrs = query_attrs.symbolize_keys
+          resource_attrs = resource_attrs.symbolize_keys
           obj = query(query_attrs).first
 
           if obj.blank?

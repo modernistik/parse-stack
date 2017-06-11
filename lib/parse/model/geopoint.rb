@@ -116,7 +116,7 @@ module Parse
     # or with an array of two items where the first is the lat and the second is the lng (ex. [32.22,-118.81])
     def attributes=(h)
       if h.is_a?(Hash)
-        h.symbolize_keys!
+        h = h.symbolize_keys
         @latitude = h[:latitude].to_f || h[:lat].to_f || @latitude
         @longitude = h[:longitude].to_f || h[:lng].to_f ||  @longitude
       elsif h.is_a?(Array) && h.count == 2
