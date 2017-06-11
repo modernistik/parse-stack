@@ -3,7 +3,8 @@
 require 'optparse'
 require 'json'
 require 'open-uri'
-require 'active_support/all'
+require 'active_support'
+require 'active_support/core_ext'
 
 DEFAULT_CONFIG_FILE = 'config.json'
 DEFAULT_CONFIG_CONTENTS = {
