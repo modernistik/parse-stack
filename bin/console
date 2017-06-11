@@ -6,16 +6,20 @@ require 'dotenv'
 require 'byebug'
 Dotenv.load
 
-Parse.setup # cache: 'redis://localhost:6379'
+def setup
+  Parse.setup # cache: 'redis://localhost:6379'
 
-puts "[ParseServerURL] #{Parse.client.server_url}"
-puts "[ParseAppID]     #{Parse.client.app_id}"
+  puts "[ParseServerURL] #{Parse.client.server_url}"
+  puts "[ParseAppID]     #{Parse.client.app_id}"
 
-if Parse.client.master_key.present?
-  Parse.auto_generate_models!.each do |model|
-    puts "Generated #{model}"
+  if Parse.client.master_key.present?
+    Parse.auto_generate_models!.each do |model|
+      puts "Generated #{model}"
+    end
   end
+
 end
+puts "Type 'setup' to connect to Parse-Server"
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
 
