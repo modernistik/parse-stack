@@ -3,6 +3,7 @@ require 'minitest/pride'
 require 'byebug'
 require_relative '../lib/parse/stack.rb'
 
+Parse.use_shortnames!
 
 module ConstraintTests
 

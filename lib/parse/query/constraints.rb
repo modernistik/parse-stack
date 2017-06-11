@@ -663,6 +663,50 @@ module Parse
       end
     end
 
+    # Equivalent to the `$geoWithin` Parse query operation and `$polygon` geopoints
+    # constraint. The polygon area is defined by a list of {Parse::GeoPoint}
+    # objects that make up the enclosed area. A polygon query should have 3 or more geopoints.
+    # Please note that some Geo queries that cross the international date lines are not currently
+    # supported by Parse.
+    #
+    #  # As many points as you want, minimum 3
+    #  q.where :field.within_polygon => [geopoint1, geopoint2, geopoint3]
+    #
+    #  # Polygon for the Bermuda Triangle
+    #  bermuda  = Parse::GeoPoint.new 32.3078000,-64.7504999 # Bermuda
+    #  miami    = Parse::GeoPoint.new 25.7823198,-80.2660226 # Miami, FL
+    #  san_juan = Parse::GeoPoint.new 18.3848232,-66.0933608 # San Juan, PR
+    #
+    #  # get all sunken ships inside the Bermuda Triangle
+    #  SunkenShip.all :location.within_polygon => [bermuda, san_juan, miami]
+    #
+    class WithinPolygonQueryConstraint < Constraint
+      # @!method within_polygon
+      # A registered method on a symbol to create the constraint. Maps to Parse
+      # operator "$geoWithin" with "$polygon" subconstraint. Takes an array of {Parse::GeoPoint} objects.
+      # @example
+      #  # As many points as you want
+      #  q.where :field.within_polygon => [geopoint1, geopoint2, geopoint3]
+      # @return [WithinPolygonQueryConstraint]
+      # @version 1.7.0 (requires Server v2.4.2 or later)
+      contraint_keyword :$geoWithin
+      register :within_polygon
+
+      # @return [Hash] the compiled constraint.
+      def build
+        geopoint_values = formatted_value
+        unless geopoint_values.is_a?(Array) &&
+               geopoint_values.all? {|point| point.is_a?(Parse::GeoPoint) } &&
+               geopoint_values.count > 2
+          raise ArgumentError, '[Parse::Query] Invalid query value parameter passed to'\
+                      ' `within_polygon` constraint: Value must be an array with 3'\
+                      ' or more `Parse::GeoPoint` objects'
+        end
+
+        { @operation.operand => { :$geoWithin => { :$polygon => geopoint_values } } }
+      end
+    end
+
   end
 
 end

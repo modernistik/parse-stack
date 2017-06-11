@@ -20,6 +20,10 @@ def setup
 
 end
 puts "Type 'setup' to connect to Parse-Server"
+
+# Create shortnames
+Parse.use_shortnames!
+
 # You can add fixtures and/or initialization code here to make experimenting
 # with your gem easier. You can also use a different console, if you like.
 

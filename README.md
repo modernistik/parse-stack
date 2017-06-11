@@ -153,6 +153,7 @@ result = Parse.call_function :myFunctionName, {param: value}
   - [Parse::ACL](#parseacl)
   - [Parse::Session](#parsesession)
   - [Parse::Installation](#parseinstallation)
+  - [Parse::Product](#parseproduct)
   - [Parse::Role](#parserole)
   - [Parse::User](#parseuser)
     - [Signup](#signup)
@@ -188,6 +189,7 @@ result = Parse.call_function :myFunctionName, {param: value}
 - [Creating, Saving and Deleting Records](#creating-saving-and-deleting-records)
   - [Create](#create)
   - [Saving](#saving)
+  - [Saving applying User ACLs](#saving-applying-user-acls)
     - [Raising an exception when save fails](#raising-an-exception-when-save-fails)
   - [Modifying Associations](#modifying-associations)
   - [Batch Requests](#batch-requests)
@@ -229,6 +231,7 @@ result = Parse.call_function :myFunctionName, {param: value}
   - [Geo Queries](#geo-queries)
     - [Max Distance Constraint](#max-distance-constraint)
     - [Bounding Box Constraint](#bounding-box-constraint)
+    - [Polygon Area Constraint](#polygon-area-constraint)
   - [Relational Queries](#relational-queries)
   - [Compound Queries](#compound-queries)
 - [Query Scopes](#query-scopes)
@@ -244,7 +247,8 @@ result = Parse.call_function :myFunctionName, {param: value}
   - [Register Webhooks](#register-webhooks)
 - [Parse REST API Client](#parse-rest-api-client)
   - [Request Caching](#request-caching)
-- [Development](#development)
+- [Contributing](#contributing)
+- [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -1761,7 +1765,7 @@ The `where` clause is based on utilizing a set of constraints on the defined col
 { :column.constraint => value }
 ```
 
-## Query Constraints
+## [Query Constraints](https://www.modernistik.com/gems/parse-stack/Parse/Constraint.html)
 Most of the constraints supported by Parse are available to `Parse::Query`. Assuming you have a column named `field`, here are some examples. For an explanation of the constraints, please see [Parse Query Constraints documentation](http://docs.parseplatform.org/rest/guide/#queries). You can build your own custom query constraints by creating a `Parse::Constraint` subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
 
 #### Equals
@@ -1974,7 +1978,7 @@ Song.all :artist => Artist.pointer(artist_id)
 Song.all :artist => Parse::Pointer.new("Artist", artist_id)
 ```
 
-### Geo Queries
+### [Geo Queries](https://www.modernistik.com/gems/parse-stack/Parse/Constraint/NearSphereQueryConstraint.html)
 Equivalent to the `$nearSphere` Parse query operation. This is only applicable if the field is of type `GeoPoint`. This will query Parse and return a list of results ordered by distance with the nearest object being first.
 
 ```ruby
@@ -2000,7 +2004,7 @@ PlaceObject.all :location.near => geopoint.max_miles(10)
 
 We will support `$maxDistanceInKilometers` (for kms) and `$maxDistanceInRadians` (for radian angle) in the future.
 
-#### Bounding Box Constraint
+#### [Bounding Box Constraint](https://www.modernistik.com/gems/parse-stack/Parse/Constraint/WithinGeoBoxQueryConstraint.html)
 Equivalent to the `$within` Parse query operation and `$box` geopoint constraint. The rectangular bounding box is defined by a southwest point as the first parameter, followed by the a northeast point. Please note that Geo box queries that cross the international date lines are not currently supported by Parse.
 
 ```ruby
@@ -2013,6 +2017,22 @@ ne = Parse::GeoPoint.new 36.12, -115.31 # Las Vegas
 
 # get all PlaceObjects inside this bounding box
 PlaceObject.all :location.within_box => [sw,ne]
+```
+
+#### [Polygon Area Constraint](https://www.modernistik.com/gems/parse-stack/Parse/Constraint/WithinPolygonQueryConstraint.html)
+Equivalent to the `$geoWithin` Parse query operation and `$polygon` geopoint constraint. The polygon area is described by a list of `Parse::GeoPoint` objects and should contain 3 or more points. This feature is only available in Parse-Server version 2.4.2 and later.
+
+```ruby
+ # As many points as you want, minimum 3
+ q.where :field.within_polygon => [geopoint1, geopoint2, geopoint3]
+
+ # Polygon for the Bermuda Triangle
+ bermuda  = Parse::GeoPoint.new 32.3078000,-64.7504999 # Bermuda
+ miami    = Parse::GeoPoint.new 25.7823198,-80.2660226 # Miami, FL
+ san_juan = Parse::GeoPoint.new 18.3848232,-66.0933608 # San Juan, PR
+
+ # get all sunken ships inside the Bermuda Triangle
+ SunkenShip.all :location.within_polygon => [bermuda, san_juan, miami]
 ```
 
 ### Relational Queries

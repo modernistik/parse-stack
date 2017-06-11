@@ -2,6 +2,7 @@
 
 ### 1.7.0
 - NEW: You can use `set_default_acl` to set default ACLs for your subclasses.
+- NEW: Support for `withinPolygon` query constraint.
 - Refactoring of the default ACL system and deprecation of `Parse::Object.acl`
 - Parse::ACL.everyone returns an ACL instance with public read and writes.
 - Documentation updates.
