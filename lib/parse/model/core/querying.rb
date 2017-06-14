@@ -205,6 +205,9 @@ module Parse
         #      # ... do something with song..
         #  end
         #
+        # @note This method will continually query for records by automatically
+        #   incrementing the *:skip* parameter until no more results are returned
+        #   by the server.
         # @return [Array<Parse::Object>] an array of matching objects. If a block is passed,
         #  an empty array is returned.
         def all(constraints = {limit: :max})

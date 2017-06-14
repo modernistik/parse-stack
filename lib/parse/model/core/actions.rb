@@ -169,58 +169,12 @@ module Parse
           obj
         end
 
-        # This methods allow you to efficiently iterate over all the records in the collection
-        # (lower memory cost) at a minor cost of performance. This method utilizes
-        # the `created_at` field of Parse records to order and iterate over all records,
-        # therefore you should not use this method if you want to perform a query
-        # with constraints against `created_at` field or need specific type of ordering.
-        # @param constraints [Hash] a set of query constraints.
-        # @yield a block which will iterate through each matching record.
-        # @example
-        #
-        #  post = Post.first
-        #  # iterate over all comments matching conditions
-        #  Comments.each( post: post) do |comment|
-        #    # ...
-        #  end
-        # @return [Parse::Object] the last Parse::Object record processed.
-        def each(constraints = {}, **opts, &block)
-          #anchor_date = opts[:anchor_date] || Parse::Date.now
-          batch_size = 250
-          start_cursor = first( order: :created_at.asc, keys: :created_at )
-          constraints.merge! cache: false, limit: batch_size, order: :created_at.asc
-          all_query = query(constraints)
-          cursor = start_cursor
-          # the exclusion set is a set of ids not to include the next query.
-          exclusion_set = []
-          loop do
-            _q = query(constraints.dup)
-            _q.where(:created_at.on_or_after => cursor.created_at)
-            # set of ids not to include in the next query. non-performant, but accurate.
-            _q.where(:id.nin => exclusion_set) unless exclusion_set.empty?
-            results = _q.results # get results
-
-            break cursor if results.empty? # break if no results
-            results.each(&block)
-            next_cursor = results.last
-            # break if we got less than the maximum requested
-            break next_cursor if results.count < batch_size
-            # break if the next object is the same as the current object.
-            break next_cursor if cursor.id == next_cursor.id
-            # The exclusion set is used in the case where multiple records have the exact
-            # same created_at date (down to the microsecond). This prevents getting the same
-            # record in the next query request.
-            exclusion_set = results.select { |r| r.created_at == next_cursor.created_at }.map(&:id)
-            results = nil
-            cursor = next_cursor
-          end
-
-        end
-
         # Auto save all objects matching the query constraints. This method is
         # meant to be used with a block. Any objects that are modified in the block
         # will be batched for a save operation. This uses the `updated_at` field to
         # continue to query for all matching objects that have not been updated.
+        # If you need to use `:updated_at` in your constraints, consider using {Parse::Core::Querying#all} or
+        # {Parse::Core::Querying#each}
         # @param constraints [Hash] a set of query constraints.
         # @yield a block which will iterate through each matching object.
         # @example
@@ -230,8 +184,18 @@ module Parse
         #    # .. modify comment ...
         #    # it will automatically be saved
         #  end
+        # @note You cannot use *:updated_at* as a constraint.
         # @return [Boolean] whether there were any errors.
         def save_all(constraints = {})
+          invalid_constraints = constraints.keys.any? do |k|
+            (k == :updated_at || k == :updatedAt) ||
+            ( k.is_a?(Parse::Operation) && (k.operand == :updated_at || k.operand == :updatedAt) )
+          end
+          if invalid_constraints
+            raise ArgumentError,
+              "[#{self}] Special method save_all() cannot be used with an :updated_at constraint."
+          end
+
           force = false
           batch_size = 250
           iterator_block = nil
@@ -262,7 +226,7 @@ module Parse
 
             # verify we didn't get duplicates fetches
             if cursor.is_a?(Parse::Object) && results.any? { |x| x.id == cursor.id }
-              warn "[Parse::SaveAll] Unbounded update detected with id #{cursor.id}."
+              warn "[#{self}.save_all] Unbounded update detected with id #{cursor.id}."
               has_errors = true
               break cursor
             end
@@ -284,7 +248,7 @@ module Parse
               update_query.where :updated_at.gte => cursor.updated_at
 
               if cursor.updated_at.present? && cursor.updated_at > anchor_date
-                warn "[Parse::SaveAll] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
+                warn "[#{self}.save_all] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
                 break cursor
               end
 

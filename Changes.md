@@ -1,8 +1,11 @@
 ## Parse-Stack Changelog
 
 ### 1.7.1
-- FIXES: Fixes issues with HTTP Method Override for long url queries.
-
+- FIXED: Fixes issues with HTTP Method Override for long url queries.
+- FIXED: Fixes issue with Parse::Object.each method signature.
+- Parse::Object save_all() and each() methods raise ArgumentError for
+  invalid constraint arguments.
+  
 ### 1.7.0
 - NEW: You can use `set_default_acl` to set default ACLs for your subclasses.
 - NEW: Support for `withinPolygon` query constraint.
