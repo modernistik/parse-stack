@@ -128,6 +128,68 @@ module Parse
           query.where(conditions)
         end
 
+        # This methods allow you to efficiently iterate over all the records in the collection
+        # (lower memory cost) at a minor cost of performance. This method utilizes
+        # the `created_at` field of Parse records to order and iterate over *all* matching records,
+        # therefore you should not use this method if you want to perform a query
+        # with constraints against the `created_at` field or need specific type of ordering.
+        # If you need to use `:created_at` in your constraints, consider using {Parse::Core::Querying#all} or
+        # {Parse::Core::Actions::ClassMethods#save_all}
+        # @param constraints [Hash] a set of query constraints.
+        # @yield a block which will iterate through each matching record.
+        # @example
+        #
+        #  post = Post.first
+        #  # iterate over all comments matching conditions
+        #  Comment.each(post: post) do |comment|
+        #     # ...
+        #  end
+        # @return [Parse::Object] the last Parse::Object record processed.
+        # @note You cannot use *:created_at* as a constraint.
+        # @raise ArgumentError if :created_at is detected in the constraints argument.
+        # @see Parse::Core::Querying.all
+        # @see Parse::Core::Actions.save_all
+        def each(constraints = {}, &block)
+          # verify we don't hvae created at as a constraint, otherwise this will not work
+          invalid_constraints = constraints.keys.any? do |k|
+            (k == :created_at || k == :createdAt) ||
+            ( k.is_a?(Parse::Operation) && (k.operand == :created_at || k.operand == :createdAt) )
+          end
+          if invalid_constraints
+            raise ArgumentError, "[#{self.class}.each] Special method each()" \
+                                 "cannot be used with a :created_at constraint."
+          end
+          batch_size = 250
+          start_cursor = first( order: :created_at.asc, keys: :created_at )
+          constraints.merge! cache: false, limit: batch_size, order: :created_at.asc
+          all_query = query(constraints)
+          cursor = start_cursor
+          # the exclusion set is a set of ids not to include the next query.
+          exclusion_set = []
+          loop do
+            _q = query(constraints.dup)
+            _q.where(:created_at.on_or_after => cursor.created_at)
+            # set of ids not to include in the next query. non-performant, but accurate.
+            _q.where(:id.nin => exclusion_set) unless exclusion_set.empty?
+            results = _q.results # get results
+
+            break cursor if results.empty? # break if no results
+            results.each(&block)
+            next_cursor = results.last
+            # break if we got less than the maximum requested
+            break next_cursor if results.count < batch_size
+            # break if the next object is the same as the current object.
+            break next_cursor if cursor.id == next_cursor.id
+            # The exclusion set is used in the case where multiple records have the exact
+            # same created_at date (down to the microsecond). This prevents getting the same
+            # record in the next query request.
+            exclusion_set = results.select { |r| r.created_at == next_cursor.created_at }.map(&:id)
+            results = nil
+            cursor = next_cursor
+          end
+
+        end
+
         # Fetch all matching objects in this collection matching the constraints.
         # This will be the most common way when querying Parse objects for a subclass.
         # When no block is passed, all objects are returned. Using a block is more memory
