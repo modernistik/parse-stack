@@ -95,7 +95,7 @@ module Parse
     #  # => [artist's songs created in the last 6 months]
     #
     # You may also call property methods in your scopes related to the instance.
-    # You also have access to the instance object for the local class
+    # *Note:* You also have access to the instance object for the local class
     # through a special "*i*" method in the scope.
     #
     #  class Concert
@@ -220,10 +220,9 @@ module Parse
     #  fans = band.fans.all :location.near => downtown
     #
     # You can perform atomic additions and removals of objects from `has_many`
-    # relations. Parse allows this by providing a specific atomic operation
-    # request. You can use the methods below to perform these types of atomic
-    # operations. The operation is performed directly on Parse server
-    # and not on your instance object.
+    # relations using the methods below. Parse allows this by providing a specific atomic operation
+    # request. The operation is performed directly on Parse server
+    # and *NOT* on your instance object.
     #
     #  # atomically add/remove
     #  band.artists.add! objects  # { __op: :AddUnique }
@@ -239,6 +238,35 @@ module Parse
     #  # atomically perform a delete operation on this field name
     #  # this should set it as `undefined`.
     #  band.op_destroy!("category") # { __op: :Delete }
+    #
+    # You can also perform queries against class entities to find related objects. Assume
+    # that users can like a band. The `Band` class can have a `likes` column that is
+    # a Parse relation to the {Parse::User} class containing the users who have liked a
+    # specific band.
+    #
+    #
+    #   class Band < Parse::Object
+    #     # likes is a Parse relation column of user objects.
+    #     has_many :likes, through: :relation, as: :user
+    #   end
+    #
+    # You can now find all {Parse::User} records who have liked a specific band. In the
+    # example below, the `:likes` key refers to the `likes` column defined in the `Band`
+    # collection which contains the set of user records.
+    #
+    #   band = Band.first # get a band
+    #
+    #   # find all users who have liked this band, where :likes is a column
+    #   # in the Band collection - NOT in the User collection.
+    #   users = Parse::User.all :likes.related_to => band
+    #
+    # You can also find all bands that a specific user has liked.
+    #
+    #   user = Parse::User.first
+    #
+    #   # find all bands where this user
+    #   # is in the `likes` column of the Band collection
+    #   bands_liked_by_user = Band.all :likes => user
     #
     module HasMany
 
@@ -367,7 +395,7 @@ module Parse
             end
 
             Parse::Query.apply_auto_introspection!(query)
-            
+
             return query if block.nil?
             query.results(&block)
           end

@@ -1264,6 +1264,38 @@ band.op_destroy!("category") # { __op: :Delete }
 
 ```
 
+You can also perform queries against class entities to find related objects. Assume
+that users can like a band. The `Band` class can have a `likes` column that is
+a Parse relation to the `Parse::User` class containing the users who have liked a
+specific band.
+
+```ruby
+  # assume the schema
+  class Band < Parse::Object
+    # likes is a Parse relation column of user objects.
+    has_many :likes, through: :relation, as: :user
+  end
+```
+
+You can now find all `Parse::User` records who have liked a specific band. *In the
+example below, the `:likes` key refers to the `likes` column defined in the `Band`
+collection which contains the set of user records.*
+
+```ruby
+  band = Band.first # get a band
+  # find all users who have liked this band, where :likes is a column
+  # in the Band collection - NOT in the User collection.
+  users = Parse::User.all :likes.related_to => band
+```
+You can also find all bands that a specific user has liked.
+
+```ruby
+  user = Parse::User.first
+  # find all bands where this user is contained in the `likes` Parse relation column
+  # of the Band collection
+  bands_liked_by_user = Band.all :likes => user
+```
+
 ##### Options
 Options for `has_many` are the same as the `belongs_to` counterpart with support for `:required`, `:as` and `:field`. It has these additional options.
 
@@ -2044,11 +2076,28 @@ Equivalent to the `$relatedTo` Parse query operation. If you want to retrieve ob
 ```ruby
 q.where :field.related_to => pointer
 q.where :field.rel => pointer # alias
+```
 
-# example
-# find all Users who have liked this post object
+In the example below, imagine you have a `Post` collection that has a Parse relation column `likes`
+which has the set of users who have liked a certain post. You would use the `Parse::Users` class to query
+against the `post` record of interest against the `likes` column of the `Post` collection.
+
+```ruby
+# assume Post class definition
+class Post < Parse::Object
+  # Parse relation to Parse::User records who've liked a post
+  has_many :likes, through: :relation, as: :user
+end
+
 post = Post.first
+# find all Users who have liked this post object,
+# where likes is a column on the Post class.
 users = Parse::User.all :likes.rel => post
+
+# or find posts that a certain user has liked
+user = Parse::User.first
+# likes is a Parse relation in the Post collection that contains User records
+liked_posts_by_user = Post.all :likes => user
 ```
 
 ### Compound Queries
