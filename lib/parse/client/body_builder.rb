@@ -31,7 +31,8 @@ module Parse
       include Parse::Protocol
       # Header sent when a GET requests exceeds the limit.
       HTTP_METHOD_OVERRIDE = 'X-Http-Method-Override'
-
+      # Maximum url length for most server requests before HTTP Method Override is used.
+      MAX_URL_LENGTH = 2_000.freeze
       class << self
         # Allows logging. Set to `true` to enable logging, `false` to disable.
         # You may specify `:debug` for additional verbosity.
@@ -51,7 +52,7 @@ module Parse
         # (which is most likely a very complicated query), we need to override the request method
         # to be POST instead of GET and send the query parameters in the body of the POST request.
         # The standard maximum POST request (which is a server setting), is usually set to 20MBs
-        if env[:method] == :get && env[:url].to_s.length > 2_000
+        if env[:method] == :get && env[:url].to_s.length >= MAX_URL_LENGTH
           env[:request_headers][HTTP_METHOD_OVERRIDE] = 'GET'
           env[:request_headers][CONTENT_TYPE] = 'application/x-www-form-urlencoded'
           # parse-sever looks for method overrides in the body under the `_method` param.
