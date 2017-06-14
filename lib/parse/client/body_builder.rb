@@ -22,7 +22,7 @@ module Parse
   def self.logging=(value)
     Parse::Middleware::BodyBuilder.logging = value
   end
-  
+
   # Namespace for Parse-Stack related middleware.
   module Middleware
     # This middleware takes an incoming Parse response, after an outgoing request,
@@ -30,7 +30,7 @@ module Parse
     class BodyBuilder < Faraday::Middleware
       include Parse::Protocol
       # Header sent when a GET requests exceeds the limit.
-      HTTP_OVERRIDE = 'X-Http-Method-Override'
+      HTTP_METHOD_OVERRIDE = 'X-Http-Method-Override'
 
       class << self
         # Allows logging. Set to `true` to enable logging, `false` to disable.
@@ -52,9 +52,11 @@ module Parse
         # to be POST instead of GET and send the query parameters in the body of the POST request.
         # The standard maximum POST request (which is a server setting), is usually set to 20MBs
         if env[:method] == :get && env[:url].to_s.length > 2_000
-          env[:request_headers][HTTP_OVERRIDE] = 'GET'
+          env[:request_headers][HTTP_METHOD_OVERRIDE] = 'GET'
           env[:request_headers][CONTENT_TYPE] = 'application/x-www-form-urlencoded'
-          env[:body] = env[:url].query
+          # parse-sever looks for method overrides in the body under the `_method` param.
+          # so we will add it to the query string, which will now go into the body.
+          env[:body] = "_method=GET&" + env[:url].query
           env[:url].query = nil
           #override
           env[:method] = :post

@@ -1,5 +1,8 @@
 ## Parse-Stack Changelog
 
+### 1.7.1
+- FIXES: Fixes issues with HTTP Method Override for long url queries.
+
 ### 1.7.0
 - NEW: You can use `set_default_acl` to set default ACLs for your subclasses.
 - NEW: Support for `withinPolygon` query constraint.
