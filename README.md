@@ -576,10 +576,10 @@ event.time_zone.name # => 'America/Los_Angeles'
 event.time_zone.valid? # => true
 
 event.time_zone.zone # => ActiveSupport::TimeZone
-event.time_zone.zone.formatted_offset # => "-08:00"
+event.time_zone.formatted_offset # => "-08:00"
 
 event.time_zone = 'Europe/Paris'
-event.time_zone.zone.formatted_offset # => +01:00"
+event.time_zone.formatted_offset # => +01:00"
 
 event.time_zone = 'Galaxy/Andromeda'
 event.time_zone.valid? # => false

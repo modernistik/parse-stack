@@ -29,10 +29,10 @@ module Parse
   #  event.time_zone.valid? # => true
   #
   #  event.time_zone.zone # => ActiveSupport::TimeZone
-  #  event.time_zone.zone.formatted_offset # => "-08:00"
+  #  event.time_zone.formatted_offset # => "-08:00"
   #
   #  event.time_zone = 'Europe/Paris'
-  #  event.time_zone.zone.formatted_offset # => +01:00"
+  #  event.time_zone.formatted_offset # => +01:00"
   #
   #  event.time_zone = 'Galaxy/Andromeda'
   #  event.time_zone.valid? # => false
@@ -40,6 +40,16 @@ module Parse
   class TimeZone
     # The mapping of TimeZones
     MAPPING = ActiveSupport::TimeZone::MAPPING
+
+    # Create methods based on the allowable public methods on ActiveSupport::TimeZone.
+    # Basically sets up sending forwarding calls to the `zone` object for a Parse::TimeZone object.
+    (ActiveSupport::TimeZone.public_instance_methods(false) - [:to_s, :name, :as_json]).each do |meth|
+      Parse::TimeZone.class_eval do
+        define_method meth do |*args|
+          zone.send meth, *args
+        end
+      end
+    end
 
     # Creates a new instance given the IANA identifier (ex. America/Los_Angeles)
     # @overload initialize(iana)
@@ -64,6 +74,7 @@ module Parse
     end
 
     # @!attribute [rw] name
+    # @raise ArgumentError if value is not a string type.
     # @return [String] the IANA identifier for this time zone.
     def name
       @zone.present? ? zone.name : @name
@@ -84,6 +95,7 @@ module Parse
     # {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html ActiveSupport::TimeZone}
     # object.
     # @see #name
+    # @raise ArgumentError
     # @return [ActiveSupport::TimeZone]
     def zone
       # lazy load the TimeZone object only when the user requests it, otherwise
