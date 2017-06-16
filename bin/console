@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
 
 require "bundler/setup"
-require "parse/stack"
-require 'dotenv'
 require 'byebug'
+require 'dotenv'
+require "parse/stack"
+
 Dotenv.load
 
 def setup

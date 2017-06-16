@@ -20,7 +20,7 @@ module Parse
   # supported in Parse and mapping them between their remote names with their local ruby named attributes.
   module Properties
     # These are the base types supported by Parse.
-    TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl].freeze
+    TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl, :timezone].freeze
     # These are the base mappings of the remote field name types.
     BASE = {objectId: :string, createdAt: :date, updatedAt: :date, ACL: :acl}.freeze
     # The list of properties that are part of all objects
@@ -107,10 +107,16 @@ module Parse
         if data_type.is_a?(Hash)
           opts.merge!(data_type)
           data_type = :string
+          # future: automatically use :timezone datatype for timezone-like fields.
+          # when the data_type was not specifically set.
+          # data_type = :timezone if key == :time_zone || key == :timezone
         end
+
+        data_type = :timezone if data_type == :string && (key == :time_zone || key == :timezone)
 
         # allow :bool for :boolean
         data_type = :boolean if data_type == :bool
+        data_type = :timezone if data_type == :time_zone
         data_type = :geopoint if data_type == :geo_point
         data_type = :integer if data_type == :int || data_type == :number
 
@@ -159,6 +165,15 @@ module Parse
           validates_presence_of key
         end
 
+        # timezone datatypes are basically enums based on IANA time zone identifiers.
+        if data_type == :timezone
+          validates_each key do |record, attribute, value|
+            # Parse::TimeZone objects have a `valid?` method to determine if the timezone is valid.
+            unless value.nil? || value.valid?
+              record.errors.add(attribute, "field :#{attribute} must be a valid IANA time zone identifier.")
+            end
+          end # validates_each
+        end # data_type == :timezone
 
         is_enum_type = opts[:enum].nil? == false
 
@@ -227,7 +242,9 @@ module Parse
             end
           end # unless scopes
 
-        end
+        end # if is enum
+
+
 
         symbolize_value = opts[:symbolize]
 
@@ -572,6 +589,8 @@ module Parse
         #  pus "[Parse::Stack] Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
         #   raise ValueError, "Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
         end
+      when :timezone
+        val = Parse::TimeZone.new(val) if val.present?
       else
         # You can provide a specific class instead of a symbol format
         if data_type.respond_to?(:typecast)

@@ -1,6 +1,9 @@
 ## Parse-Stack Changelog
 
 ### 1.7.1
+- NEW: :timezone datatype that maps to Parse::TimeZone (which mimics ActiveSupport::TimeZone)
+- NEW: Installation :time_zone field is now a Parse::TimeZone instance.
+- Any properties named `time_zone` or `timezone` with a string data type set will be converted to use Parse::TimeZone as the data class.
 - FIXED: Fixes issues with HTTP Method Override for long url queries.
 - FIXED: Fixes issue with Parse::Object.each method signature.
 - Parse::Object save_all() and each() methods raise ArgumentError for

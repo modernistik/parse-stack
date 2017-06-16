@@ -90,7 +90,7 @@ module Parse
 
     end
 
-    # @return [Hash]
+    # @return [Hash] attributes for a Parse GeoPoint.
     def attributes
       ATTRIBUTES
     end

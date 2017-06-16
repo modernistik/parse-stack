@@ -153,6 +153,7 @@ result = Parse.call_function :myFunctionName, {param: value}
   - [Parse::GeoPoint](#parsegeopoint)
     - [Calculating Distances between locations](#calculating-distances-between-locations)
   - [Parse::Bytes](#parsebytes)
+  - [Parse::TimeZone](#parsetimezone)
   - [Parse::ACL](#parseacl)
   - [Parse::Session](#parsesession)
   - [Parse::Installation](#parseinstallation)
@@ -517,7 +518,7 @@ This class manages dates in the special JSON format it requires for properties o
 
 One important note with dates, is that `created_at` and `updated_at` columns do not follow this convention all the time. Depending on the Cloud Code SDK, they can be the Parse ISO hash date format or the `iso8601` string format. By default, these are serialized as `iso8601` when sent as responses to Parse for backwards compatibility with some clients. To use the Parse ISO hash format for these fields instead, set `Parse::Object.disable_serialized_string_date = true`.
 
-### Parse::GeoPoint
+### [Parse::GeoPoint](https://www.modernistik.com/gems/parse-stack/Parse/GeoPoint.html)
 This class manages the GeoPoint data type that Parse provides to support geo-queries. To define a GeoPoint property, use the `:geopoint` data type. Please note that latitudes should not be between -90.0 and 90.0, and longitudes should be between -180.0 and 180.0.
 
 ```ruby
@@ -559,6 +560,29 @@ The `Bytes` data type represents the storage format for binary content in a Pars
   bytes.encode( content ) # same as Base64.encode64
 
   decoded = bytes.decoded # same as Base64.decode64
+```
+
+### [Parse::TimeZone](https://www.modernistik.com/gems/parse-stack/Parse/TimeZone.html)
+While Parse does not provide a native time zone data type, Parse-Stack provides a class to make it easier to manage time zone attributes, usually stored IANA string identifiers, with your ruby code. This is done by utilizing the features provided by [`ActiveSupport::TimeZone`](http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html). In addition to setting a column as a time zone field, we also add special validations to verify it is of the right IANA identifier.
+
+```ruby
+class Event < Parse::Object
+  # an event occurs in a time zone.
+  property :time_zone, :timezone, default: 'America/Los_Angeles'
+end
+
+event = Event.new
+event.time_zone.name # => 'America/Los_Angeles'
+event.time_zone.valid? # => true
+
+event.time_zone.zone # => ActiveSupport::TimeZone
+event.time_zone.zone.formatted_offset # => "-08:00"
+
+event.time_zone = 'Europe/Paris'
+event.time_zone.zone.formatted_offset # => +01:00"
+
+event.time_zone = 'Galaxy/Andromeda'
+event.time_zone.valid? # => false
 ```
 
 ### [Parse::ACL](https://www.modernistik.com/gems/parse-stack/Parse/ACL.html)
@@ -771,6 +795,7 @@ Properties are considered a literal-type of association. This means that a defin
 - **:float** - a floating numeric value. Will also generate atomic `_increment!` helper method.
 - **:boolean** (alias **:bool**) - true/false value. This will also generate a class scope helper. See [Query Scopes](#query-scopes).
 - **:date** - a Parse date type. See [Parse::Date](#parsedate).
+- **:timezone** - a time zone object. See [Parse::TimeZone](#parsetimezone).
 - **:array** - a heterogeneous list with dirty tracking. See [Parse::CollectionProxy](https://github.com/modernistik/parse-stack/blob/master/lib/parse/model/associations/collection_proxy.rb).
 - **:file** - a Parse file type. See [Parse::File](#parsefile).
 - **:geopoint** - a GeoPoint type. See [Parse::GeoPoint](#parsegeopoint).
@@ -810,7 +835,7 @@ class Post < Parse::Object
   # a list using
   property :tags, :array
 
-  # string column as enummerated type. see :enum
+  # string column as enumerated type. see :enum
   property :status, enum: [:active, :archived]
 
   # Maps to "featuredImage" column representing a File.
@@ -820,6 +845,9 @@ class Post < Parse::Object
 
   # Support bytes
   property :data, :bytes
+
+  # A field that contains time zone information (ex. 'America/Los_Angeles')
+  property :time_zone, :timezone
 
   # store SEO information. Make sure we map it to the column
   # "SEO", otherwise it would have implicitly used "seo"

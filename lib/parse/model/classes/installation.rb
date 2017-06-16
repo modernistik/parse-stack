@@ -92,9 +92,10 @@ module Parse
     property :push_type
 
     # @!attribute time_zone
-    # The current time zone where the target device is located. This should be an IANA time zone identifier.
-    # @return [String]
-    property :time_zone
+    # The current time zone where the target device is located. This should be an IANA time zone identifier
+    # or a {Parse::TimeZone} instance.
+    # @return [Parse::TimeZone]
+    property :time_zone, :timezone
 
   end
 
