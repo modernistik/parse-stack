@@ -36,7 +36,7 @@ module Parse
   #
   #  event.time_zone = 'Galaxy/Andromeda'
   #  event.time_zone.valid? # => false
-  #
+  # @version 1.7.1
   class TimeZone
     # The mapping of TimeZones
     MAPPING = ActiveSupport::TimeZone::MAPPING
@@ -52,10 +52,10 @@ module Parse
     end
 
     # Creates a new instance given the IANA identifier (ex. America/Los_Angeles)
-    # @overload initialize(iana)
+    # @overload new(iana)
     #  @param iana [String] the IANA identifier (ex. America/Los_Angeles)
     #  @return [Parse::TimeZone]
-    # @overload initialize(timezone)
+    # @overload new(timezone)
     #  You can instantiate a new instance with either a {Parse::TimeZone} or an {http://api.rubyonrails.org/classes/ActiveSupport/TimeZone.html ActiveSupport::TimeZone}
     #  object.
     #  @param timezone [Parse::TimeZone|ActiveSupport::TimeZone] an instance of either timezone class.
@@ -80,11 +80,11 @@ module Parse
       @zone.present? ? zone.name : @name
     end
 
-    def name=(timezone_name)
-      unless timezone_name.nil? || timezone_name.is_a?(String)
+    def name=(iana)
+      unless iana.nil? || iana.is_a?(String)
         raise ArgumentError, "Parse::TimeZone#name should be an IANA time zone identifier."
       end
-      @name = timezone_name
+      @name = iana
       @zone = nil
     end
 
@@ -114,7 +114,7 @@ module Parse
       elsif timezone.is_a?(Parse::TimeZone)
         @name = timezone.name
         @zone = nil
-      elsif timezone_name.nil? || timezone_name.is_a?(String)
+      elsif timezone.nil? || timezone.is_a?(String)
         @name = timezone
         @zone = nil
       else

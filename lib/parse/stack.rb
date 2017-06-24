@@ -1,7 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-exit if ENV['MERCURY_URL'] # don't use master branch
 require_relative "stack/version"
 require_relative 'client'
 require_relative 'query'
@@ -13,7 +12,6 @@ module Parse
   class Error < StandardError; end;
   module Stack
 
-    # Your code goes here...
   end
 end
 
