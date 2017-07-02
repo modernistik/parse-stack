@@ -142,7 +142,7 @@ module Parse
         # We keep the list of fields that are on the remote Parse store
         if self.fields[parse_field].present? || ( self < Parse::Object && BASE.has_key?(parse_field) )
           warn "Alias property #{self}##{parse_field} conflicts with previously defined property. Will be ignored."
-          return
+          return false
           # raise ArgumentError
         end
         #dirty tracking. It is declared to use with ActiveModel DirtyTracking
@@ -410,7 +410,7 @@ module Parse
         # if both the local name matches the calculated/provided remote column name, don't create
         # an alias method since it is the same thing. Ex. attribute 'username' would probably have the
         # remote column name also called 'username'.
-        return if parse_field == key
+        return true if parse_field == key
 
         # we will now create the aliases, however if the method is already defined
         # we warn the user unless the field is :objectId since we are in charge of that one.
@@ -424,7 +424,7 @@ module Parse
         elsif parse_field.to_sym != :objectId
           warn "Alias property method #{self}##{parse_field} already defined."
         end
-
+        true
       end # property
 
     end #ClassMethods
