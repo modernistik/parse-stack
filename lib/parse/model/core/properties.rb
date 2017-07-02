@@ -28,8 +28,8 @@ module Parse
     # Default hash map of local attribute name to remote column name
     BASE_FIELD_MAP = {id: :objectId, created_at: :createdAt, updated_at: :updatedAt, acl: :ACL}.freeze
     # The delete operation hash.
+    CORE_FIELDS = {id: :string, created_at: :date, updated_at: :date, acl: :acl}.freeze
     DELETE_OP = {"__op"=>"Delete"}.freeze
-
     # @!visibility private
     def self.included(base)
       base.extend(ClassMethods)
@@ -44,7 +44,8 @@ module Parse
       # @param type [Symbol] a property type.
       # @return [Hash] the defined fields for this Parse collection with their data type.
       def fields(type = nil)
-        @fields ||= {id: :string, created_at: :date, updated_at: :date, acl: :acl}
+        # if it's Parse::Object, then only use the initial set, otherwise add the other base fields.
+        @fields ||= (self == Parse::Object ? CORE_FIELDS : Parse::Object.fields).dup
         if type.present?
           type = type.to_sym
           return @fields.select { |k,v| v == type }
