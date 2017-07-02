@@ -133,12 +133,14 @@ module Parse
         #By default, the remote field name is a lower-first-camelcase version of the key
         # it can be overriden by the :field parameter
         parse_field = opts[:field].to_sym
-        if self.fields[key].present? && BASE_FIELD_MAP[key].nil?
-          warn "Property #{self}##{key} already defined with data type #{data_type}. Will be ignored."
-          return
+        # if this is a custom property that is already defined, OR it is a subclass trying to define a core property
+        # then warn and exit.
+        if (self.fields[key].present? && BASE_FIELD_MAP[key].nil?) || ( self < Parse::Object && BASE_FIELD_MAP.has_key?(key) )
+          warn "Property #{self}##{key} already defined with data type :#{data_type}. Will be ignored."
+          return false
         end
         # We keep the list of fields that are on the remote Parse store
-        if self.fields[parse_field].present?
+        if self.fields[parse_field].present? || ( self < Parse::Object && BASE.has_key?(parse_field) )
           warn "Alias property #{self}##{parse_field} conflicts with previously defined property. Will be ignored."
           return
           # raise ArgumentError
