@@ -11,6 +11,7 @@
 - Removes deprecated function Role.apply_default_acls. If you need the previous
   behavior, you should set your own :before_save callback that modifies the role
   object with the ACLs that you want or use the new `Role.set_default_acl`.
+- FIXED: Removed :id from the Parse::Properties::TYPES list.
 
 ### 1.7.0
 - NEW: You can use `set_default_acl` to set default ACLs for your subclasses.

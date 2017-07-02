@@ -20,7 +20,7 @@ module Parse
   # supported in Parse and mapping them between their remote names with their local ruby named attributes.
   module Properties
     # These are the base types supported by Parse.
-    TYPES = [:id, :string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl, :timezone].freeze
+    TYPES = [:string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl, :timezone].freeze
     # These are the base mappings of the remote field name types.
     BASE = {objectId: :string, createdAt: :date, updatedAt: :date, ACL: :acl}.freeze
     # The list of properties that are part of all objects
