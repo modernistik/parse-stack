@@ -171,6 +171,7 @@ module Parse
     # A has_many relationship to all {Parse::Session} instances for this user. This
     # will query the _Session collection for all sessions which have this user in it's `user`
     # column.
+    # @version 1.7.1
     # @return [Array<Parse::Session>] A list of active Parse::Session objects.
     has_many :active_sessions, as: :session
 

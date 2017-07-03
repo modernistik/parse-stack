@@ -124,6 +124,8 @@ module Parse
     # @!attribute session
     # Returns the corresponding {Parse::Session} associated with this installation, if any exists.
     # This is implemented as a has_one association to the Session class using the {installation_id}.
+    # @version 1.7.1
+    # @return [Parse::Session] The associated {Parse::Session} that might be tied to this installation
     has_one :session, ->{ where(installation_id: i.installation_id) }, scope_only: true
   end
 

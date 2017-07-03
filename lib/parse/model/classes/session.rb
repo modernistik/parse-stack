@@ -61,6 +61,8 @@ module Parse
     # @!attribute [r] installation
     # Returns the {Parse::Installation} where the sessions installation_id field matches the installation_id field
     # in the {Parse::Installation} collection. This is implemented as a has_one scope.
+    # @version 1.7.1
+    # @return [Parse::Installation] The associated {Parse::Installation} tied to this session
     has_one :installation, ->{ where(installation_id: i.installation_id) }, scope_only: true
 
     # Return the Session record for this session token.
