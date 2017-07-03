@@ -7,6 +7,21 @@ module Parse
   # Roles allow the an application to group a set of {Parse::User} records with the same set of
   # permissions, so that specific records in the database can have {Parse::ACL}s related to a role
   # than trying to add all the users in a group.
+  #
+  # The default schema for {Role} is as follows:
+  #
+  #   class Parse::Role < Parse::Object
+  #      # See Parse::Object for inherited properties...
+  #
+  #      property :name
+  #
+  #      # A role may have child roles.
+  #      has_many :roles, through: :relation
+  #
+  #      # The set of users who belong to this role.
+  #      has_many :users, through: :relation
+  #   end
+  # @see Parse::Object
   class Role < Parse::Object
 
     parse_class Parse::Model::CLASS_ROLE

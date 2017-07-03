@@ -24,6 +24,19 @@ module Parse
   # All users need to have a username and a password, with email being optional but globally unique if set.
   # You may add additional properties by redeclaring the class to match your specific schema.
   #
+  # The default schema for the {User} class is as follows:
+  #
+  #   class Parse::User < Parse::Object
+  #      # See Parse::Object for inherited properties...
+  #
+  #      property :auth_data, :object
+  #      property :username
+  #      property :password
+  #      property :email
+  #
+  #      has_many :active_sessions, as: :session
+  #   end
+  #
   # *Signup*
   #
   # You can signup new users in two ways. You can either use a class method
@@ -122,6 +135,7 @@ module Parse
   #  # Unlinks this user's Facebook account from Parse
   #  user.unlink_auth_data! :facebook
   #
+  # @see Parse::Object
   class User < Parse::Object
 
     parse_class Parse::Model::CLASS_USER
@@ -152,6 +166,13 @@ module Parse
     # All Parse users have a username and must be globally unique.
     # @return [String] The user's username.
     property :username
+
+    # @!attribute active_sessions
+    # A has_many relationship to all {Parse::Session} instances for this user. This
+    # will query the _Session collection for all sessions which have this user in it's `user`
+    # column.
+    # @return [Array<Parse::Session>] A list of active Parse::Session objects.
+    has_many :active_sessions, as: :session
 
     before_save do
       # You cannot specify user ACLs.

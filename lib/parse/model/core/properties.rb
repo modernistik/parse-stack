@@ -29,6 +29,7 @@ module Parse
     BASE_FIELD_MAP = {id: :objectId, created_at: :createdAt, updated_at: :updatedAt, acl: :ACL}.freeze
     # The delete operation hash.
     CORE_FIELDS = {id: :string, created_at: :date, updated_at: :date, acl: :acl}.freeze
+    # The delete operation hash.
     DELETE_OP = {"__op"=>"Delete"}.freeze
     # @!visibility private
     def self.included(base)

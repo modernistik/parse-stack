@@ -9,6 +9,24 @@ module Parse
   # a session token is generated. You may use a known active session token to find the corresponding
   # user for that session. Deleting a Session record (and session token), effectively logs out the user, when making Parse requests
   # on behalf of the user using the session token.
+  #
+  # The default schema for the {Session} class is as follows:
+  #   class Parse::Session < Parse::Object
+  #      # See Parse::Object for inherited properties...
+  #
+  #      property :session_token
+  #      property :created_with, :object
+  #      property :expires_at, :date
+  #      property :installation_id
+  #      property :restricted, :boolean
+  #
+  #      belongs_to :user
+  #
+  #      # Installation where the installation_id matches.
+  #      has_one :installation, ->{ where(installation_id: i.installation_id) }, scope_only: true
+  #   end
+  #
+  # @see Parse::Object
   class Session < Parse::Object
 
     parse_class Parse::Model::CLASS_SESSION
@@ -39,6 +57,11 @@ module Parse
     #  @return [User] the user corresponding to this session.
     #  @see User
     belongs_to :user
+
+    # @!attribute [r] installation
+    # Returns the {Parse::Installation} where the sessions installation_id field matches the installation_id field
+    # in the {Parse::Installation} collection. This is implemented as a has_one scope.
+    has_one :installation, ->{ where(installation_id: i.installation_id) }, scope_only: true
 
     # Return the Session record for this session token.
     # @param token [String] the session token

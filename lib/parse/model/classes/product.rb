@@ -6,6 +6,21 @@ require_relative 'user'
 module Parse
   # This class represents the data and columns contained in the standard Parse `_Product` collection.
   # These records are usually used when implementing in-app purchases in mobile applications.
+  #
+  # The default schema for {Product} is as follows:
+  #
+  #   class Parse::Product < Parse::Object
+  #      # See Parse::Object for inherited properties...
+  #
+  #      property :download, :file
+  #      property :icon,     :file,    required: true
+  #      property :order,    :integer, required: true
+  #      property :subtitle,           required: true
+  #      property :title,              required: true
+  #      property :product_identifier, required: true
+  #
+  #   end
+  # @see Parse::Object
   class Product < Parse::Object
 
     parse_class Parse::Model::CLASS_PRODUCT

@@ -70,9 +70,27 @@ module Parse
 
   # This is the core class for all app specific Parse table subclasses. This class
   # in herits from Parse::Pointer since an Object is a Parse::Pointer with additional fields,
-  # at a minimum, created_at, updated_at and ACLs.
-  # This class also handles all the relational types of associations in a Parse application and
-  # handles the main CRUD operations.
+  # at a minimum, created_at, updated_at and ACLs. This class also handles all
+  # the relational types of associations in a Parse application and handles the main CRUD operations.
+  #
+  # As the parent class to all custom subclasses, this class provides the default property schema:
+  #
+  #   class Parse::Object
+  #      # All subclasses will inherit these properties by default.
+  #
+  #      # the objectId column of a record.
+  #      property :id, :string, field: :objectId
+  #
+  #      # The the last updated date for a record (Parse::Date)
+  #      property :updated_at, :date
+  #
+  #      # The original creation date of a record (Parse::Date)
+  #      property :created_at, :date
+  #
+  #      # The Parse::ACL field
+  #      property :acl, :acl, field: :ACL
+  #
+  #   end
   #
   # Most Pointers and Object subclasses are treated the same. Therefore, defining a class Artist < Parse::Object
   # that only has `id` set, will be treated as a pointer. Therefore a Parse::Object can be in a "pointer" state

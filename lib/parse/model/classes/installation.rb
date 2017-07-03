@@ -10,7 +10,31 @@ module Parse
   # An installation object represents an instance of your app being installed
   # on a device. These objects are used to store subscription data for
   # installations which have subscribed to one or more push notification channels.
+  #
+  # The default schema for {Installation} is as follows:
+  #
+  #   class Parse::Installation < Parse::Object
+  #      # See Parse::Object for inherited properties...
+  #
+  #     property :gcm_sender_id, field: :GCMSenderId
+  #     property :app_identifier
+  #     property :app_name
+  #     property :app_version
+  #     property :badge, :integer
+  #     property :channels, :array
+  #     property :device_token
+  #     property :device_token_last_modified, :integer
+  #     property :device_type, enum: [:ios, :android, :winrt, :winphone, :dotnet]
+  #     property :installation_id
+  #     property :locale_identifier
+  #     property :parse_version
+  #     property :push_type
+  #     property :time_zone, :timezone
+  #
+  #     has_one :session, ->{ where(installation_id: i.installation_id) }, scope_only: true
+  #   end
   # @see Push
+  # @see Parse::Object
   class Installation < Parse::Object
 
     parse_class Parse::Model::CLASS_INSTALLATION
@@ -22,7 +46,7 @@ module Parse
     # provider. If you set this field, then you must set the GCM API key
     # corresponding to this GCM sender ID in your Parse application’s push settings.
     # @return [String]
-    property :gcm_sender_id, :string, field: :GCMSenderId
+    property :gcm_sender_id, field: :GCMSenderId
 
     # @!attribute app_identifier
     # A unique identifier for this installation’s client application. In iOS, this is the Bundle Identifier.
@@ -97,6 +121,10 @@ module Parse
     # @return [Parse::TimeZone]
     property :time_zone, :timezone
 
+    # @!attribute session
+    # Returns the corresponding {Parse::Session} associated with this installation, if any exists.
+    # This is implemented as a has_one association to the Session class using the {installation_id}.
+    has_one :session, ->{ where(installation_id: i.installation_id) }, scope_only: true
   end
 
 end
