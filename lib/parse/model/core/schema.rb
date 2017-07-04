@@ -29,6 +29,8 @@ module Parse
               result = { type: Parse::Model::TYPE_POINTER, targetClass: references[k] }
             when :acl
               result[:type] = Parse::Model::ACL
+            when :timezone, :time_zone
+              result[:type] = "String" # no TimeZone native in Parse
             else
               result[:type] = v.to_s.camelize
             end

@@ -1,16 +1,16 @@
 ## Parse-Stack Changelog
 
 ### 1.7.1
-- NEW: :timezone datatype that maps to Parse::TimeZone (which mimics ActiveSupport::TimeZone)
-- NEW: Installation :time_zone field is now a Parse::TimeZone instance.
-- Any properties named `time_zone` or `timezone` with a string data type set will be converted to use Parse::TimeZone as the data class.
+- NEW: `:timezone` datatype that maps to `Parse::TimeZone` (which mimics `ActiveSupport::TimeZone`)
+- NEW: Installation `:time_zone` field is now a `Parse::TimeZone` instance.
+- Any properties named `time_zone` or `timezone` with a string data type set will be converted to use `Parse::TimeZone` as the data class.
 - FIXED: Fixes issues with HTTP Method Override for long url queries.
 - FIXED: Fixes issue with Parse::Object.each method signature.
-- FIXED: Removed :id from the Parse::Properties::TYPES list.
+- FIXED: Removed `:id` from the Parse::Properties::TYPES list.
 - FIXED: Parse::Object subclasses will not be allowed to redefine core properties.
 - Parse::Object save_all() and each() methods raise ArgumentError for
   invalid constraint arguments.
-- Removes deprecated function Role.apply_default_acls. If you need the previous
+- Removes deprecated function `Role.apply_default_acls`. If you need the previous
   behavior, you should set your own :before_save callback that modifies the role
   object with the ACLs that you want or use the new `Role.set_default_acl`.
 - Parse::Object.property returns true/false whether creating the property was successful.
