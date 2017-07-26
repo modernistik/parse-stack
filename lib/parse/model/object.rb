@@ -275,7 +275,9 @@ module Parse
 
     # @return [Hash] a json-hash representing this object.
     def as_json(*args)
-      pointer? ? pointer : super(*args)
+      return pointer if pointer?
+      changed_fields = changed_attributes
+      super(*args).delete_if { |k, v| v.nil? && !changed_fields.has_key?(k) }
     end
 
     # The main constructor for subclasses. It can take different parameter types

@@ -3,6 +3,8 @@
 ### 1.7.2
 - FIXED: first_or_create will now apply dirty tracking to newly created fields.
 - NEW: `Parse::Model.autosave_on_create` has been removed in favor of `first_or_create!`.
+- FIXED: Encoding a Parse::Object into JSON will remove any values that are `nil`
+which were not explicitly changed to that value.
 
 ### 1.7.1
 - NEW: `:timezone` datatype that maps to `Parse::TimeZone` (which mimics `ActiveSupport::TimeZone`)
