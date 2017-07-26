@@ -409,7 +409,7 @@ module Parse
     end
 
     # Overrides ActiveModel::Validations#validate! instance method.
-    # It runs all valudations for this object. If it validation fails,
+    # It runs all validations for this object. If validation fails,
     # it raises ActiveModel::ValidationError otherwise it returns the object.
     # @raise ActiveModel::ValidationError
     # @see ActiveModel::Validations#validate!

@@ -86,19 +86,6 @@ module Parse
     # @!visibility private
     @@model_cache = {}
 
-    # @!attribute self.autosave_on_create
-    # If set to true, a call to {Parse::Object.first_or_create} will automatically save the object.
-    # Default is false.
-    # @return [Boolean]
-    def self.autosave_on_create
-      @@autosave_on_create ||= false
-    end
-
-    # @!visibility private
-    def self.autosave_on_create=(bool)
-      @@autosave_on_create = bool
-    end
-
     class << self
       # @!attribute self.raise_on_save_failure
       # By default, we return `true` or `false` for save and destroy operations.

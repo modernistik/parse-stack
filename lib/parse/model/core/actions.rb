@@ -149,12 +149,12 @@ module Parse
         # Finds the first object matching the query conditions, or creates a new
         # unsaved object with the attributes. This method takes the possibility of two hashes,
         # therefore make sure you properly wrap the contents of the input with `{}`.
+        # @example
         #   Parse::User.first_or_create({ ..query conditions..})
-        #   Parse::User.first_or_create({ ..query conditions..}, {.. resrouce_attrs ..})
+        #   Parse::User.first_or_create({ ..query conditions..}, {.. resource_attrs ..})
         # @param query_attrs [Hash] a set of query constraints that also are applied.
         # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
         # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
-        # @see Parse::Model.autosave_on_create
         def first_or_create(query_attrs = {}, resource_attrs = {})
 
           query_attrs = query_attrs.symbolize_keys
@@ -163,9 +163,25 @@ module Parse
 
           if obj.blank?
             obj = self.new query_attrs
-            obj.apply_attributes!(resource_attrs, dirty_track: false)
+            obj.apply_attributes!(resource_attrs, dirty_track: true)
           end
-          obj.save if obj.new? && Parse::Model.autosave_on_create
+          obj
+        end
+
+        # Finds the first object matching the query conditions, or creates a new
+        # *saved* object with the attributes. This method is similar to {first_or_create}
+        # but will also {save!} the object if it was newly created.
+        # @example
+        #   obj = Parse::User.first_or_create!({ ..query conditions..})
+        #   obj = Parse::User.first_or_create!({ ..query conditions..}, {.. resource_attrs ..})
+        # @param query_attrs [Hash] a set of query constraints that also are applied.
+        # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
+        # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
+        # @raise {Parse::RecordNotSaved} if the save fails
+        # @see #first_or_create
+        def first_or_create!(query_attrs = {}, resource_attrs = {})
+          obj = first_or_create(query_attrs, resource_attrs)
+          obj.save! if obj.new?
           obj
         end
 
@@ -479,7 +495,7 @@ module Parse
       #
       # You can define before and after :save callbacks
       # autoraise: set to true will automatically raise an exception if the save fails
-      # @raise Parse::RecordNotSaved if the save fails
+      # @raise {Parse::RecordNotSaved} if the save fails
       # @raise ArgumentError if a non-nil value is passed to `session` that doesn't provide a session token string.
       # @param session [String] a session token in order to apply ACLs to this operation.
       # @param autoraise [Boolean] whether to raise an exception if the save fails.
@@ -519,7 +535,7 @@ module Parse
       end
 
       # Save this object and raise an exception if it fails.
-      # @raise Parse::RecordNotSaved if the save fails
+      # @raise {Parse::RecordNotSaved} if the save fails
       # @raise ArgumentError if a non-nil value is passed to `session` that doesn't provide a session token string.
       # @param session (see #save)
       # @return (see #save)

@@ -1,5 +1,9 @@
 ## Parse-Stack Changelog
 
+### 1.7.2
+- FIXED: first_or_create will now apply dirty tracking to newly created fields.
+- NEW: `Parse::Model.autosave_on_create` has been removed in favor of `first_or_create!`.
+
 ### 1.7.1
 - NEW: `:timezone` datatype that maps to `Parse::TimeZone` (which mimics `ActiveSupport::TimeZone`)
 - NEW: Installation `:time_zone` field is now a `Parse::TimeZone` instance.

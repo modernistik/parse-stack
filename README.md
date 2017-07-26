@@ -1394,7 +1394,7 @@ song.changed # ['name']
 
 ```
 
-If you want to either find the first resource matching some given criteria or just create that resource if it can't be found, you can use `#first_or_create`. Note that if a match is not found, the object will not be saved to Parse automatically, since the framework provides support for heterogeneous object batch saving. This means you can group different object classes together and save them all at once through the `Array#save` method to reduce API requests. You may modify this behavior by setting `Parse::Model.autosave_on_create = true`.
+If you want to either find the first resource matching some given criteria or just create that resource if it can't be found, you can use `first_or_create`. Note that if a match is not found, the object will not be saved to Parse automatically, since the framework provides support for heterogeneous object batch saving. This means you can group different object classes together and save them all at once through the `Array#save` method to reduce API requests. If you want to truly want to find a first or create (save) the object, you may use `first_or_create!`.
 
 ```ruby
  # Finds matching song or creates a new unsaved object
@@ -1407,6 +1407,9 @@ song.id # now has a valid objectId ex. 'xyz1122df'
 song = Song.first_or_create(name: "Awesome Song", available: true)
 song.id # 'xyz1122df`
 song.save # noop since nothing changed
+
+# first_or_create! : Return an existing OR newly saved object
+song = Song.first_or_create!(name: "Awesome Song", available: true)
 
 ```
 
