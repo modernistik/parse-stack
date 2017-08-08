@@ -277,7 +277,7 @@ module Parse
             end
           end
 
-          unless opts[:cache].is_a?(Moneta::Transformer)
+          unless [:key?, :[], :delete, :store].all? { |method| opts[:cache].respond_to?(method) }
             raise ArgumentError, "Parse::Client option :cache needs to be a type of Moneta::Transformer store."
           end
           self.cache = opts[:cache]

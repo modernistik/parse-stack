@@ -81,7 +81,7 @@ module Parse
         @opts.merge!(opts) if opts.is_a?(Hash)
         @expires = @opts[:expires]
 
-        unless @store.is_a?(Moneta::Transformer)
+        unless [:key?, :[], :delete, :store].all? { |method| @store.respond_to?(method) }
           raise ArgumentError, "Caching store object must a Moneta key/value store (Moneta::Transformer)."
         end
 
