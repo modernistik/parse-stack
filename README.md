@@ -1305,7 +1305,7 @@ specific band.
   end
 ```
 
-You can now find all `Parse::User` records who have liked a specific band. *In the
+You can now find all `Parse::User` records that have "liked" a specific band. *In the
 example below, the `:likes` key refers to the `likes` column defined in the `Band`
 collection which contains the set of user records.*
 
@@ -1314,6 +1314,10 @@ collection which contains the set of user records.*
   # find all users who have liked this band, where :likes is a column
   # in the Band collection - NOT in the User collection.
   users = Parse::User.all :likes.related_to => band
+
+  # or use the relation accessor in band. It is equivalent since Band is
+  # declared with a :has_many association.
+  band.likes.all # => array of Parse::Users who liked the band
 ```
 You can also find all bands that a specific user has liked.
 
@@ -2122,8 +2126,11 @@ end
 
 post = Post.first
 # find all Users who have liked this post object,
-# where likes is a column on the Post class.
+# where 'likes' is a column on the Post class.
 users = Parse::User.all :likes.rel => post
+
+# or use the relation accessor declared in Post
+users = post.likes.all # same result
 
 # or find posts that a certain user has liked
 user = Parse::User.first
