@@ -75,7 +75,7 @@ module Parse
       # @param params [Object] method parameters
       # @return [Object] the return value from the forwarded method.
       def forward(method, params = nil)
-        return unless @delegate.present? && @delegate.respond_to?(method)
+        return unless @delegate && @delegate.respond_to?(method)
         params.nil? ? @delegate.send(method) : @delegate.send(method, params)
       end
 

@@ -300,6 +300,12 @@ module Parse
             # lets set the variable with the updated value
              instance_variable_set ivar, value
              send will_change_method
+          elsif value.nil? && data_type == :array
+            value = Parse::CollectionProxy.new [], delegate: self, key: key
+            instance_variable_set ivar, value
+            # don't send the notification yet until they actually add something
+            # which will be handled by the collection proxy.
+            # send will_change_method
           end
 
           # if the value is a String (like an iso8601 date) and the data type of
