@@ -98,6 +98,16 @@ module Parse
         ATTRIBUTES
       end
 
+      # Method to print to standard that utilizes the an internal id to make it easier
+      # to trace incoming requests.
+      def log(s)
+        # generates a unique random number in order to be used in logging. This
+        # is useful when debugging issues in production where one server instance
+        # may be running multiple threads and you want to trace the incoming call.
+        @rid ||= rand(1000)
+        puts "[#{rid}] #{s}"
+      end
+
       # true if this is a webhook function request.
       def function?
         @function_name.present?
