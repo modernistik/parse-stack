@@ -59,7 +59,7 @@ module Parse
 
       # @!attribute [rw] store
       # The internal moneta cache store instance.
-      # @return [Moneta::Transformer]
+      # @return [Moneta::Transformer,Moneta::Expires]
       attr_accessor :store
 
       # @!attribute [rw] expires
@@ -73,7 +73,7 @@ module Parse
       # @param store [Moneta] An instance of the Moneta cache store to use.
       # @param opts [Hash] additional options.
       # @option opts [Integer] :expires the default expiration for a cache entry.
-      # @raise ArgumentError, if `store` is not a Moneta::Transformer instance.
+      # @raise ArgumentError, if `store` is not a Moneta::Transformer or Moneta::Expires instance.
       def initialize(adapter, store, opts = {})
         super(adapter)
         @store = store
@@ -81,8 +81,8 @@ module Parse
         @opts.merge!(opts) if opts.is_a?(Hash)
         @expires = @opts[:expires]
 
-        unless @store.is_a?(Moneta::Transformer)
-          raise ArgumentError, "Caching store object must a Moneta key/value store (Moneta::Transformer)."
+        unless [:key?, :[], :delete, :store].all? { |method| @store.respond_to?(method) }
+          raise ArgumentError, "Caching store object must a Moneta key/value store."
         end
 
       end

@@ -122,7 +122,7 @@ module Parse
 
     # @!attribute cache
     #  The underlying cache store for caching API requests.
-    #  @return [Moneta::Transformer]
+    #  @return [Moneta::Transformer,Moneta::Expires]
     # @!attribute [r] application_id
     #  The Parse application identifier to be sent in every API request.
     #  @return [String]
@@ -206,8 +206,9 @@ module Parse
     #    the logging performed by {Parse::Middleware::BodyBuilder}.
     # @option opts [Object] :adapter The connection adapter. By default it uses
     #    the `Faraday.default_adapter` which is Net/HTTP.
-    # @option opts [Moneta::Transformer] :cache A caching adapter of type
-    #    {https://github.com/minad/moneta Moneta::Transformer} that will be used
+    # @option opts [Moneta::Transformer,Moneta::Expires] :cache A caching adapter of type
+    #    {https://github.com/minad/moneta Moneta::Transformer} or
+    #    {https://github.com/minad/moneta Moneta::Expires} that will be used
     #    by the caching middleware {Parse::Middleware::Caching}.
     #    Caching queries and object fetches can help improve the performance of
     #    your application, even if it is for a few seconds. Only successful GET
@@ -223,7 +224,7 @@ module Parse
     # @option opts [Hash] :faraday You may pass a hash of options that will be
     #    passed to the Faraday constructor.
     # @raise Parse::Error::ConnectionError if the client was not properly configured with required keys or url.
-    # @raise ArgumentError if the cache instance passed to the :cache option is not of Moneta::Transformer.
+    # @raise ArgumentError if the cache instance passed to the :cache option is not of Moneta::Transformer or Moneta::Expires
     # @see Parse::Middleware::BodyBuilder
     # @see Parse::Middleware::Caching
     # @see Parse::Middleware::Authentication
@@ -277,8 +278,8 @@ module Parse
             end
           end
 
-          unless opts[:cache].is_a?(Moneta::Transformer)
-            raise ArgumentError, "Parse::Client option :cache needs to be a type of Moneta::Transformer store."
+          unless [:key?, :[], :delete, :store].all? { |method| opts[:cache].respond_to?(method) }
+            raise ArgumentError, "Parse::Client option :cache needs to be a type of Moneta store"
           end
           self.cache = opts[:cache]
           conn.use Parse::Middleware::Caching, self.cache, {expires: opts[:expires].to_i }

@@ -8,6 +8,7 @@ single requests in a multi-request threaded environment. (See Parse::Webhooks::P
 - FIXED: Properties of :array type will always return a Parse::CollectionProxy if their internal value is nil. The object will not be marked dirty until something is added to the array.
 - FIXED: Encoding a Parse::Object into JSON will remove any values that are `nil`
 which were not explicitly changed to that value.
+- [PR#39](https://github.com/modernistik/parse-stack/pull/39): Allow Moneta::Expires as cache object to allow for non-native expiring caches by [GrahamW](https://github.com/GrahamW)
 
 ### 1.7.1
 - NEW: `:timezone` datatype that maps to `Parse::TimeZone` (which mimics `ActiveSupport::TimeZone`)
