@@ -156,6 +156,17 @@ module Parse
       end
       alias_method :eql?, :==
 
+      # Compute a hash-code for this object. It is calculated
+      # by combining the Parse class name, the {Parse::Object#id} field and
+      # any pending changes.
+      #
+      # Two objects with the same content will have the same hash code
+      # (and will compare using eql?).
+      # @return [Fixnum]
+      def hash
+        "#{parse_class}#{id}#{changes.to_s}".hash
+      end
+
       # @return [Boolean] true if instance has a Parse class and an id.
       def present?
         parse_class.present? && @id.present?
