@@ -145,6 +145,27 @@ module Parse
         @collection
       end; alias_method :push, :add
 
+      # Add items to the collection if they don't already exist
+      # @param items [Array] items to uniquely add
+      def add_unique(*items)
+        return unless items.count > 0
+        notify_will_change!
+        @collection = collection | items.flatten
+        @collection
+      end; alias_method :push_unique, :add_unique
+
+      # Set Union - Returns a new array by joining two arrays, excluding
+      # any duplicates and preserving the order from the original array.
+      # It compares elements using their hash and eql? methods for efficiency.
+      # See {https://docs.ruby-lang.org/en/2.0.0/Array.html#method-i-hash Array#|}
+      # @example
+      #    [ "a", "b", "c" ] | [ "c", "d", "a" ] #=> [ "a", "b", "c", "d" ]
+      # @param items [Array] items to uniquely add
+      # @see #add_unique
+      def |(items)
+        collection | [items].flatten
+      end
+
       # Remove items from the collection
       # @param items [Array] items to remove
       def remove(*items)
@@ -271,6 +292,19 @@ module Parse
       def select
         return collection.enum_for(:select) unless block_given?
         collection.select &Proc.new
+      end
+
+      # Alias for Array#uniq
+      def uniq
+        return collection.uniq(&Proc.new) if block_given?
+        return collection.uniq
+      end
+
+      # Alias for Array#uniq!
+      def uniq!
+        notify_will_change!
+        return collection.uniq!(&Proc.new) if block_given?
+        return collection.uniq!
       end
 
       # @!visibility private

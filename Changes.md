@@ -5,6 +5,10 @@
 - NEW: Hooks and Functions now have a `log` method, similar to `puts`, but allows easier tracing of
 single requests in a multi-request threaded environment. (See Parse::Webhooks::Payload)
 - NEW: `:id` constraints also safely supports pointers by skipping class matching.
+- NEW: Support for `add_unique` and the set union operator `|` in collection proxies.
+- NEW: Support for `uniq` and `uniq!` in collection proxies.
+- NEW: `uniq` and `uniq!` for collection proxies utilize `eql?` for determining uniqueness.
+- NEW: Updated override behavior for the `hash` method in Parse::Pointer and subclasses.
 - FIXED: first_or_create will now apply dirty tracking to newly created fields.
 - FIXED: Properties of :array type will always return a Parse::CollectionProxy if their internal value is nil. The object will not be marked dirty until something is added to the array.
 - FIXED: Encoding a Parse::Object into JSON will remove any values that are `nil`
