@@ -147,6 +147,7 @@ module Parse
 
       # Add items to the collection if they don't already exist
       # @param items [Array] items to uniquely add
+      # @return [Array] the collection.
       def add_unique(*items)
         return unless items.count > 0
         notify_will_change!
@@ -162,8 +163,52 @@ module Parse
       #    [ "a", "b", "c" ] | [ "c", "d", "a" ] #=> [ "a", "b", "c", "d" ]
       # @param items [Array] items to uniquely add
       # @see #add_unique
+      # @return [Array] array with unique items
       def |(items)
         collection | [items].flatten
+      end
+
+      # Set Intersection - Returns a new array containing unique elements common
+      # to the two arrays. The order is preserved from the original array.
+      #
+      # It compares elements using their hash and eql? methods for efficiency.
+      # See {https://ruby-doc.org/core-2.4.1/Array.html#method-i-26 Array#&}
+      # @example
+      #   [ 1, 1, 3, 5 ] & [ 3, 2, 1 ]                 #=> [ 1, 3 ]
+      #   [ 'a', 'b', 'b', 'z' ] & [ 'a', 'b', 'c' ]   #=> [ 'a', 'b' ]
+      # @param other_ary [Array]
+      # @return [Array] intersection array
+      def &(other_ary)
+        collection & [other_ary].flatten
+      end
+
+      # Alias {https://ruby-doc.org/core-2.4.1/Array.html#method-i-2D Array Difference}.
+      # Returns a new array that is a copy of the original array, removing any
+      # items that also appear in other_ary. The order is preserved from the
+      # original array.
+      # @example
+      #   [ 1, 1, 2, 2, 3, 3, 4, 5 ] - [ 1, 2, 4 ]  #=>  [ 3, 3, 5 ]
+      # @param other_ary [Array]
+      # @return [Array] delta array
+      def -(other_ary)
+        collection - [other_ary].flatten
+      end
+
+      # Alias {https://ruby-doc.org/core-2.4.1/Array.html#method-i-2B Array Concatenation}.
+      # Returns a new array built by concatenating the two arrays together to
+      # produce a third array.
+      # @example
+      #   [ 1, 2, 3 ] + [ 4, 5 ] #=> [ 1, 2, 3, 4, 5 ]
+      # @param other_ary [Array]
+      # @return [Array] concatenated array
+      def +(other_ary)
+        collection + [other_ary].flatten.to_a
+      end
+
+      # Alias {https://ruby-doc.org/core-2.4.1/Array.html#method-i-flatten Array flattening}.
+      # @return [Array] a flattened one-dimensional array
+      def flatten
+        collection.flatten
       end
 
       # Remove items from the collection
