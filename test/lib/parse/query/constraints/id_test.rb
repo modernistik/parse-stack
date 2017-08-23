@@ -36,13 +36,29 @@ class TestObjectIdConstraint < Minitest::Test
       constraint.build.as_json
       assert_equal expected, constraint.build.as_json
 
+      # Test by safely supporting pointers too
+      constraint = @klass.new(:song, Song.pointer(value) )
+      expected =  {"song" => Song.pointer(value)}.as_json
+      constraint.build.as_json
+      assert_equal expected, constraint.build.as_json
+
       # Test against a valid parse class name
       constraint = @klass.new(:my_song, value)
       expected =  {"my_song" => OtherSong.pointer(value)}.as_json
       assert_equal expected, constraint.build.as_json
 
+      # Test Pointer support
+      constraint = @klass.new(:my_song, OtherSong.pointer(value))
+      expected =  {"my_song" => OtherSong.pointer(value)}.as_json
+      assert_equal expected, constraint.build.as_json
+
       # Test with parse_class name set to something else
       constraint = @klass.new(:other_song, value)
+      expected =  {"other_song" => OtherSong.pointer(value)}.as_json
+      assert_equal expected, constraint.build.as_json
+
+      # Test with pointers
+      constraint = @klass.new(:other_song, OtherSong.pointer(value))
       expected =  {"other_song" => OtherSong.pointer(value)}.as_json
       assert_equal expected, constraint.build.as_json
     end

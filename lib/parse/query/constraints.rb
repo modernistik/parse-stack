@@ -33,6 +33,7 @@ module Parse
     #
     #  # find all songs for this artist object
     #  Song.all :artist => artist
+    #
     # In some cases, you do not have the Parse object, but you have its `objectId`.
     # You can use the objectId in the query as follows:
     #
@@ -40,6 +41,7 @@ module Parse
     #  Song.all :artist.id => artist_id
     #
     #  # other approaches, same result
+    #  Song.all :artist.id => artist # safely supported Parse::Pointer
     #  Song.all :artist => Artist.pointer(artist_id)
     #  Song.all :artist => Parse::Pointer.new("Artist", artist_id)
     #
@@ -48,6 +50,7 @@ module Parse
       # A registered method on a symbol to create the constraint.
       # @example
       #  q.where :field.id => "someObjectId"
+      #  q.where :field.id => pointer # safely supported
       # @return [ObjectIdConstraint]
       register :id
 
@@ -55,6 +58,10 @@ module Parse
       def build
         className = operand.to_parse_class
         value = formatted_value
+        # if it is already a pointer value, just return the constraint. Allows for
+        # supporting strings, symbols and pointers.
+        return { @operation.operand  => value } if value.is_a?(Parse::Pointer)
+
         begin
           klass = className.constantize
         rescue NameError => e
