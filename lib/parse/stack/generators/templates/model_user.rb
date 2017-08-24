@@ -1,5 +1,4 @@
 
-# The Parse _User collection
 class Parse::User < Parse::Object
   # add additional properties
 

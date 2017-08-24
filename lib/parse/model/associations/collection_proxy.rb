@@ -19,14 +19,15 @@ module Parse
 
     # A CollectionProxy is a special type of array wrapper that notifies a delegate
     # object about changes to the array in order to perform dirty tracking. This is
-    # used for all Array properties in Parse::Objects.
+    # used for all Array properties in Parse::Objects. Subclasses of {CollectionProxy} are
+    # also available for supporting different association types such as an array of Parse pointers
+    # and Parse relations.
+    # @see PointerCollectionProxy
+    # @see RelationCollectionProxy
     class CollectionProxy
       include ::ActiveModel::Model
       include ::ActiveModel::Dirty
       include ::Enumerable
-      # @!attribute [rw] collection
-      #  The internal backing store of the collection.
-      #  @return [Array]
 
       # @!attribute [r] delegate
       #  The object to be notified of changes to the collection.
@@ -110,16 +111,18 @@ module Parse
         collection.to_a
       end; alias_method :to_ary, :to_a
 
-      # @!attribute [rw] collection
-      #  Set the internal collection of items without dirty tracking or
-      #  change notifications.
+      # Set the internal collection of items *without* dirty tracking or
+      # change notifications.
       # @return [Array] the collection
       def set_collection!(list)
         @collection = list
       end
 
       # @!attribute [rw] collection
-      #  The internal backing store of the collection.
+      #  The internal backing store of the collection containing the content. This value is lazily
+      #  loaded for some subclasses.
+      # @note If you modify this directly, it is highly recommended that you
+      #  call {CollectionProxy#notify_will_change!} to notify the dirty tracking system.
       # @return [Array] contents of the collection.
       def collection
         if @collection.empty? && @loaded == false

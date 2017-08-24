@@ -17,8 +17,10 @@ module Parse
 
     # @!attribute [rw] collection
     #  The internal backing store of the collection.
-    # @return [Array<Parse::Object>]
-    # @see CollectionProxy#collection
+    #  @note If you modify this directly, it is highly recommended that you
+    #   call {CollectionProxy#notify_will_change!} to notify the dirty tracking system.
+    #  @return [Array<Parse::Object>]
+    #  @see CollectionProxy#collection
     def collection=(c)
       notify_will_change!
       @collection = c

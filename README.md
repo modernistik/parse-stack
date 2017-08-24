@@ -1260,6 +1260,7 @@ fan = bands.fans.first # => Parse::User object
 
 # use `add` or `remove` to modify relations
 band.fans.add user
+band.fans.add_unique user # no op
 bands.fans.remove user
 
 # updates the relation as well as changes to `band`
@@ -2007,15 +2008,28 @@ q.where :field.not_in_query => query # alias
 ```
 
 #### Matches Object Id
-Sometimes you want to find rows where a particular Parse object exists. You can do so by passing a the Parse::Object subclass, a Parse::Pointer. You can also use the `id` constraint. This will assume that the name of the field matches a particular Parse class you have defined. Assume the following:
+Sometimes you want to find rows where a particular Parse object exists. You can do so by passing a the Parse::Object subclass or a Parse::Pointer. In some cases you may only have the "objectId" of the record you are looking for. For convenience, you can also use the `id` constraint. This will assume that the name of the field matches a particular Parse class you have defined. Assume the following:
 
 ```ruby
 # where this Parse object equals the object in the column `field`.
 q.where :field => Parse::Pointer("Field", "someObjectId")
+# => "field":{"__type":"Pointer","className":"Field","objectId":"someObjectId"}}
+
 # alias, shorthand when we infer `:field` maps to `Field` parse class.
 q.where :field.id => "someObjectId"
-# "field":{"__type":"Pointer","className":"Field","objectId":"someObjectId"}}
+# => "field":{"__type":"Pointer","className":"Field","objectId":"someObjectId"}}
 
+```
+It is always important to be thoughtful in naming column names in associations as
+close to their foreign Parse class names. This enables more expressive syntax while reducing
+code. The `id` also supports any object or pointer object. These are all equivalent:
+
+```ruby
+q.where :user    => User.pointer("xyx123")
+q.where :user.id => "xyx123"
+q.where :user.id => User.pointer("xyx123")
+# All produce
+# => "user":{"__type":"Pointer","className":"_User","objectId":"xyx123"}}
 ```
 
 ##### Additional Examples
@@ -2046,6 +2060,17 @@ Song.all :artist.id => artist_id
 # other approaches, same result
 Song.all :artist => Artist.pointer(artist_id)
 Song.all :artist => Parse::Pointer.new("Artist", artist_id)
+
+# "id" safely pointers and strings for supporting these types of API patterns
+def find_songs(artist)
+  Song.all :artist.id => artist
+end
+
+# all ok
+songs = find_songs artist_id # by a string ObjectId
+songs = find_songs artist # or by an object or pointer
+songs = find_songs Artist.pointer(artist_id)
+
 ```
 
 ### [Geo Queries](https://www.modernistik.com/gems/parse-stack/Parse/Constraint/NearSphereQueryConstraint.html)
