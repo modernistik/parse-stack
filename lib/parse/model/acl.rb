@@ -49,15 +49,18 @@ module Parse
   # means denial.
   #
   # An ACL is represented by a JSON object with the keys being Parse::User object
-  # ids or the special key of *, which indicates the public access permissions.
+  # ids or the special key of "*", which indicates the public access permissions.
   # The value of each key in the hash is a {Parse::ACL::Permission} object which
   # defines the boolean permission state for read and write.
-  # The example below illustrates a Parse ACL JSON object where there is a public
+  # The example below illustrates a Parse ACL JSON object where there is a *public*
   # read permission, but public write is prevented. In addition, the user with
-  # id "3KmCvT7Zsb", is allowed to both read and write this record.
+  # id "*3KmCvT7Zsb*" is allowed to both read and write this record, and the "*Admins*"
+  # role is also allowed write access.
+  #
   #  {
   #    "*": { "read": true },
-  #    "3KmCvT7Zsb": {  "read": true, "write": true }
+  #    "3KmCvT7Zsb": {  "read": true, "write": true },
+  #    "role:Admins": { "write": true }
   #  }
   #
   # All Parse::Object subclasses have an acl property by default. With this
@@ -80,6 +83,12 @@ module Parse
   #
   #  # allow the 'Admins' role read and write
   #  artist.acl.apply_role "Admins", true, true
+  #
+  #  # remove write from all attached privileges
+  #  artist.acl.no_write!
+  #
+  #  # remove all attached privileges
+  #  artist.acl.master_key_only!
   #
   #  artist.save
   #
@@ -104,17 +113,21 @@ module Parse
   # {http://docs.parseplatform.org/rest/guide/#security Security}.
   class ACL < DataType
 
-    # @!attribute permissions
-    # Contains a hash structure of permissions, with keys mapping to either Public '*',
-    # a role name or an objectId for a user and values of type {ACL::Permission}.
-    # @return [Hash] a hash of permissions.
-
     # @!attribute delegate
-    # The instance object to be notified of changes. The delegate must support
-    # receiving a `acl_will_change!` method.
+    #  The instance object to be notified of changes. The delegate must support
+    #  receiving a {Parse::Object#acl_will_change!} method.
     # @return [Parse::Object]
     attr_accessor :permissions, :delegate
 
+    # @!attribute [rw] permissions
+    # Contains a hash structure of permissions, with keys mapping to either Public '*',
+    # a role name or an objectId for a user and values of type {ACL::Permission}. If you
+    # modify this attribute directly, you should call {Parse::Object#acl_will_change!}
+    # on the target object in order for dirty tracking to register changes.
+    # @example
+    #  object.acl.permissions
+    #  # => { "*": { "read": true }, "3KmCvT7Zsb": {  "read": true, "write": true } }
+    # @return [Hash] a hash of permissions.
     def permissions
       @permissions ||= {}
     end
@@ -301,16 +314,124 @@ module Parse
       permissions.values.any? { |v| v.present? }
     end
 
+    # Removes all ACLs, which only allows requests using the Parse Server master key
+    # to query and modify the object.
+    # @example
+    #  object.acl
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    #  object.acl.master_key_only!
+    #  # Outcome:
+    #  #    { }
+    # @version 1.7.2
+    # @return [Hash] The cleared permissions hash
+    def master_key_only!
+      will_change!
+      @permissions = {}
+    end; alias_method :clear!, :master_key_only!
+
+    # Grants read permission on all existing users and roles attached to this object.
+    # @example
+    #  object.acl
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    #  object.acl.all_read!
+    #  # Outcome:
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "read" : true, "write": true}
+    #  #     }
+    # @version 1.7.2
+    # @return [Array] list of ACL keys
+    def all_read!
+      will_change!
+      permissions.keys.each do |perm|
+        permissions[perm].read! true
+      end
+    end
+
+    # Grants write permission on all existing users and roles attached to this object.
+    # @example
+    #  object.acl
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    #  object.acl.all_write!
+    #  # Outcome:
+    #  #    { "*":          { "read" : true, "write": true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    # @version 1.7.2
+    # @return [Array] list of ACL keys
+    def all_write!
+      will_change!
+      permissions.keys.each do |perm|
+        permissions[perm].write! true
+      end
+    end
+
+    # Denies read permission on all existing users and roles attached to this object.
+    # @example
+    #  object.acl
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    #  object.acl.no_read!
+    #  # Outcome:
+    #  #    { "*":          nil,
+    #  #      "3KmCvT7Zsb": { "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    # @version 1.7.2
+    # @return [Array] list of ACL keys
+    def no_read!
+      will_change!
+      permissions.keys.each do |perm|
+        permissions[perm].read! false
+      end
+    end
+
+    # Denies write permission on all existing users and roles attached to this object.
+    # @example
+    #  object.acl
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true, "write": true },
+    #  #      "role:Admins": { "write": true }
+    #  #     }
+    #  object.acl.no_write!
+    #  # Outcome:
+    #  #    { "*":          { "read" : true },
+    #  #      "3KmCvT7Zsb": { "read" : true },
+    #  #      "role:Admins": nil
+    #  #     }
+    # @version 1.7.2
+    # @return [Array] list of ACL keys
+    def no_write!
+      will_change!
+      permissions.keys.each do |perm|
+        permissions[perm].write! false
+      end
+    end
+
     # The Permission class tracks the read and write permissions for a specific
     # ACL entry. The value of an Parse-ACL hash only contains two keys: "read" and "write".
     #
     #  # Example of the ACL format
     #   { "*":          { "read": true },
-    #     "3KmCvT7Zsb": { "read": true, "write": true }
+    #     "3KmCvT7Zsb": { "read": true, "write": true },
+    #     "role:Admins": { "write": true }
     #   }
     # This would be managed as:
     #   { "*":          ACL::Permission.new(true),
     #     "3KmCvT7Zsb": ACL::Permission.new(true, true)
+    #     "role:Amdins": ACL::Permission.new(false,true)
     #   }
     #
     class Permission
@@ -378,6 +499,32 @@ module Parse
       # @return [Boolean] whether there is at least one permission set to true.
       def present?
         @read.present? || @write.present?
+      end
+
+      # Sets the *read* value of the permission.
+      # @note Setting the value in this manner is not dirty tracked.
+      # @return [void]
+      def read!(value = true)
+        @read = value
+      end
+
+      # Sets the *write* value of the permission.
+      # @note Setting the value in this manner is not dirty tracked.
+      # @return [void]
+      def write!(value = true)
+        @write = value
+      end
+
+      # Sets the *write* value of the permission to false.
+      # @return [void]
+      def no_read!
+        @write = false
+      end
+
+      # Sets the *write* value of the permission to false.
+      # @return [void]
+      def no_write!
+        @write = false
       end
 
     end

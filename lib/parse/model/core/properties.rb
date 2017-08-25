@@ -88,17 +88,18 @@ module Parse
       # required: (data_type)
       # default: (value or Proc)
       # alias: Whether to create the remote field alias getter/setters for this attribute
+
+      # symbolize: Makes sure the saved and return value locally is in symbol format. useful
+      # for enum type fields that are string columns in Parse. Ex. a booking_status for a field
+      # could be either "submitted" or "completed" in Parse, however with symbolize, these would
+      # be available as :submitted or :completed.
+
       # This is the class level property method to be used when declaring properties. This helps builds specific methods, formatters
       # and conversion handlers for property storing and saving data for a particular parse class.
       # The first parameter is the name of the local attribute you want to declare with its corresponding data type.
       # Declaring a `property :my_date, :date`, would declare the attribute my_date with a corresponding remote column called
       # "myDate" (lower-first-camelcase) with a Parse data type of Date.
       # You can override the implicit naming behavior by passing the option :field to override.
-
-      # symbolize: Makes sure the saved and return value locally is in symbol format. useful
-      # for enum type fields that are string columns in Parse. Ex. a booking_status for a field
-      # could be either "submitted" or "completed" in Parse, however with symbolize, these would
-      # be available as :submitted or :completed.
       def property(key, data_type = :string, **opts)
 
         key = key.to_sym

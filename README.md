@@ -587,14 +587,15 @@ event.time_zone.valid? # => false
 
 ### [Parse::ACL](https://www.modernistik.com/gems/parse-stack/Parse/ACL.html)
 The `ACL` class represents the access control lists for each record. An ACL is represented by a JSON object with the keys being `Parse::User` object ids or the special key of `*`, which indicates the public access permissions.
-The value of each key in the hash is a `Parse::ACL::Permission` object which defines the boolean permission state for `read` and `write`.
+The value of each key in the hash is a [`Parse::ACL::Permission`](https://www.modernistik.com/gems/parse-stack/Parse/ACL/Permission.html) object which defines the boolean permission state for `read` and `write`.
 
-The example below illustrates a Parse ACL JSON object where there is a public read permission, but public write is prevented. In addition, the user with id `3KmCvT7Zsb`, is allowed to both read and write this record.
+The example below illustrates a Parse ACL JSON object where there is a public read permission, but public write is prevented. In addition, the user with id `3KmCvT7Zsb` and the `Admins` role, are allowed to both read and write on this record.
 
 ```json
 {
   "*": { "read": true },
-  "3KmCvT7Zsb": {  "read": true, "write": true }
+  "3KmCvT7Zsb": {  "read": true, "write": true },
+  "role:Admins": {  "read": true, "write": true }
 }
 ```
 
@@ -609,7 +610,6 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
   # apply public read, but no public write
   artist.acl.everyone true, false
 
-
   # allow user to have read and write access
   artist.acl.apply user.id, true, true
 
@@ -618,6 +618,12 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 
   # allow the 'Admins' role read and write
   artist.acl.apply_role "Admins", true, true
+
+  # remove write from all attached privileges
+  artist.acl.no_write!
+
+  # remove all attached privileges
+  artist.acl.master_key_only!
 
   artist.save
 ```
