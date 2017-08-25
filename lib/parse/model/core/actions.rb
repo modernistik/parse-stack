@@ -201,7 +201,7 @@ module Parse
         #    # it will automatically be saved
         #  end
         # @note You cannot use *:updated_at* as a constraint.
-        # @return [Boolean] whether there were any errors.
+        # @return [Boolean] true if all saves succeeded and there were no errors.
         def save_all(constraints = {})
           invalid_constraints = constraints.keys.any? do |k|
             (k == :updated_at || k == :updatedAt) ||
@@ -272,7 +272,7 @@ module Parse
 
             has_errors ||= batch.error?
           end
-          has_errors
+          not has_errors
         end
 
       end # ClassMethods
