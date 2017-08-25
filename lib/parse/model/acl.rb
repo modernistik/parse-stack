@@ -501,27 +501,31 @@ module Parse
         @read.present? || @write.present?
       end
 
-      # Sets the *read* value of the permission.
+      # Sets the *read* value of the permission. Defaults to true.
       # @note Setting the value in this manner is not dirty tracked.
+      # @version 1.7.2
       # @return [void]
       def read!(value = true)
         @read = value
       end
 
-      # Sets the *write* value of the permission.
+      # Sets the *write* value of the permission. Defaults to true.
       # @note Setting the value in this manner is not dirty tracked.
+      # @version 1.7.2
       # @return [void]
       def write!(value = true)
         @write = value
       end
 
-      # Sets the *write* value of the permission to false.
+      # Sets the *read* value of the permission to false.
+      # @version 1.7.2
       # @return [void]
       def no_read!
         @write = false
       end
 
       # Sets the *write* value of the permission to false.
+      # @version 1.7.2
       # @return [void]
       def no_write!
         @write = false
