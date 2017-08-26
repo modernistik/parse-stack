@@ -82,10 +82,20 @@ module Parse
   end
 
   # Helper method to get the default Parse client.
-  # @param conn [Symbol] the name of the client connection to use.
+  # @param conn [Symbol] the name of the client connection to use. Defaults to :default
   # @return [Parse::Client] a client object for the connection name.
   def self.client(conn = :default)
     Parse::Client.client(conn)
+  end
+
+  # The shared cache for the default client connection. This is useful if you want to
+  # also utilize the same cache store for other purposes in your application.
+  # This should normally be a {https://github.com/minad/moneta Moneta} unified
+  # cache interface.
+  # @return [Moneta::Transformer,Moneta::Expires] the cache instance
+  # @see Parse::Client#cache
+  def self.cache
+    @shared_cache ||= Parse::Client.client(:default).cache
   end
 
   # This class is the core and low level API for the Parse SDK REST interface that
@@ -122,6 +132,7 @@ module Parse
 
     # @!attribute cache
     #  The underlying cache store for caching API requests.
+    #  @see Parse.cache
     #  @return [Moneta::Transformer,Moneta::Expires]
     # @!attribute [r] application_id
     #  The Parse application identifier to be sent in every API request.

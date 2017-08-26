@@ -1815,6 +1815,23 @@ Song.all limit: 500, cache: false
 Song.all limit: 500, cache: 1.minute
 ```
 
+You may access the shared cache for the default client connection through `Parse.cache`. This is useful if you
+want to utilize the same cache store for other purposes.
+
+```ruby
+# Access the cache instance for other uses
+Parse.cache["key"] = "value"
+Parse.cache["key"] # => "value"
+
+# or with Parse queries and objects
+Parse.cache.fetch("all:song:records") do |key|
+  results = Song.all # or other complex query or operation
+  # store it in the cache, but expires in 30 seconds
+  Parse.cache.store(key, results, expires: 30)
+end
+
+```
+
 #### :use_master_key
 A true/false value. If you provided a master key as part of `Parse.setup()`, it will be sent on every request. However, if you wish to disable sending the master key on a particular request in order for the record ACLs to be enforced, you may pass `false`. If `false` is passed, caching will be disabled for this request.
 
@@ -2565,6 +2582,22 @@ Parse::Client.client.clear_cache!
 
 # or through the client accessor of a model
 Song.client.clear_cache!
+```
+
+You can always access the default shared cache through `Parse.cache` and utilize it
+for other purposes in your application:
+
+```ruby
+# Access the cache instance for other uses
+Parse.cache["key"] = "value"
+Parse.cache["key"] # => "value"
+
+# or with Parse queries and objects
+Parse.cache.fetch("all:records") do |key|
+  results = Song.all # or other complex query or operation
+  # store it in the cache, but expires in 30 seconds
+  Parse.cache.store(key, results, expires: 30)
+end
 
 ```
 
