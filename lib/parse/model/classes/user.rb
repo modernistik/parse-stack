@@ -415,6 +415,19 @@ module Parse
       response.success? ? Parse::User.build(response.result) : nil
     end
 
+    # If the current session token for this instance is nil, this method finds
+    # the most recent active Parse::Session token for this user and applies it to the instance.
+    # The user instance will now be authenticated and logged in with the selected session token.
+    # Useful if you need to call save or destroy methods on behalf of a logged in user.
+    # @return [String] The session token or nil if no session was found for this user.
+    def any_session!
+      unless @session_token.present?
+        _active_session = active_sessions(restricted: false, order: :updated_at.desc).first
+        self.session_token = _active_session.session_token if _active_session.present?
+      end
+      @session_token
+    end
+
   end
 
 end

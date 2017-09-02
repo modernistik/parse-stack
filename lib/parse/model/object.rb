@@ -368,13 +368,17 @@ module Parse
       @id.blank?
     end
 
-    # Existed returns true/false depending whether the object
-    # had existed before *its last save operation*. This implies
-    # that the created_at and updated_at dates are exactly the same. This
-    # is a helper method in a webhook afterSave to know if this object was recently
-    # saved in the beforeSave webhook.
+    # Existed returns true if the object had existed before *its last save
+    # operation*. This method returns false if the {Parse::Object#created_at}
+    # and {Parse::Object#updated_at} dates of an object are equal, implyiny this
+    # object has been newly created and saved (especially in an afterSave hook).
+    #
+    # This is a helper method in a webhook afterSave to know
+    # if this object was recently saved in the beforeSave webhook. Checking for
+    # {Parse::Object#existed?} == false in an afterSave hook, is equivalent to using
+    # {Parse::Object#new?} in a beforeSave hook.
     # @note You should not use this method inside a beforeSave webhook.
-    # @return [Boolean] true if the last beforeSave webhook successfully saved this object for the first time.
+    # @return [Boolean] true iff the last beforeSave successfully saved this object for the first time.
     def existed?
       if @id.blank? || @created_at.blank? || @updated_at.blank?
         return false
