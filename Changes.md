@@ -2,7 +2,7 @@
 
 ### 1.7.2
 - NEW: `Parse::Model.autosave_on_create` has been removed in favor of `first_or_create!`.
-- NEW: Hooks and Functions now have a `log` method, similar to `puts`, but allows easier tracing of
+- NEW: Webhook Triggers and Functions now have a `wlog` method, similar to `puts`, but allows easier tracing of
 single requests in a multi-request threaded environment. (See Parse::Webhooks::Payload)
 - NEW: `:id` constraints also safely supports pointers by skipping class matching.
 - NEW: Support for `add_unique` and the set union operator `|` in collection proxies.

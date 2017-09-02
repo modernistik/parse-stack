@@ -2398,7 +2398,7 @@ class Song < Parse::Object
     # ... do stuff ...
 
     # Helper method for logging
-    log "Doing stuff..."
+    wlog "Doing stuff..."
 
     some_result
   end
@@ -2457,7 +2457,7 @@ class Artist < Parse::Object
     error!("Name cannot be empty") if artist.name.blank?
 
     if artist.name_changed?
-      log "The artist name changed!"
+      wlog "The artist name changed!"
       # .. do something if `name` has changed
     end
 

@@ -100,12 +100,13 @@ module Parse
 
       # Method to print to standard that utilizes the an internal id to make it easier
       # to trace incoming requests.
-      def log(s)
+      def wlog(s)
         # generates a unique random number in order to be used in logging. This
         # is useful when debugging issues in production where one server instance
         # may be running multiple threads and you want to trace the incoming call.
-        @rid ||= rand(1000)
-        puts "[#{rid}] #{s}"
+        @rid ||= rand(999).to_s.rjust(3)
+        puts "[> #{@rid}] #{s}"
+        @rid
       end
 
       # true if this is a webhook function request.
