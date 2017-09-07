@@ -60,6 +60,7 @@ class Time
   end
 
 end
+
 # Adds extensions to DateTime class to be compatible with {Parse::Date}.
 class DateTime
   # @return [Parse::Date] Converts object to Parse::Date
@@ -76,5 +77,13 @@ module ActiveSupport
     def parse_date
       Parse::Date.parse iso8601(3)
     end
+  end
+end
+
+# Adds extensions to Date class to be compatible with {Parse::Date}.
+class Date
+  # @return [Parse::Date] Converts object to Parse::Date
+  def parse_date
+    Parse::Date.parse iso8601
   end
 end

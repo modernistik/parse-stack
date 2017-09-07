@@ -3,6 +3,7 @@
 
 require_relative 'operation'
 require 'time'
+require 'date'
 
 module Parse
   # Constraints are the heart of the Parse::Query system.
@@ -104,7 +105,12 @@ module Parse
       def formatted_value(value)
         d = value
         d = { __type: Parse::Model::TYPE_DATE, iso: d.utc.iso8601(3) } if d.respond_to?(:utc)
-        d = { __type: Parse::Model::TYPE_DATE, iso: d.iso8601(3) } if d.respond_to?(:iso8601)
+        # if it responds to parse_date (most likely a time/date object), then call the conversion
+        d = d.parse_date if d.respond_to?(:parse_date)
+        # if it's not a Parse::Date, but still responds to iso8601, then do it manually
+        if d.is_a?(Parse::Date) == false && d.respond_to?(:iso8601)
+          d = { __type: Parse::Model::TYPE_DATE, iso: d.iso8601(3) }
+        end
         d = d.pointer if d.respond_to?(:pointer) #simplified query object
         d = d.to_s if d.is_a?(Regexp)
         # d = d.pointer if d.is_a?(Parse::Object) #simplified query object
