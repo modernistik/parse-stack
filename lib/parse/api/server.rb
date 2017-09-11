@@ -29,7 +29,8 @@ module Parse
       # Fetches the status of the server based on the health check.
       # @return [Boolean] whether the server is 'OK'.
       def server_health
-        response = request :get, SERVER_HEALTH_PATH
+        opts = {cache: false}
+        response = request :get, SERVER_HEALTH_PATH, opts: opts
         response.success?
       end
 

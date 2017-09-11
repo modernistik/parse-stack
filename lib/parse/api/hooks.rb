@@ -23,7 +23,8 @@ module Parse
       # Fetch all defined cloud code functions.
       # @return [Parse::Response]
       def functions
-        request :get, "#{HOOKS_PREFIX}functions"
+        opts = {cache: false}
+        request :get, "#{HOOKS_PREFIX}functions", opts: opts
       end
 
       # Fetch information about a specific registered cloud function.
@@ -61,7 +62,8 @@ module Parse
       # Get the set of registered triggers.
       # @return [Parse::Response]
       def triggers
-        request :get, "#{HOOKS_PREFIX}triggers"
+        opts = {cache: false}
+        request :get, "#{HOOKS_PREFIX}triggers", opts: opts
       end
 
       # Fetch information about a registered webhook trigger.

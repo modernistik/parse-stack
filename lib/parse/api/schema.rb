@@ -12,14 +12,16 @@ module Parse
       # Get all the schemas for the application.
       # @return [Parse::Response]
       def schemas
-        request :get, SCHEMAS_PATH
+        opts = {cache: false}
+        request :get, SCHEMAS_PATH, opts: opts
       end
 
       # Get the schema for a collection.
       # @param className [String] the name of the remote Parse collection.
       # @return [Parse::Response]
       def schema(className)
-        request :get, "#{SCHEMAS_PATH}/#{className}"
+        opts = {cache: false}
+        request :get, "#{SCHEMAS_PATH}/#{className}", opts: opts
       end
 
       # Create a new collection with the specific schema.
