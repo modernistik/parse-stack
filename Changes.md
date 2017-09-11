@@ -14,6 +14,7 @@ single requests in a multi-request threaded environment. (See Parse::Webhooks::P
 - NEW: Expose the shared cache store through `Parse.cache`.
 - NEW: `User#any_session!` method, see documentation.
 - NEW: Extension to support `Date#parse_date`.
+- NEW: Added `Parse::Query#append` as alias to `Parse::Query#conditions`
 - CHANGED: `save_all` now returns true if there were no errors.
 - FIXED: first_or_create will now apply dirty tracking to newly created fields.
 - FIXED: Properties of :array type will always return a Parse::CollectionProxy if their internal value is nil. The object will not be marked dirty until something is added to the array.

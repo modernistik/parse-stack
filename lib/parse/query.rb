@@ -333,7 +333,9 @@ module Parse
         end
       end # each
       self #chaining
-    end; alias_method :query, :conditions
+    end
+    alias_method :query, :conditions
+    alias_method :append, :conditions
 
     def table=(t)
       @table = t.to_s.camelize
