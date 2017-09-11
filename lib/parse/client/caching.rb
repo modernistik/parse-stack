@@ -115,7 +115,7 @@ module Parse
 
         # if caching is enabled and we have a valid cache duration, use cache
         # otherwise work as a passthrough.
-        return @app.call(env) unless @store.present? && @enabled && @expires > 0
+        return @app.call(env) unless @enabled && @store.present? && @expires > 0
 
         url = env.url
         method = env.method
