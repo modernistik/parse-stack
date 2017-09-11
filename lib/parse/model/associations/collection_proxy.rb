@@ -301,8 +301,8 @@ module Parse
       end
 
       # @return [Hash] a JSON representation
-      def as_json(*args)
-        collection.as_json(args)
+      def as_json(opts = nil)
+        collection.as_json(opts)
       end
 
       # true if the collection is empty.

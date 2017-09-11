@@ -98,8 +98,8 @@ module Parse
     end
 
     # Encode the collection as a JSON object of Parse::Pointers.
-    def as_json(*args)
-      collection.parse_pointers.as_json
+    def as_json(opts = nil)
+      parse_pointers.as_json(opts)
     end
 
     # @return [Array<Parse::Pointer>] an array of pointers representing this collection.
