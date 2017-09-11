@@ -2394,17 +2394,29 @@ class Song < Parse::Object
 
   webhook :function, :mySongFunction do
     the_user = user # available if a Parse user made the call
-    params = params
-    # ... do stuff ...
+    str = params["str"]
 
+    # ... get the list of matching songs the user has access to.
+    results = Songs.all(:name.like => /#{str}/, :session => the_user)
     # Helper method for logging
-    wlog "Doing stuff..."
+    wlog "Found #{results.count} for #{the_user.username}"
 
-    some_result
+    results
   end
 
 end
 
+```
+
+You may optionally, register these functions outside of classes (recommended).
+
+```ruby
+Parse::Webhooks.route :function, :mySongFunction do
+  # .. do stuff ..
+  str = params["str"]
+  results = Songs.all(:name.like => /#{str}/, :session => user)
+  results
+end
 ```
 
 ### Cloud Code Triggers
@@ -2425,7 +2437,7 @@ You can register webhooks to handle the different object triggers: `:before_save
   end
 
   # or the explicit way
-  Parse::Webhooks.route :after_save, "Artist" do
+  Parse::Webhooks.route :after_save, :Artist do
     puts "User: #{user.username}" if user.present? # Parse::User
     artist = parse_object # Artist
     # no need for return in after save
