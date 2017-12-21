@@ -12,7 +12,7 @@ group :test, :development do
   gem 'pry'
   gem 'pry-stack_explorer'
   gem 'pry-nav'
-  gem 'yard'
+  gem 'yard', '>= 0.9.11'
   gem 'redcarpet'
   gem 'thin' # for yard server
 end
