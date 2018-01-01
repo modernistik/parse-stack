@@ -1,0 +1,18 @@
+PODS:
+  - Modernistik (0.3.0):
+    - Modernistik/Core (= 0.3.0)
+  - Modernistik/Core (0.3.0)
+
+DEPENDENCIES:
+  - Modernistik (from `../../`)
+
+EXTERNAL SOURCES:
+  Modernistik:
+    :path: ../../
+
+SPEC CHECKSUMS:
+  Modernistik: 755d8ab2790049965610196111aecf41466ab28b
+
+PODFILE CHECKSUM: 776de617e448fa6254db43564dcdea59f8799032
+
+COCOAPODS: 1.3.1

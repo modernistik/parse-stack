@@ -1,0 +1,6 @@
+framework module Pods_SlateExample {
+  umbrella header "Pods-SlateExample-umbrella.h"
+
+  export *
+  module * { export * }
+}

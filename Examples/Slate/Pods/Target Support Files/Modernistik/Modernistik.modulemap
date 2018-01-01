@@ -1,0 +1,6 @@
+framework module Modernistik {
+  umbrella header "Modernistik-umbrella.h"
+
+  export *
+  module * { export * }
+}
