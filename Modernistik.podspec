@@ -30,7 +30,7 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://twitter.com/modernistik'
 
   s.ios.deployment_target = '9.0'
-  s.pod_target_xcconfig = { 'SWIFT_VERSION' => '4.0' }
+
   s.default_subspec = 'Core'
 
   s.subspec 'Core' do |cs|
@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
   s.subspec 'Hyperdrive' do |cs|
     cs.dependency 'Modernistik/Core'
     cs.dependency 'Parse'
-    cs.dependency 'TimeZoneLocate'
+    cs.dependency 'TimeZoneLocate', '>= 0.4.0'
     cs.source_files = 'Modernistik/Hyperdrive/**/*'
   end
   # s.resource_bundles = {

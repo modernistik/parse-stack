@@ -243,11 +243,11 @@ extension UIFont {
         
          if let path = bundle.path(forResource: name, ofType: ext),
             let data = NSData(contentsOfFile: path),
-            let providerRef = CGDataProvider(data: data)
-        {
+            let providerRef = CGDataProvider(data: data),
             let font = CGFont(providerRef)
+        {
             //print("Registering font: \(font)")
-            CTFontManagerRegisterGraphicsFont(font!, nil)
+            CTFontManagerRegisterGraphicsFont(font, nil)
         } else {
             NSLog("[Err] Failed to register Font: \(name)")
         }
