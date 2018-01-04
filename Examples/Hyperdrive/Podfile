@@ -4,7 +4,6 @@ use_frameworks!
 
 target 'HyperdriveExample' do
   pod 'Modernistik/Hyperdrive', :path => '../../'
-
 end
 
 post_install do |installer|

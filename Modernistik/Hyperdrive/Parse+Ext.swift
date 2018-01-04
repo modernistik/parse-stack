@@ -9,6 +9,7 @@ import TimeZoneLocate
 
 extension PFObject {
 
+    /// Converts the object into a pointer dictionary.
     public var pointer: [String:Any?]? {
         assert(objectId != nil, "Tried to encode a pointer with no objectId.")
         guard let o = objectId else { return nil }
@@ -20,6 +21,7 @@ extension PFObject {
         return self == object
     }
 
+    /// Returns `true` if this object does not have an objectId.
     public var isNew:Bool {
         return objectId == nil
     }
@@ -40,6 +42,12 @@ extension PFSubclassing where Self: PFObject {
 
 }
 
+/// Compares two Parse objects by checking their objectId field and their class type.
+///
+/// - Parameters:
+///   - x: A Parse object..
+///   - y: A Parse object
+/// - Returns: `true` if both objects represent the same record.
 public func ==(x:PFObject, y:PFObject) -> Bool {
     return x.objectId == y.objectId && x.objectId != nil && type(of: x) == type(of: y)
 }
@@ -63,22 +71,31 @@ extension PFACL {
 
 extension PFUser {
 
-    open class var currentUserId:String? {
+    /// Alias for `User.current()?.objectId`
+    public class var currentUserId:String? {
         return current()?.objectId
     }
 
+    /// Whether the current user is logged in.
     open class var isAvailable:Bool {
         return current() != nil
     }
+    
+    /// Whether the current user is anonymous (unregistered)
     open class var isAnonymous:Bool {
         guard let user = current() else { return false }
         return PFAnonymousUtils.isLinked(with: user)
     }
 
+    /// Whether the current user is logged in and is not anonymous.
     open class var isRegistered:Bool {
         return isAvailable && !isAnonymous
     }
-    open class func registeredUser() -> Self? {
+    
+    /// Returns the current user only if they are logged in and not in an anonymous state.
+    ///
+    /// - Returns: The user if they are registered and logged in.
+    open static func registeredUser() -> Self? {
         let user = current()
         return ( user == nil || PFAnonymousUtils.isLinked(with: user) ) ? nil : user
     }
@@ -116,6 +133,7 @@ extension CLLocation {
 
 extension CLLocationCoordinate2D {
 
+    /// Returns a geoPoint object from this location.
     public var geoPoint:PFGeoPoint {
         return PFGeoPoint(latitude: latitude, longitude: longitude)
     }
@@ -158,10 +176,36 @@ public func ==(l:PFGeoPoint, r:PFGeoPoint) -> Bool {
 
 extension Error {
 
+    /// Returns `true` if the error is a Parse cache miss (120) error.
+    /// See `PFErrorCode.errorCacheMiss`
     public var isCacheMiss:Bool {
         return code == PFErrorCode.errorCacheMiss.rawValue
     }
 
+    /**
+    Returns an error only if we consider this being a critical error. In general,
+    all errors are critical except for two Parse errors: cache and sesion errors.
+
+    It is usually expected that you handle errors in your queries and api calls.
+    We recomned using the following pattern:
+    ````
+    if error == nil {
+     // success
+    } else if let error = error?.validError {
+     // handle a non-cache or non-session error
+    }
+    ````
+    ## Cache Errors
+    Cache error are light errors but may not affect the continuation of the request. For example,
+    if you perform a query with a cache policy of `.cacheThenNetwork` and there are no cached results
+    for the query, you will receive a `.errorCacheMiss` (120) error, however, the query will continue
+    going to the network to get server results.
+    ## Session Errors
+    These errors require special handling. In this case, this method will return nil in order to prevent your
+    the error handling from executing. However, a `HyperdriveSessionErrorNotification` will be posted to the
+    default notification center in order for you to handle the session error and log out the user of the application.
+     This design pattern helps you from having to verify session errors in every query or API callback result block.
+     */
     public var validError:Error? {
         if isCacheMiss { return nil }
         if isSessionError {
@@ -171,23 +215,43 @@ extension Error {
         return self
     }
 
+    /// Returns `true` if this error was due to an object not found or
+    /// whether a query or object refresh produced no results. This could happen
+    /// if the object doesn't exist in the system, or the current user is not allowed
+    /// to view the object due to ACLs.
+    /// See `PFErrorCode.errorObjectNotFound`
     public var isObjectNotFound:Bool {
         return code == PFErrorCode.errorObjectNotFound.rawValue && domain == "Parse"
     }
 
+    /// Returns `true` if this is a connection failure when connected to Parse server.
+    /// See `PFErrorCode.errorConnectionFailed`
     public var isOffline:Bool {
         return code == PFErrorCode.errorConnectionFailed.rawValue && domain == "Parse"
     }
 
     /// Cloud code script or hook had an error (Ex. before save hook fails)
+    /// See `PFErrorCode.scriptError`
     public var isScriptError:Bool {
         return code == PFErrorCode.scriptError.rawValue && domain == "Parse"
     }
 
+    /// Returns `true` if this is a Parse validation error.
+    /// See `PFErrorCode.validationError`
     public var isValidationError:Bool {
         return code == PFErrorCode.validationError.rawValue && domain == "Parse"
     }
 
+    /**
+     Whether the error that occurs wasn't critical, and the original request can be retried.
+     This may happen for a number of reasons, mostly due to network congestion or throttling.
+     
+     ## Rules
+        * Errors with codes 3840 and 100, which are `bad json` Parse errors are retriable.
+        * Parse errors `errorInternalServer`, `errorConnectionFailed`, `errorTimeout`,
+        `errorRequestLimitExceeded`, and `errorExceededQuota` are retriable
+        * Anything else is should not cause the app to retry a request to the server.
+    */
     public var isRetriable:Bool {
         if code == 3840 || code == 100 {
             // bad json - usually heroku app misconfigured, which returns HTML instead of Parse JSON
@@ -203,13 +267,20 @@ extension Error {
         }
     }
 
+    /// Returns true if this is a Parse invalid session token error.
+    /// A session error occurs when the session token
+    /// for the user has expired or has been revoked in Parse.
+    /// When this happens, the current user should be logged out of the app.
     public var isSessionError:Bool {
         return code == PFErrorCode.errorInvalidSessionToken.rawValue || code == PFErrorCode.errorUserCannotBeAlteredWithoutSession.rawValue
     }
 
+    /// Return the error code.
     public var code:Int {
         return (self as NSError).code
     }
+    
+    /// Return the domain string for the error.
     public var domain:String {
         return (self as NSError).domain
     }
@@ -259,6 +330,10 @@ extension TimeZoneAccessible where Self: PFObject {
 
 
 extension Sequence where Iterator.Element : PFObject {
+    
+    /// Transforms a list of Parse Objects into a list of
+    /// their corresponding objectIds. This method will handle the case
+    /// where some objects may not have objectIds.
     public var objectIds:[String] {
         return flatMap { (obj) -> String? in
             obj.objectId

@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		408D1429B7D23DE5269CF6D4 /* Pods_SlateExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 26D090EE86F0865B1E3BB209 /* Pods_SlateExample.framework */; };
+		452D8DF21FFDEFC900393C2C /* Modernistik.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 452D8DF01FFDEFC900393C2C /* Modernistik.podspec */; };
+		452D8DF31FFDEFC900393C2C /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 452D8DF11FFDEFC900393C2C /* README.md */; };
 		459BA0FE1FFAB2B3004AC37A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 459BA0FD1FFAB2B3004AC37A /* AppDelegate.swift */; };
 		459BA1001FFAB2B3004AC37A /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 459BA0FF1FFAB2B3004AC37A /* ViewController.swift */; };
 		459BA1031FFAB2B3004AC37A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 459BA1011FFAB2B3004AC37A /* Main.storyboard */; };
@@ -18,6 +20,8 @@
 /* Begin PBXFileReference section */
 		26D090EE86F0865B1E3BB209 /* Pods_SlateExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlateExample.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3D3B05D71D45E323E3CB1DA3 /* Pods-SlateExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlateExample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-SlateExample/Pods-SlateExample.debug.xcconfig"; sourceTree = "<group>"; };
+		452D8DF01FFDEFC900393C2C /* Modernistik.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Modernistik.podspec; path = ../../Modernistik.podspec; sourceTree = "<group>"; };
+		452D8DF11FFDEFC900393C2C /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = "<group>"; };
 		459BA0FA1FFAB2B3004AC37A /* SlateExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SlateExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		459BA0FD1FFAB2B3004AC37A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		459BA0FF1FFAB2B3004AC37A /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -52,6 +56,8 @@
 		459BA0F11FFAB2B3004AC37A = {
 			isa = PBXGroup;
 			children = (
+				452D8DF01FFDEFC900393C2C /* Modernistik.podspec */,
+				452D8DF11FFDEFC900393C2C /* README.md */,
 				459BA0FC1FFAB2B3004AC37A /* SlateExample */,
 				459BA0FB1FFAB2B3004AC37A /* Products */,
 				07D9AEECC6A733453177DC21 /* Pods */,
@@ -150,7 +156,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				452D8DF21FFDEFC900393C2C /* Modernistik.podspec in Resources */,
 				459BA1081FFAB2B3004AC37A /* LaunchScreen.storyboard in Resources */,
+				452D8DF31FFDEFC900393C2C /* README.md in Resources */,
 				459BA1051FFAB2B3004AC37A /* Assets.xcassets in Resources */,
 				459BA1031FFAB2B3004AC37A /* Main.storyboard in Resources */,
 			);

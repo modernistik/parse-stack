@@ -7,14 +7,18 @@ import Foundation
 
 /// A basic empty completion block that provides an error in case of failure.
 /// - parameter error: An error if not successful.
-public typealias CompletionResultBlock = (_ error:Error?) -> ()
+public typealias CompletionResultBlock = (_ error:Error?) -> Void
 public typealias ResultBlock = CompletionResultBlock
 
 /// A completion block that returns a boolean result.
 /// - parameter success: A boolean result whether it was completed successfully.
-public typealias CompletionSuccessBlock = (_ success:Bool) -> ()
+public typealias CompletionSuccessBlock = (_ success:Bool) -> Void
 public typealias SuccessBlock = CompletionSuccessBlock
 
+/// A completion block that returns a boolean result and a possible error.
+/// - parameter success: A boolean result whether it was completed successfully.
+/// - parameter error: An error if not successful.
+public typealias CompletionBooleanBlock = (_ success:Bool, _ error:Error?) -> Void
 
 /// A basic completion block with no parameters or result.
 public typealias CompletionBlock = () -> Void

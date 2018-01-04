@@ -241,9 +241,16 @@ extension Notification.Name {
     public static let HyperdriveSessionErrorNotification = Notification.Name(rawValue: "HyperdriveSessionErrorNotification")
 }
 
+/// This class provides an interface to access the remote configuration provided by Hyperdrive (also PFConfig).
+/// The class comes main static method is `key()`, which provides access to the `PFConfig` dictionary.
+/// It is recommended that you extensions to this class that provide methods that return type-safe values for easier handling.
 open class Config {
 
-    open class func key(_ key:String) -> AnyObject? {
+    /// Retrieve a value from the remote Parse config.
+    ///
+    /// - Parameter key: The name of the key.
+    /// - Returns: The value which should be casted based on what is expected.
+    public static func key(_ key:String) -> AnyObject? {
         return PFConfig.current().object(forKey: key) as AnyObject?
     }
 
@@ -294,18 +301,18 @@ extension Hyperdrive {
 
 extension Config {
     /// Returns the `minimumiOSBuildVersion` config value. Defaults to 0
-    open class var minimumBuildVersion:Int {
+    public class var minimumBuildVersion:Int {
         return key("minimumiOSBuildVersion") as? Int ?? 0
     }
 
     /// Returns the `maintenance` boolean config value. Defaults to false.
-    open class var maintenance:Bool {
+    public class var maintenance:Bool {
         return key("maintenance") as? Bool ?? false
     }
 
     /// Returns true if the `minimumBuildVersion` remote config value is greater than
     /// the current build version in the bundle (`CFBundleVersion`).
-    open class var needsUpgrade:Bool {
+    public class var needsUpgrade:Bool {
         return Config.minimumBuildVersion > Bundle.currentBuildVersion
     }
 

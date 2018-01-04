@@ -5,20 +5,25 @@
 
 import UIKit
 
+/// Protocol that requires the implementor to have a `reuseIdentifier` field.
+/// This is normally implemented by items that will go through a recycling phase.
 public protocol ReusableType {
     static var reuseIdentifier:String { get }
 }
 
 extension ReusableType {
+    
+    /// Return the reuseIdentifier for this object. By default it is their class name.
     public static var reuseIdentifier:String {
         return String(describing: Self.self)
     }
 }
 
+/// An object that has a rawValue type that returns an Int.
 public protocol IntRepresentable {
     var rawValue: Int { get }
 }
-
+/// An object that has a rawValue type that returns a String.
 public protocol StringRepresentable {
     var rawValue: String { get }
 }
