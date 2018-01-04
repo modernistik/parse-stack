@@ -7,6 +7,45 @@ import Parse
 
 /// Alias to block type `PFIdResultBlock` with signature `(result,error)`.
 public typealias FunctionResultBlock = PFIdResultBlock
+/// Alias to block type `PFGeoPointResultBlock` with signature `(geopoint,error)`.
+public typealias GeoPointResultBlock = PFGeoPointResultBlock
+
+/// Alias to `PFConfig`.
+public typealias HyperdriveConfig = PFConfig
+
+/// Alias to `PFObject`. This should be the main parent class to your subclasses.
+/// In general, your Parse subclass should inherit from `PFObject` or `HyperObject`
+/// and implement `PFSubclassing` or `ParseSubclassing`.
+/// ## Discussion
+/// The reason for the alias is that we will be making additional enhancements with Swift and
+/// protocol extensions to make things easier to setup.
+public typealias HyperObject = PFObject
+
+/// Alias to `PFUser`. Subclass this to add properties to your user class.
+public typealias HyperdriveUser = PFUser
+
+/// Alias to `PFRole`.
+public typealias HyperdriveRole = PFRole
+
+/// Alias to `PFInstallation`.
+public typealias HyperdriveInstallation = PFInstallation
+
+/// Alias to `PFSubclassing` protocol.
+/// ## Discussion
+/// The reason for the alias is that we will be making additional enhancements with Swift and
+/// protocol extensions to make things easier to setup.
+public typealias ParseSubclassing = PFSubclassing
+
+/// Alias to `PFCachePolicy`
+public typealias QueryCachePolicy = PFCachePolicy
+
+/// Alias to `PFQuery`
+public typealias Query = PFQuery
+/// Alias to `PFGeoPoint`
+public typealias GeoPoint = PFGeoPoint
+
+/// Alias to `PFFile`
+public typealias RemoteFile = PFFile
 
 /// Alias for `[String: Any]`
 public typealias Params  = [String:Any]
@@ -140,7 +179,7 @@ extension Hyperdrive where Function.RawValue == String {
 }
 
 extension Hyperdrive {
-
+    
     /// Returns the config value based on the key.
     ///
     /// - Parameter key: The name of the configuration key.
@@ -241,80 +280,3 @@ extension Notification.Name {
     public static let HyperdriveSessionErrorNotification = Notification.Name(rawValue: "HyperdriveSessionErrorNotification")
 }
 
-/// This class provides an interface to access the remote configuration provided by Hyperdrive (also PFConfig).
-/// The class comes main static method is `key()`, which provides access to the `PFConfig` dictionary.
-/// It is recommended that you extensions to this class that provide methods that return type-safe values for easier handling.
-open class Config {
-
-    /// Retrieve a value from the remote Parse config.
-    ///
-    /// - Parameter key: The name of the key.
-    /// - Returns: The value which should be casted based on what is expected.
-    public static func key(_ key:String) -> AnyObject? {
-        return PFConfig.current().object(forKey: key) as AnyObject?
-    }
-
-}
-
-// MARK: Upgrade Extension
-
-public struct LaunchState {
-    public enum Mode {
-        case restart, install, upgrade
-    }
-    public var mode = Mode.restart
-    public let build:Int
-}
-
-
-extension Hyperdrive {
-
-    public static var currentBuildVersion:Int {
-        get {
-            return UserDefaults.standard.object(forKey: "AppBuildVersionKey") as? Int ?? 0
-        }
-        set {
-            UserDefaults.standard.set(newValue, forKey: "AppBuildVersionKey")
-        }
-    }
-
-    /// Determines whether this app is an install, upgrade or regular lanuch (restart). After the block
-    /// returns, if the result is true, the internal build version will be updated. Use this method to determine
-    /// the state of the launch and do any attribution tracking or upgrade changes that need to be made.
-    public static func updateLaunchState(completion:(LaunchState)->(Bool)) {
-        let previousBuildVersion = Self.currentBuildVersion
-        //in case we used the previous value format
-        let buildVersion = Bundle.currentBuildVersion
-        var result = LaunchState(mode: .restart, build: buildVersion)
-
-        if previousBuildVersion == 0 {
-            result.mode = .install
-        } else if previousBuildVersion < buildVersion {
-            result.mode = .upgrade
-        }
-        // If true we update the build version.
-        if completion(result) {
-            currentBuildVersion = buildVersion
-        }
-    }
-}
-
-extension Config {
-    /// Returns the `minimumiOSBuildVersion` config value. Defaults to 0
-    public class var minimumBuildVersion:Int {
-        return key("minimumiOSBuildVersion") as? Int ?? 0
-    }
-
-    /// Returns the `maintenance` boolean config value. Defaults to false.
-    public class var maintenance:Bool {
-        return key("maintenance") as? Bool ?? false
-    }
-
-    /// Returns true if the `minimumBuildVersion` remote config value is greater than
-    /// the current build version in the bundle (`CFBundleVersion`).
-    public class var needsUpgrade:Bool {
-        return Config.minimumBuildVersion > Bundle.currentBuildVersion
-    }
-
-
-}

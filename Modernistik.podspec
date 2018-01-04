@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Modernistik'
-  s.version          = '0.3.0'
+  s.version          = '0.3.1'
   s.summary          = 'Swift design patterns, sugars and extensions for Modernistik development.'
 
 # This description is used to generate tags and improve search results.

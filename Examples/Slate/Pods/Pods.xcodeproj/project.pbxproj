@@ -7,22 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		02B4B548DEEE547E247D29EF5C6DACC1 /* StoryboardConformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4B9C3E09C46FFD6BB5B1E439E1EE02B /* StoryboardConformance.swift */; };
 		07A30EDA8E250900138EA105FBD13162 /* Pods-SlateExample-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 9880B39F429582E953B6BD14CAC51499 /* Pods-SlateExample-dummy.m */; };
 		085FAB6B334169F6D3D1D98F3FB8D371 /* Pods-SlateExample-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 55D154D6F367312DE43D81A93416556C /* Pods-SlateExample-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		0E09ED58453EC117D9D45AA42A44C561 /* SnappingCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656EB41AA417C8385CB307FD2C2FED6A /* SnappingCollectionViewLayout.swift */; };
+		0BF2328F57D222C6889AE772C916F8F9 /* CenterFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A73AA6028AEFA467FD798065C9CCFC /* CenterFlowLayout.swift */; };
+		25D545E0BDC860F8F110080F8C60687A /* DesignPatterns.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CE6278F531DBDD990AF7516C944FB9C /* DesignPatterns.swift */; };
+		2DC2B1D98E26A32AFDEBCED801D840DD /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
 		49B1E42E76BC0E49A1DB112E922253EC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		49C47B92AC8AC3CBEFD6E5DD61169234 /* CoreGraphics+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A766DE6F9C56087825E0A0BEC12D3E99 /* CoreGraphics+Ext.swift */; };
-		4A3F59BF23B86F8A224836168953ED71 /* Swift+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA75E7D1347BE9398CC5C6FEF3479147 /* Swift+Ext.swift */; };
-		5D9F75D309E4576C0622F2B2B0B71BD5 /* RelativeKeyboardLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D00F27D536EC2F205064A474D504B0E /* RelativeKeyboardLayoutConstraint.swift */; };
-		66AC6DC6F092A9C6111ECC59D9A0F579 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */; };
-		6CAB67B5658088F08D7E66A38599C81C /* UIKit+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = B157D548EAE388C5995704A6F3121293 /* UIKit+Ext.swift */; };
-		731BFD54FBF882080B8B061BCF96120A /* ConcurrentOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 967F87953C5D95FFB0D2E6FF1A8C46BC /* ConcurrentOperation.swift */; };
-		99B5B5893CEC8A3D0E9B9A3CD1BEC958 /* DesignPatterns.swift in Sources */ = {isa = PBXBuildFile; fileRef = E97890389E1774C680873594377A0E63 /* DesignPatterns.swift */; };
-		D7A62CBB49A48DF38C2F7DD096D03CF8 /* CenterFlowLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AA951A35DC00F2FB21891CB20470663 /* CenterFlowLayout.swift */; };
-		DAB3047D21387E399C6FBE55A829F1A0 /* Modernistik-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = 079D069E91AE3CFBF2327B26F27D93B5 /* Modernistik-dummy.m */; };
-		E9BBF5AA2621D0F54B5887850ACF7433 /* Foundation+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCE3B2D555DC3D45A8FFD359AC3A4C4C /* Foundation+Ext.swift */; };
-		F1ED8FED734A482EDC21FAA2FB93A358 /* Modernistik-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 98900D4F1C8DDE343F8EF81F0C23DA76 /* Modernistik-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		4BBD2440B3BB571C099090D67A2FEF28 /* Foundation+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9DE2531166EE804F3D7313FD2E1939A /* Foundation+Ext.swift */; };
+		55094748E6A4840B3D4AA958336327FF /* CoreGraphics+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68B5D7374A71AD442E368D2E2E6CAF39 /* CoreGraphics+Ext.swift */; };
+		756B7990DC761E9D88D21F4429689525 /* ConcurrentOperation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F87466B6D86C3FED8DE584A12EB3A8 /* ConcurrentOperation.swift */; };
+		792A086A38ADC09E269A0D22EEB45008 /* Swift+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A73A214FF522B6605AC468EBE717196 /* Swift+Ext.swift */; };
+		AE7B7B3FD3224194E38BEE4B8D030CC0 /* UIKit+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1180D9838307E9E2C0F63691767E230B /* UIKit+Ext.swift */; };
+		AF3086699F00C112CC99603B751A7CB4 /* Modernistik-umbrella.h in Headers */ = {isa = PBXBuildFile; fileRef = 6D7A7478F7535C87F1A7E6E51D8811A8 /* Modernistik-umbrella.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		BE5AF2273EB6C2779C0B17574B5AB729 /* SnappingCollectionViewLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9A05B98B73E26C0ACCD4ADBE1A49137 /* SnappingCollectionViewLayout.swift */; };
+		C2C5B0FAB69FB00567359155DCC30CB8 /* Upgrade+Ext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 450543E94E526355ECEB2DD581C23587 /* Upgrade+Ext.swift */; };
+		C7CB7C03098F8D2DC2D750CFCA11342A /* StoryboardConformance.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAD99190653258E612646F71E92728D4 /* StoryboardConformance.swift */; };
+		D8804B042B2C289FC981E032DE68AC6A /* RelativeKeyboardLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4FDC9B658E17D82758D0101D526FA56 /* RelativeKeyboardLayoutConstraint.swift */; };
+		EEEF7A348793879A15C92D870A6054E8 /* Modernistik-dummy.m in Sources */ = {isa = PBXBuildFile; fileRef = E1CE1847159BF37F147B9164FD762656 /* Modernistik-dummy.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,50 +31,51 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = D41D8CD98F00B204E9800998ECF8427E /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 2E3BE46EB9E0A33365FFA375DFA4CA69;
+			remoteGlobalIDString = 04A04E1BAD384D0764143B2400BB684F;
 			remoteInfo = Modernistik;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		079D069E91AE3CFBF2327B26F27D93B5 /* Modernistik-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Modernistik-dummy.m"; sourceTree = "<group>"; };
+		0D3EE73705F9C7F001EA091C00C581F9 /* Modernistik.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Modernistik.xcconfig; sourceTree = "<group>"; };
+		1180D9838307E9E2C0F63691767E230B /* UIKit+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UIKit+Ext.swift"; path = "Modernistik/Core/UIKit+Ext.swift"; sourceTree = "<group>"; };
 		162674233F9E4836A8DD7B3345DC548E /* Modernistik.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Modernistik.framework; path = Modernistik.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1AA951A35DC00F2FB21891CB20470663 /* CenterFlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CenterFlowLayout.swift; path = Modernistik/Core/CenterFlowLayout.swift; sourceTree = "<group>"; };
+		18A73AA6028AEFA467FD798065C9CCFC /* CenterFlowLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CenterFlowLayout.swift; path = Modernistik/Core/CenterFlowLayout.swift; sourceTree = "<group>"; };
+		1A73A214FF522B6605AC468EBE717196 /* Swift+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Swift+Ext.swift"; path = "Modernistik/Core/Swift+Ext.swift"; sourceTree = "<group>"; };
 		3D6DCF1C4A562EC26E20558FD344C0D6 /* Pods-SlateExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SlateExample.release.xcconfig"; sourceTree = "<group>"; };
-		466D72F60366A372B83681EBBFBA21DC /* Modernistik.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = Modernistik.modulemap; sourceTree = "<group>"; };
+		450543E94E526355ECEB2DD581C23587 /* Upgrade+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Upgrade+Ext.swift"; path = "Modernistik/Core/Upgrade+Ext.swift"; sourceTree = "<group>"; };
+		47F87466B6D86C3FED8DE584A12EB3A8 /* ConcurrentOperation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConcurrentOperation.swift; path = Modernistik/Core/ConcurrentOperation.swift; sourceTree = "<group>"; };
+		54186EE8528FE48781B1C80517B8BC7F /* Modernistik.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = Modernistik.modulemap; sourceTree = "<group>"; };
 		55D154D6F367312DE43D81A93416556C /* Pods-SlateExample-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Pods-SlateExample-umbrella.h"; sourceTree = "<group>"; };
 		5ECC4839A39B1EDCA58111B38AB23373 /* Pods-SlateExample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = "Pods-SlateExample.debug.xcconfig"; sourceTree = "<group>"; };
-		656EB41AA417C8385CB307FD2C2FED6A /* SnappingCollectionViewLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SnappingCollectionViewLayout.swift; path = Modernistik/Core/SnappingCollectionViewLayout.swift; sourceTree = "<group>"; };
+		64C99B0A9CD636534F2782D6B6B16756 /* Modernistik-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Modernistik-prefix.pch"; sourceTree = "<group>"; };
+		6529D2553576B0F083D44C93603A12E2 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6604A7D69453B4569E4E4827FB9155A9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS10.3.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
-		6D00F27D536EC2F205064A474D504B0E /* RelativeKeyboardLayoutConstraint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RelativeKeyboardLayoutConstraint.swift; path = Modernistik/Core/RelativeKeyboardLayoutConstraint.swift; sourceTree = "<group>"; };
-		80AC674E75095F46C8D9D7A8BEADE7A6 /* Modernistik-prefix.pch */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Modernistik-prefix.pch"; sourceTree = "<group>"; };
+		68B5D7374A71AD442E368D2E2E6CAF39 /* CoreGraphics+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "CoreGraphics+Ext.swift"; path = "Modernistik/Core/CoreGraphics+Ext.swift"; sourceTree = "<group>"; };
+		6CE6278F531DBDD990AF7516C944FB9C /* DesignPatterns.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DesignPatterns.swift; path = Modernistik/Core/DesignPatterns.swift; sourceTree = "<group>"; };
+		6D7A7478F7535C87F1A7E6E51D8811A8 /* Modernistik-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Modernistik-umbrella.h"; sourceTree = "<group>"; };
 		93A4A3777CF96A4AAC1D13BA6DCCEA73 /* Podfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; includeInIndex = 1; lastKnownFileType = text; name = Podfile; path = ../Podfile; sourceTree = SOURCE_ROOT; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
-		967F87953C5D95FFB0D2E6FF1A8C46BC /* ConcurrentOperation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ConcurrentOperation.swift; path = Modernistik/Core/ConcurrentOperation.swift; sourceTree = "<group>"; };
 		9880B39F429582E953B6BD14CAC51499 /* Pods-SlateExample-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Pods-SlateExample-dummy.m"; sourceTree = "<group>"; };
-		98900D4F1C8DDE343F8EF81F0C23DA76 /* Modernistik-umbrella.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; path = "Modernistik-umbrella.h"; sourceTree = "<group>"; };
 		9B58F79EB9FD2544576FA48EA94F3559 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A766DE6F9C56087825E0A0BEC12D3E99 /* CoreGraphics+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "CoreGraphics+Ext.swift"; path = "Modernistik/Core/CoreGraphics+Ext.swift"; sourceTree = "<group>"; };
-		AA5253D826131A7E610A2F2CB74A1081 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B157D548EAE388C5995704A6F3121293 /* UIKit+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "UIKit+Ext.swift"; path = "Modernistik/Core/UIKit+Ext.swift"; sourceTree = "<group>"; };
+		A9A05B98B73E26C0ACCD4ADBE1A49137 /* SnappingCollectionViewLayout.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SnappingCollectionViewLayout.swift; path = Modernistik/Core/SnappingCollectionViewLayout.swift; sourceTree = "<group>"; };
+		B4FDC9B658E17D82758D0101D526FA56 /* RelativeKeyboardLayoutConstraint.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RelativeKeyboardLayoutConstraint.swift; path = Modernistik/Core/RelativeKeyboardLayoutConstraint.swift; sourceTree = "<group>"; };
 		B9AD9D76F7A07F55258A2BA81F67CA6D /* Pods-SlateExample.modulemap */ = {isa = PBXFileReference; includeInIndex = 1; path = "Pods-SlateExample.modulemap"; sourceTree = "<group>"; };
-		BCE3B2D555DC3D45A8FFD359AC3A4C4C /* Foundation+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Foundation+Ext.swift"; path = "Modernistik/Core/Foundation+Ext.swift"; sourceTree = "<group>"; };
 		C588F6467695559F446255C1641FF83A /* Pods-SlateExample-resources.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SlateExample-resources.sh"; sourceTree = "<group>"; };
+		C9DE2531166EE804F3D7313FD2E1939A /* Foundation+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Foundation+Ext.swift"; path = "Modernistik/Core/Foundation+Ext.swift"; sourceTree = "<group>"; };
 		D8F18BFDA17D5963B6C9A664EEB4B886 /* Pods-SlateExample-frameworks.sh */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.script.sh; path = "Pods-SlateExample-frameworks.sh"; sourceTree = "<group>"; };
-		E0C0BDD13FF6488D1781C08CAFB43CD1 /* Modernistik.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; path = Modernistik.xcconfig; sourceTree = "<group>"; };
-		E97890389E1774C680873594377A0E63 /* DesignPatterns.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DesignPatterns.swift; path = Modernistik/Core/DesignPatterns.swift; sourceTree = "<group>"; };
-		EA75E7D1347BE9398CC5C6FEF3479147 /* Swift+Ext.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Swift+Ext.swift"; path = "Modernistik/Core/Swift+Ext.swift"; sourceTree = "<group>"; };
+		DAD99190653258E612646F71E92728D4 /* StoryboardConformance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StoryboardConformance.swift; path = Modernistik/Core/StoryboardConformance.swift; sourceTree = "<group>"; };
+		E1CE1847159BF37F147B9164FD762656 /* Modernistik-dummy.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = "Modernistik-dummy.m"; sourceTree = "<group>"; };
 		F0B704D107CFC9E710049318D052BF16 /* Pods-SlateExample-acknowledgements.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = "Pods-SlateExample-acknowledgements.plist"; sourceTree = "<group>"; };
 		F175493F97F49160A1CBACCED1A3E8FC /* Pods_SlateExample.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = Pods_SlateExample.framework; path = "Pods-SlateExample.framework"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F4B9C3E09C46FFD6BB5B1E439E1EE02B /* StoryboardConformance.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StoryboardConformance.swift; path = Modernistik/Core/StoryboardConformance.swift; sourceTree = "<group>"; };
 		FEAD2A37B43148525491C735892AB631 /* Pods-SlateExample-acknowledgements.markdown */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = "Pods-SlateExample-acknowledgements.markdown"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		77C1C26E33067EF4F919B9170B9FAA97 /* Frameworks */ = {
+		57DDF9A829262D84BECFCFE903B33EEE /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				66AC6DC6F092A9C6111ECC59D9A0F579 /* Foundation.framework in Frameworks */,
+				2DC2B1D98E26A32AFDEBCED801D840DD /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -88,23 +90,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		25263E72B60A405200399096F32000EC /* Core */ = {
-			isa = PBXGroup;
-			children = (
-				1AA951A35DC00F2FB21891CB20470663 /* CenterFlowLayout.swift */,
-				967F87953C5D95FFB0D2E6FF1A8C46BC /* ConcurrentOperation.swift */,
-				A766DE6F9C56087825E0A0BEC12D3E99 /* CoreGraphics+Ext.swift */,
-				E97890389E1774C680873594377A0E63 /* DesignPatterns.swift */,
-				BCE3B2D555DC3D45A8FFD359AC3A4C4C /* Foundation+Ext.swift */,
-				6D00F27D536EC2F205064A474D504B0E /* RelativeKeyboardLayoutConstraint.swift */,
-				656EB41AA417C8385CB307FD2C2FED6A /* SnappingCollectionViewLayout.swift */,
-				F4B9C3E09C46FFD6BB5B1E439E1EE02B /* StoryboardConformance.swift */,
-				EA75E7D1347BE9398CC5C6FEF3479147 /* Swift+Ext.swift */,
-				B157D548EAE388C5995704A6F3121293 /* UIKit+Ext.swift */,
-			);
-			name = Core;
-			sourceTree = "<group>";
-		};
 		375DDF90F35206CF9E3C8603526274CA /* Pods-SlateExample */ = {
 			isa = PBXGroup;
 			children = (
@@ -132,15 +117,33 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		3AFF47A32D13E6AF324A003D9B38E2AB /* Support Files */ = {
+		4DD5EC03851C5D918FE6F05DF6ADEE03 /* Core */ = {
 			isa = PBXGroup;
 			children = (
-				AA5253D826131A7E610A2F2CB74A1081 /* Info.plist */,
-				466D72F60366A372B83681EBBFBA21DC /* Modernistik.modulemap */,
-				E0C0BDD13FF6488D1781C08CAFB43CD1 /* Modernistik.xcconfig */,
-				079D069E91AE3CFBF2327B26F27D93B5 /* Modernistik-dummy.m */,
-				80AC674E75095F46C8D9D7A8BEADE7A6 /* Modernistik-prefix.pch */,
-				98900D4F1C8DDE343F8EF81F0C23DA76 /* Modernistik-umbrella.h */,
+				18A73AA6028AEFA467FD798065C9CCFC /* CenterFlowLayout.swift */,
+				47F87466B6D86C3FED8DE584A12EB3A8 /* ConcurrentOperation.swift */,
+				68B5D7374A71AD442E368D2E2E6CAF39 /* CoreGraphics+Ext.swift */,
+				6CE6278F531DBDD990AF7516C944FB9C /* DesignPatterns.swift */,
+				C9DE2531166EE804F3D7313FD2E1939A /* Foundation+Ext.swift */,
+				B4FDC9B658E17D82758D0101D526FA56 /* RelativeKeyboardLayoutConstraint.swift */,
+				A9A05B98B73E26C0ACCD4ADBE1A49137 /* SnappingCollectionViewLayout.swift */,
+				DAD99190653258E612646F71E92728D4 /* StoryboardConformance.swift */,
+				1A73A214FF522B6605AC468EBE717196 /* Swift+Ext.swift */,
+				1180D9838307E9E2C0F63691767E230B /* UIKit+Ext.swift */,
+				450543E94E526355ECEB2DD581C23587 /* Upgrade+Ext.swift */,
+			);
+			name = Core;
+			sourceTree = "<group>";
+		};
+		63C47E343A57AF272BE33263B801D3B3 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				6529D2553576B0F083D44C93603A12E2 /* Info.plist */,
+				54186EE8528FE48781B1C80517B8BC7F /* Modernistik.modulemap */,
+				0D3EE73705F9C7F001EA091C00C581F9 /* Modernistik.xcconfig */,
+				E1CE1847159BF37F147B9164FD762656 /* Modernistik-dummy.m */,
+				64C99B0A9CD636534F2782D6B6B16756 /* Modernistik-prefix.pch */,
+				6D7A7478F7535C87F1A7E6E51D8811A8 /* Modernistik-umbrella.h */,
 			);
 			name = "Support Files";
 			path = "Examples/Slate/Pods/Target Support Files/Modernistik";
@@ -168,7 +171,7 @@
 		8FE86BF69E3D67CAA2BF27F43E4B2FFD /* Development Pods */ = {
 			isa = PBXGroup;
 			children = (
-				CCB7AC9F1E5A7AE1B260B24F8133D3A1 /* Modernistik */,
+				D51AEBB03398041315F3CAD2AD844584 /* Modernistik */,
 			);
 			name = "Development Pods";
 			sourceTree = "<group>";
@@ -181,16 +184,6 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		CCB7AC9F1E5A7AE1B260B24F8133D3A1 /* Modernistik */ = {
-			isa = PBXGroup;
-			children = (
-				25263E72B60A405200399096F32000EC /* Core */,
-				3AFF47A32D13E6AF324A003D9B38E2AB /* Support Files */,
-			);
-			name = Modernistik;
-			path = ../../..;
-			sourceTree = "<group>";
-		};
 		D35AF013A5F0BAD4F32504907A52519E /* iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -199,14 +192,24 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
+		D51AEBB03398041315F3CAD2AD844584 /* Modernistik */ = {
+			isa = PBXGroup;
+			children = (
+				4DD5EC03851C5D918FE6F05DF6ADEE03 /* Core */,
+				63C47E343A57AF272BE33263B801D3B3 /* Support Files */,
+			);
+			name = Modernistik;
+			path = ../../..;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
-		1D2B158AA7DEE2BB0E551E435B16D443 /* Headers */ = {
+		24CBD2E5FBF666CE6FAAD35DA1102172 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1ED8FED734A482EDC21FAA2FB93A358 /* Modernistik-umbrella.h in Headers */,
+				AF3086699F00C112CC99603B751A7CB4 /* Modernistik-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -221,13 +224,13 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
-		2E3BE46EB9E0A33365FFA375DFA4CA69 /* Modernistik */ = {
+		04A04E1BAD384D0764143B2400BB684F /* Modernistik */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 15F52773A36C324E2DA29924D1C086A7 /* Build configuration list for PBXNativeTarget "Modernistik" */;
+			buildConfigurationList = 6217509E526800E1F15DC8859EAE5E31 /* Build configuration list for PBXNativeTarget "Modernistik" */;
 			buildPhases = (
-				1D38DB694B582015B7B78194B16A9AC4 /* Sources */,
-				77C1C26E33067EF4F919B9170B9FAA97 /* Frameworks */,
-				1D2B158AA7DEE2BB0E551E435B16D443 /* Headers */,
+				888FD3D54972DF03A7494FDB16209152 /* Sources */,
+				57DDF9A829262D84BECFCFE903B33EEE /* Frameworks */,
+				24CBD2E5FBF666CE6FAAD35DA1102172 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -277,28 +280,29 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				2E3BE46EB9E0A33365FFA375DFA4CA69 /* Modernistik */,
+				04A04E1BAD384D0764143B2400BB684F /* Modernistik */,
 				7BE5D2DA865739855061DD65742445E4 /* Pods-SlateExample */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXSourcesBuildPhase section */
-		1D38DB694B582015B7B78194B16A9AC4 /* Sources */ = {
+		888FD3D54972DF03A7494FDB16209152 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D7A62CBB49A48DF38C2F7DD096D03CF8 /* CenterFlowLayout.swift in Sources */,
-				731BFD54FBF882080B8B061BCF96120A /* ConcurrentOperation.swift in Sources */,
-				49C47B92AC8AC3CBEFD6E5DD61169234 /* CoreGraphics+Ext.swift in Sources */,
-				99B5B5893CEC8A3D0E9B9A3CD1BEC958 /* DesignPatterns.swift in Sources */,
-				E9BBF5AA2621D0F54B5887850ACF7433 /* Foundation+Ext.swift in Sources */,
-				DAB3047D21387E399C6FBE55A829F1A0 /* Modernistik-dummy.m in Sources */,
-				5D9F75D309E4576C0622F2B2B0B71BD5 /* RelativeKeyboardLayoutConstraint.swift in Sources */,
-				0E09ED58453EC117D9D45AA42A44C561 /* SnappingCollectionViewLayout.swift in Sources */,
-				02B4B548DEEE547E247D29EF5C6DACC1 /* StoryboardConformance.swift in Sources */,
-				4A3F59BF23B86F8A224836168953ED71 /* Swift+Ext.swift in Sources */,
-				6CAB67B5658088F08D7E66A38599C81C /* UIKit+Ext.swift in Sources */,
+				0BF2328F57D222C6889AE772C916F8F9 /* CenterFlowLayout.swift in Sources */,
+				756B7990DC761E9D88D21F4429689525 /* ConcurrentOperation.swift in Sources */,
+				55094748E6A4840B3D4AA958336327FF /* CoreGraphics+Ext.swift in Sources */,
+				25D545E0BDC860F8F110080F8C60687A /* DesignPatterns.swift in Sources */,
+				4BBD2440B3BB571C099090D67A2FEF28 /* Foundation+Ext.swift in Sources */,
+				EEEF7A348793879A15C92D870A6054E8 /* Modernistik-dummy.m in Sources */,
+				D8804B042B2C289FC981E032DE68AC6A /* RelativeKeyboardLayoutConstraint.swift in Sources */,
+				BE5AF2273EB6C2779C0B17574B5AB729 /* SnappingCollectionViewLayout.swift in Sources */,
+				C7CB7C03098F8D2DC2D750CFCA11342A /* StoryboardConformance.swift in Sources */,
+				792A086A38ADC09E269A0D22EEB45008 /* Swift+Ext.swift in Sources */,
+				AE7B7B3FD3224194E38BEE4B8D030CC0 /* UIKit+Ext.swift in Sources */,
+				C2C5B0FAB69FB00567359155DCC30CB8 /* Upgrade+Ext.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -316,7 +320,7 @@
 		BD882643BDDF53C31B9E9336C5FC96D5 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = Modernistik;
-			target = 2E3BE46EB9E0A33365FFA375DFA4CA69 /* Modernistik */;
+			target = 04A04E1BAD384D0764143B2400BB684F /* Modernistik */;
 			targetProxy = 55C7BE246787AB6E64DD4A651EDFF163 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -357,38 +361,6 @@
 				VERSION_INFO_PREFIX = "";
 			};
 			name = Debug;
-		};
-		2FBCF0366FFDAB7670D3111D065824F8 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E0C0BDD13FF6488D1781C08CAFB43CD1 /* Modernistik.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/Modernistik/Modernistik-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Modernistik/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/Modernistik/Modernistik.modulemap";
-				PRODUCT_NAME = Modernistik;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
 		};
 		3EF57863C136CA493F7D12A56AF68635 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -485,38 +457,6 @@
 			};
 			name = Debug;
 		};
-		836E5D4A59DA9F1C9B20184A9F4F01FC /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E0C0BDD13FF6488D1781C08CAFB43CD1 /* Modernistik.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_IDENTITY = "";
-				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				GCC_PREFIX_HEADER = "Target Support Files/Modernistik/Modernistik-prefix.pch";
-				INFOPLIST_FILE = "Target Support Files/Modernistik/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				MODULEMAP_FILE = "Target Support Files/Modernistik/Modernistik.modulemap";
-				OTHER_SWIFT_FLAGS = "-DDEBUG";
-				PRODUCT_NAME = Modernistik;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.2;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
 		98F29E7567052F62660DDD7069ADF73C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -572,18 +512,73 @@
 			};
 			name = Release;
 		};
+		AB88B02318A7BFFEEA44B48C3AE40EFE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0D3EE73705F9C7F001EA091C00C581F9 /* Modernistik.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/Modernistik/Modernistik-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Modernistik/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Modernistik/Modernistik.modulemap";
+				OTHER_SWIFT_FLAGS = "-DDEBUG";
+				PRODUCT_NAME = Modernistik;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		B64E9E8E74EE0D366063A26EB39163E5 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0D3EE73705F9C7F001EA091C00C581F9 /* Modernistik.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "Target Support Files/Modernistik/Modernistik-prefix.pch";
+				INFOPLIST_FILE = "Target Support Files/Modernistik/Info.plist";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MODULEMAP_FILE = "Target Support Files/Modernistik/Modernistik.modulemap";
+				PRODUCT_NAME = Modernistik;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) ";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		15F52773A36C324E2DA29924D1C086A7 /* Build configuration list for PBXNativeTarget "Modernistik" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				836E5D4A59DA9F1C9B20184A9F4F01FC /* Debug */,
-				2FBCF0366FFDAB7670D3111D065824F8 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		21D4BEC6524DA4FCFAAADE6DCDC6FD58 /* Build configuration list for PBXNativeTarget "Pods-SlateExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -598,6 +593,15 @@
 			buildConfigurations = (
 				7C07ED8089F70A31B83996A8910D7F18 /* Debug */,
 				98F29E7567052F62660DDD7069ADF73C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		6217509E526800E1F15DC8859EAE5E31 /* Build configuration list for PBXNativeTarget "Modernistik" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AB88B02318A7BFFEEA44B48C3AE40EFE /* Debug */,
+				B64E9E8E74EE0D366063A26EB39163E5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

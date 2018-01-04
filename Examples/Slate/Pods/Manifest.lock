@@ -1,7 +1,7 @@
 PODS:
-  - Modernistik (0.3.0):
-    - Modernistik/Core (= 0.3.0)
-  - Modernistik/Core (0.3.0)
+  - Modernistik (0.3.1):
+    - Modernistik/Core (= 0.3.1)
+  - Modernistik/Core (0.3.1)
 
 DEPENDENCIES:
   - Modernistik (from `../../`)
@@ -11,7 +11,7 @@ EXTERNAL SOURCES:
     :path: ../../
 
 SPEC CHECKSUMS:
-  Modernistik: 755d8ab2790049965610196111aecf41466ab28b
+  Modernistik: 5ef1ba1a84b3a919c8fc1d7e771d23e6a58fb2d0
 
 PODFILE CHECKSUM: 776de617e448fa6254db43564dcdea59f8799032
 
