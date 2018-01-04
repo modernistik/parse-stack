@@ -62,7 +62,7 @@ public class RelativeKeyboardLayoutConstraint: NSLayoutConstraint {
         NotificationCenter.default.removeObserver(self)
     }
 
-    public func keyboardWillShowNotification(notification: NSNotification) {
+    @objc public func keyboardWillShowNotification(notification: NSNotification) {
         if let userInfo = notification.userInfo {
             if let frameValue = userInfo[UIKeyboardFrameEndUserInfoKey] as? NSValue {
                 let frame = frameValue.cgRectValue
@@ -93,7 +93,7 @@ public class RelativeKeyboardLayoutConstraint: NSLayoutConstraint {
         
     }
     
-    public func keyboardWillHideNotification(notification: NSNotification) {
+    @objc public func keyboardWillHideNotification(notification: NSNotification) {
         keyboardVisibleHeight = 0
         updateConstant()
         guard animate else { UIApplication.shared.keyWindow?.setNeedsUpdateConstraints(); return }

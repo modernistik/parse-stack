@@ -1,12 +1,12 @@
 PODS:
   - Bolts/Tasks (1.9.0)
-  - Modernistik/Core (0.3.1)
-  - Modernistik/Hyperdrive (0.3.1):
+  - Modernistik/Core (0.4.0)
+  - Modernistik/Hyperdrive (0.4.0):
     - Modernistik/Core
     - Parse
     - TimeZoneLocate
-  - Parse (1.15.3):
-    - Bolts/Tasks (~> 1.8)
+  - Parse (1.15.4):
+    - Bolts/Tasks (~> 1.9)
   - TimeZoneLocate (0.4.0)
 
 DEPENDENCIES:
@@ -18,8 +18,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
-  Modernistik: 5ef1ba1a84b3a919c8fc1d7e771d23e6a58fb2d0
-  Parse: cdc0f1f975ee8be0409e66f21b05df4ae067047c
+  Modernistik: aecb09e5154d894c8588a069989938d73b3a305e
+  Parse: 1968c634e1c782fb31aad6872f6d32de911bb122
   TimeZoneLocate: 0d4330e627343906ad699139467e2bcdf5a52262
 
 PODFILE CHECKSUM: bf521c1c65c47e1855b1ea1a7cc0dcbc9bb96a7c

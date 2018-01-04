@@ -19,7 +19,7 @@ extension ReusableType {
     }
 }
 
-/// An object that has a rawValue type that returns an Int.
+/// An object tha@objc @objc t has a rawValue type that returns an Int.
 public protocol IntRepresentable {
     var rawValue: Int { get }
 }
@@ -272,42 +272,42 @@ open class ModernHeaderFooterView : UITableViewHeaderFooterView, ReusableType, M
 /// either instantiating from nibs/storyboards or code.
 open class ModernView: UIView, ModernViewConformance {
     
-    public convenience init(square:CGFloat) {
+    @objc public convenience init(square:CGFloat) {
         self.init(frame: .square(square))
     }
     
-    public override init(frame: CGRect) {
+    @objc public override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
     }
     
-    public required init?(coder aDecoder: NSCoder) {
+    @objc public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
     
-    public required init(autolayout: Bool) {
+    @objc public required init(autolayout: Bool) {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = !autolayout
         setupView()
     }
     
-    open override func awakeFromNib() {
+    @objc open override func awakeFromNib() {
         super.awakeFromNib()
         setupView()
     }
     
     /// Method where the view should be setup once.
-    open func setupView() {
+    @objc open func setupView() {
         backgroundColor = .clear
     }
     
     /// This method should be called whenever there is a need to update the interface.
-    open func updateInterface() {
+    @objc open func updateInterface() {
         setNeedsDisplay()
     }
     
     /// This method should be called whenever there is a need to reset the interface.
-    open func prepareForReuse() {}
+    @objc open func prepareForReuse() {}
     
 }
 
@@ -403,7 +403,7 @@ open class ModernButton: UIButton, ModernViewConformance {
     /// This method should be called whenever there is a need to reset the interface.
     open func prepareForReuse() {}
     
-    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    @objc open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if minimumHitArea == CGSize.zero { return super.hitTest(point, with: event) }
         // need optimization
         // if the button is hidden/disabled/transparent it can't be hit
@@ -461,7 +461,7 @@ open class ModernUIControl: UIControl, ModernViewConformance {
     /// This method should be called whenever there is a need to reset the interface.
     open func prepareForReuse() {}
     
-    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    @objc open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if minimumHitArea == CGSize.zero { return super.hitTest(point, with: event) }
         // need optimization
         // if the button is hidden/disabled/transparent it can't be hit
@@ -490,7 +490,7 @@ open class TappableModernView : ModernView {
         addGestureRecognizer(tap)
     }
     
-    open func tapped() {
+    @objc open func tapped() {
         tapActionBlock?()
     }
     
@@ -498,7 +498,7 @@ open class TappableModernView : ModernView {
         tapActionBlock = block
     }
     
-    open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    @objc open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if minimumHitArea == CGSize.zero { return super.hitTest(point, with: event) }
         // need optimization
         // if the button is hidden/disabled/transparent it can't be hit

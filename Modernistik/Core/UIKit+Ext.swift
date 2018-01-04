@@ -23,7 +23,7 @@ extension UIView {
     /// Creates a new UIView with a square frame and origin coordinates.
     ///
     /// - Parameter square: the size of width and height
-    public convenience init(square:CGFloat) {
+    @objc public convenience init(square:CGFloat) {
         self.init(frame: .square(square) )
     }
     
@@ -32,7 +32,7 @@ extension UIView {
     /// - Parameters:
     ///   - width: The width of the frame
     ///   - height: The height of the frame
-    public convenience init(width:CGFloat, height:CGFloat) {
+    @objc public convenience init(width:CGFloat, height:CGFloat) {
         self.init(frame: CGRect(x: 0, y: 0, width: width, height: height))
     }
     
@@ -72,7 +72,7 @@ extension UIView {
     
     /// Returns an zero frame instance ready for autolayout.
     /// - parameter autolayout: true or false whether this view will be used in autolayout. If true is passed, `translatesAutoresizingMaskIntoConstraints` will be set to false.
-    public convenience init(autolayout: Bool) {
+    @objc public convenience init(autolayout: Bool) {
         self.init(frame: .zero)
         if autolayout {
             translatesAutoresizingMaskIntoConstraints = false
@@ -81,7 +81,7 @@ extension UIView {
     
     /// Returns an zero frame instance ready for autolayout with an accessibility identifier useful for layout debugging.
     /// - parameter name: the string name to use for accessibilityIdentifier.
-    public convenience init(name: String) {
+    @objc public convenience init(name: String) {
         self.init(autolayout: true)
         // Sets identifier for the view, helpful in debugging constraints.
         accessibilityIdentifier = name
@@ -161,7 +161,7 @@ extension UIViewController {
         return UINavigationController(rootViewController: self)
     }
     
-    public func animatedDismiss() {
+    @objc public func animatedDismiss() {
         dismiss(animated: true, completion: nil)
     }
     
@@ -247,7 +247,7 @@ extension UIFont {
         {
             let font = CGFont(providerRef)
             //print("Registering font: \(font)")
-            CTFontManagerRegisterGraphicsFont(font, nil)
+            CTFontManagerRegisterGraphicsFont(font!, nil)
         } else {
             NSLog("[Err] Failed to register Font: \(name)")
         }
