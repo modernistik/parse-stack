@@ -216,11 +216,11 @@ module Parse
 
       # @!attribute key
       # Returns the configured webhook key if available. By default it will use
-      # the value of ENV['PARSE_WEBHOOK_KEY'] if not configured.
+      # the value of ENV['PARSE_SERVER_WEBHOOK_KEY'] if not configured.
       # @return [String]
       attr_accessor :key
       def key
-        @key ||= ENV['PARSE_WEBHOOK_KEY']
+        @key ||= ENV['PARSE_SERVER_WEBHOOK_KEY'] || ENV['PARSE_WEBHOOK_KEY']
       end
 
       # Standard Rack call method. This method processes an incoming cloud code

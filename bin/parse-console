@@ -79,9 +79,9 @@ opt_parser = OptionParser.new do |o|
       raise "Contents not a JSON hash." unless json.is_a?(Hash)
       json.each { |k,v| ENV[k.upcase] = v }
       opts[:server_url] ||= ENV['PARSE_SERVER_URL']
-      opts[:app_id] ||= ENV['PARSE_APP_ID'] || ENV['PARSE_APPLICATION_ID']
-      opts[:api_key] ||= ENV['PARSE_REST_API_KEY'] || ENV['PARSE_API_KEY']
-      opts[:master_key] ||= ENV['PARSE_MASTER_KEY']
+      opts[:app_id]     ||= ENV['PARSE_SERVER_APPLICATION_ID'] || ENV['PARSE_APP_ID']
+      opts[:api_key]    ||= ENV['PARSE_SERVER_REST_API_KEY']   || ENV['PARSE_API_KEY']
+      opts[:master_key] ||= ENV['PARSE_SERVER_MASTER_KEY']     || ENV['PARSE_MASTER_KEY']
     rescue Exception => e
       $stderr.puts "Error: Invalid JSON format for #{url} (#{e})"
       exit 1

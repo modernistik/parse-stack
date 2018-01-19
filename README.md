@@ -299,7 +299,7 @@ To connect to a Parse server, you will need a minimum of an `application_id`, an
   Parse.setup app_id: "YOUR_APP_ID",
               api_key: "YOUR_API_KEY",
               master_key: "YOUR_MASTER_KEY", # optional
-              server_url: 'https://api.parse.com/1/' #default
+              server_url: 'https://localhost:1337/parse' #default
 ```
 
 If you wish to add additional connection middleware to the stack, you may do so by utilizing passing a block to the setup method.
@@ -324,16 +324,16 @@ Calling `setup` will create the default `Parse::Client` session object that will
 There are additional connection options that you may pass the setup method when creating a `Parse::Client`.
 
 #### `:server_url`
-The server url of your Parse Server if you are not using the hosted Parse service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://api.parse.com/1/` if not specified.
+The server url of your Parse Server if you are not using the hosted Parse service. By default it will use `PARSE_SERVER_URL` environment variable available or fall back to `https://localhost:1337/parse` if not specified.
 
 #### `:app_id`
-The Parse application id. By default it will use `PARSE_APP_ID` environment variable if not specified.
+The Parse application id. By default it will use `PARSE_SERVER_APPLICATION_ID` environment variable if not specified.
 
 #### `:api_key`
-The Parse REST API Key. By default it will use `PARSE_API_KEY` environment variable if not specified.
+The Parse REST API Key. By default it will use `PARSE_SERVER_REST_API_KEY` environment variable if not specified.
 
 #### `:master_key` _(optional)_
-The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models. By default it will use `PARSE_MASTER_KEY` environment variable if not specified.
+The Parse application master key. If this key is set, it will be sent on every request sent by the client and your models. By default it will use `PARSE_SERVER_MASTER_KEY` environment variable if not specified.
 
 #### `:logging`
 A true or false value. It provides you additional logging information of requests and responses. If set to the special symbol of `:debug`, it will provide additional payload data in the log messages.
@@ -2384,7 +2384,7 @@ curl -X POST \
   -H "X-Parse-REST-API-Key: ${REST_API_KEY}" \
   -H "Content-Type: application/json" \
   -d '{}' \
-  https://api.parse.com/1/functions/helloWorld
+  https://localhost:1337/parse/functions/helloWorld
 ```
 
 If you are creating `Parse::Object` subclasses, you may also register them there to keep common code and functionality centralized.

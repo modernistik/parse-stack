@@ -1,5 +1,9 @@
 ## Parse-Stack Changelog
 
+### 1.7.3
+- CHANGED: Moved to using preferred ENV variable names based on parse-server cli.
+- CHANGED: Default url is now http://localhost:1337/parse
+
 ### 1.7.2
 - NEW: `Parse::Model.autosave_on_create` has been removed in favor of `first_or_create!`.
 - NEW: Webhook Triggers and Functions now have a `wlog` method, similar to `puts`, but allows easier tracing of

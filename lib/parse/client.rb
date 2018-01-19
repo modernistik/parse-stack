@@ -185,7 +185,7 @@ module Parse
       #   Parse.setup app_id: "YOUR_APP_ID",
       #               api_key: "YOUR_REST_API_KEY",
       #               master_key: "YOUR_MASTER_KEY", # optional
-      #               server_url: 'https://api.parse.com/1/' #default
+      #               server_url: 'https://localhost:1337/parse' #default
       # @param opts (see Parse::Client#initialize)
       # @option opts (see Parse::Client#initialize)
       # @yield the block for additional configuration with Faraday middleware.
@@ -206,11 +206,11 @@ module Parse
     #   are not using the hosted Parse service. By default it will use
     #   ENV["PARSE_SERVER_URL"] if available, otherwise fallback to {Parse::Protocol::SERVER_URL}.
     # @option opts [String] :app_id The Parse application id. Defaults to
-    #    ENV['PARSE_APP_ID'] or ENV['PARSE_APPLICATION_ID'].
-    # @option opts [String] :api_key Your Parse REST API Key. Defaults to ENV['PARSE_REST_API_KEY'].
+    #    ENV['PARSE_SERVER_APPLICATION_ID'].
+    # @option opts [String] :api_key Your Parse REST API Key. Defaults to ENV['PARSE_SERVER_REST_API_KEY'].
     # @option opts [String] :master_key The Parse application master key (optional).
     #    If this key is set, it will be sent on every request sent by the client
-    #    and your models. Defaults to ENV['PARSE_MASTER_KEY'].
+    #    and your models. Defaults to ENV['PARSE_SERVER_MASTER_KEY'].
     # @option opts [Boolean] :logging It provides you additional logging information
     #    of requests and responses. If set to the special symbol of *:debug*, it
     #    will provide additional payload data in the log messages. This option affects
@@ -242,9 +242,9 @@ module Parse
     # @see Parse::Protocol
     def initialize(opts = {})
       @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
-      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_APP_ID"] || ENV['PARSE_APPLICATION_ID']
-      @api_key        = opts[:api_key] || opts[:rest_api_key]  || ENV["PARSE_REST_API_KEY"] || ENV["PARSE_API_KEY"]
-      @master_key     = opts[:master_key] || ENV["PARSE_MASTER_KEY"]
+      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_SERVER_APPLICATION_ID"] || ENV['PARSE_APP_ID']
+      @api_key        = opts[:api_key] || opts[:rest_api_key]  || ENV["PARSE_SERVER_REST_API_KEY"] || ENV["PARSE_API_KEY"]
+      @master_key     = opts[:master_key] || ENV['PARSE_SERVER_MASTER_KEY'] || ENV["PARSE_MASTER_KEY"]
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
       if @server_url.nil? || @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
