@@ -3,6 +3,7 @@
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.
 - CHANGED: Default url is now http://localhost:1337/parse
+- NEW: Added method `hyperdrive_config!` to apply remote ENV from remote JSON url.
 
 ### 1.7.2
 - NEW: `Parse::Model.autosave_on_create` has been removed in favor of `first_or_create!`.
