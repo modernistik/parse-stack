@@ -108,10 +108,15 @@ extension SegueHandlerType where Self: UIViewController, SegueIdentifier.RawValu
     // Perform a segue using a `SegueIdentifier`. See `SegueHandlerType` protocol.
     /// ## Example
     ///     performSegueIdentifier(.segueToNext, sender: self)
-    /// - parameter segueIdentifier: The SegueIdentifier enum defined in the current controller scope.
+    /// - parameter to: The SegueIdentifier enum defined in the current controller scope.
     /// - parameter sender: The object that you want to use to initiate the segue. This object is
     /// made available for informational purposes during the actual segue.
-    public func performSegueIdentifier(_ segueIdentifier: SegueIdentifier, sender: AnyObject?) {
+    public func segue(to: SegueIdentifier, sender: Any? = nil) {
+        performSegue(withIdentifier: to.rawValue, sender: sender)
+    }
+    
+    @available(*, deprecated, message: "This method has been renamed to segue(to:).")
+    public func performSegueIdentifier(_ segueIdentifier: SegueIdentifier, sender: Any?) {
         performSegue(withIdentifier: segueIdentifier.rawValue, sender: sender)
     }
     
@@ -121,9 +126,12 @@ extension SegueHandlerType where Self: UIViewController, SegueIdentifier.RawValu
     /// - parameter segueIdentifier: The SegueIdentifier enum defined in the current controller scope.
     /// - parameter sender: The object that you want to use to initiate the segue. This object is
     /// made available for informational purposes during the actual segue.
-    public func performSegue(withIdentifier segueIdentifier: SegueIdentifier, sender: AnyObject?) {
-        performSegue(withIdentifier: segueIdentifier.rawValue, sender: sender)
-    }
+//    @available(*, deprecated, message: "This method has been renamed to segue(to:).")
+//    public func performSegue(withIdentifier segueIdentifier: SegueIdentifier, sender: Any?) {
+//        performSegue(withIdentifier: segueIdentifier.rawValue, sender: sender)
+//    }
+    
+
 }
 
 /// A protocol that combines `StoryboardInstantiable` and `SegueHandlerType`. Generally,
