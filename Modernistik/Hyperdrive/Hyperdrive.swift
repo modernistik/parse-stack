@@ -238,8 +238,8 @@ extension Hyperdrive {
      */
     public static func setupDefaultPublicACL(read:Bool, write:Bool, withAccessForCurrentUser currentUserAccess:Bool = true) {
         let defaultACL = PFACL()
-        defaultACL.getPublicReadAccess = read
-        defaultACL.getPublicWriteAccess = write
+        defaultACL.hasPublicReadAccess = read
+        defaultACL.hasPublicWriteAccess = write
         PFACL.setDefault(defaultACL, withAccessForCurrentUser: currentUserAccess)
     }
 
