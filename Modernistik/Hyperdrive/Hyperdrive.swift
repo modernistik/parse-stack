@@ -269,7 +269,7 @@ extension Notification.Name {
 
     /// Notification sent when the global config has been updated from the server. You can update the configuration data
     /// by calling `Config.updateConfiguration` method.
-    public static let HyperdriveConfigUpdatedNotification = NSNotification.Name("HyperdriveConfigUpdatedNotification")
+    public static let HyperdriveConfigUpdatedNotification = Notification.Name(rawValue: "HyperdriveConfigUpdatedNotification")
 
     /**
      Notification sent when the server responds with a session error. This could mean the current logged in user token

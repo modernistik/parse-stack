@@ -65,8 +65,6 @@ extension Sequence where Iterator.Element : PFObject {
     /// their corresponding objectIds. This method will handle the case
     /// where some objects may not have objectIds.
     public var objectIds:[String] {
-        return compactMap { (obj) -> String? in
-            obj.objectId
-        }
+        return compactMap { $0.objectId }
     }
 }

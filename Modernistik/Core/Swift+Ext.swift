@@ -69,7 +69,7 @@ extension Double: IntegerInitializable {
 }
 
 extension MutableCollection {
-    /// Shuffles the contents of this collection.
+    /// Shuffles the contents of this collection. See also [Stack Overflow](https://stackoverflow.com/questions/24026510/how-do-i-shuffle-an-array-in-swift)
     mutating func shuffle() {
         let c = count
         guard c > 1 else { return }
@@ -85,6 +85,7 @@ extension MutableCollection {
 
 extension Sequence {
     /// Returns an array with the contents of this sequence, shuffled.
+    /// See also [Stack Overflow](https://stackoverflow.com/questions/24026510/how-do-i-shuffle-an-array-in-swift)
     func shuffled() -> [Element] {
         var result = Array(self)
         result.shuffle()
