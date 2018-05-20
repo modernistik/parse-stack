@@ -31,6 +31,7 @@ import UIKit
  keyboardConstraint.animate = false
  ````
  */
+#if os(iOS)
 final
 public class RelativeKeyboardLayoutConstraint: NSLayoutConstraint {
     
@@ -122,3 +123,4 @@ public class RelativeKeyboardLayoutConstraint: NSLayoutConstraint {
     }
     
 }
+#endif

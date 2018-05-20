@@ -127,7 +127,7 @@ extension UIView {
         layer.add(bounceAnimation, forKey: "bounce")
     }
     
-    @available(iOS 10.0, *)
+    @available(iOS 10.0, tvOS 10, *)
     /// Animate the change in alpha of the view.
     public func fade(to:CGFloat, duration:TimeInterval = 0.25, completion:CompletionBlock? = nil) {
         
@@ -141,13 +141,13 @@ extension UIView {
     }
     
     /// Animate the fade out the view.
-    @available(iOS 10.0, *)
+    @available(iOS 10.0, tvOS 10, *)
     public func fadeOut(completion:CompletionBlock? = nil) {
         fade(to: 0, completion: completion)
     }
     
     /// Animate the fade in the view.
-    @available(iOS 10.0, *)
+    @available(iOS 10.0, tvOS 10, *)
     public func fadeIn(completion:CompletionBlock? = nil) {
         fade(to: 1, completion: completion)
     }
@@ -197,11 +197,13 @@ extension UIColor {
 
 extension UIImage {
     
+    #if os(iOS)
     /// Save an image to the user's photo album.
     /// - note: For more options use `UIImageWriteToSavedPhotosAlbum()`
     public func saveToPhotosAlbum() {
         UIImageWriteToSavedPhotosAlbum(self, nil, nil, nil)
     }
+    #endif
     
     /// A synchronous method that sets the image based on the contents at a url.
     /// When transport security is enabled, all urls should be https.
