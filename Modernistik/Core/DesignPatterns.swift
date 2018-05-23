@@ -423,7 +423,10 @@ open class ModernButton: UIButton, ModernViewConformance {
     
 }
 
-open class ModernUIControl: UIControl, ModernViewConformance {
+@available(*, deprecated, renamed: "ModernControl", message: "This class has been deprecated in favor of ModernControl.")
+open class ModernUIControl : ModernControl {}
+
+open class ModernControl: UIControl, ModernViewConformance {
     public var minimumHitArea = CGSize.zero
     
     public convenience init(square:CGFloat) {
