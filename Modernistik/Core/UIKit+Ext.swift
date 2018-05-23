@@ -151,6 +151,16 @@ extension UIView {
     public func fadeIn(completion:CompletionBlock? = nil) {
         fade(to: 1, completion: completion)
     }
+    
+    public func shake(dx:CGFloat = 10) {
+        let animation = CABasicAnimation(keyPath: "position")
+        animation.duration = 0.07
+        animation.repeatCount = 4
+        animation.autoreverses = true
+        animation.fromValue = NSValue(cgPoint: CGPoint(x: center.x - dx, y: center.y))
+        animation.toValue = NSValue(cgPoint: CGPoint(x: center.x + dx, y: center.y))
+        layer.add(animation, forKey: "shake")
+    }
 }
 
 
