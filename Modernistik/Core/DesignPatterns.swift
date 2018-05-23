@@ -391,6 +391,15 @@ open class ModernButton: UIButton, ModernViewConformance {
         super.awakeFromNib()
         setupView()
     }
+    /// Alias for title(for: .normal) setter and getter.
+    open var title:String? {
+        get {
+            return title(for: .normal)
+        }
+        set {
+            setTitle(newValue, for: .normal)
+        }
+    }
     
     /// Method where the view should be setup once.
     open func setupView() {
