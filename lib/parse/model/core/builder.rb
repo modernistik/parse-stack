@@ -62,7 +62,7 @@ module Parse
           if data_type == :pointer
             klass.belongs_to key, as: type[:targetClass],  field: field
           elsif data_type == :relation
-            klass.has_many key, as: type[:targetClass],  field: field
+            klass.has_many key, through: :relation, as: type[:targetClass],  field: field
           else
             klass.property key, data_type, field: field
           end

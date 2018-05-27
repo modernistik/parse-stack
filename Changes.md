@@ -8,7 +8,8 @@
   fields as all Parse SDKs now support the new JSON format. `Parse.disable_serialized_string_date`
   has also been removed so that `created_at` and `updated_at` return the same value
   as `createdAt` and `updatedAt` respectively.
-  
+- FIXED: Builder properly auto generates Parse Relation associations using `through: :relation`.
+
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.
 - CHANGED: Default url is now http://localhost:1337/parse
