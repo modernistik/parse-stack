@@ -1,5 +1,8 @@
 ## Parse-Stack Changelog
 
+### 1.7.4
+- CHANGED: Renamed `hyperdrive_config!` to `Parse::Hyperdrive.config!`
+  
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.
 - CHANGED: Default url is now http://localhost:1337/parse
