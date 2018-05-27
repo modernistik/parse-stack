@@ -4,6 +4,10 @@
 - NEW: Added `parse_object` extension to Hash classes to more easily call
   Parse::Object.build in `map` loops with symbol to proc.
 - CHANGED: Renamed `hyperdrive_config!` to `Parse::Hyperdrive.config!`
+- REMOVED: The used of non-JSON dates has been removed for `createdAt` and `updatedAt`
+  fields as all Parse SDKs now support the new JSON format. `Parse.disable_serialized_string_date`
+  has also been removed so that `created_at` and `updated_at` return the same value
+  as `createdAt` and `updatedAt` respectively.
   
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.

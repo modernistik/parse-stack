@@ -184,12 +184,8 @@ module Parse
     # to set it to something different.
     class << self
 
-      attr_accessor :disable_serialized_string_date, :parse_class
+      attr_accessor :parse_class
       attr_reader :default_acls
-      # @!attribute disable_serialized_string_date
-      #  Disables returning a serialized string date properties when encoding to JSON.
-      #  This affects created_at and updated_at fields in order to be backwards compatible with old SDKs.
-      #  @return [Boolean] the disabled status of whether string dates should be serialized.
 
       # The class method to override the implicitly assumed Parse collection name
       # in your Parse database. The default Parse collection name is the singular form
@@ -508,20 +504,6 @@ module Parse
     # @!attribute acl
     #  @return [ACL] the access control list (permissions) object for this record.
     property :acl, :acl, field: :ACL
-
-    # Alias to {created_at}
-    # @return (see #created_at)
-    def createdAt
-      return @created_at if Parse::Object.disable_serialized_string_date.present?
-      @created_at.to_time.utc.iso8601(3) if @created_at.present?
-    end
-
-    # Alias to {updated_at}
-    # @return (see #updated_at)
-    def updatedAt
-      return @updated_at if Parse::Object.disable_serialized_string_date.present?
-      @updated_at.to_time.utc.iso8601(3) if @updated_at.present?
-    end
 
     # Access the value for a defined property through hash accessor. This method
     # returns nil if the key is not one of the defined properties for this Parse::Object

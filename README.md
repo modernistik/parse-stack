@@ -516,8 +516,6 @@ This class manages dates in the special JSON format it requires for properties o
   song.save # ok
 ```
 
-One important note with dates, is that `created_at` and `updated_at` columns do not follow this convention all the time. Depending on the Cloud Code SDK, they can be the Parse ISO hash date format or the `iso8601` string format. By default, these are serialized as `iso8601` when sent as responses to Parse for backwards compatibility with some clients. To use the Parse ISO hash format for these fields instead, set `Parse::Object.disable_serialized_string_date = true`.
-
 ### [Parse::GeoPoint](https://www.modernistik.com/gems/parse-stack/Parse/GeoPoint.html)
 This class manages the GeoPoint data type that Parse provides to support geo-queries. To define a GeoPoint property, use the `:geopoint` data type. Please note that latitudes should not be between -90.0 and 90.0, and longitudes should be between -180.0 and 180.0.
 

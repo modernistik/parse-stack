@@ -15,13 +15,7 @@ require_relative 'model'
 
 module Parse
   # This class manages dates in the special JSON format it requires for
-  # properties of type _:date_. One important note with dates, is that 'created_at' and 'updated_at'
-  # columns do not follow this convention all the time. Depending on the
-  # Cloud Code SDK, they can be the Parse ISO hash date format or the `iso8601`
-  # string format. By default, these are serialized as `iso8601` when sent as
-  # responses to Parse for backwards compatibility with some clients. To use
-  # the Parse ISO hash format for these fields instead, set
-  # `Parse::Object.disable_serialized_string_date = true`.
+  # properties of type _:date_. 
   class Date < ::DateTime
     # The default attributes in a Parse Date hash.
     ATTRIBUTES = {  __type: :string, iso: :string }.freeze
