@@ -1,6 +1,8 @@
 ## Parse-Stack Changelog
 
 ### 1.7.4
+- NEW: Added `parse_object` extension to Hash classes to more easily call
+  Parse::Object.build in `map` loops with symbol to proc.
 - CHANGED: Renamed `hyperdrive_config!` to `Parse::Hyperdrive.config!`
   
 ### 1.7.3

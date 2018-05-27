@@ -546,6 +546,18 @@ module Parse
 
   end
 
+end
+
+class Hash
+
+  # Turns a Parse formatted JSON hash into a Parse-Stack class object, if one is found.
+  # This is equivalent to calling `Parse::Object.build` on the hash object itself, but allows
+  # for doing this in loops, such as `map` when using symbol to proc. However, you can also use
+  # the Array extension `Array#parse_objects` for doing that more safely.
+  # @return [Parse::Object] A Parse::Object subclass represented the built class.
+  def parse_object
+    Parse::Object.build(self)
+  end
 
 end
 
