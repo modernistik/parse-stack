@@ -13,7 +13,8 @@ module Parse
   module Stack
 
   end
-
+  
+  # Special class to support Modernistik Hyperdrive server.
   class Hyperdrive
     # Applies a remote JSON hash containing the ENV keys and values from a remote
     # URL. Values from the JSON hash are only applied to the current ENV hash ONLY if

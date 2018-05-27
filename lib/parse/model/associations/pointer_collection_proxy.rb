@@ -102,11 +102,6 @@ module Parse
       parse_pointers.as_json(opts)
     end
 
-    # @return [Array<Parse::Pointer>] an array of pointers representing this collection.
-    def parse_pointers
-      collection.parse_pointers
-    end
-
   end
 
 end

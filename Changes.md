@@ -11,6 +11,9 @@
 - FIXED: Builder properly auto generates Parse Relation associations using `through: :relation`.
 - REMOVED: Defining `has_many` or `belongs_to` associations more than once will no longer result
   in an `ArgumentError` (they are now warnings). This will allow you to define associations for classes before calling `auto_generate_models!`
+- CHANGED: Parse::CollectionProxy now supports `parse_objects` and `parse_pointers` for compatibility with the
+  sibling `Array` methods. Having an Parse-JSON Hash array or a Parse::CollectionProxy which contains a series
+  of Parse hashes can now be easily converted to an array of Parse objects with these methods.
 
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.
@@ -20,7 +23,7 @@
 ### 1.7.2
 - NEW: `Parse::Model.autosave_on_create` has been removed in favor of `first_or_create!`.
 - NEW: Webhook Triggers and Functions now have a `wlog` method, similar to `puts`, but allows easier tracing of
-single requests in a multi-request threaded environment. (See Parse::Webhooks::Payload)
+  single requests in a multi-request threaded environment. (See Parse::Webhooks::Payload)
 - NEW: `:id` constraints also safely supports pointers by skipping class matching.
 - NEW: Support for `add_unique` and the set union operator `|` in collection proxies.
 - NEW: Support for `uniq` and `uniq!` in collection proxies.
@@ -34,10 +37,12 @@ single requests in a multi-request threaded environment. (See Parse::Webhooks::P
 - NEW: Added `Parse::Query#append` as alias to `Parse::Query#conditions`
 - CHANGED: `save_all` now returns true if there were no errors.
 - FIXED: first_or_create will now apply dirty tracking to newly created fields.
-- FIXED: Properties of :array type will always return a Parse::CollectionProxy if their internal value is nil. The object will not be marked dirty until something is added to the array.
+- FIXED: Properties of :array type will always return a Parse::CollectionProxy if
+  their internal value is nil. The object will not be marked dirty until something is added to the array.
 - FIXED: Encoding a Parse::Object into JSON will remove any values that are `nil`
-which were not explicitly changed to that value.
-- [PR#39](https://github.com/modernistik/parse-stack/pull/39): Allow Moneta::Expires as cache object to allow for non-native expiring caches by [GrahamW](https://github.com/GrahamW)
+  which were not explicitly changed to that value.
+- [PR#39](https://github.com/modernistik/parse-stack/pull/39): Allow Moneta::Expires
+  as cache object to allow for non-native expiring caches by [GrahamW](https://github.com/GrahamW)
 
 
 ### 1.7.1

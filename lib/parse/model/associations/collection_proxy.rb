@@ -360,6 +360,18 @@ module Parse
         "#<#{self.class} changed?=#{changed?} @collection=#{@collection.inspect} >"
       end
 
+      # Alias to `to_a.parse_objects` from Array#parse_objects
+      # @return [Array<Parse::Object>] an array of Parse Object subclasses representing this collection.
+      def parse_objects
+        collection.to_a.parse_objects
+      end
+
+      # Alias to `to_a.parse_pointers` from Array#parse_pointers
+      # @return [Array<Parse::Pointer>] an array of pointers representing this collection.
+      def parse_pointers
+        collection.to_a.parse_pointers
+      end
+
     end
 
 
