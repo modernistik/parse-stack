@@ -129,10 +129,12 @@ module Parse
           set_attribute_method = :"#{key}_set_attribute!"
 
           if self.fields[key].present? && Parse::Properties::BASE_FIELD_MAP[key].nil?
-            raise ArgumentError, "Belongs relation #{self}##{key} already defined with type #{klassName}"
+            warn "Belongs relation #{self}##{key} already defined with type #{klassName}"
+            return false
           end
           if self.fields[parse_field].present?
-            raise ArgumentError, "Alias belongs_to #{self}##{parse_field} conflicts with previously defined property."
+            warn "Alias belongs_to #{self}##{parse_field} conflicts with previously defined property."
+            return false
           end
           # store this attribute in the attributes hash with the proper remote column name.
           # we know the type is pointer.
@@ -172,7 +174,7 @@ module Parse
           end
 
           if self.method_defined?("#{key}?")
-            puts "Creating belongs_to helper :#{key}?. Will overwrite existing method #{self}##{key}?."
+            warn "Creating belongs_to helper :#{key}?. Will overwrite existing method #{self}##{key}?."
           end
 
           define_method("#{key}?") do

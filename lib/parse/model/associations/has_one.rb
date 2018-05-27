@@ -122,7 +122,7 @@ module Parse
           ivar = :"@_has_one_#{key}"
 
           if self.method_defined?(key)
-            puts "Creating has_one :#{key} association. Will overwrite existing method #{self}##{key}."
+            warn "Creating has_one :#{key} association. Will overwrite existing method #{self}##{key}."
           end
 
           define_method(key) do |*args, &block|

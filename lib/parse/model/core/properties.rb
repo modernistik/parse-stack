@@ -159,7 +159,7 @@ module Parse
         self.fields.merge!( key => data_type, parse_field => data_type )
         # This creates a mapping between the local field and the remote field name.
         self.field_map.merge!( key => parse_field )
-        #puts "Current Self: #{self} - #{key} = #{self.attributes}"
+
         # if the field is marked as required, then add validations
         if opts[:required]
           # if integer or float, validate that it's a number
@@ -359,7 +359,7 @@ module Parse
           end
 
           if self.method_defined?("#{key}_decrement!")
-            puts "Creating decrement helper :#{key}_decrement!. Will overwrite existing method #{self}##{key}_decrement!."
+            warn "Creating decrement helper :#{key}_decrement!. Will overwrite existing method #{self}##{key}_decrement!."
           end
 
           define_method("#{key}_decrement!") do |amount = -1|

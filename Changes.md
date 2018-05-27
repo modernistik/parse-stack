@@ -9,6 +9,8 @@
   has also been removed so that `created_at` and `updated_at` return the same value
   as `createdAt` and `updatedAt` respectively.
 - FIXED: Builder properly auto generates Parse Relation associations using `through: :relation`.
+- REMOVED: Defining `has_many` or `belongs_to` associations more than once will no longer result
+  in an `ArgumentError` (they are now warnings). This will allow you to define associations for classes before calling `auto_generate_models!`
 
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.
