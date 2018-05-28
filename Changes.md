@@ -14,6 +14,7 @@
 - CHANGED: Parse::CollectionProxy now supports `parse_objects` and `parse_pointers` for compatibility with the
   sibling `Array` methods. Having an Parse-JSON Hash array or a Parse::CollectionProxy which contains a series
   of Parse hashes can now be easily converted to an array of Parse objects with these methods.
+- FIXED: Correctly discards ACL changes on User model saves.
 
 ### 1.7.3
 - CHANGED: Moved to using preferred ENV variable names based on parse-server cli.

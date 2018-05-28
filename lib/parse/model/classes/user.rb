@@ -177,7 +177,7 @@ module Parse
 
     before_save do
       # You cannot specify user ACLs.
-      self.clear_attribute_change!(:acl)
+      self.clear_attribute_change!([:acl])
     end
 
     # @return [Boolean] true if this user is anonymous.
