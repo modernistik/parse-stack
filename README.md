@@ -6,19 +6,18 @@
 
 Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full *[API Reference](https://www.modernistik.com/gems/parse-stack/index.html)* for more detailed information about our Parse Server SDK.
 
-#### Tutorial Videos
-1. Getting Started: https://youtu.be/zoYSGmciDlQ
-2. Custom Classes and Relations: https://youtu.be/tfSesotfU7w
-3. Working with Existing Schemas: https://youtu.be/EJGPT7YWyXA
-
 ### Code Status
 [![Gem Version](https://img.shields.io/gem/v/parse-stack.svg)](https://github.com/modernistik/parse-stack)
 [![Downloads](https://img.shields.io/gem/dt/parse-stack.svg)](https://rubygems.org/gems/parse-stack)
 [![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
 [![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](https://www.modernistik.com/gems/parse-stack/index.html)
 
-### Questions?
-[![Gitter](https://badges.gitter.im/modernistik/parse-stack.svg)](https://gitter.im/modernistik/parse-stack?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+#### Tutorial Videos
+1. Getting Started: https://youtu.be/zoYSGmciDlQ
+2. Custom Classes and Relations: https://youtu.be/tfSesotfU7w
+3. Working with Existing Schemas: https://youtu.be/EJGPT7YWyXA
+
+Any other questions, please post them on StackOverflow with the proper parse-stack / parse-server / ruby tags.
 
 ## Installation
 
@@ -350,7 +349,7 @@ A caching adapter of type `Moneta::Transformer`. Caching queries and object fetc
   Parse.setup(cache: store, expires: 10, ...)
 ```
 
-As a shortcut, if you are planning on using REDIS and have configured the use of `redis` in your `Gemfile`, you can just pass the redis connection string directly to the cache option.
+As a shortcut, if you are planning on using REDIS and have configured the use of `redis` in your `Gemfile`, you can just pass the REDIS connection string directly to the cache option.
 
 ```ruby
   Parse.setup(cache: 'redis://localhost:6379', ...)
@@ -363,7 +362,7 @@ Sets the default cache expiration time (in seconds) for successful non-empty `GE
 You may pass a hash of options that will be passed to the `Faraday` constructor.
 
 ## Working With Existing Schemas
-If you already have a Parse application with defined schemas and collections, you can have Parse-Stack automatically generate the ruby Parse::Object subclasses instead of writing them on your own. Through this process, the framework will download all the defined schemas of all your collections, and infer the properties and associations defined. While this method is useful for getting started with the framework with an existing app, we highly recommend definiting your own models. This would allow you to customize and utilize all the features availabling in Parse::Stack.
+If you already have a Parse application with defined schemas and collections, you can have Parse-Stack automatically generate the ruby Parse::Object subclasses instead of writing them on your own. Through this process, the framework will download all the defined schemas of all your collections, and infer the properties and associations defined. While this method is useful for getting started with the framework with an existing app, we highly recommend defining your own models. This would allow you to customize and utilize all the features available in Parse Stack.
 
 ```ruby
   # after you have called Parse.setup
@@ -625,7 +624,7 @@ All `Parse::Object` subclasses have an `acl` property by default. With this prop
 
   artist.save
 ```
-You may also set default ACLs for newly created insatnces of your subclasses using `set_default_acl`:
+You may also set default ACLs for newly created instances of your subclasses using `set_default_acl`:
 
 ```ruby
 class AdminData < Parse::Object
@@ -862,7 +861,7 @@ end
 
 After properties are defined, you can use appropriate getter and setter methods to modify the values. As properties become modified, the model will keep track of the changes using the [dirty tracking feature of ActiveModel](http://api.rubyonrails.org/classes/ActiveModel/Dirty.html). If an attribute is modified in-place then make use of **[attribute_name]_will_change!** to mark that the attribute is changing. Otherwise ActiveModel can't track changes to in-place attributes.
 
-To support dirty tracking on properties of data type of `:array`, we utilize a proxy class called `Parse::CollectionProxy`. This class has special functionality which allows lazy loading of content as well and keeping track of the changes that are made. While you are able to access the internal array on the collection through the `#collection` method, it is important not to make in-place edits to the object. You should use the preferred methods of `#add` and `#remove` to modify the contents of the collection. When `#save` is called on the object, the changes will be commited to Parse.
+To support dirty tracking on properties of data type of `:array`, we utilize a proxy class called `Parse::CollectionProxy`. This class has special functionality which allows lazy loading of content as well and keeping track of the changes that are made. While you are able to access the internal array on the collection through the `#collection` method, it is important not to make in-place edits to the object. You should use the preferred methods of `#add` and `#remove` to modify the contents of the collection. When `#save` is called on the object, the changes will be committed to Parse.
 
 ```ruby
 post = Post.first
@@ -1523,7 +1522,7 @@ For the cases when you want to modify the items in this association without havi
   artist.songs.add! song # Add operation
   artist.songs.add_unique! other_song # AddUnique operation
   artist.songs.remove! another_song # Remove operation
-  artist.save # noop. operations were sent directly to Parse
+  artist.save # no-op. (no operations were sent directly to Parse)
 
   artist.songs.destroy! # Delete operation of all Songs
 ```
@@ -1646,7 +1645,7 @@ However, Parse-Stack performs automatic fetching of associations when the associ
   song.artist.name
 
   # You can manually do the same with `fetch` and `fetch!`
-  song.artist.fetch # considered "fetch if needed". Noop if not needed.
+  song.artist.fetch # considered "fetch if needed". No-op if not needed.
   song.artist.fetch! # force fetch regardless of state.
 ```
 
@@ -2611,9 +2610,13 @@ end
 
 ```
 
+## Hire Us
+
+Interested in our consulting work? You can find us here: [https://www.modernistik.com](https://www.modernistik.com)
+
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/modernistik/parse-stack.
+Bug reports and pull requests are welcome on GitHub at [https://github.com/modernistik/parse-stack](https://github.com/modernistik/parse-stack).
 
 ## License
 
