@@ -39,9 +39,9 @@ module Parse
           uri = "#{CLASS_PATH_PREFIX}#{className}"
           class_prefix = className.downcase.to_sym
           if PREFIX_MAP.has_key?(class_prefix)
-            uri = "#{PREFIX_MAP[class_prefix]}/"
+            uri = PREFIX_MAP[class_prefix]
           end
-          id.present? ? "#{uri}/#{id}" : uri
+          id.present? ? "#{uri}/#{id}" : "#{uri}/"
         end
 
       end
