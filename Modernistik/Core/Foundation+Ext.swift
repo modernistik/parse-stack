@@ -27,6 +27,11 @@ public typealias CompletionBlock = () -> Void
 extension Bundle {
     
     /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
+    public class var releaseVersion:String {
+        return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+    }
+    
+    /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
     public class var currentBuildVersion:Int {
         if let buildVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
             let buildNumber = Int(buildVersion) {
