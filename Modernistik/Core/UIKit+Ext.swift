@@ -71,10 +71,10 @@ extension UIView {
     }
     
     /// Returns an zero frame instance ready for autolayout.
-    /// - parameter autolayout: true or false whether this view will be used in autolayout. If true is passed, `translatesAutoresizingMaskIntoConstraints` will be set to false.
+    /// - parameter autolayout: true or false whether this view will be used in autolayout. If true is passed (default), `translatesAutoresizingMaskIntoConstraints` will be set to false.
     @objc public convenience init(autolayout: Bool) {
         self.init(frame: .zero)
-        if autolayout {
+        if autolayout { // if true, set to false, otherwise leave default value.
             translatesAutoresizingMaskIntoConstraints = false
         }
     }
@@ -337,6 +337,17 @@ extension UITableView {
     /// Animate scrolling the table view to the top.
     public func scrollToTop() {
         setContentOffset(.zero, animated: true)
+    }
+}
+
+extension UICollectionView {
+    // Creates an autolayout enabled UICollectionView utilizing a UICollectionViewFlowLayout.
+    /// - parameter autolayout: true or false whether this view will be used in autolayout. If true is passed (default), `translatesAutoresizingMaskIntoConstraints` will be set to false.
+    public convenience init(autolayout:Bool = true) {
+        self.init(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+        if autolayout { // if true,
+            translatesAutoresizingMaskIntoConstraints = false
+        }
     }
 }
 
