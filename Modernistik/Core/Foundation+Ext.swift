@@ -27,12 +27,12 @@ public typealias CompletionBlock = () -> Void
 extension Bundle {
     
     /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
-    public class var releaseVersion:String {
+    public static var releaseVersion:String {
         return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     }
     
     /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
-    public class var currentBuildVersion:Int {
+    public static var currentBuildVersion:Int {
         if let buildVersion = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String,
             let buildNumber = Int(buildVersion) {
                 return buildNumber
@@ -57,15 +57,18 @@ extension Array where Element: NSLayoutConstraint {
 }
 
 extension FileManager {
-    /// Returns the documents directory
-    
-    public var documentsDirectory:URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    /// Returns the documents directory for the default file manager
+    public static var documentsDirectory:URL {
+        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
     
-    /// Returns the caches directory
-    public var cachesDirectory: URL {
-        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0]
+    /// Returns the caches directory for the default file manager
+    public static var cachesDirectory: URL {
+        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+    }
+    
+    public static func directory(for directory:FileManager.SearchPathDirectory) -> URL {
+        return FileManager.default.urls(for: directory, in: .userDomainMask).first!
     }
 }
 
@@ -81,7 +84,7 @@ extension UserDefaults {
     ````
      let key = "ShouldShowOneTimePopUp"
      
-     if( UserDefaults.flagOnce(forKey: key) ) {
+     if UserDefaults.flagOnce(forKey: key) {
        // show one-time popup
      }
      
