@@ -110,6 +110,19 @@ extension UIView {
             layer.cornerRadius = bounds.longest / by
         }
     }
+    /// Returns a set of constraints where the current view is pinned to all sides to the supplied view.
+    /// If the supplied view is the current view's parent, this would be similarly represented in the visual format of `H:|[view]|` and `V:|[view]|`.
+    ///
+    /// If both views are siblings, then the two views would overlap.
+    ///
+    /// - Note: The returned constraints are not activated automatically.
+    /// - Parameter view: the view to use for the anchoring the constraints
+    public func constraintsPinned(toView view:UIView) -> [NSLayoutConstraint] {
+        return [topAnchor.constraint(equalTo: view.topAnchor),
+        bottomAnchor.constraint(equalTo: view.bottomAnchor),
+        leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        trailingAnchor.constraint(equalTo: view.trailingAnchor)]
+    }
 
 }
 

@@ -15,7 +15,7 @@ extension CGColor {
 
 
 extension CGFloat {
-    /// Same as .pi / 2
+    /// Same as Double.pi / 2 or M_PI_2
     public static var pi_2 : CGFloat {
         return .pi / 2
     }
