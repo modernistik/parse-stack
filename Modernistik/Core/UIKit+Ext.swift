@@ -8,6 +8,33 @@ import UIKit
 
 
 
+extension UIDevice {
+    
+    /// Returns true if the current interface idiom is an iPad
+    public static var isPad:Bool {
+        return UIDevice.current.userInterfaceIdiom == .pad
+    }
+    /// Returns true if the current interface idiom is an iPhone or iPod Touch
+    public static var isPhone:Bool {
+        return UIDevice.current.userInterfaceIdiom == .phone
+    }
+    
+    /// Returns true if the current interface idiom is an AppleTV
+    public static var isTV:Bool {
+        return UIDevice.current.userInterfaceIdiom == .tv
+    }
+    
+    /// Returns true if the current device is in vertical mode.
+    public static var isPortrait: Bool {
+        return UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown
+    }
+    
+    /// Returns true if the current device is in landscape (horizontal) mode
+    public static var isLandscape: Bool {
+        return UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
+    }
+}
+
 extension UIApplication {
     
     /// Sends the user to the Settings app to the specific app settings panel
@@ -179,6 +206,14 @@ extension UIView {
 
 
 extension UIViewController {
+    
+    /// Shorthand for observing a notification in a UIViewController in the default NotificationCenter.
+    ///
+    /// Equivalent to `NotificationCenter.default.addObserver(self, selector: selector, name: name, object: nil)`
+    public func addNotificationObserver(name:Notification.Name, selector:Selector, object:Any? = nil) {
+        NotificationCenter.default.addObserver(self, selector: selector, name: name, object: object)
+    }
+    
     /// Instantiates a new controller embedded inside a UINavigationController.
     public var navigatable:UINavigationController {
         return UINavigationController(rootViewController: self)
@@ -404,14 +439,22 @@ open class ModernTableController : ModernViewController, UITableViewDataSource, 
     }
     
     override open func setupConstraints() {
-        let views = ["tableView":tableView]
-        var layoutConstraints = [NSLayoutConstraint]()
-        layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[tableView]|", options: [], metrics: nil, views: views)
-        layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views)
-        view.addConstraints(layoutConstraints)
+        if #available(iOS 11.0, *) {
+            let layoutConstraints = [
+                tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            ]
+            view.addConstraints(layoutConstraints)
+        } else {
+            let views = ["tableView":tableView]
+            var layoutConstraints = [NSLayoutConstraint]()
+            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[tableView]|", options: [], metrics: nil, views: views)
+            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views)
+            view.addConstraints(layoutConstraints)
+        }
     }
-    
-    override open func updateInterface() {}
     
     open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return 0
@@ -422,6 +465,48 @@ open class ModernTableController : ModernViewController, UITableViewDataSource, 
     }
 }
 
+open class ModernCollectionController : ModernViewController, UICollectionViewDataSource, UICollectionViewDelegate {
+    public let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
+    
+    override open func viewDidLoad() {
+        super.viewDidLoad()
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
+        ModernCollectionCell.register(withCollectionView: collectionView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
+        // Do any additional setup after loading the view.
+    }
+    
+    open override func setupConstraints() {
+        if #available(iOS 11.0, *) {
+            let layoutConstraints = [
+                collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+                collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            ]
+            view.addConstraints(layoutConstraints)
+        } else {
+            let views = ["collectionView":collectionView]
+            var layoutConstraints = [NSLayoutConstraint]()
+            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[collectionView]|", options: [], metrics: nil, views: views)
+            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[collectionView]|", options: [], metrics: nil, views: views)
+            view.addConstraints(layoutConstraints)
+        }
+    }
+    
+    open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return 0
+    }
+    
+    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        return ModernCollectionCell.dequeueReusableCell(inCollectionView: collectionView, forIndexPath: indexPath)
+    }
+    
+    
+}
 
 @available(*, deprecated, renamed: "ModernTableCell", message: "This class has been deprecated in favor of ModernTableCell.")
 open class ReusableTableCell : ModernTableCell {}
