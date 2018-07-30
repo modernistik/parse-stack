@@ -73,7 +73,9 @@ extension ModernControllerConformance where Self : UIViewController {
     public func updateInterface() {}
 }
 
-public protocol StaticViewMetrics {
+/// Provides a standard interface to get recommended proportional heights based on
+/// different sized devices or viewports.
+public protocol ProportionalViewMetrics {
     /// The recommended height for this view. The default implementation is the width of
     /// the UIScreen.mainScreen() divided by the aspectRatio.
     static var recommendedHeight: CGFloat { get }
@@ -86,19 +88,7 @@ public protocol StaticViewMetrics {
     /// - Parameter forWidth: the width to use when calculating the height.
     /// - Returns: The recommended height based on input width.
     static func recommendedHeight(forWidth:CGFloat) -> CGFloat
-}
-
-// Default implementation.
-extension StaticViewMetrics {
-
-    public static func recommendedHeight(forWidth:CGFloat) -> CGFloat {
-        return recommendedHeight
-    }
-}
-
-/// Provides a standard interface to get recommended proportional heights based on
-/// different sized devices or viewports.
-public protocol ProportionalViewMetrics : StaticViewMetrics {
+    
     /// The ratio between width and height of the view. To calculate the height
     /// we would divide the width by the aspectRatio (width/height).
     static var aspectRatio: CGFloat { get }
@@ -119,9 +109,17 @@ extension ProportionalViewMetrics {
     }
     /// The recommended height for the given with, with respect to the current
     /// aspectRatio (width/height).
-    public static func recommendedHeight(forWidth:CGFloat) -> CGFloat {
-        return forWidth / aspectRatio
+    /// - parameter width: The width to use to calculate the height.
+    public static func recommendedHeight(forWidth width:CGFloat) -> CGFloat {
+        return width / aspectRatio
     }
+    
+    /// Returns a size with a recommended height based on the supplied width.
+    /// - parameter width: The width to use to calculate the height.
+    public static func recommendedSize(forWidth width:CGFloat) -> CGSize {
+        return CGSize(width: width, height: recommendedHeight(forWidth: width))
+    }
+    
 }
 
 extension ReusableType where Self: UITableViewCell {
