@@ -434,7 +434,7 @@ module Parse
     #  Song.all :limit => 2025 # large limits supported.
     #  Song.all :limit => :max # as many records as possible.
     # @param count [Integer,Symbol] The number of records to return. You may pass :max
-    #  to get as many as 11_000 records with the aid if skipping.
+    #  to get as many records as possible (Parse-Server dependent).
     # @return [self]
     def limit(count)
       if count.is_a?(Numeric)

@@ -1785,16 +1785,16 @@ Use on Pointer columns to return the full object. You may chain multiple columns
 ```
 
 #### :limit
-Limit the number of objects returned by the query. The default is 100, with Parse allowing a maximum of 1000. The framework also allows a value of `:max`. Utilizing this will have the framework continually intelligently utilize `:skip` to continue to paginate through results until an empty result set is received or the `:skip` limit is reached (10,000). When utilizing `all()`, `:max` is the default option for `:limit`.
+Limit the number of objects returned by the query. The default is 100, with Parse allowing a maximum of 1000. The framework also allows a value of `:max`. Utilizing this will have the framework continually intelligently utilize `:skip` to continue to paginate through results until an empty result set is received or the `:skip` limit is reached. When utilizing `all()`, `:max` is the default option for `:limit`.
 
 ```ruby
  Song.all :limit => 1 # same as Song.first
  Song.all :limit => 1000 # maximum allowed by Parse
- Song.all :limit => :max # up to 11,000 records (theoretical).
+ Song.all :limit => :max
 ```
 
 #### :skip
-Use with limit to paginate through results. Default is 0 with maximum value being 10,000.
+Use with limit to paginate through results. Default is 0.
 
 ```ruby
  # get the next 3 songs after the first 10
