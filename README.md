@@ -13,7 +13,7 @@ pod 'Modernistik', '~> 0.4' # Swift 4+
 ```
 
 #### Examples
-To run the example project, clone the repo, and run `pod install` from the Examples directory first.
+To run the example project, clone the repo, and run `pod install` from the Examples directory first. To make it easier, you can run the `./setup.sh` script to prepare all examples..
 
 ## Core SDK
 The CoreSDK (`Slate`) has several enhancements and helper methods as Swift extensions to the Swift Standard library, Foundation, CoreGraphics and UIKit. In addition it provides a set of protocols and base components that should be used when creating classes - these are usually prefixed with `Modern`. The CoreSDK is installed by default.

@@ -11,10 +11,11 @@ post_install do |installer|
     installer.pods_project.targets.each do |target|
         target.build_configurations.each do |config|
 
+            # config.build_settings['SWIFT_VERSION'] = '4.0'
             if config.name == 'Release'
-                config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Owholemodule'
-                else
-                config.build_settings['SWIFT_OPTIMIZATION_LEVEL'] = '-Onone'
+                config.build_settings['SWIFT_COMPILATION_MODE'] = 'wholemodule'
+            else
+                config.build_settings['SWIFT_COMPILATION_MODE'] = 'none'
             end
 
             if config.name == 'Debug'
