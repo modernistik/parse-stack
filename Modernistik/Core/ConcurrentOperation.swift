@@ -4,15 +4,18 @@
 //
 
 import Foundation
+
+/// A callback block for ConcurrentOperation instances that allow you to add simple block-based tasks that have asynchronous code. To use, call `finish()` whenever the task you were performing is completed.
+public typealias ConcurrentOperationBlock = (_ finish: @escaping (CompletionBlock) ) -> Void
 /**
  A useful Operation subclass that allows for asynchrnous
  actions to be performed before being marked as completed.
  
- To use, you sublcass `ConcurrentOperation`, define override
+ To use, you sublcass `ConcurrentOperation`, override
  `main()` and call `finish()` whenever you want to mark the
  operation as completed.
  
- ## Example
+ ## Subclassing Example
  ````
  public class SampleOperation : ConcurrentOperation {
  
@@ -27,9 +30,27 @@ import Foundation
     }
  }
  ````
+ 
+ For small tasks, may also use the block based approach instead of subclassing:
+ 
+  ## Block Example
+  ````
+ let op =  ConcurrentOperation { (finish) in
+    async_background {
+    // .. do some async work
+    // when done, call finish()
+        finish()
+    }
+ }
+ queue.addOperation(op)
+  ````
+ - note: Do not call `super.main()` in your implementation.
 */
 open class ConcurrentOperation: Operation {
 
+    public lazy var finishCallback:CompletionBlock = { return { self.finish() } }()
+    public var task:ConcurrentOperationBlock?
+    
     // MARK: - Types
     public enum State {
         case ready, executing, finished
@@ -82,11 +103,19 @@ open class ConcurrentOperation: Operation {
         return true
     }
 
+    public convenience init(task:@escaping ConcurrentOperationBlock) {
+        self.init()
+        self.task = task
+    }
     /// Override this method to perform work, but do not call `super`. Work can be synchronous or
     /// asynchronous, however your implementation should call `completed()` when you can declare
     /// the task as finished.
     override open func main() {
-        assertionFailure("\(type(of: self)): Subclasses must implement `main` and call `finish()` when done. Do not call super class.")
+        if let task = task {
+            task(finishCallback)
+            return
+        }
+        assertionFailure("\(type(of: self)): Subclasses must implement `main` and call `finish()` when done. Do not call super in your implementation.")
         finish()
     }
 
