@@ -33,6 +33,21 @@ extension UIDevice {
     public static var isLandscape: Bool {
         return UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
     }
+    
+    /// Returns true if the device is plugged into power
+    /// and the battery is less than 100% charged.
+    public static var isCharging:Bool {
+        let current = UIDevice.current
+        current.isBatteryMonitoringEnabled = true
+        return current.batteryState == .charging
+    }
+    /// Returns true if the device is not plugged
+    /// into power; the battery is discharging.
+    public static var isUnplugged:Bool {
+        let current = UIDevice.current
+        current.isBatteryMonitoringEnabled = true
+        return current.batteryState == .unplugged
+    }
 }
 
 extension UIApplication {
