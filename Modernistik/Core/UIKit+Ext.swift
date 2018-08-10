@@ -138,6 +138,12 @@ extension UIView {
         layer.mask = mask
     }
     
+    /// Adds a shadow to the view's layer given the parameters.
+    /// - parameter dx: the horizontal offset amount of shadow. Applied to `shadowOffset`.
+    /// - parameter dy: the vertical offset amount of shadow. Applied to `shadowOffset`.
+    /// - parameter radius: the shadow radius. Alias to `shadowRadius`
+    /// - parameter opacity: the shadow opacity. Alias to `shadowOpacity` and defaults to 1.
+    /// - parameter color: the shadow color. Alias to `shadowColor` and defaults to black.
     public func addShadow(dx:CGFloat, dy:CGFloat, radius:CGFloat, opacity:CGFloat = 1, color:UIColor = UIColor.black) {
         layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius).cgPath
         layer.shadowColor = color.cgColor
@@ -147,9 +153,17 @@ extension UIView {
         layer.masksToBounds = false
     }
     
-    public func rounded(by:CGFloat = 2.0) {
-        if by > 0 {
-            layer.cornerRadius = bounds.longest / by
+    /// Rounds the corners of the view dividing the current longest bounds dimension by an amount.
+    /// This is short hand for:
+    ///
+    ///     layer.cornerRadius = bounds.longest / 2
+    ///     layer.maskToBounds = true
+    ///
+    /// - parameter by : The dividing factor. T default is 2 which creates a circle.
+    public func rounded(by factor:CGFloat = 2.0) {
+        if factor > 0 {
+            layer.cornerRadius = bounds.longest / factor
+            layer.masksToBounds = true
         }
     }
     /// Returns a set of constraints where the current view is pinned to all sides to the supplied view.
@@ -233,11 +247,11 @@ extension UIViewController {
     public var navigatable:UINavigationController {
         return UINavigationController(rootViewController: self)
     }
-    
+    /// Shorthand for dismissing the controller. Useful when needed to be set as a selector to an action.
     @objc public func animatedDismiss() {
         dismiss(animated: true, completion: nil)
     }
-    
+    /// Returns a UINavigationController with this controller set at its root with a cancel button that will call `animatedDismiss`. You may change the set bar button item style. Useful for quick presentations.
     public func embeddedInDismissableSystemNavigation(style:UIBarButtonSystemItem = .cancel) -> UINavigationController {
         
         let buttonItem = UIBarButtonItem(barButtonSystemItem: style, target: self, action: #selector(UIViewController.animatedDismiss))

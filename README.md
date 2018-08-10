@@ -1,6 +1,6 @@
 <h1 align="center">Modernistik Framework</h1>
 
-This framework represents extension, utilizies, design patterns and practices adopted for Modernistik software development in Swift / Objective-C. It has two main components: `Core` and `Hyperdrive`.
+This framework represents extension, utilizes, design patterns and practices adopted for Modernistik software development in Swift / Objective-C. It has two main components: `Core` and `Hyperdrive`.
 
 ## Installation
 
