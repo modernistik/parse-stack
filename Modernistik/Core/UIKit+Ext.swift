@@ -454,21 +454,23 @@ open class ModernTableController : ModernViewController, UITableViewDataSource, 
     }
     
     override open func setupConstraints() {
+        var layoutConstraints = [
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ]
+        
         if #available(iOS 11.0, *) {
-            let layoutConstraints = [
+            layoutConstraints += [
                 tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
                 tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
             ]
-            view.addConstraints(layoutConstraints)
         } else {
-            let views = ["tableView":tableView]
-            var layoutConstraints = [NSLayoutConstraint]()
-            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[tableView]|", options: [], metrics: nil, views: views)
-            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[tableView]|", options: [], metrics: nil, views: views)
-            view.addConstraints(layoutConstraints)
+            layoutConstraints += [
+                tableView.topAnchor.constraint(equalTo: view.topAnchor),
+                tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            ]
         }
+        view.addConstraints(layoutConstraints)
     }
     
     open func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -495,21 +497,22 @@ open class ModernCollectionController : ModernViewController, UICollectionViewDa
     }
     
     open override func setupConstraints() {
+        var layoutConstraints = [
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ]
         if #available(iOS 11.0, *) {
-            let layoutConstraints = [
+            layoutConstraints += [
                 collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-                collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+                collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
             ]
-            view.addConstraints(layoutConstraints)
         } else {
-            let views = ["collectionView":collectionView]
-            var layoutConstraints = [NSLayoutConstraint]()
-            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "H:|[collectionView]|", options: [], metrics: nil, views: views)
-            layoutConstraints += NSLayoutConstraint.constraints(withVisualFormat: "V:|[collectionView]|", options: [], metrics: nil, views: views)
-            view.addConstraints(layoutConstraints)
+            layoutConstraints += [
+                collectionView.topAnchor.constraint(equalTo: view.topAnchor),
+                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            ]
         }
+        view.addConstraints(layoutConstraints)
     }
     
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
