@@ -29,10 +29,10 @@ Pod::Spec.new do |s|
   s.source           = { :git => 'https://github.com/modernistik/cocoa.git', :tag => s.version.to_s }
   s.social_media_url = 'https://twitter.com/modernistik'
 
+  s.default_subspec = 'Core'
+  s.swift_version = '4.0'
   s.ios.deployment_target = '9.0'
   s.tvos.deployment_target = '9.0'
-
-  s.default_subspec = 'Core'
 
   s.subspec 'Core' do |cs|
     cs.source_files = 'Modernistik/Core/**/*'
@@ -42,7 +42,7 @@ Pod::Spec.new do |s|
     cs.dependency 'Modernistik/Core'
     cs.dependency 'Parse', '>= 1.17'
     cs.dependency 'TimeZoneLocate', '>= 0.4'
-    cs.source_files = 'Modernistik/Hyperdrive/**/*'
+    cs.ios.source_files = 'Modernistik/Hyperdrive/**/*'
   end
   # s.resource_bundles = {
   #   'Modernistik' => ['Modernistik/Assets/*.png']
