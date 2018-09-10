@@ -25,17 +25,20 @@ extension UIDevice {
     }
     
     /// Returns true if the current device is in vertical mode.
+    @available(tvOS, unavailable)
     public static var isPortrait: Bool {
         return UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown
     }
     
     /// Returns true if the current device is in landscape (horizontal) mode
+    @available(tvOS, unavailable)
     public static var isLandscape: Bool {
         return UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
     }
     
     /// Returns true if the device is plugged into power
     /// and the battery is less than 100% charged.
+    @available(tvOS, unavailable)
     public static var isCharging:Bool {
         let current = UIDevice.current
         current.isBatteryMonitoringEnabled = true
@@ -43,6 +46,7 @@ extension UIDevice {
     }
     /// Returns true if the device is not plugged
     /// into power; the battery is discharging.
+    @available(tvOS, unavailable)
     public static var isUnplugged:Bool {
         let current = UIDevice.current
         current.isBatteryMonitoringEnabled = true
@@ -473,7 +477,7 @@ open class ModernTableController : ModernViewController, UITableViewDataSource, 
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ]
         
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11.0, tvOS 11.0, *) {
             layoutConstraints += [
                 tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
                 tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
@@ -515,7 +519,7 @@ open class ModernCollectionController : ModernViewController, UICollectionViewDa
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ]
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11.0, tvOS 11.0, *) {
             layoutConstraints += [
                 collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
                 collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
