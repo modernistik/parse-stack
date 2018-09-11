@@ -157,7 +157,7 @@ extension UIView {
         layer.masksToBounds = false
     }
     
-    /// Rounds the corners of the view dividing the current longest bounds dimension by an amount.
+    /// Makes the vide rounded. Rounds the corners of the view dividing the current longest bounds dimension by an amount.
     /// This is short hand for:
     ///
     ///     layer.cornerRadius = bounds.longest / 2
@@ -166,10 +166,18 @@ extension UIView {
     /// - parameter by : The dividing factor. T default is 2 which creates a circle.
     public func rounded(by factor:CGFloat = 2.0) {
         if factor > 0 {
+            cornerRadius(bounds.longest / factor)
             layer.cornerRadius = bounds.longest / factor
             layer.masksToBounds = true
         }
     }
+    
+    /// Sets the layer's corner radius and enabled masking to its bounds.
+    public func cornerRadius(_ amount:CGFloat) {
+        layer.cornerRadius = amount
+        layer.masksToBounds = true
+    }
+    
     /// Returns a set of constraints where the current view is pinned to all sides to the supplied view.
     /// If the supplied view is the current view's parent, this would be similarly represented in the visual format of `H:|[view]|` and `V:|[view]|`.
     ///
