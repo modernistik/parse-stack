@@ -363,6 +363,50 @@ open class ModernCollectionCell : UICollectionViewCell, ReusableType, ModernView
     
 }
 
+/// Provides a base UILabel class that conforms to the general design lifecycle patterns
+/// of setup/update/reuse, etc.
+open class ModernLabel : UILabel, ModernViewConformance {
+    
+    public convenience init(square:CGFloat) {
+        self.init(frame: .square(square))
+    }
+    
+    public override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupView()
+    }
+    
+    public required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+    
+    public required init(autolayout: Bool) {
+        super.init(frame: .zero)
+        translatesAutoresizingMaskIntoConstraints = !autolayout
+        setupView()
+    }
+    
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        setupView()
+    }
+    
+    open func setupView() {}
+    
+    /// This method should be called whenever there is a need to update the interface.
+    open func updateInterface() {
+        setNeedsDisplay()
+    }
+    
+    /// This method should be called whenever there is a need to reset the interface.
+    open func prepareForReuse() {
+        text = nil
+    }
+}
+
+/// Provides a base UIButton class that conforms to the general design lifecycle patterns
+/// of setup/update/reuse, etc. It also supports modifying the `minimumHitArea` property for
+/// easily increasing the target tap frame.
 open class ModernButton: UIButton, ModernViewConformance {
     public var minimumHitArea = CGSize.zero
     
@@ -433,6 +477,9 @@ open class ModernButton: UIButton, ModernViewConformance {
 @available(*, deprecated, renamed: "ModernControl", message: "This class has been deprecated in favor of ModernControl.")
 open class ModernUIControl : ModernControl {}
 
+/// Provides a base ModernControl class that conforms to the general design lifecycle patterns
+/// of setup/update/reuse, etc. It also supports modifying the `minimumHitArea` property for
+/// easily increasing the target tap frame.
 open class ModernControl: UIControl, ModernViewConformance {
     public var minimumHitArea = CGSize.zero
     
@@ -490,12 +537,14 @@ open class ModernControl: UIControl, ModernViewConformance {
     }
 }
 
+/// Provides a simple UIView that implements ModernViewConformance, which has an adjustable hit target area by modifying `minimumHitArea`, and allows for easily adding a block to be executed whenever the view is tapped.
 open class TappableModernView : ModernView {
     public var minimumHitArea = CGSize.zero
     public var tapActionBlock:(() -> Void)?
     
     override open func setupView() {
         super.setupView()
+        isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
         addGestureRecognizer(tap)
     }

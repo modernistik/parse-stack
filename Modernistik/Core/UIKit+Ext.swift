@@ -173,6 +173,11 @@ extension UIView {
     }
     
     /// Sets the layer's corner radius and enabled masking to its bounds.
+    /// This is short hand for:
+    ///
+    ///     layer.cornerRadius = amount
+    ///     layer.maskToBounds = true
+    ///
     public func cornerRadius(_ amount:CGFloat) {
         layer.cornerRadius = amount
         layer.masksToBounds = true
