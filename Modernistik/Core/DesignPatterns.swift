@@ -314,7 +314,7 @@ open class ModernView: UIView, ModernViewConformance {
 /// of setup/update/reuse, etc.
 open class ModernTableCell : UITableViewCell, ReusableType, ModernViewConformance {
     
-    override public init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+    override public init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupView()
     }

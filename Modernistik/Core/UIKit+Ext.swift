@@ -58,7 +58,7 @@ extension UIApplication {
     
     /// Sends the user to the Settings app to the specific app settings panel
     public class func openSettingsPanel() {
-        if let url = URL(string: UIApplicationOpenSettingsURLString) {
+        if let url = URL(string: UIApplication.openSettingsURLString) {
             UIApplication.shared.openURL(url)
         }
     }
@@ -207,7 +207,7 @@ extension UIView {
         let bounceAnimation = CAKeyframeAnimation(keyPath: "transform.scale")
         bounceAnimation.duration = duration
         bounceAnimation.values = scales
-        let f = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+        let f = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
         bounceAnimation.timingFunctions = scales.map({ (_) -> CAMediaTimingFunction in return f })
         bounceAnimation.isRemovedOnCompletion = false
         layer.add(bounceAnimation, forKey: "bounce")
@@ -269,7 +269,7 @@ extension UIViewController {
         dismiss(animated: true, completion: nil)
     }
     /// Returns a UINavigationController with this controller set at its root with a cancel button that will call `animatedDismiss`. You may change the set bar button item style. Useful for quick presentations.
-    public func embeddedInDismissableSystemNavigation(style:UIBarButtonSystemItem = .cancel) -> UINavigationController {
+    public func embeddedInDismissableSystemNavigation(style:UIBarButtonItem.SystemItem = .cancel) -> UINavigationController {
         
         let buttonItem = UIBarButtonItem(barButtonSystemItem: style, target: self, action: #selector(UIViewController.animatedDismiss))
         
@@ -330,14 +330,14 @@ extension UIImage {
     /// Returns the data for the specified image in PNG format
     /// If the image object’s underlying image data has been purged, calling this function forces that data to be reloaded into memory.
     /// - returns: A data object containing the PNG data, or nil if there was a problem generating the data. This function may return nil if the image has no data or if the underlying CGImageRef contains data in an unsupported bitmap format.
-    public var png: Data? { return UIImagePNGRepresentation(self) }
+    public var png: Data? { return self.pngData() }
     
     /// Returns the data for the specified image in JPEG format.
     /// If the image object’s underlying image data has been purged, calling this function forces that data to be reloaded into memory.
     /// - returns: A data object containing the JPEG data, or nil if there was a problem generating the data. This function may return nil if the image has no data or if the underlying CGImageRef contains data in an unsupported bitmap format.
     public func jpeg(quality: CGFloat = 0.80) -> Data? {
         guard 0...1 ~= quality else { return nil }
-        return UIImageJPEGRepresentation(self, quality)
+        return self.jpegData(compressionQuality: quality)
     }
     
 }
@@ -363,7 +363,7 @@ extension UIFont {
 }
 
 extension UIButton {
-    public func setImageFromUrl(_ link:String, contentMode mode: UIViewContentMode) {
+    public func setImageFromUrl(_ link:String, contentMode mode: UIView.ContentMode) {
         contentMode = mode
         if let url = URL(string: link) {
             URLSession.shared.dataTask(with: url, completionHandler: { (data, _, error) -> Void in

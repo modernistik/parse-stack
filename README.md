@@ -9,7 +9,7 @@ it, simply add the following line to your Podfile:
 
 ```ruby
 pod 'Modernistik', '~> 0.4' # Swift 4+
-# pod 'Modernistik', '~> 0.3' # for Swift 3
+pod 'Modernistik', '~> 0.4.5' # Swift 4.2
 ```
 
 #### Examples
