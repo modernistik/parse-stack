@@ -59,7 +59,11 @@ extension UIApplication {
     /// Sends the user to the Settings app to the specific app settings panel
     public class func openSettingsPanel() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
-            UIApplication.shared.openURL(url)
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
         }
     }
 }
