@@ -121,6 +121,11 @@ extension UIView {
     }
     
     /// Returns an zero frame instance ready for autolayout.
+    /// # Example
+    /// ```
+    /// // How to instantiate while subscribing to autolayout
+    /// let view = UIView(autolayout: true)
+    /// ```
     /// - parameter autolayout: true or false whether this view will be used in autolayout. If true is passed (default), `translatesAutoresizingMaskIntoConstraints` will be set to false.
     @objc public convenience init(autolayout: Bool) {
         self.init(frame: .zero)
@@ -138,7 +143,10 @@ extension UIView {
     }
     
     /// Uses a CAShapeLayer as mask to round the corners defined in `corners` argument.
-    /// Ex. myView.roundCorners([.topLeft,.topRight], radius: 10)
+    /// # Example
+    /// ```
+    /// view.roundCorners([.topLeft,.topRight], radius: 10)
+    /// ```
     public func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
         let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(square: radius))
         let mask = CAShapeLayer()
@@ -162,11 +170,13 @@ extension UIView {
     }
     
     /// Makes the vide rounded. Rounds the corners of the view dividing the current longest bounds dimension by an amount.
-    /// This is short hand for:
-    ///
-    ///     layer.cornerRadius = bounds.longest / 2
-    ///     layer.maskToBounds = true
-    ///
+    /// # Example
+    /// ```
+    ///  view.rounded()
+    ///  // which is shorthand for:
+    ///  view.layer.cornerRadius = bounds.longest / 2
+    ///  view.layer.maskToBounds = true
+    /// ```
     /// - parameter by : The dividing factor. T default is 2 which creates a circle.
     public func rounded(by factor:CGFloat = 2.0) {
         if factor > 0 {
@@ -178,10 +188,13 @@ extension UIView {
     
     /// Sets the layer's corner radius and enabled masking to its bounds.
     /// This is short hand for:
-    ///
-    ///     layer.cornerRadius = amount
-    ///     layer.maskToBounds = true
-    ///
+    /// ```
+    /// let amount = 10
+    /// view.cornerRadius(amount)
+    /// // shorthand for:
+    /// view.layer.cornerRadius = amount
+    /// view.layer.maskToBounds = true
+    /// ```
     public func cornerRadius(_ amount:CGFloat) {
         layer.cornerRadius = amount
         layer.masksToBounds = true

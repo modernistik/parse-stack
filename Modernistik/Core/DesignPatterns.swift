@@ -5,8 +5,12 @@
 
 import UIKit
 
-/// Protocol that requires the implementor to have a `reuseIdentifier` field.
-/// This is normally implemented by items that will go through a recycling phase.
+/** Protocol that requires the implementor to have a `reuseIdentifier` field.
+    This is normally implemented by items that will go through a recycling phase like `UITableViewCell` or `UICollectionViewCell`.
+# Discussion:
+ We have defined an extension to this protocol which automatically returns the name of the class as the
+ default implementation of this property.
+*/
 public protocol ReusableType {
     static var reuseIdentifier:String { get }
 }
@@ -19,7 +23,7 @@ extension ReusableType {
     }
 }
 
-/// An object tha@objc @objc t has a rawValue type that returns an Int.
+/// An object that has a rawValue type that returns an Int.
 public protocol IntRepresentable {
     var rawValue: Int { get }
 }
@@ -28,7 +32,26 @@ public protocol StringRepresentable {
     var rawValue: String { get }
 }
 
-/// Basic protocol for following a standard lifecycle of calls for UIView subclasses.
+/** Basic protocol for following a standard lifecycle of calls for UIView subclasses. This
+ is the starting point for most view classes. Normally, you do not have to conform to this protocol
+ and you would use one of the concrete subclasses. The three methods that need implementation are:
+ 
+ ```
+ func setupView() {
+    // code to setup subviews and layout
+ }
+ 
+ func updateInterface() {
+    // code to update the interface
+ }
+ 
+ func prepareForReuse() {
+    // code to reset the view.
+    // this method is already present
+    // in UITableViewCell and UICollectionViewCell
+ }
+ ```
+*/
 public protocol ModernViewConformance : class {
     /// This method, called once in the view's lifecycle, should implement
     /// setting up the view's children in the parent's view. This method will be called
@@ -46,7 +69,19 @@ public protocol ModernViewConformance : class {
     /// when it is going through view recycling, for example, cells in a table view.
     func prepareForReuse()
 }
-
+/** Basic protocol that most application controllers should adopt. Normally you would not implement
+this protocol and instead subclass `ModernViewController` which provides extension and functionality.
+ This protocol defines two methods:
+ ```
+ func setupConstraints() {
+    // code to setup view constraints
+ }
+ 
+ func updateInterface() {
+ // code to update the interface based on some state or action change.
+ }
+ ```
+ */
 public protocol ModernControllerConformance: class {
     
     /**
@@ -73,20 +108,45 @@ extension ModernControllerConformance where Self : UIViewController {
     public func updateInterface() {}
 }
 
-/// Provides a standard interface to get recommended proportional heights based on
-/// different sized devices or viewports.
+/** Provides a standard interface to get recommended proportional heights based on
+ different sized devices or viewports. The idea behind this pattern is in defining an aspect
+ ratio that this view prefers. By adopting this protocol and setting the `aspectRatio`, several
+ extensions will make it easier to determine correct sizes utilizing this value.
+ # Example
+ 
+ ```
+ // Adopt the protocol
+ class MyView : ModernView, ProportionalViewMetrics {
+    static var aspectRatio:CGFloat = 1920/1080
+ }
+ 
+ // Using the aspect ratio, we can calculate proper sizes
+ MyView.recommendedHeight(forWidth: 640) //-> 360
+ ```
+*/
 public protocol ProportionalViewMetrics {
     /// The recommended height for this view. The default implementation is the width of
     /// the UIScreen.mainScreen() divided by the aspectRatio.
     static var recommendedHeight: CGFloat { get }
     
-    /// Returns the height based on the aspectRatio for a given width. By default, this is
-    /// is calculated by width/aspectRatio
-    ///
-    /// The default implementation returns the `recommendedHeight` value.
-    ///
-    /// - Parameter forWidth: the width to use when calculating the height.
-    /// - Returns: The recommended height based on input width.
+    /**
+     Returns the height based on the aspectRatio for a given width. By default, this is
+     is calculated by width/aspectRatio. The default implementation
+     returns the `recommendedHeight` value.
+     # Example
+     
+     ```
+     // Assume subclass
+     class MyView : ModernView, ProportionalViewMetrics {
+        static var aspectRatio:CGFloat = 1920/1080
+     }
+     
+     // Using the aspect ratio, we can calculate proper sizes
+     MyView.recommendedHeight(forWidth: 640) //-> 360
+     ```
+    - parameter forWidth: the width to use when calculating the height.
+    - returns: The recommended height based on input width.
+    */
     static func recommendedHeight(forWidth:CGFloat) -> CGFloat
     
     /// The ratio between width and height of the view. To calculate the height
@@ -100,7 +160,7 @@ extension ProportionalViewMetrics {
     /// The ratio between width and height of the view. To calculate the height
     /// we would divide the width by the aspectRatio (width/height).
     public static var aspectRatio:CGFloat { return 1 }
-    /// Returns 1/aspectRatio (height/width).
+    /// Returns `1/aspectRatio` (height/width).
     public static var inverseAspectRatio:CGFloat { return 1 / aspectRatio }
     /// The ratio between width and height of the view. To calculate the height
     /// we would divide the width by the aspectRatio (width/height).
@@ -115,6 +175,10 @@ extension ProportionalViewMetrics {
     }
     
     /// Returns a size with a recommended height based on the supplied width.
+    /// Shorthand for:
+    /// ```
+    /// CGSize(width: width, height: recommendedHeight(forWidth: width))
+    /// ```
     /// - parameter width: The width to use to calculate the height.
     public static func recommendedSize(forWidth width:CGFloat) -> CGSize {
         return CGSize(width: width, height: recommendedHeight(forWidth: width))
@@ -267,7 +331,9 @@ open class ModernHeaderFooterView : UITableViewHeaderFooterView, ReusableType, M
 }
 
 /// Base view class that follows the general setup/update/reuse pattern when
-/// either instantiating from nibs/storyboards or code.
+/// either instantiating from nibs/storyboards or code. Because it implements
+/// `ModernViewConformance`, it will properly call `setupView()` whether the view
+/// is instantiated through an designated initializer, storyboard or nib.
 open class ModernView: UIView, ModernViewConformance {
     
     @objc public convenience init(square:CGFloat) {

@@ -8,6 +8,10 @@
 
 import QuartzCore
 
+/// A view that is backed by a CAGradientLayer in order to draw gradients quickly. This
+/// class is useful for small gradients or ones that need animation as it fast and takes advantage
+/// of the GPU. For larger gradients, it is better to use `SmoothGradientView` as it uses CoreGraphics
+/// to draw gradients without banding.
 open
 class GradientLayerView: ModernView {
     
@@ -89,6 +93,9 @@ class GradientLayerView: ModernView {
     
 }
 
+/// This class creates a smooth gradient using CoreGraphics with little to no banding at the cost
+/// of speed. If you are creating small gradients or need them to be
+/// on animation layers, it is better to use `GradientLayerView`.
 open class SmoothGradientView : ModernView {
     
     public var startColor = UIColor.black {
@@ -132,6 +139,7 @@ open class SmoothGradientView : ModernView {
             setNeedsDisplay()
         }
     }
+    /// Changes the direction of the gradient.
     public var isHorizontal = false {
         didSet {
             setNeedsDisplay()
