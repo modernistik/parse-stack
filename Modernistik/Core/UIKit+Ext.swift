@@ -142,16 +142,28 @@ extension UIView {
         accessibilityIdentifier = name
     }
     
-    /// Uses a CAShapeLayer as mask to round the corners defined in `corners` argument.
+    /// Uses a CAShapeLayer as mask to round the corners defined in `corners` argument. (Mutating)
     /// # Example
     /// ```
-    /// view.roundCorners([.topLeft,.topRight], radius: 10)
+    /// view.round(corners: [.topLeft,.topRight], radius: 10)
     /// ```
-    public func roundCorners(_ corners: UIRectCorner, radius: CGFloat) {
-        let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(square: radius))
-        let mask = CAShapeLayer()
-        mask.path = path.cgPath
-        layer.mask = mask
+    public func round(corners: UIRectCorner, radius: CGFloat) {
+        
+        if #available(iOS 11.0, *) {
+            var maskedCorners:CACornerMask = []
+            if corners.contains(.topLeft) { maskedCorners.insert(.layerMinXMinYCorner) }
+            if corners.contains(.topRight) { maskedCorners.insert(.layerMaxXMinYCorner) }
+            if corners.contains(.bottomLeft) { maskedCorners.insert(.layerMinXMaxYCorner) }
+            if corners.contains(.bottomRight) { maskedCorners.insert(.layerMaxXMaxYCorner) }
+            layer.cornerRadius = radius
+            layer.maskedCorners = maskedCorners
+        } else {
+            let path = UIBezierPath(roundedRect: bounds, byRoundingCorners: corners, cornerRadii: CGSize(square: radius))
+            let mask = CAShapeLayer()
+            mask.path = path.cgPath
+            layer.mask = mask
+        }
+            layer.masksToBounds = true
     }
     
     /// Adds a shadow to the view's layer given the parameters.
