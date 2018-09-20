@@ -145,6 +145,7 @@ extension UIView {
     /// Uses a CAShapeLayer as mask to round the corners defined in `corners` argument. (Mutating)
     /// # Example
     /// ```
+    /// // round only the top left and right corners by 10.
     /// view.round(corners: [.topLeft,.topRight], radius: 10)
     /// ```
     public func round(corners: UIRectCorner, radius: CGFloat) {
@@ -166,13 +167,13 @@ extension UIView {
             layer.masksToBounds = true
     }
     
-    /// Adds a shadow to the view's layer given the parameters.
+    /// Adds a shadow to the view's layer given the parameters. Note, that this will set `maskToBounds` to false.
     /// - parameter dx: the horizontal offset amount of shadow. Applied to `shadowOffset`.
     /// - parameter dy: the vertical offset amount of shadow. Applied to `shadowOffset`.
     /// - parameter radius: the shadow radius. Alias to `shadowRadius`
-    /// - parameter opacity: the shadow opacity. Alias to `shadowOpacity` and defaults to 1.
+    /// - parameter opacity: the shadow opacity. Alias to `shadowOpacity` and defaults to 0.5.
     /// - parameter color: the shadow color. Alias to `shadowColor` and defaults to black.
-    public func addShadow(dx:CGFloat, dy:CGFloat, radius:CGFloat, opacity:CGFloat = 1, color:UIColor = UIColor.black) {
+    public func addShadow(dx:CGFloat, dy:CGFloat, radius:CGFloat, opacity:CGFloat = 0.5, color:UIColor = UIColor.black) {
         layer.shadowPath = UIBezierPath(roundedRect: bounds, cornerRadius: layer.cornerRadius).cgPath
         layer.shadowColor = color.cgColor
         layer.shadowOffset = CGSize(width: dx, height: dy)
@@ -181,7 +182,7 @@ extension UIView {
         layer.masksToBounds = false
     }
     
-    /// Makes the vide rounded. Rounds the corners of the view dividing the current longest bounds dimension by an amount.
+    /// Makes the view rounded by setting the corner radius of the view to a dividing factor of the longest bounds dimension.
     /// # Example
     /// ```
     ///  view.rounded()
@@ -192,24 +193,26 @@ extension UIView {
     /// - parameter by : The dividing factor. T default is 2 which creates a circle.
     public func rounded(by factor:CGFloat = 2.0) {
         if factor > 0 {
-            cornerRadius(bounds.longest / factor)
-            layer.cornerRadius = bounds.longest / factor
-            layer.masksToBounds = true
+            cornerRadius = bounds.longest / factor
         }
     }
     
     /// Sets the layer's corner radius and enabled masking to its bounds.
     /// This is short hand for:
     /// ```
-    /// let amount = 10
-    /// view.cornerRadius(amount)
+    /// view.cornerRadius = 10
     /// // shorthand for:
-    /// view.layer.cornerRadius = amount
+    /// view.layer.cornerRadius = 10
     /// view.layer.maskToBounds = true
     /// ```
-    public func cornerRadius(_ amount:CGFloat) {
-        layer.cornerRadius = amount
-        layer.masksToBounds = true
+    public var cornerRadius:CGFloat {
+        get {
+            return layer.cornerRadius
+        }
+        set {
+            layer.cornerRadius = newValue
+            layer.masksToBounds = newValue > 0
+        }
     }
     
     /// Returns a set of constraints where the current view is pinned to all sides to the supplied view.
@@ -321,8 +324,17 @@ extension UIColor {
     /// fades or overlays with opacity.
     ///
     /// - parameter alpha: The opacity value (0.0 to 1.0)
+    @available(*, deprecated, message: "This method has been deprecated in favor of `UIColor.black.alpha(amount)`.")
     public convenience init(blackWithAlpha alpha:CGFloat) {
         self.init(red: 0, green: 0, blue: 0, alpha: alpha)
+    }
+    
+    
+    /// Alias to `withAlphaComponent(value)`.
+    /// Creates and returns a color object that has the same color space
+    /// and component values as the receiver, but has the specified alpha component.
+    public func alpha(_ alpha:CGFloat) -> UIColor {
+        return self.withAlphaComponent(alpha)
     }
     
 }
