@@ -497,10 +497,15 @@ module Parse
     #  # add where :like_count is greater than 20
     #  query.add_constraint(:like_count.gt, 20)
     #
+    #  # same, but ignore field formatting
+    #  query.add_constraint(:like_count.gt, 20, filter: false)
+    #
     # @param operator [Parse::Operator] an operator object containing the operation and operand.
     # @param value [Object] the value for the constraint.
+    # @param opts [Object] A set of options. Passing :filter with false, will skip field formatting.
+    # @see Query#format_field
     # @return [self]
-    def add_constraint(operator, value = nil, **opts)
+    def add_constraint(operator, value = nil, opts = {})
       @where ||= []
       constraint = operator # assume Parse::Constraint
       unless constraint.is_a?(Parse::Constraint)
