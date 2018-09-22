@@ -6,6 +6,10 @@
 
 Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full *[API Reference](https://www.modernistik.com/gems/parse-stack/index.html)* for more detailed information about our Parse Server SDK.
 
+### Hire Us
+
+Interested in our work? You can find us here: [https://www.modernistik.com](https://www.modernistik.com)
+
 ### Code Status
 [![Gem Version](https://img.shields.io/gem/v/parse-stack.svg)](https://github.com/modernistik/parse-stack)
 [![Downloads](https://img.shields.io/gem/dt/parse-stack.svg)](https://rubygems.org/gems/parse-stack)
@@ -134,7 +138,7 @@ result = Parse.call_function :myFunctionName, {param: value}
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-- [Overview](#overview)
+
 - [Architecture](#architecture)
   - [Parse::Client](#parseclient)
   - [Parse::Query](#parsequery)
@@ -235,6 +239,7 @@ result = Parse.call_function :myFunctionName, {param: value}
     - [Max Distance Constraint](#max-distance-constraint)
     - [Bounding Box Constraint](#bounding-box-constraint)
     - [Polygon Area Constraint](#polygon-area-constraint)
+    - [Full Text Search Constraint](#full-text-search-constraint)
   - [Relational Queries](#relational-queries)
   - [Compound Queries](#compound-queries)
 - [Query Scopes](#query-scopes)
@@ -2150,6 +2155,29 @@ Equivalent to the `$geoWithin` Parse query operation and `$polygon` geopoint con
  SunkenShip.all :location.within_polygon => [bermuda, san_juan, miami]
 ```
 
+#### [Full Text Search Constraint](https://www.modernistik.com/gems/parse-stack/Parse/Constraint/FullTextSearchQueryConstraint.html)
+Equivalent to the `$text` Parse query operation and `$search` parameter constraint for efficient search capabilities. By creating indexes on one or more columns your strings are turned into tokens for full text search functionality. The `$search` key can take any number of parameters in hash form. *Requires Parse Server 2.5.0 or later*
+
+```ruby
+ # Do a full text search on "anthony"
+ q.where :field.text_search => "anthony"
+
+ # perform advance searches
+ q.where :field.text_search => {term: "anthony", case_insensitive: true}
+ # equivalent
+ q.where :field.text_search => {:$term => "anthony", :$caseInsensitive => true}
+```
+
+You may use the following keys for the parameters clause.
+| Parameter | Use |
+|:--------------------|:----------------------------------------------------|
+| $term               | Specify a field to search (**Required**)|
+| $language           | Determines the list of stop words and the rules for tokenizer.|
+| $caseSensitive      | Enable or disable case sensitive search.|
+| $diacriticSensitive | Enable or disable diacritic sensitive search.|
+
+For additional details, please see [Query on String Values](https://docs.parseplatform.org/rest/guide/#queries-on-string-values).
+
 ### Relational Queries
 Equivalent to the `$relatedTo` Parse query operation. If you want to retrieve objects that are members of a `Relation` field in your Parse class.
 
@@ -2609,10 +2637,6 @@ Parse.cache.fetch("all:records") do |key|
 end
 
 ```
-
-## Hire Us
-
-Interested in our consulting work? You can find us here: [https://www.modernistik.com](https://www.modernistik.com)
 
 ## Contributing
 

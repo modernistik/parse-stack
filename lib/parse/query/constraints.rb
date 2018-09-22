@@ -714,6 +714,56 @@ module Parse
       end
     end
 
+
+    class FullTextSearchQueryConstraint < Constraint
+      # @!method text_search
+      # A registered method on a symbol to create the constraint. Maps to Parse
+      # operator "$text" with "$search" subconstraint. Takes a hash of parameters.
+      # @example
+      #  # As many points as you want
+      #  q.where :field.text_search => {parameters}
+      #
+      # Where `parameters` can be one of:
+      #   $term : Specify a field to search (Required)
+      #   $language : Determines the list of stop words and the rules for tokenizer.
+      #   $caseSensitive : Enable or disable case sensitive search.
+      #   $diacriticSensitive : Enable or disable diacritic sensitive search
+      #
+      # @note This method will automatically add `$` to each key of the parameters
+      # hash if it doesn't already have it.
+      # @return [WithinPolygonQueryConstraint]
+      # @version 1.8.0 (requires Server v2.5.0 or later)
+      contraint_keyword :$text
+      register :text_search
+
+      # @return [Hash] the compiled constraint.
+      def build
+        params = formatted_value
+
+        params = { :$term => params.to_s } if params.is_a?(String) || params.is_a?(Symbol)
+
+        unless params.is_a?(Hash)
+          raise ArgumentError, '[Parse::Query] Invalid query value parameter passed to'\
+                      ' `text_search` constraint: Value must be a string or a hash of parameters.'
+        end
+
+        params = params.inject({}) do |h,(k,v)|
+          u = k.to_s
+          u = u.columnize.prepend('$') unless u.start_with?('$')
+          h[u] = v
+          h
+        end
+
+        unless params["$term"].present?
+          raise ArgumentError, "[Parse::Query] Invalid query value parameter passed to"\
+                      " `text_search` constraint: Missing required `$term` subkey.\n"\
+                      "\tExample: #{@operation.operand}.text_search => { term: 'text to search' }"
+        end
+
+        { @operation.operand => { :$text => { :$search => params } } }
+      end
+    end
+
   end
 
 end
