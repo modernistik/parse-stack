@@ -1,5 +1,8 @@
 ## Parse-Stack Changelog
 
+### 1.8.0
+- NEW: Support for Parse Server [full text search](https://github.com/modernistik/parse-stack#full-text-search-constraint) with the `text_search` operator. Related to [Issue#46](https://github.com/modernistik/parse-stack/issues/46).
+
 ### 1.7.4
 - NEW: Added `parse_object` extension to Hash classes to more easily call
   Parse::Object.build in `map` loops with symbol to proc.

@@ -2169,12 +2169,13 @@ Equivalent to the `$text` Parse query operation and `$search` parameter constrai
 ```
 
 You may use the following keys for the parameters clause.
+
 | Parameter | Use |
-|:--------------------|:----------------------------------------------------|
-| $term               | Specify a field to search (**Required**)|
-| $language           | Determines the list of stop words and the rules for tokenizer.|
-| $caseSensitive      | Enable or disable case sensitive search.|
-| $diacriticSensitive | Enable or disable diacritic sensitive search.|
+| :--- | :----- |
+| `$term`               | Specify a field to search (**Required**)|
+| `$language`           | Determines the list of stop words and the rules for tokenizer.|
+| `$caseSensitive`      | Enable or disable case sensitive search.|
+| `$diacriticSensitive` | Enable or disable diacritic sensitive search.|
 
 For additional details, please see [Query on String Values](https://docs.parseplatform.org/rest/guide/#queries-on-string-values).
 
