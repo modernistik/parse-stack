@@ -314,7 +314,7 @@ module Parse
         elsif expression == :keys
           keys value
         elsif expression == :key
-          @key = value
+          keys [value]
         elsif expression == :skip
           skip value
         elsif expression == :limit
