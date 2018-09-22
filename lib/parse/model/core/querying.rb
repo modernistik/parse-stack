@@ -252,6 +252,19 @@ module Parse
           query(constraints).count
         end
 
+        # Finds the distinct values for a specified field across a single
+        # collection or view and returns the results in an array.
+        # @example
+        #  # get a list of unique city names for users who are older than 21.
+        #  cities = User.distinct(:city, :age.gt => 21 )
+        # @param field The name of the field to use for unique aggregation.
+        # @param constraints (see #all)
+        # @return [Array] a list of distinct values
+        # @see Parse::Query#distinct
+        def distinct(field, constraints = {})
+          query(constraints).distinct(field)
+        end
+
         # Find objects matching the constraint ordered by the descending created_at date.
         # @param constraints (see #all)
         # @return [Array<Parse::Object>]

@@ -612,6 +612,35 @@ module Parse
         copy_query
     end
 
+    # Queries can be made using distinct, allowing you find unique values for a specified field.
+    # For this to be performant, please remember to index your database.
+    # @example
+    #   # Return a set of unique city names
+    #   # for users who are greater than 21 years old
+    #   Parse::Query.all(distinct: :age)
+    #   query = Parse::Query.new("_User")
+    #   query.where :age.gt => 21
+    #   # triggers query
+    #   query.distinct(:city) #=> ["San Diego", "Los Angeles", "San Juan"]
+    # @note This feature requires use of the Master Key in the API.
+    # @param field [Symbol|String] The name of the field used for filtering.
+    # @version 1.8.0
+    def distinct(field)
+      if field.nil? == false && field.respond_to?(:to_s)
+        # disable counting if it was enabled.
+        old_count_value = @count
+        @count = nil
+        compile_query = compile # temporary store
+        # add distinct field
+        compile_query[:distinct] = Query.format_field(field).to_sym
+        @count = old_count_value
+        # perform aggregation
+        return client.aggregate_objects(@table, compile_query.as_json, _opts ).result
+      else
+        raise ArgumentError, "Invalid field name passed to `distinct`."
+      end
+    end
+
     # Perform a count query.
     # @example
     #  # get number of songs with a play_count > 10

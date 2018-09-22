@@ -207,6 +207,7 @@ result = Parse.call_function :myFunctionName, {param: value}
 - [Advanced Querying](#advanced-querying)
   - [Results Caching](#results-caching)
   - [Counting](#counting)
+  - [Distinct Aggregation](#distinct-aggregation)
   - [Query Expressions](#query-expressions)
     - [:order](#order)
     - [:keys](#keys)
@@ -1735,7 +1736,8 @@ When a query API is made, the results are cached in the query object in case you
 ```
 
 ### Counting
-If you only need to know the result count for a query, provide count a non-zero value. However, if you need to perform a count query, use `count()` method instead.
+If you only need to know the result count for a query, provide count a
+non-zero value. However, if you need to perform a count query, use `count()` method instead.
 
 ```ruby
  # get number of songs with a play_count > 10
@@ -1745,6 +1747,23 @@ If you only need to know the result count for a query, provide count a non-zero 
  query = Parse::Query.new("Song")
  query.where :play_count.gt => 10
  query.count
+
+```
+
+### Distinct Aggregation
+Finds the distinct values for a specified field across a single collection or
+view and returns the results in an array. You may mix this with additional query constraints.
+
+```ruby
+ # Return a list of unique city names
+ # for users created in the last 10 days.
+ User.distinct :city, :created_at.after => 10.days.ago
+ # ex. ["San Diego", "Los Angeles", "San Juan"]
+
+ # same
+ query = Parse::Query.new("_User")
+ query.where :created_at.after => 10.days.ago
+ query.distinct(:city) #=> ["San Diego", "Los Angeles", "San Juan"]
 
 ```
 

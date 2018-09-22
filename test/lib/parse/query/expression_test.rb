@@ -25,10 +25,40 @@ class TestParseQueryExpressions < Minitest::Test
 
   def test_exp_keys
     assert_empty @query.clause(:keys)
+    simple_query = {"keys"=>"test"}
+    compound_query = {"keys"=>"test,field"}
+
+    q = User.query(:key => "test")
+    assert_equal q.compile.as_json, simple_query
+    q = User.query(:key => ["test"])
+    assert_equal q.compile.as_json, simple_query
+    q = User.query(:key => ["test","field"])
+    assert_equal q.compile.as_json, compound_query
+    q = User.query(:key => :test)
+    assert_equal q.compile.as_json, simple_query
+    q = User.query(:key => [:test,:field])
+    assert_equal q.compile.as_json, compound_query
+
+    q = User.query(:keys => "test")
+    assert_equal q.compile.as_json, simple_query
+    q = User.query(:keys => ["test"])
+    assert_equal q.compile.as_json, simple_query
+    q = User.query(:keys => ["test","field"])
+    assert_equal q.compile.as_json, compound_query
+    q = User.query(:keys => :test)
+    assert_equal q.compile.as_json, simple_query
+    q = User.query(:keys => [:test,:field])
+    assert_equal q.compile.as_json, compound_query
   end
 
   def test_exp_includes
     assert_empty @query.clause(:includes)
+    @query.includes(:field)
+    assert_equal @query.compile.as_json, {"include" => "field"}
+    @query.includes(:field, :name)
+    assert_equal @query.compile.as_json, {"include" => "field,name"}
+    @query.where(:field.eq => "text")
+    assert_equal @query.compile.as_json, {"include"=> "field,name", "where"=>"{\"field\":\"text\"}"}
   end
 
   def test_exp_skip
