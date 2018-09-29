@@ -60,13 +60,24 @@ public protocol ModernViewConformance : class {
     /// The default implementation does nothing.
     func setupView()
     
+    /// This method should implement setting up the autolayout constraints, if any, for the subviews that
+    /// were added in `setupView()`. This method should only be called once in the view's lifecycle, normally before
+    /// a layout pass.
+    ///
+    /// - note: The default implementation does nothing. Do not call `setNeedsUpdateConstraints()` inside
+    /// your implementation. Calling `setNeedsUpdateConstraints()` may schedule another update pass, creating a feedback loop.
+    /// - note: If you do not want to inherit the parent's layout constraints in your subclass, you should not
+    /// call the super implementation.
+    func setupConstraints()
+    
     /// This method, should implement changes in the view's interface.
     ///
-    /// The default implementation does nothing.
+    /// - note: The default implementation does nothing.
     func updateInterface()
     
     /// This method, should implement resetting any view properties or subviews
     /// when it is going through view recycling, for example, cells in a table view.
+    /// - note: The default implementation does nothing.
     func prepareForReuse()
 }
 /** Basic protocol that most application controllers should adopt. Normally you would not implement
@@ -309,7 +320,7 @@ extension Nibbed where Self: UICollectionViewCell, Self: ReusableType {
 
 
 open class ModernHeaderFooterView : UITableViewHeaderFooterView, ReusableType, ModernViewConformance {
- 
+    
     override public init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setupView()
@@ -324,9 +335,18 @@ open class ModernHeaderFooterView : UITableViewHeaderFooterView, ReusableType, M
         setupView()
     }
     
-    open func setupView() {}
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
     
-    open func updateInterface() {}
+    @objc open func setupView() {}
+    @objc open func setupConstraints() { }
+    @objc open func updateInterface() {}
 
 }
 
@@ -365,6 +385,25 @@ open class ModernView: UIView, ModernViewConformance {
         backgroundColor = .clear
     }
     
+    /// This method should implement setting up the autolayout constraints, if any, for the subviews that
+    /// were added in `setupView()`. This method is only called once in the view's lifecycle in `updateConstraints()`
+    /// layout pass through an internal flag.
+    ///
+    /// - note: The default implementation does nothing. Do not call `setNeedsUpdateConstraints()` inside
+    /// your implementation. Calling `setNeedsUpdateConstraints()` may schedule another update pass, creating a feedback loop.
+    /// - note: If you do not want to inherit the parent's layout constraints in your subclass, you should not
+    /// call the super implementation.
+    @objc open func setupConstraints() {}
+    
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
+    
     /// This method should be called whenever there is a need to update the interface.
     @objc open func updateInterface() {
         setNeedsDisplay()
@@ -394,20 +433,25 @@ open class ModernTableCell : UITableViewCell, ReusableType, ModernViewConformanc
         setupView()
     }
     
-    open func setupView() {
-        
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
     }
     
-    open func updateInterface() {
-        
-    }
+    @objc open func setupView() {}
+    @objc open func setupConstraints() {}
+    @objc open func updateInterface() {}
     
 }
 
 /// Provides a base UICollectionViewCell class that conforms to the general design lifecycle patterns
 /// of setup/update/reuse, etc.
 open class ModernCollectionCell : UICollectionViewCell, ReusableType, ModernViewConformance {
-    
+
     override public init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
@@ -422,9 +466,18 @@ open class ModernCollectionCell : UICollectionViewCell, ReusableType, ModernView
         setupView()
     }
     
-    open func setupView() {}
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
     
-    open func updateInterface() {}
+    @objc open func setupView() {}
+    @objc open func setupConstraints() {}
+    @objc open func updateInterface() {}
     
     
 }
@@ -432,7 +485,7 @@ open class ModernCollectionCell : UICollectionViewCell, ReusableType, ModernView
 /// Provides a base UILabel class that conforms to the general design lifecycle patterns
 /// of setup/update/reuse, etc.
 open class ModernLabel : UILabel, ModernViewConformance {
-    
+
     public convenience init(square:CGFloat) {
         self.init(frame: .square(square))
     }
@@ -457,19 +510,29 @@ open class ModernLabel : UILabel, ModernViewConformance {
         setupView()
     }
     
-    open func setupView() {}
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
     
+    @objc open func setupView() {}
+    @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
-    open func updateInterface() {}
+    @objc open func updateInterface() {}
     
     /// This method should be called whenever there is a need to reset the interface.
-    open func prepareForReuse() { text = nil }
+    @objc open func prepareForReuse() { text = nil }
 }
 
 /// Provides a base UIButton class that conforms to the general design lifecycle patterns
 /// of setup/update/reuse, etc. It also supports modifying the `minimumHitArea` property for
 /// easily increasing the target tap frame.
 open class ModernButton: UIButton, ModernViewConformance {
+    
     public var minimumHitArea = CGSize.zero
     
     public convenience init(square:CGFloat) {
@@ -496,7 +559,7 @@ open class ModernButton: UIButton, ModernViewConformance {
         setupView()
     }
     /// Alias for title(for: .normal) setter and getter.
-    open var title:String? {
+    @objc open var title:String? {
         get {
             return title(for: .normal)
         }
@@ -505,16 +568,27 @@ open class ModernButton: UIButton, ModernViewConformance {
         }
     }
     
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
+    
     /// Method where the view should be setup once.
-    open func setupView() {
+    @objc open func setupView() {
         backgroundColor = .clear
     }
     
+    @objc open func setupConstraints() { }
+    
     /// This method should be called whenever there is a need to update the interface.
-    open func updateInterface() {}
+    @objc open func updateInterface() {}
     
     /// This method should be called whenever there is a need to reset the interface.
-    open func prepareForReuse() {}
+    @objc open func prepareForReuse() {}
     
     @objc open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if minimumHitArea == CGSize.zero { return super.hitTest(point, with: event) }
@@ -569,14 +643,23 @@ open class ModernControl: UIControl, ModernViewConformance {
         setupView()
     }
     
-    /// Method where the view should be setup once.
-    open func setupView() { backgroundColor = .clear }
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
     
+    /// Method where the view should be setup once.
+    @objc open func setupView() { backgroundColor = .clear }
+    @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
-    open func updateInterface() {}
+    @objc open func updateInterface() {}
     
     /// This method should be called whenever there is a need to reset the interface.
-    open func prepareForReuse() {}
+    @objc open func prepareForReuse() {}
     
     @objc open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
         if minimumHitArea == CGSize.zero { return super.hitTest(point, with: event) }
@@ -621,14 +704,68 @@ open class ModernTextField : UITextField, ModernViewConformance {
         setupView()
     }
     
-    /// Method where the view should be setup once.
-    open func setupView() { backgroundColor = .clear }
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
     
+    /// Method where the view should be setup once.
+    @objc open func setupView() { backgroundColor = .clear }
+    @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
-    open func updateInterface() {}
+    @objc open func updateInterface() {}
     
     /// This method should be called whenever there is a need to reset the interface.
-    open func prepareForReuse() { text = nil }
+    @objc open func prepareForReuse() { text = nil }
+    
+}
+
+/// Provides a base UITextField class that conforms to the general design lifecycle patterns
+/// of setup/update/reuse, etc.
+open class ModernTextView : UITextView, ModernViewConformance {
+    
+    public init(autolayout:Bool) {
+        super.init(frame: .zero, textContainer: nil)
+        self.translatesAutoresizingMaskIntoConstraints = false
+        setupView()
+    }
+    
+    public override init(frame: CGRect, textContainer: NSTextContainer?) {
+        super.init(frame: frame, textContainer: textContainer)
+        setupView()
+    }
+    
+    required public init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        setupView()
+    }
+    
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        setupView()
+    }
+    
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
+    
+    /// Method where the view should be setup once.
+    @objc open func setupView() {}
+    @objc open func setupConstraints() {}
+    /// This method should be called whenever there is a need to update the interface.
+    @objc open func updateInterface() {}
+    
+    /// This method should be called whenever there is a need to reset the interface.
+    @objc open func prepareForReuse() { text = nil }
     
 }
 
@@ -637,13 +774,22 @@ open class TappableModernView : ModernView {
     public var minimumHitArea = CGSize.zero
     public var tapActionBlock:(() -> Void)?
     
+    private var needsSetupConstraints = true
+    @objc open override func updateConstraints() {
+        super.updateConstraints()
+        if needsSetupConstraints {
+            needsSetupConstraints = false
+            setupConstraints()
+        }
+    }
+    
     override open func setupView() {
         super.setupView()
         isUserInteractionEnabled = true
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapped))
         addGestureRecognizer(tap)
     }
-    
+
     @objc open func tapped() {
         tapActionBlock?()
     }
