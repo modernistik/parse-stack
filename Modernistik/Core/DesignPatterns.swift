@@ -56,8 +56,6 @@ public protocol ModernViewConformance : class {
     /// This method, called once in the view's lifecycle, should implement
     /// setting up the view's children in the parent's view. This method will be called
     /// when the view is instantiated programmatically or through a storyboard.
-    ///
-    /// The default implementation does nothing.
     func setupView()
     
     /// This method should implement setting up the autolayout constraints, if any, for the subviews that
@@ -99,8 +97,6 @@ public protocol ModernControllerConformance: class {
      This method will be called once as part of the view controller
      lifecycle, in order for the controller to setup its autolayout
      constraints and add them to the view controller's view property.
-     
-     The default implmentation of this method does nothing.
      
      - note: If you do not want to inherit the parent's layout constraints in your subclass, you should not
      call super.
@@ -344,7 +340,9 @@ open class ModernHeaderFooterView : UITableViewHeaderFooterView, ReusableType, M
         }
     }
     
-    @objc open func setupView() {}
+    @objc open func setupView() {
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() { }
     @objc open func updateInterface() {}
 
@@ -383,14 +381,15 @@ open class ModernView: UIView, ModernViewConformance {
     /// Method where the view should be setup once.
     @objc open func setupView() {
         backgroundColor = .clear
+        setNeedsUpdateConstraints()
     }
     
     /// This method should implement setting up the autolayout constraints, if any, for the subviews that
     /// were added in `setupView()`. This method is only called once in the view's lifecycle in `updateConstraints()`
     /// layout pass through an internal flag.
     ///
-    /// - note: The default implementation does nothing. Do not call `setNeedsUpdateConstraints()` inside
-    /// your implementation. Calling `setNeedsUpdateConstraints()` may schedule another update pass, creating a feedback loop.
+    /// - note: Do not call `setNeedsUpdateConstraints()` inside your implementation.
+    /// Calling `setNeedsUpdateConstraints()` may schedule another update pass, creating a feedback loop.
     /// - note: If you do not want to inherit the parent's layout constraints in your subclass, you should not
     /// call the super implementation.
     @objc open func setupConstraints() {}
@@ -434,6 +433,7 @@ open class ModernTableCell : UITableViewCell, ReusableType, ModernViewConformanc
     }
     
     private var needsSetupConstraints = true
+    
     @objc open override func updateConstraints() {
         super.updateConstraints()
         if needsSetupConstraints {
@@ -442,7 +442,9 @@ open class ModernTableCell : UITableViewCell, ReusableType, ModernViewConformanc
         }
     }
     
-    @objc open func setupView() {}
+    @objc open func setupView() {
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() {}
     @objc open func updateInterface() {}
     
@@ -475,7 +477,9 @@ open class ModernCollectionCell : UICollectionViewCell, ReusableType, ModernView
         }
     }
     
-    @objc open func setupView() {}
+    @objc open func setupView() {
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() {}
     @objc open func updateInterface() {}
     
@@ -519,7 +523,10 @@ open class ModernLabel : UILabel, ModernViewConformance {
         }
     }
     
-    @objc open func setupView() {}
+    @objc open func setupView() {
+        backgroundColor = .clear
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
     @objc open func updateInterface() {}
@@ -580,6 +587,7 @@ open class ModernButton: UIButton, ModernViewConformance {
     /// Method where the view should be setup once.
     @objc open func setupView() {
         backgroundColor = .clear
+        setNeedsUpdateConstraints()
     }
     
     @objc open func setupConstraints() { }
@@ -653,7 +661,10 @@ open class ModernControl: UIControl, ModernViewConformance {
     }
     
     /// Method where the view should be setup once.
-    @objc open func setupView() { backgroundColor = .clear }
+    @objc open func setupView() {
+        backgroundColor = .clear
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
     @objc open func updateInterface() {}
@@ -714,7 +725,10 @@ open class ModernTextField : UITextField, ModernViewConformance {
     }
     
     /// Method where the view should be setup once.
-    @objc open func setupView() { backgroundColor = .clear }
+    @objc open func setupView() {
+        backgroundColor = .clear
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
     @objc open func updateInterface() {}
@@ -759,7 +773,9 @@ open class ModernTextView : UITextView, ModernViewConformance {
     }
     
     /// Method where the view should be setup once.
-    @objc open func setupView() {}
+    @objc open func setupView() {
+        setNeedsUpdateConstraints()
+    }
     @objc open func setupConstraints() {}
     /// This method should be called whenever there is a need to update the interface.
     @objc open func updateInterface() {}
