@@ -228,10 +228,10 @@ extension CGRect {
     ///
     /// - parameter width: The new width value.
     /// - returns: a new CGRect with the modified width.
-    public func with(width:CGFloat) -> CGRect {
-        return CGRect(x: origin.x, y: origin.y, width: width, height: size.height)
+    public func with(width:CGFloat, height:CGFloat? = nil) -> CGRect {
+        return CGRect(x: origin.x, y: origin.y, width: width, height: height ?? size.height)
     }
-
+    
     /// Returns a new CGRect with the modified height
     ///
     /// - parameter height: The new height value.
@@ -239,31 +239,30 @@ extension CGRect {
     public func with(height:CGFloat) -> CGRect {
         return CGRect(x: origin.x, y: origin.y, width: size.width, height: height)
     }
-
-    /// Returns a new CGRect with the modified width and height
-    ///
-    /// - parameter width: The new width value.
-    /// - parameter height: The new height value.
-    /// - returns: a new CGRect with the modified dimensions.
-    public func adjusted(width:CGFloat, height:CGFloat) -> CGRect {
-        return CGRect(x: origin.x, y: origin.y, width: width, height: height)
-    }
-
-    /// Returns a new CGRect with only the origin modified
+    
+    /// Returns a new CGRect with only the origin (both x and y) modified.
+    /// All other values will remain the same.
     ///
     /// - parameter x: The new x coordinate.
     /// - parameter y: The new y coordinate.
     /// - returns: a new CGRect with the modified coordinates
-    public func adjusted(x:CGFloat, y:CGFloat) -> CGRect {
-        return CGRect(x: x, y: y, width: width, height: height)
+    public func with(x:CGFloat, y:CGFloat? = nil) -> CGRect {
+        return CGRect(x: x, y: y ?? origin.y, width: width, height: size.height)
     }
-
+    
+    /// Returns a new CGRect with only the y-origin modified.
+    /// - parameter y: The new y coordinate.
+    /// - returns: a new CGRect with the modified coordinates
+    public func with(y:CGFloat) -> CGRect {
+        return with(x: origin.x, y: y)
+    }
+    
     /// Returns a square CGRect with width and height set to same value.
     ///
     /// - parameter square: The new value for both width and height.
     /// - returns: a new CGRect with the modified dimensions
-    public func adjusted(square: CGFloat) -> CGRect {
-        return adjusted(width: square, height: square)
+    public func resize(square: CGFloat) -> CGRect {
+        return with(width: square, height: square)
     }
 
     /// Returns the smallest value of either the width or height
