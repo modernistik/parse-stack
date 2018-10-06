@@ -788,7 +788,7 @@ open class ModernTextView : UITextView, ModernViewConformance {
 /// Provides a simple UIView that implements ModernViewConformance, which has an adjustable hit target area by modifying `minimumHitArea`, and allows for easily adding a block to be executed whenever the view is tapped.
 open class TappableModernView : ModernView {
     public var minimumHitArea = CGSize.zero
-    public var tapActionBlock:(() -> Void)?
+    var _actionBlock:(() -> Void)?
     
     private var needsSetupConstraints = true
     @objc open override func updateConstraints() {
@@ -807,11 +807,11 @@ open class TappableModernView : ModernView {
     }
 
     @objc open func tapped() {
-        tapActionBlock?()
+        _actionBlock?()
     }
     
-    open func tapAction(block: @escaping (() -> Void)) {
-        tapActionBlock = block
+    open func tap(block: @escaping (() -> Void)) {
+        _actionBlock = block
     }
     
     @objc open override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
