@@ -337,6 +337,20 @@ extension UIColor {
         return self.withAlphaComponent(alpha)
     }
     
+    /// Creates a new UIColor with using natural RGB numbers which will be divided by 255.
+    /// Example:
+    ///
+    ///     let color = UIColor(r: 108, green: 114, blue: 124)
+    ///     // equivalent to:
+    ///     let sameColor = UIColor(red: 108/255.0, g: 114/255.0, b: 124/255.0)
+    ///
+    /// - parameter r: The red color integer value between 0 and 255.
+    /// - parameter g: The green color integer value between 0 and 255.
+    /// - parameter b: The blue color integer value between 0 and 255.
+    /// - parameter a: The alpha value (opacity) between 0 and 1.0. Defaults to 1.0
+    public convenience init(r:CGFloat, g:CGFloat, b:CGFloat, a:CGFloat = 1) {
+        self.init(red: r/255.0, green: g/255.0, blue: b/255.0, alpha: a)
+    }
 }
 
 
