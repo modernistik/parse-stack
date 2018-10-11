@@ -338,18 +338,38 @@ extension UIColor {
     }
     
     /// Creates a new UIColor with using natural RGB numbers which will be divided by 255.
+    /// If the value provided for any field is less than `1.0`,
+    /// it will assume you've already done the division by `255`.
     /// Example:
     ///
-    ///     let color = UIColor(r: 108, green: 114, blue: 124)
+    ///     UIColor(r: 108, green: 114, blue: 124)
     ///     // equivalent to:
-    ///     let sameColor = UIColor(red: 108/255.0, g: 114/255.0, b: 124/255.0)
+    ///     UIColor(red: 108/255.0, green: 114/255.0, blue: 124/255.0)
     ///
     /// - parameter r: The red color integer value between 0 and 255.
     /// - parameter g: The green color integer value between 0 and 255.
     /// - parameter b: The blue color integer value between 0 and 255.
     /// - parameter a: The alpha value (opacity) between 0 and 1.0. Defaults to 1.0
     public convenience init(r:CGFloat, g:CGFloat, b:CGFloat, a:CGFloat = 1) {
-        self.init(red: r/255.0, green: g/255.0, blue: b/255.0, alpha: a)
+        let amountRed = r > 1.0 ? r/255.0 : r
+        let amountGreen = g > 1.0 ? g/255.0 : g
+        let amountBlue = b > 1.0 ? b/255.0 : b
+        self.init(red: amountRed, green: amountGreen, blue: amountBlue, alpha: a)
+    }
+    
+    /// Creates a new UIColor with the same value for all RGB fields.
+    /// Example:
+    ///
+    ///     UIColor(all: 142)
+    ///     UIColor(all: 0.556)
+    ///     // equivalent to:
+    ///     UIColor(red: 142/255.0, green: 142/255.0, blue: 142/255.0)
+    ///     UIColor(red: 0.556, green: 0.556, blue: 0.556)
+    ///
+    /// - parameter all: The color value (fractional or natural) to apply to color values.
+    public convenience init(all:CGFloat, alpha:CGFloat = 1) {
+        let amount = all > 1.0 ? all/255.0 : all
+        self.init(red: amount, green: amount, blue: amount, alpha: alpha)
     }
 }
 
