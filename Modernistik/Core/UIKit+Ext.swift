@@ -554,7 +554,7 @@ open class ModernTableController : ModernViewController, UITableViewDataSource, 
     override open func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(tableView)
-        ModernTableCell.register(withTableView: tableView)
+        ModernTableCell.register(with: tableView)
         tableView.dataSource = self
         tableView.delegate = self
     }
@@ -584,7 +584,7 @@ open class ModernTableController : ModernViewController, UITableViewDataSource, 
     }
     
     open func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return ModernTableCell.dequeueReusableCell(inTableView: tableView)
+        return ModernTableCell.dequeueReusableCell(in: tableView)
     }
 }
 
@@ -595,7 +595,7 @@ open class ModernCollectionController : ModernViewController, UICollectionViewDa
         super.viewDidLoad()
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(collectionView)
-        ModernCollectionCell.register(withCollectionView: collectionView)
+        ModernCollectionCell.register(with: collectionView)
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .clear
@@ -626,7 +626,7 @@ open class ModernCollectionController : ModernViewController, UICollectionViewDa
     }
     
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return ModernCollectionCell.dequeueReusableCell(inCollectionView: collectionView, forIndexPath: indexPath)
+        return ModernCollectionCell.dequeueReusableCell(in: collectionView, for: indexPath)
     }
     
     

@@ -195,11 +195,12 @@ extension ProportionalViewMetrics {
 
 extension ReusableType where Self: UITableViewCell {
     
-    public static func register(withTableView tableView:UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
+    public static func register(with tableView:UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
         tableView.register(Self.self, forCellReuseIdentifier: reuseIdentifier)
     }
     
-    public static func dequeueReusableCell(inTableView tableView: UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) -> Self {
+    
+    public static func dequeueReusableCell(in tableView: UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) -> Self {
         
         if let cell = tableView.dequeueReusableCell(withIdentifier: reuseIdentifier) as? Self {
             return cell
@@ -220,11 +221,11 @@ extension ReusableType where Self: UITableViewCell {
 
 extension ReusableType where Self : UITableViewHeaderFooterView {
     
-    public static func register(withTableView tableView:UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
+    public static func register(with tableView:UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
         tableView.register(Self.self, forHeaderFooterViewReuseIdentifier: reuseIdentifier)
     }
     
-    public static func dequeueReusableHeaderFooterView(inTableView tableView: UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) -> Self {
+    public static func dequeueReusableHeaderFooterView(in tableView: UITableView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) -> Self {
         
         if let cell = tableView.dequeueReusableHeaderFooterView(withIdentifier: reuseIdentifier) as? Self {
             return cell
@@ -233,7 +234,7 @@ extension ReusableType where Self : UITableViewHeaderFooterView {
         return Self()
     }
     
-    public static func dequeueReusableHeaderFooterView(inTableView tableView: UITableView) -> Self {
+    public static func dequeueReusableHeaderFooterView(in tableView: UITableView) -> Self {
         let ident = String(describing: Self.self)
         
         if let cell = tableView.dequeueReusableHeaderFooterView(withIdentifier: ident) as? Self {
@@ -247,11 +248,11 @@ extension ReusableType where Self : UITableViewHeaderFooterView {
 
 extension ReusableType where Self: UICollectionViewCell {
     
-    public static func register(withCollectionView collectionView:UICollectionView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
+    public static func register(with collectionView:UICollectionView, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
         collectionView.register(Self.self, forCellWithReuseIdentifier: reuseIdentifier)
     }
     
-    public static func dequeueReusableCell(inCollectionView collectionView: UICollectionView, forIndexPath indexPath: IndexPath, reuseIdentifier:String = String(describing: Self.self)) -> Self {
+    public static func dequeueReusableCell(in collectionView: UICollectionView, for indexPath: IndexPath, reuseIdentifier:String = String(describing: Self.self)) -> Self {
         
         if let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? Self {
             return cell
@@ -263,11 +264,11 @@ extension ReusableType where Self: UICollectionViewCell {
 
 extension ReusableType where Self: UICollectionReusableView {
     
-    public static func register(withCollectionView collectionView:UICollectionView, forSupplementaryViewOfKind kind:String, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
+    public static func register(with collectionView:UICollectionView, forSupplementaryViewOfKind kind:String, withIdentifier reuseIdentifier:String = String(describing: Self.self)) {
         collectionView.register(Self.self, forSupplementaryViewOfKind: kind, withReuseIdentifier: reuseIdentifier)
     }
     
-    public static func dequeueReusableSupplementaryView(ofKind elementKind:String, inCollectionView collectionView: UICollectionView, forIndexPath indexPath: IndexPath, reuseIdentifier:String = String(describing: Self.self)) -> Self {
+    public static func dequeueReusableSupplementaryView(ofKind elementKind:String, in collectionView: UICollectionView, for indexPath: IndexPath, reuseIdentifier:String = String(describing: Self.self)) -> Self {
         
         if let view = collectionView.dequeueReusableSupplementaryView(ofKind: elementKind, withReuseIdentifier: reuseIdentifier, for: indexPath) as? Self {
             return view
@@ -302,14 +303,14 @@ extension Nibbed where Self: ReusableType, Self: UIView {
 
 extension Nibbed where Self: UITableViewCell, Self: ReusableType {
     /// Registers the table cell class using the registered nib file.
-    public static func registerNib(withTableView tableView:UITableView) {
+    public static func registerNib(with tableView:UITableView) {
         tableView.register(Self.nib, forCellReuseIdentifier: String(describing: Self.self))
     }
 }
 
 extension Nibbed where Self: UICollectionViewCell, Self: ReusableType {
     /// Registers the collection cell class using the registered nib file.
-    public static func registerNib(withCollectionView collectionView:UICollectionView) {
+    public static func registerNib(with collectionView:UICollectionView) {
         collectionView.register(Self.nib, forCellWithReuseIdentifier: String(describing: Self.self))
     }
 }

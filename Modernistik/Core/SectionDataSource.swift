@@ -117,7 +117,7 @@ public protocol SectionDataSource: class {
      ```
      - parameter tableView: The tableView to configure.
      */
-    func configure(tableView:UITableView)
+    func configure(with tableView:UITableView)
     /**
      Return the tableView cell height for this particular row. By default, this returns `UITableView.automaticDimension`. This
      method can also be used in table view data sources for sending estimated heights.
@@ -133,14 +133,14 @@ public protocol SectionDataSource: class {
      - parameter row: The row number based on the indexPath.
      - parameter tableView: The tableView requesting the cell.
      */
-    func cell(forRow row:Int, inTableView tableView:UITableView) -> UITableViewCell
+    func cell(forRow row:Int, in tableView:UITableView) -> UITableViewCell
     /**
      A hook to perform an action when a selected row in the data source is selected. Normally this should be called
      in your table view delegate method for cell selection.
      - parameter row: The row number that was selected.
      - parameter tableView: The tableView in which the selection ocurred.
     */
-    func selected(row:Int, inTableView tableView:UITableView)
+    func selected(row:Int, in tableView:UITableView)
     
     /**
      A hook to perform an action when a selected row's accessory is selected. Normally this should be called
@@ -149,7 +149,7 @@ public protocol SectionDataSource: class {
      - parameter tableView: The tableView in which the selection ocurred.
      - parameter row: The row number that was selected.
     */
-    func selected(accessoryRow:Int, inTableView tableView:UITableView)
+    func selected(accessoryRow:Int, in tableView:UITableView)
     
 }
 
@@ -157,10 +157,10 @@ extension SectionDataSource {
     /// Alias for `count`.
     public var numberOfRows:Int { return count }
     public func height(forRow row:Int) -> CGFloat { return UITableView.automaticDimension }
-    public func selected(row: Int, inTableView tableView: UITableView) { }
-    public func selected(accessoryRow: Int, inTableView tableView: UITableView) { }
-    public func tableView(_ tableView:UITableView, didSelectRow row:Int) { selected(row: row, inTableView: tableView) }
-    public func tableView(_ tableView:UITableView, didSelectAccessoryAtRow row:Int) { selected(accessoryRow: row, inTableView: tableView) }
+    public func selected(row: Int, in tableView: UITableView) { }
+    public func selected(accessoryRow: Int, in tableView: UITableView) { }
+    public func tableView(_ tableView:UITableView, didSelectRow row:Int) { selected(row: row, in: tableView) }
+    public func tableView(_ tableView:UITableView, didSelectAccessoryAtRow row:Int) { selected(accessoryRow: row, in: tableView) }
 }
 
 // MARK: SectionIndexType
@@ -188,13 +188,13 @@ public class EmptySectionDataSource : SectionDataSource {
     
     public init() {}
     public var count: Int { return 0 }
-    public func configure(tableView:UITableView) {
-        ModernTableCell.register(withTableView: tableView)
+    public func configure(with tableView:UITableView) {
+        ModernTableCell.register(with: tableView)
     }
     
     public func height(forRow row:Int) -> CGFloat { return UITableView.automaticDimension }
-    public func cell(forRow row: Int, inTableView tableView: UITableView) -> UITableViewCell {
-        return ModernTableCell.dequeueReusableCell(inTableView: tableView)
+    public func cell(forRow row: Int, in tableView: UITableView) -> UITableViewCell {
+        return ModernTableCell.dequeueReusableCell(in: tableView)
     }
     
 }
@@ -202,15 +202,15 @@ public class EmptySectionDataSource : SectionDataSource {
 public protocol CollectionDataSource: class {
     
     var count:Int { get }
-    func configure(collectionView:UICollectionView)
+    func configure(with collectionView:UICollectionView)
     func sizeForItemAt(indexPath:IndexPath, inLayout collectionViewLayout: UICollectionViewLayout) -> CGSize
-    func cell(for indexPath:IndexPath, inCollectionView collectionView:UICollectionView) -> UICollectionViewCell
-    func selectedItem(at indexPath:IndexPath, inCollectionView collectionView:UICollectionView)
+    func cell(for indexPath:IndexPath, in collectionView:UICollectionView) -> UICollectionViewCell
+    func selectedItem(at indexPath:IndexPath, in collectionView:UICollectionView)
     
 }
 
 extension CollectionDataSource {
     /// Alias for `count`.
     public var numberOfItems:Int { return count; }
-    public func selectedItem(at indexPath:IndexPath, inCollectionView collectionView:UICollectionView) {}
+    public func selectedItem(at indexPath:IndexPath, in collectionView:UICollectionView) {}
 }

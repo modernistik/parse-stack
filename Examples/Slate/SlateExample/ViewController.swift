@@ -20,13 +20,13 @@ class NamesDataSource : SectionDataSource {
     }
     
     // register some cells to dequeue later on.
-    func configure(tableView:UITableView) {
-        ModernTableCell.register(withTableView: tableView)
+    func configure(with tableView:UITableView) {
+        ModernTableCell.register(with: tableView)
     }
     
     // Implement this method to return the proper cell based on the requested row.
-    func cell(forRow row:Int, usingTableView tableView:UITableView) -> UITableViewCell {
-        let cell = ModernTableCell.dequeueReusableCell(inTableView: tableView)
+    func cell(forRow row:Int, in tableView:UITableView) -> UITableViewCell {
+        let cell = ModernTableCell.dequeueReusableCell(in: tableView)
         
         cell.textLabel?.text = names[row]
         return cell
@@ -50,8 +50,8 @@ class ViewController : UITableViewController {
         dataSource2.names = ["Thanos","Galactus"]
         
         // configure
-        dataSource1.configure(tableView: tableView)
-        dataSource2.configure(tableView: tableView)
+        dataSource1.configure(with: tableView)
+        dataSource2.configure(with: tableView)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -71,7 +71,7 @@ class ViewController : UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // select the right data source
         let ds = data(for: indexPath.section)
-        return ds.cell(forRow: indexPath.row, usingTableView:tableView)
+        return ds.cell(forRow: indexPath.row, in:tableView)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {

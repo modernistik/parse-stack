@@ -64,15 +64,16 @@ extension String {
     ///   values used in the visual format string. Their values must be NSNumber objects.
     /// - parameter views: A dictionary of views that appear in the visual format string. The keys must be the string values used in the visual format string, and the values must be the view objects.
     /// - returns: An array of NSLayoutConstraints that were parsed from the string.
-    func constraints(options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String : Any]?, views: [String : Any]) -> [NSLayoutConstraint] {
+    public func constraints(options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String : Any]? = nil, views: [String : Any]) -> [NSLayoutConstraint] {
         return NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: metrics, views: views)
     }
     
     /// Uses the string as a NSLayoutConstraint visual format with no options or metrics.
+    /// - parameter opts: Options describing the attribute and the direction of layout for all objects in the visual format string.
     /// - parameter views: A dictionary of views that appear in the visual format string. The keys must be the string values used in the visual format string, and the values must be the view objects.
     /// - returns: An array of NSLayoutConstraints that were parsed from the string.
-    func constraints(views: [String : Any]) -> [NSLayoutConstraint] {
-        return NSLayoutConstraint.constraints(withVisualFormat: self, options: [], metrics: nil, views: views)
+    public func constraints(options opts: NSLayoutConstraint.FormatOptions, views: [String : Any]) -> [NSLayoutConstraint] {
+        return constraints(options: opts, metrics: nil, views: views)
     }
 }
 
