@@ -56,6 +56,28 @@ extension Array where Element: NSLayoutConstraint {
     
 }
 
+extension String {
+    /// Uses the string as a NSLayoutConstraint visual format specification for constraints. For more information,
+    /// see Auto Layout Cookbook in Auto Layout Guide.
+    /// - parameter opts: Options describing the attribute and the direction of layout for all objects in the visual format string.
+    /// - parameter metrics: A dictionary of constants that appear in the visual format string. The dictionary’s keys must be the string
+    ///   values used in the visual format string. Their values must be NSNumber objects.
+    /// - parameter views: A dictionary of views that appear in the visual format string. The keys must be the string values used in the visual format string, and the values must be the view objects.
+    /// - returns: An array of NSLayoutConstraints that were parsed from the string.
+    func constraints(options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String : Any]?, views: [String : Any]) -> [NSLayoutConstraint] {
+        return NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: metrics, views: views)
+    }
+    
+    /// Uses the string as a NSLayoutConstraint visual format with no options or metrics.
+    /// - parameter views: A dictionary of views that appear in the visual format string. The keys must be the string values used in the visual format string, and the values must be the view objects.
+    /// - returns: An array of NSLayoutConstraints that were parsed from the string.
+    func constraints(views: [String : Any]) -> [NSLayoutConstraint] {
+        return NSLayoutConstraint.constraints(withVisualFormat: self, options: [], metrics: nil, views: views)
+    }
+}
+
+
+
 extension FileManager {
     /// Returns the documents directory for the default file manager
     public static var documentsDirectory:URL {
