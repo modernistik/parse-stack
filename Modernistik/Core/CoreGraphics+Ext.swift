@@ -146,9 +146,9 @@ extension CGRect {
         return insetBy(dx: insetAmount, dy: insetAmount)
     }
     
-    /// returns half the value of the longest side. Useful for when calculating corner radius
+    /// returns half the value of the shortest side. Useful for when calculating corner radius
     public var half:CGFloat {
-        return longest / 2.0
+        return shortest / 2.0
     }
     
     /// Get the center point of this rect. Useful when needing to center two views together.

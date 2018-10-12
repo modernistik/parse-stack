@@ -187,13 +187,13 @@ extension UIView {
     /// ```
     ///  view.rounded()
     ///  // which is shorthand for:
-    ///  view.layer.cornerRadius = bounds.longest / 2
+    ///  view.layer.cornerRadius = bounds.shortest / 2
     ///  view.layer.maskToBounds = true
     /// ```
-    /// - parameter by : The dividing factor. T default is 2 which creates a circle.
+    /// - parameter by : The dividing factor. Default is 2, which creates a circle.
     public func rounded(by factor:CGFloat = 2.0) {
         if factor > 0 {
-            cornerRadius = bounds.longest / factor
+            cornerRadius = bounds.shortest / factor
         }
     }
     
