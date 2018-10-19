@@ -65,6 +65,7 @@ extension String {
     /// - parameter views: A dictionary of views that appear in the visual format string. The keys must be the string values used in the visual format string, and the values must be the view objects.
     /// - returns: An array of NSLayoutConstraints that were parsed from the string.
     public func constraints(options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String : Any]? = nil, views: [String : Any]) -> [NSLayoutConstraint] {
+        // NOTE: If you exception breakpoint hits here, go back one call stack to see the constraint that is causing the error.
         return NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: metrics, views: views)
     }
     
@@ -73,7 +74,8 @@ extension String {
     /// - parameter views: A dictionary of views that appear in the visual format string. The keys must be the string values used in the visual format string, and the values must be the view objects.
     /// - returns: An array of NSLayoutConstraints that were parsed from the string.
     public func constraints(options opts: NSLayoutConstraint.FormatOptions, views: [String : Any]) -> [NSLayoutConstraint] {
-        return constraints(options: opts, metrics: nil, views: views)
+        // NOTE: If you exception breakpoint hits here, go back one call stack to see the constraint that is causing the error.
+        return NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: nil, views: views)
     }
 }
 
