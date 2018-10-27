@@ -220,13 +220,48 @@ extension UIView {
     ///
     /// If both views are siblings, then the two views would overlap.
     ///
-    /// - Note: The returned constraints are not activated automatically.
-    /// - Parameter view: the view to use for the anchoring the constraints
+    /// - note: The returned constraints are not activated automatically.
+    /// - parameter view: the view to use for the anchoring the constraints
     public func constraintsPinned(toView view:UIView) -> [NSLayoutConstraint] {
         return [topAnchor.constraint(equalTo: view.topAnchor),
         bottomAnchor.constraint(equalTo: view.bottomAnchor),
         leadingAnchor.constraint(equalTo: view.leadingAnchor),
         trailingAnchor.constraint(equalTo: view.trailingAnchor)]
+    }
+    /// An enum to use as parameters in sizing constraints.
+    public enum SizeDimension {
+        case width, height
+    }
+    
+    /// Returns a constraint where view's aspect ratio is maintained dependent on a specific
+    /// dimension. The method will make one layout dimension dependent to a multiple
+    /// of the input layout dimension.
+    ///
+    /// This is useful alias method for making views maintain a specific aspect ratio, such as staying square.
+    ///
+    /// # Example 1: Staying Square
+    /// Make the widthAnchor dependent on the heightAnchor to keep the view square.
+    ///
+    ///     v.constrainAspect(by: .height)
+    ///     // equivalent to:
+    ///     v.widthAnchor.constraint(equalTo: view.heightAnchor, multiplier: 1)
+    ///
+    /// # Example 2: Matching an Aspect Ratio
+    /// Make a view maintain a 1920x1080 (HD) aspect ratio depending on the varying `width`.
+    ///
+    ///     // height = width * 1080/1920
+    ///     v.constrainAspect(by: .width, ratio: 1080/1920)
+    ///
+    ///     // equivalent to:
+    ///     v.widthAnchor.constraint(equalTo: v.heightAnchor, multiplier: 1080/1920)
+    ///
+    /// - note: The returned constraints are not activated automatically.
+    /// - parameter dimension: the dependent dimension, either `.width` or `.height`.
+    /// - parameter ratio: The multiplier constant for the constraint. Default is 1 for a square dimension.
+    public func constrainAspect(by dimension: SizeDimension, ratio:CGFloat = 1) -> NSLayoutConstraint {
+        return dimension == .height ?
+            widthAnchor.constraint(equalTo: heightAnchor, multiplier: ratio) :
+            heightAnchor.constraint(equalTo: widthAnchor, multiplier: ratio)
     }
 
 }
