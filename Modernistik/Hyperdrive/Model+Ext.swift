@@ -50,7 +50,7 @@ extension PFUser {
     /// Returns the current user only if they are logged in and not in an anonymous state.
     ///
     /// - Returns: The user if they are registered and logged in.
-    open static func registeredUser() -> Self? {
+    public static func registeredUser() -> Self? {
         let user = current()
         return ( user == nil || PFAnonymousUtils.isLinked(with: user) ) ? nil : user
     }
