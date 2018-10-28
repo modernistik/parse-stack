@@ -368,7 +368,7 @@ extension UIColor {
     /// Alias to `withAlphaComponent(value)`.
     /// Creates and returns a color object that has the same color space
     /// and component values as the receiver, but has the specified alpha component.
-    public func alpha(_ alpha:CGFloat) -> UIColor {
+    public func opacity(_ alpha:CGFloat) -> UIColor {
         return self.withAlphaComponent(alpha)
     }
     
