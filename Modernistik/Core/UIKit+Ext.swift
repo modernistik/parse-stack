@@ -150,7 +150,7 @@ extension UIView {
     /// ```
     public func round(corners: UIRectCorner, radius: CGFloat) {
         
-        if #available(iOS 11.0, *) {
+        if #available(iOS 11.0, tvOS 11.0, *) {
             var maskedCorners:CACornerMask = []
             if corners.contains(.topLeft) { maskedCorners.insert(.layerMinXMinYCorner) }
             if corners.contains(.topRight) { maskedCorners.insert(.layerMaxXMinYCorner) }
