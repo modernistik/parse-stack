@@ -31,8 +31,8 @@ Pod::Spec.new do |s|
 
   s.default_subspec = 'Core'
   s.swift_version = '4.2'
-  s.ios.deployment_target = '9.0'
-  s.tvos.deployment_target = '9.0'
+  s.ios.deployment_target = '10.0'
+  s.tvos.deployment_target = '10.0'
 
   s.subspec 'Core' do |cs|
     cs.source_files = 'Modernistik/Core/**/*'
