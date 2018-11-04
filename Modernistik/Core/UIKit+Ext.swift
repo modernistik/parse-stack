@@ -57,6 +57,7 @@ extension UIDevice {
 extension UIApplication {
     
     /// Sends the user to the Settings app to the specific app settings panel
+    @available(tvOSApplicationExtension, unavailable)
     public class func openSettingsPanel() {
         if let url = URL(string: UIApplication.openSettingsURLString) {
             if #available(iOS 10.0, *) {
