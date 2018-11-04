@@ -59,12 +59,8 @@ extension UIApplication {
     /// Sends the user to the Settings app to the specific app settings panel
     @available(tvOSApplicationExtension, unavailable)
     public class func openSettingsPanel() {
-        if let url = URL(string: UIApplication.openSettingsURLString) {
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(url)
-            }
+        if let url = UIApplication.openSettingsURLString.url {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
 }
