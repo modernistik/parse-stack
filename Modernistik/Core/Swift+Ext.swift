@@ -456,3 +456,15 @@ extension NSAttributedString {
         return boundingBox.width
     }
 }
+
+extension Optional where Wrapped == String {
+    /// A Boolean value indicating whether a string has no characters.
+    public var isEmpty: Bool {
+        return self?.isEmpty ?? true
+    }
+    
+    /// A Boolean value indicating whether a string has characters.
+    public var isPresent: Bool {
+        return self?.isEmpty ?? false
+    }
+}
