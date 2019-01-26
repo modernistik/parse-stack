@@ -3,8 +3,8 @@ PATH
   specs:
     parse-stack (1.8.0)
       active_model_serializers (>= 0.9, < 1)
-      activemodel (>= 4.2.1, < 6)
-      activesupport (>= 4.2.1, < 6)
+      activemodel (>= 4.2.1, < 7)
+      activesupport (>= 4.2.1, < 7)
       faraday (>= 0.8, < 1)
       faraday_middleware (>= 0.9, < 1)
       moneta (< 2)
