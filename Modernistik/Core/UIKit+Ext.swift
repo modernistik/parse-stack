@@ -280,7 +280,7 @@ extension UIView {
     @available(iOS 10.0, tvOS 10, *)
     /// Animate the change in alpha of the view.
     public func fade(to:CGFloat, duration:TimeInterval = 0.25, completion:CompletionBlock? = nil) {
-        
+        if alpha == to { completion?(); return }
         let anim = UIViewPropertyAnimator(duration: duration, curve: .easeInOut) {
             self.alpha = to
         }
