@@ -267,7 +267,8 @@ extension UIView {
 extension UIView {
     
     /// Animate a bounce effect on the view.
-    public func bounce(duration:TimeInterval = 0.6, scales:[CGFloat] = [0.60,1.1,0.9,1]) {
+    public func bounce(duration:TimeInterval = 0.6, scales:[CGFloat] = [0.60,1.1,0.9,1], completion:CompletionBlock? = nil) {
+        CATransaction.begin()
         let bounceAnimation = CAKeyframeAnimation(keyPath: "transform.scale")
         bounceAnimation.duration = duration
         bounceAnimation.values = scales
@@ -275,6 +276,10 @@ extension UIView {
         bounceAnimation.timingFunctions = scales.map({ (_) -> CAMediaTimingFunction in return f })
         bounceAnimation.isRemovedOnCompletion = false
         layer.add(bounceAnimation, forKey: "bounce")
+        CATransaction.setCompletionBlock {
+            completion?()
+        }
+        CATransaction.commit()
     }
     
     @available(iOS 10.0, tvOS 10, *)
@@ -302,7 +307,8 @@ extension UIView {
         fade(to: 1, completion: completion)
     }
     
-    public func shake(dx:CGFloat = 10) {
+    public func shake(dx:CGFloat = 10, completion:CompletionBlock? = nil) {
+        CATransaction.begin()
         let animation = CABasicAnimation(keyPath: "position")
         animation.duration = 0.07
         animation.repeatCount = 4
@@ -310,6 +316,10 @@ extension UIView {
         animation.fromValue = NSValue(cgPoint: CGPoint(x: center.x - dx, y: center.y))
         animation.toValue = NSValue(cgPoint: CGPoint(x: center.x + dx, y: center.y))
         layer.add(animation, forKey: "shake")
+        CATransaction.setCompletionBlock {
+            completion?()
+        }
+        CATransaction.commit()
     }
 }
 

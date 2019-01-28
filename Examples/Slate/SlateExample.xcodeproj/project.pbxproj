@@ -191,7 +191,7 @@
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-SlateExample/Pods-SlateExample-frameworks.sh",
+				"${SRCROOT}/Pods/Target Support Files/Pods-SlateExample/Pods-SlateExample-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Modernistik/Modernistik.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -200,7 +200,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SlateExample/Pods-SlateExample-frameworks.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-SlateExample/Pods-SlateExample-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
