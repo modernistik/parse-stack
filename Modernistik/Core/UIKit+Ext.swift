@@ -110,9 +110,13 @@ extension UIView {
         }
     }
     
+    /// Center this view within the provided rectangular area.
+    public func center(in rect: CGRect) {
+        center = CGPoint(x: rect.width / 2, y: rect.height / 2)
+    }
     
+    /// Return an image from the bundle for the current class.
     public func bundleImage(_ named: String) -> UIImage? {
-
         let bundle = Bundle(for: self.classForCoder)
         return UIImage(named: named, in: bundle, compatibleWith: nil)
     }
