@@ -165,3 +165,11 @@ public func async_main(_ closure: @escaping CompletionBlock ) {
 public func async_background(_ closure: @escaping CompletionBlock ) {
     DispatchQueue.global().async(execute: closure)
 }
+
+/// Dispatch a block with a specified quality of service.
+///
+/// - parameter qos: The quality of service class to use.
+/// - parameter closure: The closure to execute.
+public func async(qos: DispatchQoS.QoSClass = .userInitiated, closure: @escaping CompletionBlock ) {
+    DispatchQueue.global(qos: qos).async(execute: closure)
+}
