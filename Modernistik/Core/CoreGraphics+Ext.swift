@@ -19,6 +19,15 @@ extension CGFloat {
     public static var pi_2 : CGFloat {
         return .pi / 2
     }
+    
+    /// Round to a specific number of decimal places.
+    /// ```
+    ///    1.23556789.roundTo(3) // 1.236
+    /// ```
+    /// - parameter decimalPlaces: The number decimal places to keep.
+    public func roundTo(_ decimalPlaces: Int) -> CGFloat {
+        return CGFloat( Double(self).roundTo(decimalPlaces) )
+    }
 }
 
 extension CGPoint {

@@ -128,6 +128,11 @@ extension Array where Element: Equatable {
 extension Int {
 
     /// Return the radian value using the number as degrees.
+    ///
+    /// You can also use the degree symbol using (Option + Shift + 8).
+    /// ```
+    ///    35.degress == 35°
+    /// ```
     public var degreesToRadians: CGFloat { return CGFloat(self) * .pi / 180.0 }
     
     /// Returns the number of meters based on the miles provided
@@ -214,6 +219,11 @@ extension Int {
 
 extension FloatingPoint {
     /// Turns the number from degrees into radian value
+    ///
+    /// You can also use the degree symbol using (Option + Shift + 8).
+    /// ```
+    ///    35.degress == 35°
+    /// ```
     public var degreesToRadians: Self { return self * .pi / 180 }
     /// Turns the number from radians into a degree value
     public var radiansToDegrees: Self { return self * 180 / .pi }
@@ -222,8 +232,22 @@ extension FloatingPoint {
 
 // MARK: Double extensions
 extension Double {
+    /// Round to a specific number of decimal places.
+    /// ```
+    ///    1.23556789.roundTo(3) // 1.236
+    /// ```
+    /// - parameter decimalPlaces: The number decimal places to keep.
+    public func roundTo(_ decimalPlaces: Int) -> Double {
+        let divisor = pow(10.0, Double(decimalPlaces))
+        return (self * divisor).rounded() / divisor
+    }
     
     /// Return the radian value using the number as degrees.
+    ///
+    /// You can also use the degree symbol using (Option + Shift + 8).
+    /// ```
+    ///    35.degress == 35°
+    /// ```
     public var degrees: CGFloat { return CGFloat(self * .pi / 180.0) }
     
     /**
