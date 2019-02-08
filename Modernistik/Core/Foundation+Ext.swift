@@ -173,3 +173,20 @@ public func async_background(_ closure: @escaping CompletionBlock ) {
 public func async(qos: DispatchQoS.QoSClass = .userInitiated, closure: @escaping CompletionBlock ) {
     DispatchQueue.global(qos: qos).async(execute: closure)
 }
+
+public final class Tools {
+    /// Measure a synchronous executing block. Returns the number of seconds
+    /// it took to run the closure.
+    /// ```
+    ///    let secs = Tools.measure {
+    ///       //.. some synchronous operation
+    ///    }
+    ///    print("\(secs) seconds")
+    /// ```
+    public static func measure(closure: CompletionBlock) -> Double {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        closure()
+        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
+        return timeElapsed.roundTo(3)
+    }
+}
