@@ -162,20 +162,25 @@ public func async_main(_ closure: @escaping CompletionBlock ) {
 /// Dispatch a block in the background queue
 ///
 /// - parameter closure: The closure to execute on the background thread.
+//@available(*, deprecated, renamed: "dispatch(_:closure:)", message: "This method has been renamed.")
 public func async_background(_ closure: @escaping CompletionBlock ) {
     DispatchQueue.global(qos: .background).async(execute: closure)
 }
 
-/// Dispatch a block with a specified quality of service.
+/// Dispatch a block with in the background using a specified quality of service.
 /// ```
-///   async(.background) {
-///      // do some work...
+///   dispatch(.background) {
+///      // do some work in the background queue...
+///   }
+///
+///   dispatch(.userInteractive) {
+///      // do some work on the main thread.
 ///   }
 /// ```
-///
+/// - note: To use dispatch a block to the main thread, use `.userInteractive`
 /// - parameter qos: The quality of service class to use. Defaults to `.default`.
 /// - parameter closure: The closure to execute.
-public func async(_ qos: DispatchQoS.QoSClass = .default, closure: @escaping CompletionBlock ) {
+public func dispatch(_ qos: DispatchQoS.QoSClass = .default, closure: @escaping CompletionBlock ) {
     DispatchQueue.global(qos: qos).async(execute: closure)
 }
 
