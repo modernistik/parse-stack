@@ -72,6 +72,15 @@ extension CGSize {
     public init(square size:CGFloat) {
         self.init(width: size, height: size)
     }
+    
+    /// Returns a CGRect with size equal to this CGSize at origin point.
+    /// ```
+    ///   CGSize(square: 80).rect
+    ///   // CGRect x,y = {0,0} width,height = {80,80}
+    /// ```
+    public var rect: CGRect {
+        return CGRect(width: width, height: height)
+    }
 }
 
 extension CGRect {
