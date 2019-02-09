@@ -184,19 +184,14 @@ public func dispatch(_ qos: DispatchQoS.QoSClass = .default, closure: @escaping 
     DispatchQueue.global(qos: qos).async(execute: closure)
 }
 
-public final class Tools {
-    /// Measure a synchronous executing block. Returns the number of seconds
-    /// it took to run the closure.
-    /// ```
-    ///    let secs = Tools.measure {
-    ///       //.. some synchronous operation
-    ///    }
-    ///    print("\(secs) seconds")
-    /// ```
-    public static func measure(closure: CompletionBlock) -> Double {
-        let startTime = CFAbsoluteTimeGetCurrent()
-        closure()
-        let timeElapsed = CFAbsoluteTimeGetCurrent() - startTime
-        return timeElapsed.roundTo(3)
+extension CFTimeInterval {
+    /// Returns the absolute current time.
+    public static var currentTime: CFTimeInterval  {
+        return CFAbsoluteTimeGetCurrent()
+    }
+    /// The amount of time that has lapsed up to 3 decimal places
+    /// using this value as an absolute time interval.
+    public var timeLapsed: CFTimeInterval {
+        return (CFAbsoluteTimeGetCurrent() - self).roundTo(3)
     }
 }
