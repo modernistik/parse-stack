@@ -152,7 +152,7 @@ public func async_delay(_ seconds:Double, closure: @escaping CompletionBlock) {
     DispatchQueue.main.asyncAfter(deadline: .now() + seconds, execute: closure)
 }
 
-/// Dispatch a block on the main queue
+/// Dispatch a block on the main queue.
 ///
 /// - parameter closure: The closure to execute on the main thread.
 public func async_main(_ closure: @escaping CompletionBlock ) {
@@ -163,14 +163,19 @@ public func async_main(_ closure: @escaping CompletionBlock ) {
 ///
 /// - parameter closure: The closure to execute on the background thread.
 public func async_background(_ closure: @escaping CompletionBlock ) {
-    DispatchQueue.global().async(execute: closure)
+    DispatchQueue.global(qos: .background).async(execute: closure)
 }
 
 /// Dispatch a block with a specified quality of service.
+/// ```
+///   async(.background) {
+///      // do some work...
+///   }
+/// ```
 ///
-/// - parameter qos: The quality of service class to use.
+/// - parameter qos: The quality of service class to use. Defaults to `.default`.
 /// - parameter closure: The closure to execute.
-public func async(qos: DispatchQoS.QoSClass = .userInitiated, closure: @escaping CompletionBlock ) {
+public func async(_ qos: DispatchQoS.QoSClass = .default, closure: @escaping CompletionBlock ) {
     DispatchQueue.global(qos: qos).async(execute: closure)
 }
 
