@@ -81,6 +81,17 @@ extension CGSize {
     public var rect: CGRect {
         return CGRect(width: width, height: height)
     }
+    /// Returns a new size that proportionally fits within the provided size.
+    /// - note: The width and height values must be greater than 0.
+    /// - parameter maxSize: The maximum size to bound the target size.
+    public func aspectFit(to maxSize:CGSize) -> CGSize {
+        guard width > 0 && height > 0 else { return .zero }
+        let widthRatio  = maxSize.width  / width
+        let heightRatio = maxSize.height / height
+        return widthRatio > heightRatio ?
+            CGSize(width: width * heightRatio, height: height * heightRatio) :
+            CGSize(width: width * widthRatio,  height: height * widthRatio)
+    }
 }
 
 extension CGRect {
