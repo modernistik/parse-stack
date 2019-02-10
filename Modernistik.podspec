@@ -40,7 +40,7 @@ Pod::Spec.new do |s|
 
   s.subspec 'Hyperdrive' do |cs|
     cs.dependency 'Modernistik/Core'
-    cs.dependency 'Parse', '>= 1.17'
+    cs.dependency 'Parse', '>= 1.17.2'
     cs.dependency 'TimeZoneLocate', '>= 0.4'
     cs.ios.source_files = 'Modernistik/Hyperdrive/**/*'
   end
