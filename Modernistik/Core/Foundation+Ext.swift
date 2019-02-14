@@ -79,6 +79,12 @@ extension String {
     }
 }
 
+extension URL {
+    /// Returns true if the url is a file path and if it exists in the local file system.
+    public var fileExists: Bool {
+        return isFileURL && FileManager.default.fileExists(atPath: path)
+    }
+}
 
 
 extension FileManager {

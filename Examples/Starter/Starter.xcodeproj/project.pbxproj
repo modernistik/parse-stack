@@ -165,7 +165,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-Starter/Pods-Starter-frameworks.sh",
+				"${PODS_ROOT}/Target Support Files/Pods-Starter/Pods-Starter-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Modernistik/Modernistik.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
@@ -176,7 +176,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Starter/Pods-Starter-frameworks.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Starter/Pods-Starter-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		D873707C7A5D181C82641C60 /* [CP] Check Pods Manifest.lock */ = {
