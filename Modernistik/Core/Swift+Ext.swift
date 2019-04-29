@@ -107,6 +107,11 @@ extension Array {
     public var lastIndex:Int {
         return self.count - 1
     }
+    
+    /// Returns whether there are values in the array: (eg. `!isEmpty`).
+    public var hasItems: Bool {
+        return !isEmpty
+    }
 
 }
 
@@ -428,6 +433,10 @@ extension String {
         return removeCharacters(from: CharacterSet(charactersIn: chartSet))
     }
 
+    /// Returns true if this is a non-empty string.
+    public var isPresent: Bool {
+        return !isEmpty
+    }
 }
 
 extension String {
@@ -482,13 +491,13 @@ extension NSAttributedString {
 }
 
 extension Optional where Wrapped == String {
-    /// A Boolean value indicating whether a string has no characters.
+    /// Returns true of the optional string is nil or the underlying value is an empty string.
     public var isEmpty: Bool {
         return self?.isEmpty ?? true
     }
     
-    /// A Boolean value indicating whether a string has characters.
+    /// Returns true of the optional string is a non-empty string.
     public var isPresent: Bool {
-        return self?.isEmpty ?? false
+        return !isEmpty
     }
 }
