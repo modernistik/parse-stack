@@ -678,6 +678,13 @@ open class ModernCollectionController : ModernViewController, UICollectionViewDa
     
 }
 
+extension UIInterfaceOrientationMask {
+    /// Returns an orientation mask for [.portrait, .portraitUpsideDown]
+    public static var vertical : UIInterfaceOrientationMask {
+        return [.portrait, .portraitUpsideDown]
+    }
+}
+
 @available(*, deprecated, renamed: "ModernTableCell", message: "This class has been deprecated in favor of ModernTableCell.")
 open class ReusableTableCell : ModernTableCell {}
 
