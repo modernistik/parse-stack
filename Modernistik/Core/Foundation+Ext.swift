@@ -56,6 +56,13 @@ extension Array where Element: NSLayoutConstraint {
     
 }
 
+extension Array {
+    /// Returns true if index is inRange of 0 and the array's last index.
+    public func has(index: Int) -> Bool {
+        return index >= 0 && index.inRange(0, lastIndex)
+    }
+}
+
 extension String {
     /// Uses the string as a NSLayoutConstraint visual format specification for constraints. For more information,
     /// see Auto Layout Cookbook in Auto Layout Guide.
