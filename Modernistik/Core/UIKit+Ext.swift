@@ -130,8 +130,18 @@ extension UIView {
     /// - parameter autolayout: true or false whether this view will be used in autolayout. If true is passed (default), `translatesAutoresizingMaskIntoConstraints` will be set to false.
     @objc public convenience init(autolayout: Bool) {
         self.init(frame: .zero)
-        if autolayout { // if true, set to false, otherwise leave default value.
-            translatesAutoresizingMaskIntoConstraints = false
+        if autolayout { // if true, set it, otherwise leave default value.
+            self.autolayout = true
+        }
+    }
+    /// Alias to `translatesAutoresizingMaskIntoConstraints` that applies the inverse value. This
+    /// just makes the settings more readable.
+    @objc public var autolayout: Bool {
+        get {
+            return !translatesAutoresizingMaskIntoConstraints
+        }
+        set {
+            translatesAutoresizingMaskIntoConstraints = !newValue
         }
     }
     
