@@ -33,6 +33,16 @@ extension Sequence where Iterator.Element : RawRepresentable {
     }
 }
 
+extension RawRepresentable where Self : Equatable {
+    /// True if the enum matches any of the ones provided.
+    /// - important: If you only need to check
+    /// against 1 enum, it is recommended using the `==` operator instead.
+    /// - parameter enums: A variable list of enums to check against.
+    public func any(_ enums:Self...) -> Bool {
+        return enums.contains(self)
+    }
+}
+
 /// Requires the implementor to support being initialized with an integer
 public
 protocol IntegerInitializable: ExpressibleByIntegerLiteral {
