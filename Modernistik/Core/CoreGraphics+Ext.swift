@@ -2,7 +2,7 @@
 //  Modernistik
 //  Copyright © Modernistik LLC. All rights reserved.
 //
-import CoreGraphics.CGColor
+import CoreGraphics
 import UIKit.UIColor
 
 extension CGColor {
@@ -46,6 +46,14 @@ extension CGPoint {
     /// - returns: A CGPoint with the y coordinate modified
     public func with(y: CGFloat) -> CGPoint {
         return CGPoint(x: x, y: y)
+    }
+    
+    /// Returns the distance to another point.
+    ///
+    /// - parameter point: The target point to use for calculation.
+    /// - returns: The distance to target point from current one.
+    public func distance(to point: CGPoint) -> CGFloat {
+        return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
     }
 }
 
@@ -95,6 +103,32 @@ extension CGSize {
 }
 
 extension CGRect {
+    
+    /// Returns a new rect by swapping width and height value.
+    ///
+    ///     let rect:CGRect = CGRect(width: 100, height: 50).pivoted
+    ///
+    ///     rect.size.height == 100 // true
+    ///     rect.size.width == 50 // true
+    /// - returns: A new rect rotated 90 degrees from anchor point.
+    public var pivoted : CGRect {
+        return with(width: height, height: width)
+    }
+    
+    /// Returns true if `width > height`
+    public var isHorizontal: Bool {
+        return width >= height
+    }
+    
+    /// Returns true if `width < height`
+    public var isVertical: Bool {
+        return width <= height
+    }
+    
+    /// Returns true if `width == height`
+    public var isSquare: Bool {
+        return width == height
+    }
     
     /// Returns a square rect based on the provided size setting the coordinates to origin.
     ///
