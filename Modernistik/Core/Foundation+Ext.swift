@@ -175,7 +175,7 @@ public func async_main(_ closure: @escaping CompletionBlock ) {
 /// Dispatch a block in the background queue
 ///
 /// - parameter closure: The closure to execute on the background thread.
-//@available(*, deprecated, renamed: "dispatch(_:closure:)", message: "This method has been renamed.")
+@available(*, deprecated, renamed: "dispatch(_:closure:)", message: "This method has been renamed.")
 public func async_background(_ closure: @escaping CompletionBlock ) {
     DispatchQueue.global(qos: .background).async(execute: closure)
 }

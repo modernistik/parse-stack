@@ -132,7 +132,7 @@ extension Array where Element: Equatable {
     ///
     /// - Parameter item: the item to remove if it exists
     public mutating func removeItem(_ item:Element) {
-        if let itemIndex = index(of: item) {
+        if let itemIndex = firstIndex(of: item) {
             self.remove(at: itemIndex)
         }
     }
@@ -383,10 +383,6 @@ extension String {
     public var fileUrl:URL? {
         return URL(fileURLWithPath: self)
     }
-
-    // Shorthand for `characters.count`
-    @available(*, deprecated, renamed: "count", message: "Swift 4 has support for `count`, or use `characters.count` to enable easier migration.")
-    public var length: Int { return self.characters.count }
 
     /// Returns the first character in the string.
     public var first:String {

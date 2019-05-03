@@ -376,16 +376,6 @@ extension UIViewController {
 // MARK: UIColor
 extension UIColor {
     
-    /// Returns a black color with a modified alpha component. Useful when creating
-    /// fades or overlays with opacity.
-    ///
-    /// - parameter alpha: The opacity value (0.0 to 1.0)
-    @available(*, deprecated, message: "This method has been deprecated in favor of `UIColor.black.alpha(amount)`.")
-    public convenience init(blackWithAlpha alpha:CGFloat) {
-        self.init(red: 0, green: 0, blue: 0, alpha: alpha)
-    }
-    
-    
     /// Alias to `withAlphaComponent(value)`.
     /// Creates and returns a color object that has the same color space
     /// and component values as the receiver, but has the specified alpha component.
@@ -694,12 +684,3 @@ extension UIInterfaceOrientationMask {
         return [.portrait, .portraitUpsideDown]
     }
 }
-
-@available(*, deprecated, renamed: "ModernTableCell", message: "This class has been deprecated in favor of ModernTableCell.")
-open class ReusableTableCell : ModernTableCell {}
-
-@available(*, deprecated, renamed: "ModernCollectionCell", message: "This class has been deprecated in favor of ModernCollectionCell.")
-open class ReusableCollectionCell : ModernCollectionCell {}
-
-@available(*, deprecated, renamed: "ModernHeaderFooterView", message: "This class has been deprecated in favor of ModernHeaderFooterView.")
-open class ReusableHeaderFooterView : ModernHeaderFooterView {}

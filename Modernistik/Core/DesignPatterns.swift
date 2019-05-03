@@ -619,9 +619,6 @@ open class ModernButton: UIButton, ModernViewConformance {
     
 }
 
-@available(*, deprecated, renamed: "ModernControl", message: "This class has been deprecated in favor of ModernControl.")
-open class ModernUIControl : ModernControl {}
-
 /// Provides a base UIControl class that conforms to the general design lifecycle patterns
 /// of setup/update/reuse, etc. It also supports modifying the `minimumHitArea` property for
 /// easily increasing the target tap frame.

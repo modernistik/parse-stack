@@ -120,17 +120,6 @@ extension SegueHandlerType where Self: UIViewController, SegueIdentifier.RawValu
         performSegue(withIdentifier: segueIdentifier.rawValue, sender: sender)
     }
     
-    // Perform a segue using a `SegueIdentifier`. See `SegueHandlerType` protocol.
-    /// ## Example
-    ///     performSegueIdentifier(.segueToNext, sender: self)
-    /// - parameter segueIdentifier: The SegueIdentifier enum defined in the current controller scope.
-    /// - parameter sender: The object that you want to use to initiate the segue. This object is
-    /// made available for informational purposes during the actual segue.
-//    @available(*, deprecated, message: "This method has been renamed to segue(to:).")
-//    public func performSegue(withIdentifier segueIdentifier: SegueIdentifier, sender: Any?) {
-//        performSegue(withIdentifier: segueIdentifier.rawValue, sender: sender)
-//    }
-    
 
 }
 
