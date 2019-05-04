@@ -32,6 +32,7 @@ import UIKit
  ````
  */
 #if os(iOS)
+@available(iOSApplicationExtension, unavailable)
 final
 public class RelativeKeyboardLayoutConstraint: NSLayoutConstraint {
     
