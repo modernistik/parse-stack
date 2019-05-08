@@ -8,8 +8,8 @@ Modernistik is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'Modernistik', '~> 0.4' # Swift 4+
-pod 'Modernistik', '~> 0.4.5' # Swift 4.2
+pod 'Modernistik', '~> 0.4' # Swift 4.2+
+pod 'Modernistik', '~> 0.5' # Swift 5+
 ```
 
 #### Examples
