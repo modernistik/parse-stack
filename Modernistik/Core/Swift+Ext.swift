@@ -507,3 +507,17 @@ extension Optional where Wrapped == String {
         return !isEmpty
     }
 }
+
+extension Optional where Wrapped == Array<Any> {
+    
+    /// Returns true of the optional string is nil or the underlying value is an empty array.
+    public var isEmpty: Bool {
+        return self?.isEmpty ?? true
+    }
+    
+    /// Returns true of the optional string is a non-empty array.
+    public var isPresent: Bool {
+        return !isEmpty
+    }
+    
+}
