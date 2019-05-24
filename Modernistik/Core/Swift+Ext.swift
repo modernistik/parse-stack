@@ -402,18 +402,12 @@ extension String {
 
     /// Returns the current string with the first letter in lowercase.
     public var downcasingFirst: String {
-        
-        let first = String(prefix(1)).lowercased()
-        let other = String(dropFirst())
-        return first + other
-
+        return prefix(1).lowercased() + dropFirst()
     }
 
     /// Returns the current string with the first letter in uppercase.
     public var uppercasingFirst: String {
-        let first = String(prefix(1)).uppercased()
-        let other = String(dropFirst())
-        return first + other
+        return prefix(1).uppercased() + dropFirst()
     }
     
     /// Remove characters from the string contained in the character set.
@@ -519,5 +513,47 @@ extension Optional where Wrapped == Array<Any> {
     public var isPresent: Bool {
         return !isEmpty
     }
+
+}
+
+extension Optional where Wrapped == String {
+    /// Returns the string if it's not an empty string, otherwise nil.
+    public var presence: String? {
+        guard let s = self else { return nil }
+        return s.presence
+    }
+}
+
+
+extension String {
+    /// Returns the string if it's not an empty string.
+    public var presence: String? {
+        let s = trimmed
+        return s.isEmpty ? nil : s
+    }
+    /// Returns the current string in camel-case form.
+    public var camelized: String {
+        if isEmpty { return "" }
+        
+        let parts = self.components(separatedBy: CharacterSet.alphanumerics.inverted)
+        guard let firstPart = parts.first else { return self }
+        
+        let first = String(describing: firstPart).downcasingFirst
+        let rest = parts.dropFirst().map { String($0).uppercasingFirst }
+        
+        return ([first] + rest).joined(separator: "")
+    }
+}
+
+
+extension StringProtocol where Self: RangeReplaceableCollection {
+    /// Returns a string with all whitespace and newlines removed.
+    public var removingAllWhitespacesAndNewlines: Self {
+        return filter { !$0.isNewline && !$0.isWhitespace }
+    }
     
+    /// Removes all whitespace and newlines removed from the current string.
+    public mutating func removeAllWhitespacesAndNewlines() {
+        return removeAll { $0.isNewline || $0.isWhitespace }
+    }
 }
