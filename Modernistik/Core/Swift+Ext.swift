@@ -38,8 +38,16 @@ extension RawRepresentable where Self : Equatable {
     /// - important: If you only need to check
     /// against 1 enum, it is recommended using the `==` operator instead.
     /// - parameter enums: A variable list of enums to check against.
-    public func any(_ enums:Self...) -> Bool {
+    public func any(of enums:Self...) -> Bool {
         return enums.contains(self)
+    }
+}
+
+extension Set {
+    /// True if any of the items are inside the set.
+    /// - parameter enums: A variable list of enums to check against.
+    public func contains(any items:Element...) -> Bool {
+        return self.intersection(items).isEmpty == false
     }
 }
 
