@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Modernistik'
-  s.version          = '0.5.0'
+  s.version          = '0.5.1'
   s.summary          = 'Swift design patterns, sugars and extensions for Modernistik development.'
 
 # This description is used to generate tags and improve search results.
@@ -43,6 +43,11 @@ Pod::Spec.new do |s|
     cs.dependency 'Parse', '>= 1.17.2'
     cs.dependency 'TimeZoneLocate', '>= 0.4'
     cs.ios.source_files = 'Modernistik/Hyperdrive/**/*'
+  end
+
+  s.subspec 'Phoenix' do |cs|
+    cs.dependency 'Modernistik/Core'
+    cs.ios.source_files = 'Modernistik/Phoenix/**/*'
   end
   # s.resource_bundles = {
   #   'Modernistik' => ['Modernistik/Assets/*.png']

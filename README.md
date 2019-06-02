@@ -22,8 +22,15 @@ The CoreSDK (`Slate`) has several enhancements and helper methods as Swift exten
 pod 'Modernistik'
 ```
 
-## Hyperdrive SDK
-When buildling applications that interact with Hyperdrive or Parse Server, you can include this additional subspec in order to get the additional Parse SDK extensions as well as the Hyperdrive protocol, which should serve as a foundation for buildling a Hyperdrive-connected mobile application. To install this piece of the SDK, include `Modernistik/Hyperdrive` in your pod declaration:
+## Phoenix Queue
+The Phoenix is a persistence job queue system for Swift. It allows to build idempotent and asynchronous job tasks using Foundation's `Operation` (NSOperation), that allows for jobs to be "stored" when the application is about to terminate, and be restored (resume) once the app has relaunched. 
+
+```ruby
+pod 'Modernistik/Phoneix'
+```
+
+## Hyperdrive
+When buildling applications that interact with Hyperdrive or [Parse Server](https://parseplatform.org/), you can include this additional subspec in order to get the additional [Parse SDK](https://github.com/parse-community/Parse-SDK-iOS-OSX) extensions as well as the Hyperdrive protocol, which should serve as a foundation for buildling a Hyperdrive-connected mobile application. To install this piece of the SDK, include `Modernistik/Hyperdrive` in your pod declaration:
 
 ```ruby
 pod 'Modernistik/Hyperdrive'

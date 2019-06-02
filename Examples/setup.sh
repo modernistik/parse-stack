@@ -2,4 +2,5 @@
 
 cd Starter; pod install; cd ../
 cd Slate; pod install; cd ../
+cd Phoenix; pod install; cd ../
 cd Hyperdrive; pod install; cd ../
