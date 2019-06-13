@@ -445,6 +445,10 @@ extension String {
     public var isPresent: Bool {
         return !isEmpty
     }
+    /// Returns utf8 encoded data.
+    public var utf8Data: Data? {
+        return data(using: .utf8)
+    }
 }
 
 extension String {
@@ -563,5 +567,12 @@ extension StringProtocol where Self: RangeReplaceableCollection {
     /// Removes all whitespace and newlines removed from the current string.
     public mutating func removeAllWhitespacesAndNewlines() {
         return removeAll { $0.isNewline || $0.isWhitespace }
+    }
+}
+
+extension Data {
+    /// Returns a string representation of the data in UTF-8 encoding.
+    public var utf8String: String? {
+        return String(data: self, encoding: .utf8)
     }
 }
