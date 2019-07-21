@@ -1,8 +1,6 @@
-<img src='https://raw.githubusercontent.com/modernistik/parse-stack/master/.github/parse-ruby-sdk.png?raw=true' width='500' alt='Ruby Parse Server SDK'/>
+![Parse Stack - The Parse Server Ruby Client SDK](https://raw.githubusercontent.com/modernistik/parse-stack/master/parse-stack.png?raw=true)
 
-# Parse Stack - The Parse Server Ruby Client SDK
-
-[Parse Stack](https://github.com/modernistik/parse-stack) is the [Parse Server](http://parseplatform.org/) SDK, REST Client and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
+A full featured Active Model ORM and Ruby REST API for Parse-Server. [Parse Stack](https://github.com/modernistik/parse-stack) is the [Parse Server](http://parseplatform.org/) SDK, REST Client and ORM framework for [Ruby](https://www.ruby-lang.org/en/). It provides a client adapter, a query engine, an object relational mapper (ORM) and a Cloud Code Webhooks rack application.
 
 Below is a [quick start guide](https://github.com/modernistik/parse-stack#overview), but you can also check out the full *[API Reference](https://www.modernistik.com/gems/parse-stack/index.html)* for more detailed information about our Parse Server SDK.
 
