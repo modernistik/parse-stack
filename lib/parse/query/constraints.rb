@@ -714,7 +714,7 @@ module Parse
       end
     end
 
-
+    # Equivalent to the full text search support with `$text` with a set of search crieteria.
     class FullTextSearchQueryConstraint < Constraint
       # @!method text_search
       # A registered method on a symbol to create the constraint. Maps to Parse
