@@ -1,4 +1,4 @@
-<h1 align="center">Modernistik Framework</h1>
+![Modernistik Cocoa Framework](https://raw.githubusercontent.com/modernistik/cocoa/master/modernistik.png)
 
 This framework represents extension, utilizes, design patterns and practices adopted for Modernistik software development in Swift / Objective-C. It has two main components: `Core` and `Hyperdrive`.
 
@@ -23,10 +23,10 @@ pod 'Modernistik'
 ```
 
 ## Phoenix Queue
-The Phoenix is a persistence job queue system for Swift. It allows to build idempotent and asynchronous job tasks using Foundation's `Operation` (NSOperation), that allows for jobs to be "stored" when the application is about to terminate, and be restored (resume) once the app has relaunched. 
+The Phoenix is a persistence job queue system for Swift. It allows to build idempotent and asynchronous job tasks using Foundation's `Operation` (NSOperation), that allows for jobs to be "stored" when the application is about to terminate, and be restored (resume) once the app has relaunched.
 
 ```ruby
-pod 'Modernistik/Phoneix'
+pod 'Modernistik/Phoenix'
 ```
 
 ## Hyperdrive
