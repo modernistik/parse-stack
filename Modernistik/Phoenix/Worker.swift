@@ -127,8 +127,8 @@ open class Worker: Operation {
         } else {
             before()
             state = .executing
-            Phoenix.postNotification(name: .PhoneixOperationStarted, worker: self)
-            Phoenix.postNotification(name: .PhoneixOperationQueueDidChange, worker: self)
+            Phoenix.postNotification(name: .PhoenixOperationStarted, worker: self)
+            Phoenix.postNotification(name: .PhoenixOperationQueueDidChange, worker: self)
             main()
             // if the worker has been marked as non-async
             // call completed when main returns.
@@ -193,7 +193,7 @@ open class Worker: Operation {
         status = .success
         state = .finished
         Phoenix.postNotification(name: .PhoenixOperationFinished, worker: self)
-        Phoenix.postNotification(name: .PhoneixOperationQueueDidChange, worker: self)
+        Phoenix.postNotification(name: .PhoenixOperationQueueDidChange, worker: self)
         after()
     }
     
@@ -210,7 +210,7 @@ open class Worker: Operation {
         status = .failed
         state = .finished // to allow notifications to go out
         Phoenix.postNotification(name: .PhoenixOperationFinished, worker: self)
-        Phoenix.postNotification(name: .PhoneixOperationQueueDidChange, worker: self)
+        Phoenix.postNotification(name: .PhoenixOperationQueueDidChange, worker: self)
         after()
     }
     

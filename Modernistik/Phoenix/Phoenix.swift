@@ -35,8 +35,8 @@ public class UserDefaultsPhoenixStore : PhoenixPersistence {
 }
 
 extension Notification.Name {
-   public static let PhoneixOperationQueueDidChange = Notification.Name("PhoenixOperationQueueDidChange")
-   public static let PhoneixOperationStarted = Notification.Name("PhoenixOperationStarted")
+   public static let PhoenixOperationQueueDidChange = Notification.Name("PhoenixOperationQueueDidChange")
+   public static let PhoenixOperationStarted = Notification.Name("PhoenixOperationStarted")
    public static let PhoenixOperationFinished = Notification.Name("PhoenixOperationFinished")
 }
 
