@@ -27,7 +27,7 @@ Pod::Spec.new do |s|
   s.license          = 'Proprietary'
   s.author           = { 'Modernistik' => 'contact@modernistik.com' }
   s.source           = { :git => 'https://github.com/modernistik/cocoa.git', :tag => s.version.to_s }
-  s.social_media_url = 'https://twitter.com/modernistik'
+  s.social_media_url = 'https://www.modernistik.com'
 
   s.default_subspec = 'Core'
   s.swift_version = '5.0'
