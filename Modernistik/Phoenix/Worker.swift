@@ -265,7 +265,7 @@ extension Worker {
                 queuePriority = priority
             }
             
-            if let p = newValue["params"] as? [String:Any?] {
+            if let p = newValue["params"] as? [String:Any] {
                 params = p
             }
             

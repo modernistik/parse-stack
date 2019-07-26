@@ -7,6 +7,16 @@ import Foundation
 import UIKit
 
 
+#if os(iOS)
+@available(tvOS,unavailable)
+extension UIInterfaceOrientationMask {
+    /// Returns an orientation mask for [.portrait, .portraitUpsideDown]
+    @available(tvOS,unavailable)
+    public static var vertical : UIInterfaceOrientationMask {
+        return [.portrait, .portraitUpsideDown]
+    }
+}
+#endif
 
 extension UIDevice {
     
@@ -677,11 +687,4 @@ open class ModernCollectionController : ModernViewController, UICollectionViewDa
     }
     
     
-}
-
-extension UIInterfaceOrientationMask {
-    /// Returns an orientation mask for [.portrait, .portraitUpsideDown]
-    public static var vertical : UIInterfaceOrientationMask {
-        return [.portrait, .portraitUpsideDown]
-    }
 }
