@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Modernistik'
-  s.version          = '0.5.1'
+  s.version          = '0.5.2'
   s.summary          = 'Swift design patterns, sugars and extensions for Modernistik development.'
 
 # This description is used to generate tags and improve search results.
@@ -38,13 +38,6 @@ Pod::Spec.new do |s|
     cs.source_files = 'Modernistik/Core/**/*'
   end
 
-  s.subspec 'Hyperdrive' do |cs|
-    cs.dependency 'Modernistik/Core'
-    cs.dependency 'Parse', '>= 1.17.2'
-    cs.dependency 'TimeZoneLocate', '>= 0.4'
-    cs.ios.source_files = 'Modernistik/Hyperdrive/**/*'
-  end
-
   s.subspec 'Phoenix' do |cs|
     cs.dependency 'Modernistik/Core'
     cs.ios.source_files = 'Modernistik/Phoenix/**/*'
@@ -59,4 +52,4 @@ Pod::Spec.new do |s|
 end
 # To publish `pod trunk push Modernistik.podspec`
 # https://guides.cocoapods.org/making/getting-setup-with-trunk.html
-# Register a new authentication token: pod trunk register persaud@modernistik.com 'Anthony Persaud' --description='Macbook'
+# Register a new authentication token: pod trunk register <email> '<name>' --description='Macbook'

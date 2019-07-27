@@ -1,6 +1,6 @@
 ![Modernistik Cocoa Framework](https://raw.githubusercontent.com/modernistik/cocoa/master/modernistik.png)
 
-This framework represents extension, utilizes, design patterns and practices adopted for Modernistik software development in Swift / Objective-C. It has two main components: `Core` and `Hyperdrive`.
+This framework represents extension, utilizes, design patterns and practices adopted for Modernistik software development in Swift / Objective-C.
 
 ## Installation
 
@@ -8,8 +8,8 @@ Modernistik is available through [CocoaPods](http://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 
 ```ruby
-pod 'Modernistik', '~> 0.4' # Swift 4.2+
 pod 'Modernistik', '~> 0.5' # Swift 5+
+pod 'Modernistik', '~> 0.4' # Swift 4.2+
 ```
 
 #### Examples
@@ -30,10 +30,10 @@ pod 'Modernistik/Phoenix'
 ```
 
 ## Hyperdrive
-When buildling applications that interact with Hyperdrive or [Parse Server](https://parseplatform.org/), you can include this additional subspec in order to get the additional [Parse SDK](https://github.com/parse-community/Parse-SDK-iOS-OSX) extensions as well as the Hyperdrive protocol, which should serve as a foundation for buildling a Hyperdrive-connected mobile application. To install this piece of the SDK, include `Modernistik/Hyperdrive` in your pod declaration:
+When buildling applications that interact with Hyperdrive or [Parse Server](https://parseplatform.org/), you can include this additional subspec in order to get the additional [Parse SDK](https://github.com/parse-community/Parse-SDK-iOS-OSX) extensions as well as the Hyperdrive protocol, which should serve as a foundation for buildling a Hyperdrive-connected mobile application. To install this piece of the SDK, include `ParseSDKExtensions` in your pod declaration:
 
 ```ruby
-pod 'Modernistik/Hyperdrive'
+pod 'ParseSDKExtensions' # previously Modernistik/Hyperdrive
 ```
 
 ## Author
