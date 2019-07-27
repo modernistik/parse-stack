@@ -1,6 +1,6 @@
 ![Modernistik Cocoa Framework](https://raw.githubusercontent.com/modernistik/cocoa/master/modernistik.png)
 
-This framework represents extension, utilizes, design patterns and practices adopted for Modernistik software development in Swift / Objective-C.
+This framework represents extensions, utilities, design patterns and practices adopted for Modernistik software development in Swift.
 
 [![CI Status](https://img.shields.io/travis/modernistik/cocoa.svg?style=flat)](https://travis-ci.org/modernistik/Modernistik)
 [![Version](https://img.shields.io/cocoapods/v/Modernistik.svg?style=flat)](https://cocoapods.org/pods/Modernistik)
@@ -32,13 +32,6 @@ The Phoenix is a persistence job queue system for Swift. It allows to build idem
 
 ```ruby
 pod 'Modernistik/Phoenix'
-```
-
-## Hyperdrive
-When buildling applications that interact with Hyperdrive or [Parse Server](https://parseplatform.org/), you can include this additional subspec in order to get the additional [Parse SDK](https://github.com/parse-community/Parse-SDK-iOS-OSX) extensions as well as the Hyperdrive protocol, which should serve as a foundation for buildling a Hyperdrive-connected mobile application. To install this piece of the SDK, include `ParseSDKExtensions` in your pod declaration:
-
-```ruby
-pod 'ParseSDKExtensions' # previously Modernistik/Hyperdrive
 ```
 
 ## Author
