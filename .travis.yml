@@ -9,7 +9,8 @@ podfile: Examples/Modernistik/Podfile
 before_install:
 - gem install cocoapods # Since Travis is not always on latest version
 - pod install --project-directory=Examples/Modernistik
+- pod install --project-directory=Examples/TV
 script:
-- set -o pipefail && xcodebuild clean build -workspace Examples/TV/TV.xcworkspace -scheme 'TV' -destination 'platform=tvOS Simulator,name=Apple TV 4K' -configuration Release -sdk appletvsimulator | xcpretty -c
+- set -o pipefail && xcodebuild clean build -workspace Examples/TV/TV.xcworkspace -scheme 'TV' -destination 'platform=tvOS Simulator,name=Apple TV 4K' -sdk appletvsimulator | xcpretty -c
 - set -o pipefail && xcodebuild test -enableCodeCoverage YES -workspace Examples/Modernistik/Modernistik.xcworkspace -scheme Modernistik-Example -sdk iphonesimulator12.2 ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone X,OS=12.2' | xcpretty
 - pod lib lint
