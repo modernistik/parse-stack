@@ -34,13 +34,23 @@ extension Sequence where Iterator.Element: RawRepresentable {
     }
 }
 
-extension RawRepresentable where Self: Equatable {
-    /// True if the enum matches any of the ones provided.
+extension Equatable {
+    /// True if the target matches any of the ones provided in the list.
+    /// ```
+    /// // Example with enums
+    /// enum Color {
+    ///     case red, green, blue, yellow
+    /// }
+    ///
+    /// let color = Color.red
+    ///
+    /// color.any(.green, .red) // true
+    /// ```
     /// - important: If you only need to check
-    /// against 1 enum, it is recommended using the `==` operator instead.
-    /// - parameter enums: A variable list of enums to check against.
-    public func any(of enums: Self...) -> Bool {
-        return enums.contains(self)
+    /// against 1 item type, it is recommended using the `==` operator instead.
+    /// - parameter items: A variable list of items to check against.
+    public func any(of items: Self...) -> Bool {
+        return items.contains(self)
     }
 }
 
@@ -302,8 +312,8 @@ extension Double {
 
     /// Returns time as a set of hours, minutes and seconds separated by ':' (ex "01:55").
     ///
-    ///    9999.3.secondsToClockFormat // "2:46:39"
-    ///    458.secondsToClockFormat // "7:38"
+    ///     9999.3.secondsToClockFormat // "2:46:39"
+    ///     458.secondsToClockFormat // "7:38"
     public var secondsToClockFormat: String {
         if isNaN || isInfinite {
             return "0:00"
@@ -317,6 +327,25 @@ extension Double {
             return "\(hours):" + String.localizedStringWithFormat("%02d", abs(minutes)) + ":\(secondsString)"
         }
         return "\(minutes):\(secondsString)"
+    }
+
+    /// Rounds the value to a number of decimal places.
+    ///
+    ///     let rounded = 12.3456.places(2) // 12.34
+    ///
+    /// - Parameter places: The number of decimal places to round to.
+    public func places(_ places: Int) -> Double {
+        if places < 1 { return rounded() }
+        let scaler = Double(truncating: pow(10, places) as NSNumber)
+        let inflated = self * scaler
+        return Double(inflated.rounded() / scaler)
+    }
+}
+
+extension Substring {
+    /// Recast substring as string
+    public var string: String? {
+        return String(self)
     }
 }
 
