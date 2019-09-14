@@ -6,33 +6,33 @@
 import Foundation
 
 /// A callback block for ConcurrentOperation instances that allow you to add simple block-based tasks that have asynchronous code. To use, call `finish()` whenever the task you were performing is completed.
-public typealias ConcurrentOperationBlock = (_ finish: @escaping (CompletionBlock) ) -> Void
+public typealias ConcurrentOperationBlock = (_ finish: @escaping (CompletionBlock)) -> Void
 /**
  A useful Operation subclass that allows for asynchrnous
  actions to be performed before being marked as completed.
- 
+
  To use, you sublcass `ConcurrentOperation`, override
  `main()` and call `finish()` whenever you want to mark the
  operation as completed.
- 
+
  ## Subclassing Example
  ````
  public class SampleOperation : ConcurrentOperation {
- 
+
     override open func main() {
- 
+
         //... do some async work.
         async_delay(3) {
- 
+
             // call when done
             self.finish()
         }
     }
  }
  ````
- 
+
  For small tasks, may also use the block based approach instead of subclassing:
- 
+
   ## Block Example
   ````
  let op =  ConcurrentOperation { (finish) in
@@ -45,13 +45,13 @@ public typealias ConcurrentOperationBlock = (_ finish: @escaping (CompletionBloc
  queue.addOperation(op)
   ````
  - note: Do not call `super.main()` in your implementation.
-*/
+ */
 open class ConcurrentOperation: Operation {
+    public lazy var finishCallback: CompletionBlock = { { self.finish() } }()
+    public var task: ConcurrentOperationBlock?
 
-    public lazy var finishCallback:CompletionBlock = { return { self.finish() } }()
-    public var task:ConcurrentOperationBlock?
-    
     // MARK: - Types
+
     public enum State {
         case ready, executing, finished
         var keyPath: String {
@@ -67,6 +67,7 @@ open class ConcurrentOperation: Operation {
     }
 
     // MARK: - Properties
+
     open var state = State.ready {
         willSet {
             willChangeValue(forKey: newValue.keyPath)
@@ -79,14 +80,14 @@ open class ConcurrentOperation: Operation {
     }
 
     open override func start() {
-  
-        if self.isCancelled {
+        if isCancelled {
             state = .finished
         } else {
             state = .executing
             main()
         }
     }
+
     open override var isReady: Bool {
         return super.isReady && state == .ready
     }
@@ -103,14 +104,15 @@ open class ConcurrentOperation: Operation {
         return true
     }
 
-    public convenience init(task:@escaping ConcurrentOperationBlock) {
+    public convenience init(task: @escaping ConcurrentOperationBlock) {
         self.init()
         self.task = task
     }
+
     /// Override this method to perform work, but do not call `super`. Work can be synchronous or
     /// asynchronous, however your implementation should call `completed()` when you can declare
     /// the task as finished.
-    override open func main() {
+    open override func main() {
         if let task = task {
             task(finishCallback)
             return
@@ -125,6 +127,3 @@ open class ConcurrentOperation: Operation {
         state = .finished
     }
 }
-
-
-

@@ -3,16 +3,17 @@
 //  Copyright © Modernistik LLC. All rights reserved.
 //
 
+import CoreGraphics
 import Foundation
+import UIKit
 
 /// Alias for `[AnyHashable: Any]`
 public typealias ObjectDictionary = [AnyHashable: Any?]
 
 /// Alias for `[String: Any]`
-public typealias StringDictionary = [String:Any?]
+public typealias StringDictionary = [String: Any?]
 
-extension Sequence where Iterator.Element : RawRepresentable {
-    
+extension Sequence where Iterator.Element: RawRepresentable {
     /**
      Transform a list of enums of RawRepresentable type, into a list of their rawValues.
 
@@ -21,24 +22,24 @@ extension Sequence where Iterator.Element : RawRepresentable {
      enum Colors: Int {
         case blue, red, yellow
      }
-     
+
      let colors: [Colors] = [.blue, .yellow, .red]
      colors.rawValues # => [0,2,1]
      ````
-     
+
      - returns: An array of rawValues based on enum RawRepresentable type.
      */
-    public var rawValues:[Iterator.Element.RawValue] {
-        return self.map { $0.rawValue }
+    public var rawValues: [Iterator.Element.RawValue] {
+        return map { $0.rawValue }
     }
 }
 
-extension RawRepresentable where Self : Equatable {
+extension RawRepresentable where Self: Equatable {
     /// True if the enum matches any of the ones provided.
     /// - important: If you only need to check
     /// against 1 enum, it is recommended using the `==` operator instead.
     /// - parameter enums: A variable list of enums to check against.
-    public func any(of enums:Self...) -> Bool {
+    public func any(of enums: Self...) -> Bool {
         return enums.contains(self)
     }
 }
@@ -46,8 +47,8 @@ extension RawRepresentable where Self : Equatable {
 extension Set {
     /// True if any of the items are inside the set.
     /// - parameter enums: A variable list of enums to check against.
-    public func contains(any items:Element...) -> Bool {
-        return self.intersection(items).isEmpty == false
+    public func contains(any items: Element...) -> Bool {
+        return intersection(items).isEmpty == false
     }
 }
 
@@ -60,7 +61,6 @@ protocol IntegerInitializable: ExpressibleByIntegerLiteral {
 
 postfix operator °
 extension Int: IntegerInitializable {
-
     /// Turns the number (interpreted as an angle) into radians with the ° (degree) operator.
     ///  ````
     ///    let radians = 45.0° // => 0.785398163397448
@@ -68,7 +68,7 @@ extension Int: IntegerInitializable {
     /// - attention: To type the degree symbol, use (Option + Shift + 8)
     /// - parameter lhs: The integer to interpret as an angle.
     /// - returns: the number of radians
-    postfix public static func °(lhs: Int) -> CGFloat {
+    public static postfix func ° (lhs: Int) -> CGFloat {
         return CGFloat(lhs) * .pi / 180
     }
 }
@@ -81,7 +81,7 @@ extension Double: IntegerInitializable {
     /// - attention: To type the degree symbol, use (Option + Shift + 8)
     /// - parameter lhs: The integer to interpret as an angle.
     /// - returns: the number of radians
-    postfix public static func °(lhs: Double) -> CGFloat {
+    public static postfix func ° (lhs: Double) -> CGFloat {
         return CGFloat(lhs) * .pi / 180
     }
 }
@@ -91,7 +91,7 @@ extension MutableCollection {
     mutating func shuffle() {
         let c = count
         guard c > 1 else { return }
-        
+
         for (firstUnshuffled, unshuffledCount) in zip(indices, stride(from: c, to: 1, by: -1)) {
             // Change `Int` in the next line to `IndexDistance` in < Swift 4.1
             let d: Int = numericCast(arc4random_uniform(numericCast(unshuffledCount)))
@@ -112,44 +112,42 @@ extension Sequence {
 }
 
 // MARK: Arrray extensions
-extension Array {
 
+extension Array {
     /// Randombly picks an item of the array
-    public var sample:Element? {
+    public var sample: Element? {
         if count == 0 { return nil }
         let index = count.random
         return self[index]
     }
 
     /// Returns the last possible index of the Array
-    public var lastIndex:Int {
-        return self.count - 1
+    public var lastIndex: Int {
+        return count - 1
     }
-    
+
     /// Returns whether there are values in the array: (eg. `!isEmpty`).
     public var hasItems: Bool {
         return !isEmpty
     }
-
 }
 
 // MARK: Array equatable extensions
-extension Array where Element: Equatable {
 
+extension Array where Element: Equatable {
     /// Removes the first instance of the element from the array
     ///
     /// - Parameter item: the item to remove if it exists
-    public mutating func removeItem(_ item:Element) {
+    public mutating func removeItem(_ item: Element) {
         if let itemIndex = firstIndex(of: item) {
-            self.remove(at: itemIndex)
+            remove(at: itemIndex)
         }
     }
-
 }
 
 // MARK: Int extensions
-extension Int {
 
+extension Int {
     /// Return the radian value using the number as degrees.
     ///
     /// You can also use the degree symbol using (Option + Shift + 8).
@@ -157,20 +155,20 @@ extension Int {
     ///    35.degress == 35°
     /// ```
     public var degreesToRadians: CGFloat { return CGFloat(self) * .pi / 180.0 }
-    
+
     /// Returns the number of meters based on the miles provided
     public var milesToMeters: Int {
-        return 1609*self
+        return 1609 * self
     }
 
     /// Returns the number of bytes expressed using current value as MBs.
-    public var MBs: Int { return self * 1_024 * 1_024; }
+    public var MBs: Int { return self * 1024 * 1024 }
 
     /// Returns a random integer less than the current value.
     ///
     ///     30.random // => 5
     ///     30.random // => 22
-    public var random:Int {
+    public var random: Int {
         return Int(arc4random_uniform(UInt32(self)))
     }
 
@@ -179,8 +177,8 @@ extension Int {
     /// - parameter low: The lower limit boundary
     /// - parameter high: The higher limit boundary
     /// - returns: A value that is in range of the provided limits
-    public func clamp(_ low:Int, _ high:Int) -> Int {
-        return ( self > high ) ? high : ( self < low ? low : self )
+    public func clamp(_ low: Int, _ high: Int) -> Int {
+        return (self > high) ? high : (self < low ? low : self)
     }
 
     /// Determines whether the current value is in the appropriate range
@@ -188,44 +186,44 @@ extension Int {
     /// - parameter low: The lower bound value
     /// - parameter high: high The upper limit value
     /// - returns: Boolean on whether the value is within the range of the limits.
-    public func inRange(_ low:Int, _ high:Int) -> Bool {
-        return (low <= self && self <= high )
+    public func inRange(_ low: Int, _ high: Int) -> Bool {
+        return (low <= self && self <= high)
     }
 
     /// Returns the start IndexPath of the section interpreted by the integer.
     ///
     ///     2.sectionPath // IndexPath(row: 0, section: 2)
     ///
-    public var sectionPath:IndexPath {
+    public var sectionPath: IndexPath {
         return IndexPath(row: 0, section: self)
     }
-    
+
     /// Returns an IndexPath using the integer as a row number, in a specific section.
     ///
     /// - parameter section: The section number. Default is 0.
     /// - returns: An IndexPath with the integer as row in provided section.
-    public func row(inSection section:Int = 0) -> IndexPath {
+    public func row(inSection section: Int = 0) -> IndexPath {
         return IndexPath(row: Int(self), section: section)
     }
-    
+
     /// Alias for `row(inSection: 0)`. Returns an IndexPath using the integer as a row number.
-    public var row:IndexPath {
+    public var row: IndexPath {
         return row(inSection: 0)
     }
-    
+
     /**
      Breaks the total number of seconds into groupings of hours, minutes and remaining seconds.
      ````
      9999.secondsDecompose
      // => (hours 2, minutes 46, seconds 39)
-     
+
      parts.hours // 2
      parts.minutes // 46
      parts.seconds // 39
-     
+
      ````
      */
-    public var secondsDecompose:(hours: Int, minutes: Int, seconds: Int) {
+    public var secondsDecompose: (hours: Int, minutes: Int, seconds: Int) {
         let secs = self
         let hours = secs / 3600
         let minutes = (secs % 3600) / 60
@@ -237,7 +235,6 @@ extension Int {
     public var secondsToClockFormat: String {
         return Double(self).secondsToClockFormat
     }
-    
 }
 
 extension FloatingPoint {
@@ -250,10 +247,10 @@ extension FloatingPoint {
     public var degreesToRadians: Self { return self * .pi / 180 }
     /// Turns the number from radians into a degree value
     public var radiansToDegrees: Self { return self * 180 / .pi }
-    
 }
 
 // MARK: Double extensions
+
 extension Double {
     /// Round to a specific number of decimal places.
     /// ```
@@ -264,7 +261,7 @@ extension Double {
         let divisor = pow(10.0, Double(decimalPlaces))
         return (self * divisor).rounded() / divisor
     }
-    
+
     /// Return the radian value using the number as degrees.
     ///
     /// You can also use the degree symbol using (Option + Shift + 8).
@@ -272,49 +269,46 @@ extension Double {
     ///    35.degress == 35°
     /// ```
     public var degrees: CGFloat { return CGFloat(self * .pi / 180.0) }
-    
+
     /**
-     Breaks the total number of seconds into groupings of hours, minutes and remaining seconds.
-    ````
-     let seconds = 9999.3
-     let parts = seconds.secondsDecompose
-     // => (hours 2, minutes 46, seconds 39)
-     
-     parts.hours // 2
-     parts.minutes // 46
-     parts.seconds // 39
-     
-    ````
-    */
-    public var secondsDecompose:(hours: Int, minutes: Int, seconds: Int) {
+      Breaks the total number of seconds into groupings of hours, minutes and remaining seconds.
+     ````
+      let seconds = 9999.3
+      let parts = seconds.secondsDecompose
+      // => (hours 2, minutes 46, seconds 39)
+
+      parts.hours // 2
+      parts.minutes // 46
+      parts.seconds // 39
+
+     ````
+     */
+    public var secondsDecompose: (hours: Int, minutes: Int, seconds: Int) {
         return Int(self).secondsDecompose
     }
-    
+
     /// Returns the number of bytes expressed using current value as MBs.
-    public var MBs: Double { return self * 1_024 * 1_024 }
-    
+    public var MBs: Double { return self * 1024 * 1024 }
+
     /// Returns a random Double value less than the current value.
-    public var random:Double {
+    public var random: Double {
         return Double(arc4random_uniform(UInt32(self)))
     }
 
-    
     /// Convert the amount to meters if we intepret it as miles.
     public var milesToMeters: Double {
-        return 1609.0*self
+        return 1609.0 * self
     }
 
-    
     /// Returns time as a set of hours, minutes and seconds separated by ':' (ex "01:55").
     ///
     ///    9999.3.secondsToClockFormat // "2:46:39"
     ///    458.secondsToClockFormat // "7:38"
     public var secondsToClockFormat: String {
-
-        if self.isNaN || self.isInfinite {
+        if isNaN || isInfinite {
             return "0:00"
         }
-        let seconds = Int(self.truncatingRemainder(dividingBy: 60))
+        let seconds = Int(truncatingRemainder(dividingBy: 60))
         let minutes = Int((self / 60).truncatingRemainder(dividingBy: 60))
         let hours = Int(self / 3600)
         let secondsString = String.localizedStringWithFormat("%02d", abs(seconds))
@@ -324,16 +318,15 @@ extension Double {
         }
         return "\(minutes):\(secondsString)"
     }
-
 }
 
 // MARK: Optional extensions
-extension Optional {
 
+extension Optional {
     /// Returns true if the optional can unwrap to a value
-    public var hasValue:Bool {
+    public var hasValue: Bool {
         switch self {
-        case .some(_):
+        case .some:
             return true
         case _:
             return false
@@ -341,7 +334,7 @@ extension Optional {
     }
 
     /// Returns true if the optional is .None (nil)
-    public var isNil:Bool {
+    public var isNil: Bool {
         switch self {
         case .none:
             return true
@@ -351,11 +344,9 @@ extension Optional {
     }
 }
 
-
 // MARK: String extensions
-extension String {
 
-    
+extension String {
     /// Return only the digits (concatenated) of the string.
     /// ## Example
     ///     "(123) 210-1981".digits // => 1232101981
@@ -364,7 +355,7 @@ extension String {
         return components(separatedBy: CharacterSet.decimalDigits.inverted)
             .joined()
     }
-    
+
     /// Returns whether the string is a valid email address.
     /// It currently uses this regular expression:
     ///
@@ -372,28 +363,28 @@ extension String {
     public var isValidEmail: Bool {
         // print("validate calendar: \(testStr)")
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}"
-        
-        let emailTest = NSPredicate(format:"SELF MATCHES %@", emailRegEx)
+
+        let emailTest = NSPredicate(format: "SELF MATCHES %@", emailRegEx)
         return emailTest.evaluate(with: self)
     }
-    
+
     /// Removes whitespace from both ends of a string using `CharacterSet.whitespacesAndNewlines`
-    public var trimmed:String {
+    public var trimmed: String {
         return trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
 
     /// Creates a URL object from the contents of the string
-    public var url:URL? {
+    public var url: URL? {
         return URL(string: self)
     }
 
     /// Creates a file URL object from the contents of the string
-    public var fileUrl:URL? {
+    public var fileUrl: URL? {
         return URL(fileURLWithPath: self)
     }
 
     /// Returns the first character in the string.
-    public var first:String {
+    public var first: String {
         return String(self[startIndex])
     }
 
@@ -403,7 +394,7 @@ extension String {
     }
 
     /// Returns a trimmed non-blank string if availble
-    public var sanitized:String? {
+    public var sanitized: String? {
         let t = trimmed
         return t.isEmpty ? nil : t
     }
@@ -417,16 +408,16 @@ extension String {
     public var uppercasingFirst: String {
         return prefix(1).uppercased() + dropFirst()
     }
-    
+
     /// Remove characters from the string contained in the character set.
     ///
     /// - Parameter forbiddenChars: The characters to remove
     /// - Returns: A string not containing the characters in the set.
     public func removeCharacters(from forbiddenChars: CharacterSet) -> String {
-        let passed = self.unicodeScalars.filter { !forbiddenChars.contains($0) }
+        let passed = unicodeScalars.filter { !forbiddenChars.contains($0) }
         return String(String.UnicodeScalarView(passed))
     }
-    
+
     /// Remove a set of characters from a string.
     /// ## Example
     ///
@@ -445,6 +436,7 @@ extension String {
     public var isPresent: Bool {
         return !isEmpty
     }
+
     /// Returns utf8 encoded data.
     public var utf8Data: Data? {
         return data(using: .utf8)
@@ -452,7 +444,6 @@ extension String {
 }
 
 extension String {
-    
     /// Return the recommended height required to render the text given a width constraint and UIFont.
     ///
     /// - parameter width: The maximum width allowed to contain the text.
@@ -461,10 +452,10 @@ extension String {
     public func height(withConstrainedWidth width: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingBox = (self as NSString).boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        
+
         return boundingBox.height
     }
-    
+
     /// Return the recommended width required to render the text given a height constraint and UIFont.
     ///
     /// - parameter height: The maximum height allowed to contain the text.
@@ -473,7 +464,7 @@ extension String {
     public func width(withConstraintedHeight height: CGFloat, font: UIFont) -> CGFloat {
         let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
         let boundingBox = (self as NSString).boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: font], context: nil)
-        
+
         return boundingBox.width
     }
 }
@@ -486,10 +477,10 @@ extension NSAttributedString {
     public func height(withConstrainedWidth width: CGFloat) -> CGFloat {
         let constraintRect = CGSize(width: width, height: .greatestFiniteMagnitude)
         let boundingBox = boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, context: nil)
-        
+
         return boundingBox.height
     }
-    
+
     /// Return the recommended width required to render the attributed text given a height constraint.
     ///
     /// - parameter height: The maximum height allowed to contain the text.
@@ -497,7 +488,7 @@ extension NSAttributedString {
     public func width(withConstrainedHeight height: CGFloat) -> CGFloat {
         let constraintRect = CGSize(width: .greatestFiniteMagnitude, height: height)
         let boundingBox = boundingRect(with: constraintRect, options: .usesLineFragmentOrigin, context: nil)
-        
+
         return boundingBox.width
     }
 }
@@ -507,25 +498,23 @@ extension Optional where Wrapped == String {
     public var isEmpty: Bool {
         return self?.isEmpty ?? true
     }
-    
+
     /// Returns true of the optional string is a non-empty string.
     public var isPresent: Bool {
         return !isEmpty
     }
 }
 
-extension Optional where Wrapped == Array<Any> {
-    
+extension Optional where Wrapped == [Any] {
     /// Returns true of the optional string is nil or the underlying value is an empty array.
     public var isEmpty: Bool {
         return self?.isEmpty ?? true
     }
-    
+
     /// Returns true of the optional string is a non-empty array.
     public var isPresent: Bool {
         return !isEmpty
     }
-
 }
 
 extension Optional where Wrapped == String {
@@ -536,34 +525,33 @@ extension Optional where Wrapped == String {
     }
 }
 
-
 extension String {
     /// Returns the string if it's not an empty string.
     public var presence: String? {
         let s = trimmed
         return s.isEmpty ? nil : s
     }
+
     /// Returns the current string in camel-case form.
     public var camelized: String {
         if isEmpty { return "" }
-        
-        let parts = self.components(separatedBy: CharacterSet.alphanumerics.inverted)
+
+        let parts = components(separatedBy: CharacterSet.alphanumerics.inverted)
         guard let firstPart = parts.first else { return self }
-        
+
         let first = String(describing: firstPart).downcasingFirst
         let rest = parts.dropFirst().map { String($0).uppercasingFirst }
-        
+
         return ([first] + rest).joined(separator: "")
     }
 }
-
 
 extension StringProtocol where Self: RangeReplaceableCollection {
     /// Returns a string with all whitespace and newlines removed.
     public var removingAllWhitespacesAndNewlines: Self {
         return filter { !$0.isNewline && !$0.isWhitespace }
     }
-    
+
     /// Removes all whitespace and newlines removed from the current string.
     public mutating func removeAllWhitespacesAndNewlines() {
         return removeAll { $0.isNewline || $0.isWhitespace }
