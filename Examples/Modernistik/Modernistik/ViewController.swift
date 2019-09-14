@@ -57,24 +57,24 @@ class ViewController: UITableViewController {
     }
 
     override func tableView(_: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let ds = data(for: section)
-        return ds.count
+        let dataSection = data(for: section)
+        return dataSection.count
     }
 
     override func tableView(_: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let ds = data(for: indexPath.section)
-        return ds.height(forRow: indexPath.row)
+        let dataSection = data(for: indexPath.section)
+        return dataSection.height(forRow: indexPath.row)
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         // select the right data source
-        let ds = data(for: indexPath.section)
-        return ds.cell(forRow: indexPath.row, in: tableView)
+        let dataSection = data(for: indexPath.section)
+        return dataSection.cell(forRow: indexPath.row, in: tableView)
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let ds = data(for: indexPath.section)
+        let dataSection = data(for: indexPath.section)
         // forward the call
-        ds.tableView(tableView, didSelectRow: indexPath.row)
+        dataSection.tableView(tableView, didSelectRow: indexPath.row)
     }
 }
