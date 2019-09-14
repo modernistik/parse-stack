@@ -26,5 +26,6 @@ let package = Package(
             dependencies: [],
             path: "Modernistik"
             ),
-    ]
+    ],
+    swiftLanguageVersions: [.v4, .v5]
 )
