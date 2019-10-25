@@ -206,3 +206,17 @@ extension CFTimeInterval {
         return (CFAbsoluteTimeGetCurrent() - self).roundTo(3)
     }
 }
+
+extension Set {
+    /// Return an array containing the elements of the Set
+    public var array: [Element] {
+        [Element](self)
+    }
+}
+
+extension Array where Element: Equatable {
+    /// Alias for `contains(value) == false`
+    public func missing(_ value: Element) -> Bool {
+        contains(value) == false
+    }
+}
