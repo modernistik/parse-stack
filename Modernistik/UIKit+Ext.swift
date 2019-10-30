@@ -75,6 +75,15 @@ extension UIApplication {
     }
 }
 
+extension UIEdgeInsets {
+    /// Return an inset where all sides are set to the same value.
+    /// - Parameter inset: The amount to inset
+    public static func all(_ inset: CGFloat) -> UIEdgeInsets {
+        UIEdgeInsets(top: inset, left: inset,
+                     bottom: inset, right: inset)
+    }
+}
+
 extension UIView {
     /// Creates a new UIView with a square frame and origin coordinates.
     ///
@@ -679,4 +688,33 @@ open class ModernPageController : UIPageViewController, ModernControllerConforma
     }
 
     open func updateInterface() {}
+}
+
+open
+class ModernStackViewController: ModernViewController {
+    let scrollView = UIScrollView(autolayout: true)
+    let stackView = ModernStackView(autolayout: true)
+
+    open override func viewDidLoad() {
+        super.viewDidLoad()
+        view.addSubview(scrollView)
+        scrollView.addSubview(stackView)
+        stackView.axis = .vertical
+    }
+
+    open override func setupConstraints() {
+        super.setupConstraints()
+        view.addConstraints(scrollView.constraintsPinned(toView: view))
+        view.addConstraints(stackView.constraintsPinned(toView: scrollView))
+        view.addConstraint(stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor,
+                                                            constant: -(scrollView.contentInset.left + scrollView.contentInset.right)))
+    }
+
+    open func addArrangedSubview(_ view: UIView) {
+        stackView.addArrangedSubview(view)
+    }
+
+    open func scrollTo(view: UIView) {
+        scrollView.scrollRectToVisible(view.frame, animated: true)
+    }
 }
