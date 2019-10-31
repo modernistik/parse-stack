@@ -139,7 +139,6 @@ extension UserDefaults {
         if d.object(forKey: key) == nil || d.bool(forKey: key) == false {
             flagged = true
             d.set(true, forKey: key)
-            d.synchronize()
         }
 
         return flagged
@@ -150,7 +149,6 @@ extension UserDefaults {
     /// - parameter key: The NSUserDefaults string key name.
     public class func resetFlag(forKey key: String) {
         standard.removeObject(forKey: key)
-        standard.synchronize()
     }
 }
 
