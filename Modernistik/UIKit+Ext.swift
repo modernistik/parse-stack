@@ -380,6 +380,9 @@ extension UIViewController {
         } else {
             navigationItem.rightBarButtonItem = buttonItem
         }
+        if let controller = self as? UIAdaptivePresentationControllerDelegate {
+            navController.presentationController?.delegate = controller
+        }
         return navController
     }
 }
