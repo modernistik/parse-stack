@@ -712,11 +712,15 @@ class ModernStackViewController: ModernViewController {
         view.addConstraint(stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor,
                                                             constant: -(scrollView.contentInset.left + scrollView.contentInset.right)))
     }
-
+    
+    /// Alias to add a view to the stackView.
+    /// - Parameter view: The view to add to the stack view.
     open func addArrangedSubview(_ view: UIView) {
         stackView.addArrangedSubview(view)
     }
-
+    
+    /// Scroll to a specific view which could be in the stack view.
+    /// - Parameter view: The view to scroll to.
     open func scrollTo(view: UIView) {
         scrollView.scrollRectToVisible(view.frame, animated: true)
     }
