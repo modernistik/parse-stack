@@ -2,7 +2,7 @@
 # * https://www.objc.io/issues/6-build-tools/travis-ci/
 # * https://github.com/supermarin/xcpretty#usage
 os: osx
-osx_image: xcode11.2
+osx_image: xcode11.3
 language: swift
 # cache: cocoapods
 podfile: Examples/Modernistik/Podfile
@@ -11,6 +11,6 @@ before_install:
 - pod install --project-directory=Examples/Modernistik
 - pod install --project-directory=Examples/TV
 script:
-- set -o pipefail && xcodebuild clean build -workspace Examples/TV/TV.xcworkspace -scheme 'TV' -destination 'platform=tvOS Simulator,name=Apple TV 4K' -sdk appletvsimulator13.2 | xcpretty -c
-- set -o pipefail && xcodebuild test -enableCodeCoverage YES -workspace Examples/Modernistik/Modernistik.xcworkspace -scheme Modernistik-Example -sdk iphonesimulator13.2 ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone 11,OS=13.2' | xcpretty
+- set -o pipefail && xcodebuild clean build -workspace Examples/TV/TV.xcworkspace -scheme 'TV' -destination 'platform=tvOS Simulator,name=Apple TV 4K' -sdk appletvsimulator | xcpretty -c
+- set -o pipefail && xcodebuild test -enableCodeCoverage YES -workspace Examples/Modernistik/Modernistik.xcworkspace -scheme Modernistik-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.3' | xcpretty
 - pod lib lint
