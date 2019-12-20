@@ -12,5 +12,5 @@ before_install:
 - pod install --project-directory=Examples/TV
 script:
 - set -o pipefail && xcodebuild clean build -workspace Examples/TV/TV.xcworkspace -scheme 'TV' -destination 'platform=tvOS Simulator,name=Apple TV 4K' -sdk appletvsimulator | xcpretty -c
-- set -o pipefail && xcodebuild test -enableCodeCoverage YES -workspace Examples/Modernistik/Modernistik.xcworkspace -scheme Modernistik-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.3' | xcpretty
+- set -o pipefail && xcodebuild test -enableCodeCoverage YES -workspace Examples/Modernistik/Modernistik.xcworkspace -scheme Modernistik-Example -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -destination 'platform=iOS Simulator,name=iPhone 11 Pro,OS=13.3' | xcpretty -c
 - pod lib lint
