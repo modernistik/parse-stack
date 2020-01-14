@@ -5,9 +5,9 @@
 //  Created by Anthony Persaud on 3/13/16.
 //
 
+import CoreLocation
 import Foundation
 import MapKit
-import CoreLocation
 
 extension MKMapView {
     /// Present the provided location in the map view area from a camera angle that is offset from there. The address argument is
@@ -25,7 +25,7 @@ extension MKMapView {
             }
         }
     }
-    
+
     /// Present the provided location in the map view area from a camera angle that is offset from there.
     /// - Parameter coordinate: The location to present in the map.
     /// - Parameter offsetDistance: The distance to offset the camera from the `coordinate`. (Default: 0.005)
@@ -38,12 +38,12 @@ extension MKMapView {
         let camera = MKMapCamera(lookingAtCenter: coordinate, fromEyeCoordinate: eyeCoordinate, eyeAltitude: altitude)
         setCamera(camera, animated: animated)
     }
-    
+
     /// Animates the current map camera around the current visible location.
     /// - note: You must have called `showcaseMap` to setup the camera before animating flyover.
     /// - Parameter duration: The duration of the animation
     /// - Parameter headingDistance: The amount of arc-distance to travel. 180 would be considered half way around.
-    public func animateFlyover(duration:TimeInterval = 120, headingDistance:CLLocationDirection = 90 ) {
+    public func animateFlyover(duration: TimeInterval = 120, headingDistance: CLLocationDirection = 90) {
         if let camera = self.camera.copy() as? MKMapCamera {
             UIView.animate(withDuration: duration, delay: 0,
                            options: [.curveEaseOut], animations: { () -> Void in
@@ -53,4 +53,3 @@ extension MKMapView {
         }
     }
 }
-

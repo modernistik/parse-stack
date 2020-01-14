@@ -352,6 +352,16 @@ extension UIView {
     }
 }
 
+extension UIView {
+    /// Ensures view is redrawn when being unhidden, and
+    /// prevents "stacking" isHidden count inside UIStackView.
+    public func set(hidden: Bool) {
+        if isHidden == hidden { return }
+        isHidden = hidden
+        setNeedsDisplay()
+    }
+}
+
 extension UIViewController {
     /// Shorthand for observing a notification in a UIViewController in the default NotificationCenter.
     ///
@@ -564,164 +574,23 @@ extension UICollectionView {
     }
 }
 
-open class ModernViewController: UIViewController, ModernControllerConformance {
-    private var needsSetupConstraints = true
+// MARK: Array NSLayoutConstraint extensions
 
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        view.setNeedsUpdateConstraints()
+extension Array where Element: NSLayoutConstraint {
+    /// Activates an array of NSLayoutConstraints
+    public func activate() {
+        NSLayoutConstraint.activate(self)
     }
 
-    open func setupConstraints() {}
-
-    open override func updateViewConstraints() {
-        if needsSetupConstraints {
-            needsSetupConstraints = false
-            setupConstraints()
-        }
-        // According to Apple's doc, it should be called as the final step in the
-        // implementation.
-        super.updateViewConstraints()
-    }
-
-    open func updateInterface() {}
-}
-
-open class ModernTableController: ModernViewController, UITableViewDataSource, UITableViewDelegate {
-    public let tableView = UITableView(autolayout: true)
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        view.addSubview(tableView)
-        ModernTableCell.register(with: tableView)
-        tableView.dataSource = self
-        tableView.delegate = self
-    }
-
-    open override func setupConstraints() {
-        var layoutConstraints = [
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ]
-
-        if #available(iOS 11.0, tvOS 11.0, *) {
-            layoutConstraints += [
-                tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ]
-        } else {
-            layoutConstraints += [
-                tableView.topAnchor.constraint(equalTo: view.topAnchor),
-                tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            ]
-        }
-        view.addConstraints(layoutConstraints)
-    }
-
-    open func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        return 0
-    }
-
-    open func tableView(_ tableView: UITableView, cellForRowAt _: IndexPath) -> UITableViewCell {
-        return ModernTableCell.dequeueReusableCell(in: tableView)
+    /// Deactivates an array of NSLayoutConstraints
+    public func deactivate() {
+        NSLayoutConstraint.deactivate(self)
     }
 }
 
-open class ModernCollectionController: ModernViewController, UICollectionViewDataSource, UICollectionViewDelegate {
-    public let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
-
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(collectionView)
-        ModernCollectionCell.register(with: collectionView)
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.backgroundColor = .clear
-        // Do any additional setup after loading the view.
-    }
-
-    open override func setupConstraints() {
-        var layoutConstraints = [
-            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ]
-        if #available(iOS 11.0, tvOS 11.0, *) {
-            layoutConstraints += [
-                collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            ]
-        } else {
-            layoutConstraints += [
-                collectionView.topAnchor.constraint(equalTo: view.topAnchor),
-                collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            ]
-        }
-        view.addConstraints(layoutConstraints)
-    }
-
-    open func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        return 0
-    }
-
-    open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return ModernCollectionCell.dequeueReusableCell(in: collectionView, for: indexPath)
-    }
-}
-
-open class ModernPageController : UIPageViewController, ModernControllerConformance {
-    private var needsSetupConstraints = true
-
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .white
-        view.setNeedsUpdateConstraints()
-    }
-
-    open func setupConstraints() {}
-
-    open override func updateViewConstraints() {
-        if needsSetupConstraints {
-            needsSetupConstraints = false
-            setupConstraints()
-        }
-        // According to Apple's doc, it should be called as the final step in the
-        // implementation.
-        super.updateViewConstraints()
-    }
-
-    open func updateInterface() {}
-}
-
-open
-class ModernStackViewController: ModernViewController {
-    let scrollView = UIScrollView(autolayout: true)
-    let stackView = ModernStackView(autolayout: true)
-
-    open override func viewDidLoad() {
-        super.viewDidLoad()
-        view.addSubview(scrollView)
-        scrollView.addSubview(stackView)
-        stackView.axis = .vertical
-    }
-
-    open override func setupConstraints() {
-        super.setupConstraints()
-        view.addConstraints(scrollView.constraintsPinned(toView: view))
-        view.addConstraints(stackView.constraintsPinned(toView: scrollView))
-        view.addConstraint(stackView.widthAnchor.constraint(equalTo: scrollView.widthAnchor,
-                                                            constant: -(scrollView.contentInset.left + scrollView.contentInset.right)))
-    }
-    
-    /// Alias to add a view to the stackView.
-    /// - Parameter view: The view to add to the stack view.
-    open func addArrangedSubview(_ view: UIView) {
-        stackView.addArrangedSubview(view)
-    }
-    
-    /// Scroll to a specific view which could be in the stack view.
-    /// - Parameter view: The view to scroll to.
-    open func scrollTo(view: UIView) {
-        scrollView.scrollRectToVisible(view.frame, animated: true)
+extension Array {
+    /// Returns true if index is inRange of 0 and the array's last index.
+    public func has(index: Int) -> Bool {
+        return index >= 0 && index.inRange(0, lastIndex)
     }
 }

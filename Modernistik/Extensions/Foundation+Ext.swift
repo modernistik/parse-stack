@@ -42,27 +42,6 @@ extension Bundle {
     }
 }
 
-// MARK: Array NSLayoutConstraint extensions
-
-extension Array where Element: NSLayoutConstraint {
-    /// Activates an array of NSLayoutConstraints
-    public func activate() {
-        NSLayoutConstraint.activate(self)
-    }
-
-    /// Deactivates an array of NSLayoutConstraints
-    public func deactivate() {
-        NSLayoutConstraint.deactivate(self)
-    }
-}
-
-extension Array {
-    /// Returns true if index is inRange of 0 and the array's last index.
-    public func has(index: Int) -> Bool {
-        return index >= 0 && index.inRange(0, lastIndex)
-    }
-}
-
 extension String {
     /// Uses the string as a NSLayoutConstraint visual format specification for constraints. For more information,
     /// see Auto Layout Cookbook in Auto Layout Guide.
@@ -216,5 +195,21 @@ extension Array where Element: Equatable {
     /// Alias for `contains(value) == false`
     public func missing(_ value: Element) -> Bool {
         contains(value) == false
+    }
+}
+
+extension ClosedRange {
+    public func clamp(value: Bound) -> Bound {
+        if value < lowerBound { return lowerBound }
+        if value > upperBound { return upperBound }
+        return value
+    }
+}
+
+extension Comparable {
+    public func clamp(in range: ClosedRange<Self>) -> Self {
+        if self < range.lowerBound { return range.lowerBound }
+        if self > range.upperBound { return range.upperBound }
+        return self
     }
 }

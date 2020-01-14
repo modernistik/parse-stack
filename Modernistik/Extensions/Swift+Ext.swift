@@ -592,4 +592,8 @@ extension Data {
     public var utf8String: String? {
         return String(data: self, encoding: .utf8)
     }
+
+    public var hexString: String {
+        map { String(format: "%02.2hhx", $0) }.joined()
+    }
 }
