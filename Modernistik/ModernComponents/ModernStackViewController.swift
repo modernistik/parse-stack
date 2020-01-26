@@ -10,8 +10,8 @@ import UIKit
 
 open
 class ModernStackViewController: ModernViewController {
-    let scrollView = UIScrollView(autolayout: true)
-    let stackView = ModernStackView(autolayout: true)
+    public let scrollView = UIScrollView(autolayout: true)
+    public let stackView = ModernStackView(autolayout: true)
 
     open override func viewDidLoad() {
         super.viewDidLoad()
