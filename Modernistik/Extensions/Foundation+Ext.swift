@@ -27,6 +27,22 @@ public typealias CompletionBlock = () -> Void
 // MARK: NSBundle
 
 extension Bundle {
+    /// A settings bundle key where to store the displayed app version.
+    public static let AppVersionSettingsKey = "AppVersionSettingsKey"
+    
+    /// This updates the settings key where the full app version is stored. This is useful when using the Settings bundle to
+    /// display the current app version. You can set a `Title` field your `Root.plist` of your `Settings.bundle` with the title `Version`, and set the identifier
+    /// to the value of `Bundle.AppVersionSettingsKey` (usually `AppVersionSettingsKey`). Calling this method, will then automatically update `UserDefaults`
+    /// with the new value, updating the visible version number to users in the Settings app.
+    public static func updateSettingsBundleAppVersion() {
+        UserDefaults.standard.set(appVersion, forKey: AppVersionSettingsKey)
+    }
+    
+    /// Returns the string `{releaseVersion}-{currentBuildVersion}`.
+    public static var appVersion: String {
+        return "\(releaseVersion)-\(currentBuildVersion)"
+    }
+    
     /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
     public static var releaseVersion: String {
         return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
