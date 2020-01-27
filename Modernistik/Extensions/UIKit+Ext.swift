@@ -62,6 +62,14 @@ extension UIDevice {
         current.isBatteryMonitoringEnabled = true
         return current.batteryState == .unplugged
     }
+    
+    public static var isSimulator: Bool {
+        #if targetEnvironment(simulator)
+            return true
+        #else
+            return false
+        #endif
+    }
 }
 
 extension UIApplication {
