@@ -229,3 +229,16 @@ extension Comparable {
         return self
     }
 }
+
+extension Encodable {
+    
+    /// Return the JSON encoded data for this object.
+    public var jsonData: Data? {
+        try? JSONEncoder().encode(self)
+    }
+    
+    /// Return a serialized JSON string representing this object.
+    public var jsonString: String? {
+        jsonData?.utf8String
+    }
+}
