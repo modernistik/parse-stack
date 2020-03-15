@@ -470,6 +470,16 @@ extension String {
     public var utf8Data: Data? {
         return data(using: .utf8)
     }
+    
+    /// Alias  of `contains() == false`
+    public func missing(_ character:Character) -> Bool {
+        contains(character) == false
+    }
+    
+    /// Alias  of `contains() == false`
+    public func missing<T: StringProtocol>(_ other:T) -> Bool {
+        contains(other) == false
+    }
 }
 
 extension String {
