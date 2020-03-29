@@ -24,13 +24,13 @@ Pod::Spec.new do |s|
 
   s.homepage         = 'https://github.com/modernistik/cocoa'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
-  s.license          = 'Proprietary'
+  s.license          = 'MIT'
   s.author           = { 'Modernistik' => 'contact@modernistik.com' }
   s.source           = { :git => 'https://github.com/modernistik/cocoa.git', :tag => s.version.to_s }
   s.social_media_url = 'https://www.modernistik.com'
 
 
-  s.swift_version = ['5.0','5.1']
+  s.swift_version = ['5.0','5.1', '5.2']
   s.ios.deployment_target = '10.0'
   s.tvos.deployment_target = '11.0'
   s.source_files = 'Modernistik/**/*'
@@ -45,7 +45,7 @@ Pod::Spec.new do |s|
   # }
 
   # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
+  s.frameworks = 'UIKit', 'Foundation'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
 # To publish `pod trunk push Modernistik.podspec`
