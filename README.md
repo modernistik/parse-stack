@@ -1,8 +1,8 @@
-![Modernistik Cocoa Framework](https://raw.githubusercontent.com/modernistik/cocoa/master/modernistik.png)
+![Modernistik Cocoa Framework](https://raw.githubusercontent.com/modernistik/Modernistik/master/modernistik.png)
 
 This framework represents extensions, utilities, design patterns and practices adopted for Modernistik software development in Swift.
 
-[![CI Status](https://img.shields.io/travis/modernistik/cocoa.svg?style=flat)](https://travis-ci.org/modernistik/cocoa)
+[![CI Status](https://img.shields.io/travis/modernistik/cocoa.svg?style=flat)](https://travis-ci.org/modernistik/Modernistik)
 [![Version](https://img.shields.io/cocoapods/v/Modernistik.svg?style=flat)](https://cocoapods.org/pods/Modernistik)
 [![License](https://img.shields.io/cocoapods/l/Modernistik.svg?style=flat)](https://cocoapods.org/pods/Modernistik)
 [![Platform](https://img.shields.io/cocoapods/p/Modernistik.svg?style=flat)](https://cocoapods.org/pods/Modernistik)
@@ -13,7 +13,6 @@ it, simply add the following line to your Podfile:
 
 ```ruby
 pod 'Modernistik', '~> 0.5' # Swift 5+
-pod 'Modernistik', '~> 0.4' # Swift 4.2+
 ```
 
 ## Examples

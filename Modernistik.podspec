@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Modernistik'
-  s.version          = '0.5.7'
+  s.version          = '0.6.0'
   s.summary          = 'Swift design patterns, sugars and extensions for Modernistik development.'
 
 # This description is used to generate tags and improve search results.
@@ -22,11 +22,11 @@ Pod::Spec.new do |s|
   of best practices and standard classes used when developing client applications in iOS, macOS and tvOS.
                        DESC
 
-  s.homepage         = 'https://github.com/modernistik/cocoa'
+  s.homepage         = 'https://github.com/modernistik/Modernistik'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = 'MIT'
   s.author           = { 'Modernistik' => 'contact@modernistik.com' }
-  s.source           = { :git => 'https://github.com/modernistik/cocoa.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/modernistik/Modernistik.git', :tag => s.version.to_s }
   s.social_media_url = 'https://www.modernistik.com'
 
 

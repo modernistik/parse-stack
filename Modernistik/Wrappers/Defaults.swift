@@ -27,11 +27,7 @@ public struct Defaults<Value> {
             storage.object(forKey: key) as? Value ?? defaultValue
         }
         set {
-            if newValue == nil {
-                storage.removeObject(forKey: key)
-            } else {
-                storage.set(newValue, forKey: key)
-            }
+            storage.set(newValue, forKey: key)
         }
     }
 }
