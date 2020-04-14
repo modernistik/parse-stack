@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Modernistik'
-  s.version          = '0.6.0'
+  s.version          = '0.6.1'
   s.summary          = 'Swift design patterns, sugars and extensions for Modernistik development.'
 
 # This description is used to generate tags and improve search results.
@@ -48,6 +48,6 @@ Pod::Spec.new do |s|
   s.frameworks = 'UIKit', 'Foundation'
   # s.dependency 'AFNetworking', '~> 2.3'
 end
-# To publish `pod trunk push Modernistik.podspec`
+# To publish `pod trunk push Modernistik.podspec --allow-warnings`
 # https://guides.cocoapods.org/making/getting-setup-with-trunk.html
 # Register a new authentication token: pod trunk register <email> '<name>' --description='Macbook'

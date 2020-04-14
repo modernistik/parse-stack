@@ -154,8 +154,8 @@ public protocol SectionDataSource: AnyObject {
 
 extension SectionDataSource {
     /// Alias for `count`.
-    public var numberOfRows: Int { return count }
-    public func height(forRow _: Int) -> CGFloat { return UITableView.automaticDimension }
+    public var numberOfRows: Int { count }
+    public func height(forRow _: Int) -> CGFloat { UITableView.automaticDimension }
     public func selected(row _: Int, in _: UITableView) {}
     public func selected(accessoryRow _: Int, in _: UITableView) {}
     public func tableView(_ tableView: UITableView, didSelectRow row: Int) { selected(row: row, in: tableView) }
@@ -174,7 +174,7 @@ public protocol SectionIndexType: RawRepresentable, IntRepresentable {
 
 extension SectionIndexType {
     public var title: String {
-        return String(describing: self)
+        String(describing: self)
     }
 }
 
@@ -185,14 +185,14 @@ extension SectionIndexType {
 public final
 class EmptySectionDataSource: SectionDataSource {
     public init() {}
-    public var count: Int { return 0 }
+    public var count: Int { 0 }
     public func configure(with tableView: UITableView) {
         ModernTableCell.register(with: tableView)
     }
 
-    public func height(forRow _: Int) -> CGFloat { return UITableView.automaticDimension }
+    public func height(forRow _: Int) -> CGFloat { UITableView.automaticDimension }
     public func cell(forRow _: Int, in tableView: UITableView) -> UITableViewCell {
-        return ModernTableCell.dequeueReusableCell(in: tableView)
+        ModernTableCell.dequeueReusableCell(in: tableView)
     }
 }
 
@@ -206,6 +206,6 @@ public protocol CollectionDataSource: AnyObject {
 
 extension CollectionDataSource {
     /// Alias for `count`.
-    public var numberOfItems: Int { return count }
+    public var numberOfItems: Int { count }
     public func selectedItem(at _: IndexPath, in _: UICollectionView) {}
 }

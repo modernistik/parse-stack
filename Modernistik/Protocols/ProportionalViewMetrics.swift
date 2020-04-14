@@ -60,20 +60,20 @@ public protocol ProportionalViewMetrics {
 extension ProportionalViewMetrics {
     /// The ratio between width and height of the view. To calculate the height
     /// we would divide the width by the aspectRatio (width/height).
-    public static var aspectRatio: CGFloat { return 1 }
+    public static var aspectRatio: CGFloat { 1 }
     /// Returns `1/aspectRatio` (height/width).
-    public static var inverseAspectRatio: CGFloat { return 1 / aspectRatio }
+    public static var inverseAspectRatio: CGFloat { 1 / aspectRatio }
     /// The ratio between width and height of the view. To calculate the height
     /// we would divide the width by the aspectRatio (width/height).
     public static var recommendedHeight: CGFloat {
-        return UIScreen.main.bounds.width / aspectRatio
+        UIScreen.main.bounds.width / aspectRatio
     }
 
     /// The recommended height for the given with, with respect to the current
     /// aspectRatio (width/height).
     /// - parameter width: The width to use to calculate the height.
     public static func recommendedHeight(forWidth width: CGFloat) -> CGFloat {
-        return width / aspectRatio
+        width / aspectRatio
     }
 
     /// Returns a size with a recommended height based on the supplied width.
@@ -83,6 +83,6 @@ extension ProportionalViewMetrics {
     /// ```
     /// - parameter width: The width to use to calculate the height.
     public static func recommendedSize(forWidth width: CGFloat) -> CGSize {
-        return CGSize(width: width, height: recommendedHeight(forWidth: width))
+        CGSize(width: width, height: recommendedHeight(forWidth: width))
     }
 }

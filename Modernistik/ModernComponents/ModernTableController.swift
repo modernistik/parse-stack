@@ -39,10 +39,10 @@ open class ModernTableController: ModernViewController, UITableViewDataSource, U
     }
 
     open func tableView(_: UITableView, numberOfRowsInSection _: Int) -> Int {
-        return 0
+        0
     }
 
     open func tableView(_ tableView: UITableView, cellForRowAt _: IndexPath) -> UITableViewCell {
-        return ModernTableCell.dequeueReusableCell(in: tableView)
+        ModernTableCell.dequeueReusableCell(in: tableView)
     }
 }

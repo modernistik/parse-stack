@@ -89,19 +89,19 @@ open class ConcurrentOperation: Operation {
     }
 
     open override var isReady: Bool {
-        return super.isReady && state == .ready
+        super.isReady && state == .ready
     }
 
     open override var isExecuting: Bool {
-        return state == .executing
+        state == .executing
     }
 
     open override var isFinished: Bool {
-        return state == .finished
+        state == .finished
     }
 
     open override var isAsynchronous: Bool {
-        return true
+        true
     }
 
     public convenience init(task: @escaping ConcurrentOperationBlock) {

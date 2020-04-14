@@ -30,7 +30,7 @@ extension Sequence where Iterator.Element: RawRepresentable {
      - returns: An array of rawValues based on enum RawRepresentable type.
      */
     public var rawValues: [Iterator.Element.RawValue] {
-        return map { $0.rawValue }
+        map { $0.rawValue }
     }
 }
 
@@ -50,7 +50,7 @@ extension Equatable {
     /// against 1 item type, it is recommended using the `==` operator instead.
     /// - parameter items: A variable list of items to check against.
     public func any(of items: Self...) -> Bool {
-        return items.contains(self)
+        items.contains(self)
     }
 }
 
@@ -58,7 +58,7 @@ extension Set {
     /// True if any of the items are inside the set.
     /// - parameter enums: A variable list of enums to check against.
     public func contains(any items: Element...) -> Bool {
-        return intersection(items).isEmpty == false
+        intersection(items).isEmpty == false
     }
 }
 
@@ -79,7 +79,7 @@ extension Int: IntegerInitializable {
     /// - parameter lhs: The integer to interpret as an angle.
     /// - returns: the number of radians
     public static postfix func ° (lhs: Int) -> CGFloat {
-        return CGFloat(lhs) * .pi / 180
+        CGFloat(lhs) * .pi / 180
     }
 }
 
@@ -92,7 +92,7 @@ extension Double: IntegerInitializable {
     /// - parameter lhs: The integer to interpret as an angle.
     /// - returns: the number of radians
     public static postfix func ° (lhs: Double) -> CGFloat {
-        return CGFloat(lhs) * .pi / 180
+        CGFloat(lhs) * .pi / 180
     }
 }
 
@@ -133,12 +133,12 @@ extension Array {
 
     /// Returns the last possible index of the Array
     public var lastIndex: Int {
-        return count - 1
+        count - 1
     }
 
     /// Returns whether there are values in the array: (eg. `!isEmpty`).
     public var hasItems: Bool {
-        return !isEmpty
+        !isEmpty
     }
 }
 
@@ -164,22 +164,22 @@ extension Int {
     /// ```
     ///    35.degress == 35°
     /// ```
-    public var degreesToRadians: CGFloat { return CGFloat(self) * .pi / 180.0 }
+    public var degreesToRadians: CGFloat { CGFloat(self) * .pi / 180.0 }
 
     /// Returns the number of meters based on the miles provided
     public var milesToMeters: Int {
-        return 1609 * self
+        1609 * self
     }
 
     /// Returns the number of bytes expressed using current value as MBs.
-    public var MBs: Int { return self * 1024 * 1024 }
+    public var MBs: Int { self * 1024 * 1024 }
 
     /// Returns a random integer less than the current value.
     ///
     ///     30.random // => 5
     ///     30.random // => 22
     public var random: Int {
-        return Int(arc4random_uniform(UInt32(self)))
+        Int(arc4random_uniform(UInt32(self)))
     }
 
     /// Returns the current value unless it is outside one of the limit boundaries. In that case it returns that closest limit boundary.
@@ -188,7 +188,7 @@ extension Int {
     /// - parameter high: The higher limit boundary
     /// - returns: A value that is in range of the provided limits
     public func clamp(_ low: Int, _ high: Int) -> Int {
-        return (self > high) ? high : (self < low ? low : self)
+        (self > high) ? high : (self < low ? low : self)
     }
 
     /// Determines whether the current value is in the appropriate range
@@ -197,7 +197,7 @@ extension Int {
     /// - parameter high: high The upper limit value
     /// - returns: Boolean on whether the value is within the range of the limits.
     public func inRange(_ low: Int, _ high: Int) -> Bool {
-        return (low <= self && self <= high)
+        (low <= self && self <= high)
     }
 
     /// Returns the start IndexPath of the section interpreted by the integer.
@@ -205,7 +205,7 @@ extension Int {
     ///     2.sectionPath // IndexPath(row: 0, section: 2)
     ///
     public var sectionPath: IndexPath {
-        return IndexPath(row: 0, section: self)
+        IndexPath(row: 0, section: self)
     }
 
     /// Returns an IndexPath using the integer as a row number, in a specific section.
@@ -213,12 +213,12 @@ extension Int {
     /// - parameter section: The section number. Default is 0.
     /// - returns: An IndexPath with the integer as row in provided section.
     public func row(inSection section: Int = 0) -> IndexPath {
-        return IndexPath(row: Int(self), section: section)
+        IndexPath(row: Int(self), section: section)
     }
 
     /// Alias for `row(inSection: 0)`. Returns an IndexPath using the integer as a row number.
     public var row: IndexPath {
-        return row(inSection: 0)
+        row(inSection: 0)
     }
 
     /**
@@ -243,7 +243,7 @@ extension Int {
 
     /// Returns time as a set of hours, minutes and seconds separated by ':' (ex "01:55").
     public var secondsToClockFormat: String {
-        return Double(self).secondsToClockFormat
+        Double(self).secondsToClockFormat
     }
 }
 
@@ -254,9 +254,9 @@ extension FloatingPoint {
     /// ```
     ///    35.degress == 35°
     /// ```
-    public var degreesToRadians: Self { return self * .pi / 180 }
+    public var degreesToRadians: Self { self * .pi / 180 }
     /// Turns the number from radians into a degree value
-    public var radiansToDegrees: Self { return self * 180 / .pi }
+    public var radiansToDegrees: Self { self * 180 / .pi }
 }
 
 // MARK: Double extensions
@@ -278,7 +278,7 @@ extension Double {
     /// ```
     ///    35.degress == 35°
     /// ```
-    public var degrees: CGFloat { return CGFloat(self * .pi / 180.0) }
+    public var degrees: CGFloat { CGFloat(self * .pi / 180.0) }
 
     /**
       Breaks the total number of seconds into groupings of hours, minutes and remaining seconds.
@@ -298,16 +298,16 @@ extension Double {
     }
 
     /// Returns the number of bytes expressed using current value as MBs.
-    public var MBs: Double { return self * 1024 * 1024 }
+    public var MBs: Double { self * 1024 * 1024 }
 
     /// Returns a random Double value less than the current value.
     public var random: Double {
-        return Double(arc4random_uniform(UInt32(self)))
+        Double(arc4random_uniform(UInt32(self)))
     }
 
     /// Convert the amount to meters if we intepret it as miles.
     public var milesToMeters: Double {
-        return 1609.0 * self
+        1609.0 * self
     }
 
     /// Returns time as a set of hours, minutes and seconds separated by ':' (ex "01:55").
@@ -345,7 +345,7 @@ extension Double {
 extension Substring {
     /// Recast substring as string
     public var string: String? {
-        return String(self)
+        String(self)
     }
 }
 
@@ -381,7 +381,7 @@ extension String {
     ///     "(123) 210-1981".digits // => 1232101981
     ///     "ABC123DEF456".digits // => 123456
     public var digits: String {
-        return components(separatedBy: CharacterSet.decimalDigits.inverted)
+        components(separatedBy: CharacterSet.decimalDigits.inverted)
             .joined()
     }
 
@@ -399,27 +399,27 @@ extension String {
 
     /// Removes whitespace from both ends of a string using `CharacterSet.whitespacesAndNewlines`
     public var trimmed: String {
-        return trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
 
     /// Creates a URL object from the contents of the string
     public var url: URL? {
-        return URL(string: self)
+        URL(string: self)
     }
 
     /// Creates a file URL object from the contents of the string
     public var fileUrl: URL? {
-        return URL(fileURLWithPath: self)
+        URL(fileURLWithPath: self)
     }
 
     /// Returns the first character in the string.
     public var first: String {
-        return String(self[startIndex])
+        String(self[startIndex])
     }
 
     /// Returns the last character in the string
     public var last: String {
-        return String(self[index(before: endIndex)])
+        String(self[index(before: endIndex)])
     }
 
     /// Returns a trimmed non-blank string if availble
@@ -430,12 +430,12 @@ extension String {
 
     /// Returns the current string with the first letter in lowercase.
     public var downcasingFirst: String {
-        return prefix(1).lowercased() + dropFirst()
+        prefix(1).lowercased() + dropFirst()
     }
 
     /// Returns the current string with the first letter in uppercase.
     public var uppercasingFirst: String {
-        return prefix(1).uppercased() + dropFirst()
+        prefix(1).uppercased() + dropFirst()
     }
 
     /// Remove characters from the string contained in the character set.
@@ -458,26 +458,26 @@ extension String {
     /// - Parameter chartSet: A string containing the characters to remove
     /// - Returns: A string not containing characters in the input string.
     public func removeCharacters(from chartSet: String) -> String {
-        return removeCharacters(from: CharacterSet(charactersIn: chartSet))
+        removeCharacters(from: CharacterSet(charactersIn: chartSet))
     }
 
     /// Returns true if this is a non-empty string.
     public var isPresent: Bool {
-        return !isEmpty
+        !isEmpty
     }
 
     /// Returns utf8 encoded data.
     public var utf8Data: Data? {
-        return data(using: .utf8)
+        data(using: .utf8)
     }
-    
+
     /// Alias  of `contains() == false`
-    public func missing(_ character:Character) -> Bool {
+    public func missing(_ character: Character) -> Bool {
         contains(character) == false
     }
-    
+
     /// Alias  of `contains() == false`
-    public func missing<T: StringProtocol>(_ other:T) -> Bool {
+    public func missing<T: StringProtocol>(_ other: T) -> Bool {
         contains(other) == false
     }
 }
@@ -535,24 +535,24 @@ extension NSAttributedString {
 extension Optional where Wrapped == String {
     /// Returns true of the optional string is nil or the underlying value is an empty string.
     public var isEmpty: Bool {
-        return self?.isEmpty ?? true
+        self?.isEmpty ?? true
     }
 
     /// Returns true of the optional string is a non-empty string.
     public var isPresent: Bool {
-        return !isEmpty
+        !isEmpty
     }
 }
 
 extension Optional where Wrapped == [Any] {
     /// Returns true of the optional string is nil or the underlying value is an empty array.
     public var isEmpty: Bool {
-        return self?.isEmpty ?? true
+        self?.isEmpty ?? true
     }
 
     /// Returns true of the optional string is a non-empty array.
     public var isPresent: Bool {
-        return !isEmpty
+        !isEmpty
     }
 }
 
@@ -588,19 +588,19 @@ extension String {
 extension StringProtocol where Self: RangeReplaceableCollection {
     /// Returns a string with all whitespace and newlines removed.
     public var removingAllWhitespacesAndNewlines: Self {
-        return filter { !$0.isNewline && !$0.isWhitespace }
+        filter { !$0.isNewline && !$0.isWhitespace }
     }
 
     /// Removes all whitespace and newlines removed from the current string.
     public mutating func removeAllWhitespacesAndNewlines() {
-        return removeAll { $0.isNewline || $0.isWhitespace }
+        removeAll { $0.isNewline || $0.isWhitespace }
     }
 }
 
 extension Data {
     /// Returns a string representation of the data in UTF-8 encoding.
     public var utf8String: String? {
-        return String(data: self, encoding: .utf8)
+        String(data: self, encoding: .utf8)
     }
 
     public var hexString: String {

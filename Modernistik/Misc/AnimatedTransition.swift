@@ -10,10 +10,10 @@ import UIKit
 open class AnimatedTransition: NSObject, UIViewControllerAnimatedTransitioning, UIViewControllerTransitioningDelegate {
     open weak var activeTransitionContext: UIViewControllerContextTransitioning?
     open var isReversed = false
-    open var duration: TimeInterval { return 0.5 }
+    open var duration: TimeInterval { 0.5 }
 
     open func transitionDuration(using _: UIViewControllerContextTransitioning?) -> TimeInterval {
-        return duration
+        duration
     }
 
     open func animateTransition(using transitionContext: UIViewControllerContextTransitioning) {

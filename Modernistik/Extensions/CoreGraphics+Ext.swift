@@ -8,14 +8,14 @@ import UIKit.UIColor
 extension CGColor {
     /// Converts a CGColor to a UIColor instance.
     public var color: UIColor {
-        return UIColor(cgColor: self)
+        UIColor(cgColor: self)
     }
 }
 
 extension CGFloat {
     /// Same as Double.pi / 2 or M_PI_2
     public static var pi_2: CGFloat {
-        return .pi / 2
+        .pi / 2
     }
 
     /// Round to a specific number of decimal places.
@@ -24,7 +24,7 @@ extension CGFloat {
     /// ```
     /// - parameter decimalPlaces: The number decimal places to keep.
     public func roundTo(_ decimalPlaces: Int) -> CGFloat {
-        return CGFloat(Double(self).roundTo(decimalPlaces))
+        CGFloat(Double(self).roundTo(decimalPlaces))
     }
 }
 
@@ -34,7 +34,7 @@ extension CGPoint {
     /// - parameter x: The new x-coordinate valud
     /// - returns: A CGPoint with the x coordinate modified
     public func with(x: CGFloat) -> CGPoint {
-        return CGPoint(x: x, y: y)
+        CGPoint(x: x, y: y)
     }
 
     /// Returns a copy with the y value changed.
@@ -42,7 +42,7 @@ extension CGPoint {
     /// - parameter y: The new y-coordinate valud
     /// - returns: A CGPoint with the y coordinate modified
     public func with(y: CGFloat) -> CGPoint {
-        return CGPoint(x: x, y: y)
+        CGPoint(x: x, y: y)
     }
 
     /// Returns the distance to another point.
@@ -50,7 +50,7 @@ extension CGPoint {
     /// - parameter point: The target point to use for calculation.
     /// - returns: The distance to target point from current one.
     public func distance(to point: CGPoint) -> CGFloat {
-        return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
+        sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
     }
 }
 
@@ -62,7 +62,7 @@ extension CGSize {
     /// - parameter size: the dimension of each side (width and height)
     /// - returns: A new CGSize with equal width and height
     public static func square(_ size: CGFloat) -> CGSize {
-        return CGSize(width: size, height: size)
+        CGSize(width: size, height: size)
     }
 
     /// Returns a square size based on the provided size.
@@ -83,7 +83,7 @@ extension CGSize {
     ///   // CGRect x,y = {0,0} width,height = {80,80}
     /// ```
     public var rect: CGRect {
-        return CGRect(width: width, height: height)
+        CGRect(width: width, height: height)
     }
 
     /// Returns a new size that proportionally fits within the provided size.
@@ -108,22 +108,22 @@ extension CGRect {
     ///     rect.size.width == 50 // true
     /// - returns: A new rect rotated 90 degrees from anchor point.
     public var pivoted: CGRect {
-        return with(width: height, height: width)
+        with(width: height, height: width)
     }
 
     /// Returns true if `width > height`
     public var isHorizontal: Bool {
-        return width >= height
+        width >= height
     }
 
     /// Returns true if `width < height`
     public var isVertical: Bool {
-        return width <= height
+        width <= height
     }
 
     /// Returns true if `width == height`
     public var isSquare: Bool {
-        return width == height
+        width == height
     }
 
     /// Returns a square rect based on the provided size setting the coordinates to origin.
@@ -132,7 +132,7 @@ extension CGRect {
     /// - parameter size: The dimensions for width and height.
     /// - returns: A new rect with origin coordinates and equal sides.
     public static func square(_ size: CGFloat) -> CGRect {
-        return CGRect(x: 0, y: 0, width: size, height: size)
+        CGRect(x: 0, y: 0, width: size, height: size)
     }
 
     /// Returns a CGRect with square sides with origin coordinates.
@@ -175,7 +175,7 @@ extension CGRect {
     /// Returns a rect for an inscribed square using the rect's shortest side.
     /// Alias for `squareInset(size: shortest)`.
     public var square: CGRect {
-        return squareInset(size: shortest)
+        squareInset(size: shortest)
     }
 
     /**
@@ -207,12 +207,12 @@ extension CGRect {
 
     /// returns half the value of the shortest side. Useful for when calculating corner radius
     public var half: CGFloat {
-        return shortest / 2.0
+        shortest / 2.0
     }
 
     /// Get the center point of this rect. Useful when needing to center two views together.
     public var center: CGPoint {
-        return CGPoint(
+        CGPoint(
             x: origin.x + width / 2.0,
             y: origin.y + height / 2.0
         )
@@ -220,7 +220,7 @@ extension CGRect {
 
     /// Alias for origin.x.
     public var left: CGFloat {
-        get { return minX }
+        get { minX }
         set { origin.x = newValue }
     }
 
@@ -246,13 +246,13 @@ extension CGRect {
      ````
      */
     public var right: CGFloat {
-        get { return maxX }
+        get { maxX }
         set { origin.x = newValue - width }
     }
 
     /// Alias for `minY`, however it can be set to modify the `origin.y`.
     public var top: CGFloat {
-        get { return minY }
+        get { minY }
         set { origin.y = newValue }
     }
 
@@ -279,7 +279,7 @@ extension CGRect {
      ````
      */
     public var bottom: CGFloat {
-        get { return maxY }
+        get { maxY }
         set { origin.y = newValue - height }
     }
 
@@ -288,7 +288,7 @@ extension CGRect {
     /// - parameter width: The new width value.
     /// - returns: a new CGRect with the modified width.
     public func with(width: CGFloat, height: CGFloat? = nil) -> CGRect {
-        return CGRect(x: origin.x, y: origin.y, width: width, height: height ?? size.height)
+        CGRect(x: origin.x, y: origin.y, width: width, height: height ?? size.height)
     }
 
     /// Returns a new CGRect with the modified height
@@ -296,7 +296,7 @@ extension CGRect {
     /// - parameter height: The new height value.
     /// - returns: a new CGRect with the modified height.
     public func with(height: CGFloat) -> CGRect {
-        return CGRect(x: origin.x, y: origin.y, width: size.width, height: height)
+        CGRect(x: origin.x, y: origin.y, width: size.width, height: height)
     }
 
     /// Returns a new CGRect with only the origin (both x and y) modified.
@@ -306,14 +306,14 @@ extension CGRect {
     /// - parameter y: The new y coordinate.
     /// - returns: a new CGRect with the modified coordinates
     public func with(x: CGFloat, y: CGFloat? = nil) -> CGRect {
-        return CGRect(x: x, y: y ?? origin.y, width: width, height: size.height)
+        CGRect(x: x, y: y ?? origin.y, width: width, height: size.height)
     }
 
     /// Returns a new CGRect with only the y-origin modified.
     /// - parameter y: The new y coordinate.
     /// - returns: a new CGRect with the modified coordinates
     public func with(y: CGFloat) -> CGRect {
-        return with(x: origin.x, y: y)
+        with(x: origin.x, y: y)
     }
 
     /// Returns a square CGRect with width and height set to same value.
@@ -321,17 +321,17 @@ extension CGRect {
     /// - parameter square: The new value for both width and height.
     /// - returns: a new CGRect with the modified dimensions
     public func resize(square: CGFloat) -> CGRect {
-        return with(width: square, height: square)
+        with(width: square, height: square)
     }
 
     /// Returns the smallest value of either the width or height
     public var shortest: CGFloat {
-        return min(width, height)
+        min(width, height)
     }
 
     /// Returns the longest value of either the width or height
     public var longest: CGFloat {
-        return max(width, height)
+        max(width, height)
     }
 
     /// In place modification of width and height size attributes

@@ -41,7 +41,7 @@ open class ModernButton: UIButton, ModernViewConformance {
     /// Alias for title(for: .normal) setter and getter.
     @objc open var title: String? {
         get {
-            return title(for: .normal)
+            title(for: .normal)
         }
         set {
             setTitle(newValue, for: .normal)

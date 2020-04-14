@@ -12,7 +12,7 @@ import UIKit
         /// Returns an orientation mask for [.portrait, .portraitUpsideDown]
         @available(tvOS, unavailable)
         public static var vertical: UIInterfaceOrientationMask {
-            return [.portrait, .portraitUpsideDown]
+            [.portrait, .portraitUpsideDown]
         }
     }
 #endif
@@ -20,29 +20,29 @@ import UIKit
 extension UIDevice {
     /// Returns true if the current interface idiom is an iPad
     public static var isPad: Bool {
-        return UIDevice.current.userInterfaceIdiom == .pad
+        UIDevice.current.userInterfaceIdiom == .pad
     }
 
     /// Returns true if the current interface idiom is an iPhone or iPod Touch
     public static var isPhone: Bool {
-        return UIDevice.current.userInterfaceIdiom == .phone
+        UIDevice.current.userInterfaceIdiom == .phone
     }
 
     /// Returns true if the current interface idiom is an AppleTV
     public static var isTV: Bool {
-        return UIDevice.current.userInterfaceIdiom == .tv
+        UIDevice.current.userInterfaceIdiom == .tv
     }
 
     /// Returns true if the current device is in vertical mode.
     @available(tvOS, unavailable)
     public static var isPortrait: Bool {
-        return UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown
+        UIDevice.current.orientation == .portrait || UIDevice.current.orientation == .portraitUpsideDown
     }
 
     /// Returns true if the current device is in landscape (horizontal) mode
     @available(tvOS, unavailable)
     public static var isLandscape: Bool {
-        return UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
+        UIDevice.current.orientation == .landscapeLeft || UIDevice.current.orientation == .landscapeRight
     }
 
     /// Returns true if the device is plugged into power
@@ -62,7 +62,7 @@ extension UIDevice {
         current.isBatteryMonitoringEnabled = true
         return current.batteryState == .unplugged
     }
-    
+
     public static var isSimulator: Bool {
         #if targetEnvironment(simulator)
             return true
@@ -115,7 +115,7 @@ extension UIView {
     ///     view.centerY += 10
     public var centerY: CGFloat {
         get {
-            return center.y
+            center.y
         }
         set {
             center = CGPoint(x: center.x, y: newValue)
@@ -128,7 +128,7 @@ extension UIView {
     ///     view.centerX += 50
     public var centerX: CGFloat {
         get {
-            return center.x
+            center.x
         }
         set {
             center = CGPoint(x: newValue, y: center.y)
@@ -164,7 +164,7 @@ extension UIView {
     /// just makes the settings more readable.
     @objc public var autolayout: Bool {
         get {
-            return !translatesAutoresizingMaskIntoConstraints
+            !translatesAutoresizingMaskIntoConstraints
         }
         set {
             translatesAutoresizingMaskIntoConstraints = !newValue
@@ -243,7 +243,7 @@ extension UIView {
     /// ```
     public var cornerRadius: CGFloat {
         get {
-            return layer.cornerRadius
+            layer.cornerRadius
         }
         set {
             layer.cornerRadius = newValue
@@ -259,10 +259,10 @@ extension UIView {
     /// - note: The returned constraints are not activated automatically.
     /// - parameter view: the view to use for the anchoring the constraints
     public func constraintsPinned(toView view: UIView) -> [NSLayoutConstraint] {
-        return [topAnchor.constraint(equalTo: view.topAnchor),
-                bottomAnchor.constraint(equalTo: view.bottomAnchor),
-                leadingAnchor.constraint(equalTo: view.leadingAnchor),
-                trailingAnchor.constraint(equalTo: view.trailingAnchor)]
+        [topAnchor.constraint(equalTo: view.topAnchor),
+         bottomAnchor.constraint(equalTo: view.bottomAnchor),
+         leadingAnchor.constraint(equalTo: view.leadingAnchor),
+         trailingAnchor.constraint(equalTo: view.trailingAnchor)]
     }
 
     /// An enum to use as parameters in sizing constraints.
@@ -296,7 +296,7 @@ extension UIView {
     /// - parameter dimension: the dependent dimension, either `.width` or `.height`.
     /// - parameter ratio: The multiplier constant for the constraint. Default is 1 for a square dimension.
     public func constrainAspect(by dimension: SizeDimension, ratio: CGFloat = 1) -> NSLayoutConstraint {
-        return dimension == .height ?
+        dimension == .height ?
             widthAnchor.constraint(equalTo: heightAnchor, multiplier: ratio) :
             heightAnchor.constraint(equalTo: widthAnchor, multiplier: ratio)
     }
@@ -380,7 +380,7 @@ extension UIViewController {
 
     /// Instantiates a new controller embedded inside a UINavigationController.
     public var navigatable: UINavigationController {
-        return UINavigationController(rootViewController: self)
+        UINavigationController(rootViewController: self)
     }
 
     /// Shorthand for dismissing the controller. Useful when needed to be set as a selector to an action.
@@ -412,7 +412,7 @@ extension UIColor {
     /// Creates and returns a color object that has the same color space
     /// and component values as the receiver, but has the specified alpha component.
     public func opacity(_ alpha: CGFloat) -> UIColor {
-        return withAlphaComponent(alpha)
+        withAlphaComponent(alpha)
     }
 
     /// Creates a new UIColor with using natural RGB numbers which will be divided by 255.
@@ -481,7 +481,7 @@ extension UIImage {
     /// Returns the data for the specified image in PNG format
     /// If the image object’s underlying image data has been purged, calling this function forces that data to be reloaded into memory.
     /// - returns: A data object containing the PNG data, or nil if there was a problem generating the data. This function may return nil if the image has no data or if the underlying CGImageRef contains data in an unsupported bitmap format.
-    public var png: Data? { return pngData() }
+    public var png: Data? { pngData() }
 
     /// Returns the data for the specified image in JPEG format.
     /// If the image object’s underlying image data has been purged, calling this function forces that data to be reloaded into memory.
@@ -526,7 +526,7 @@ extension UILabel {
     /// Helper accessor the pointSize of the label's current font.
     public var pointSize: CGFloat {
         get {
-            return font?.pointSize ?? 0
+            font?.pointSize ?? 0
         }
         set {
             if let font = font {
@@ -540,7 +540,7 @@ extension UITextView {
     /// Helper accessor the pointSize of the text view's current font.
     public var pointSize: CGFloat {
         get {
-            return font?.pointSize ?? 0
+            font?.pointSize ?? 0
         }
         set {
             if let font = font {
@@ -554,7 +554,7 @@ extension UITextField {
     /// Helper accessor the pointSize of the text field's current font.
     public var pointSize: CGFloat {
         get {
-            return font?.pointSize ?? 0
+            font?.pointSize ?? 0
         }
         set {
             if let font = font {
@@ -599,6 +599,6 @@ extension Array where Element: NSLayoutConstraint {
 extension Array {
     /// Returns true if index is inRange of 0 and the array's last index.
     public func has(index: Int) -> Bool {
-        return index >= 0 && index.inRange(0, lastIndex)
+        index >= 0 && index.inRange(0, lastIndex)
     }
 }

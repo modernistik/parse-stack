@@ -31,7 +31,7 @@ public protocol ReusableType {
 extension ReusableType {
     /// Return the reuseIdentifier for this object. By default it is their class name.
     public static var reuseIdentifier: String {
-        return String(describing: Self.self)
+        String(describing: Self.self)
     }
 }
 

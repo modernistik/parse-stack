@@ -42,10 +42,10 @@ open class ModernCollectionController: ModernViewController, UICollectionViewDat
     }
 
     open func collectionView(_: UICollectionView, numberOfItemsInSection _: Int) -> Int {
-        return 0
+        0
     }
 
     open func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        return ModernCollectionCell.dequeueReusableCell(in: collectionView, for: indexPath)
+        ModernCollectionCell.dequeueReusableCell(in: collectionView, for: indexPath)
     }
 }

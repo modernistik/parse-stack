@@ -16,7 +16,7 @@ public protocol Nibbed {
 extension Nibbed where Self: ReusableType, Self: UIView {
     /// Load a UINib object for the current view based on the view name.
     public static var nib: UINib {
-        return UINib(nibName: String(describing: Self.self), bundle: nil)
+        UINib(nibName: String(describing: Self.self), bundle: nil)
     }
 
     /// Load the proper view subclass from its corresponding nib/xib in the main bundle.

@@ -29,7 +29,7 @@ public typealias CompletionBlock = () -> Void
 extension Bundle {
     /// A settings bundle key where to store the displayed app version.
     public static let AppVersionSettingsKey = "AppVersionSettingsKey"
-    
+
     /// This updates the settings key where the full app version is stored. This is useful when using the Settings bundle to
     /// display the current app version. You can set a `Title` field your `Root.plist` of your `Settings.bundle` with the title `Version`, and set the identifier
     /// to the value of `Bundle.AppVersionSettingsKey` (usually `AppVersionSettingsKey`). Calling this method, will then automatically update `UserDefaults`
@@ -37,15 +37,15 @@ extension Bundle {
     public static func updateSettingsBundleAppVersion() {
         UserDefaults.standard.set(appVersion, forKey: AppVersionSettingsKey)
     }
-    
+
     /// Returns the string `{releaseVersion}-{currentBuildVersion}`.
     public static var appVersion: String {
-        return "\(releaseVersion)-\(currentBuildVersion)"
+        "\(releaseVersion)-\(currentBuildVersion)"
     }
-    
+
     /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
     public static var releaseVersion: String {
-        return Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
+        Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "1.0"
     }
 
     /// Returns the current build version based on the `CFBundleVersion` of the Info.plist. Defaults 0.
@@ -68,7 +68,7 @@ extension String {
     /// - returns: An array of NSLayoutConstraints that were parsed from the string.
     public func constraints(options opts: NSLayoutConstraint.FormatOptions = [], metrics: [String: Any]? = nil, views: [String: Any]) -> [NSLayoutConstraint] {
         // NOTE: If you exception breakpoint hits here, go back one call stack to see the constraint that is causing the error.
-        return NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: metrics, views: views)
+        NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: metrics, views: views)
     }
 
     /// Uses the string as a NSLayoutConstraint visual format with no options or metrics.
@@ -77,30 +77,30 @@ extension String {
     /// - returns: An array of NSLayoutConstraints that were parsed from the string.
     public func constraints(options opts: NSLayoutConstraint.FormatOptions, views: [String: Any]) -> [NSLayoutConstraint] {
         // NOTE: If you exception breakpoint hits here, go back one call stack to see the constraint that is causing the error.
-        return NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: nil, views: views)
+        NSLayoutConstraint.constraints(withVisualFormat: self, options: opts, metrics: nil, views: views)
     }
 }
 
 extension URL {
     /// Returns true if the url is a file path and if it exists in the local file system.
     public var fileExists: Bool {
-        return isFileURL && FileManager.default.fileExists(atPath: path)
+        isFileURL && FileManager.default.fileExists(atPath: path)
     }
 }
 
 extension FileManager {
     /// Returns the documents directory for the default file manager
     public static var documentsDirectory: URL {
-        return FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
     }
 
     /// Returns the caches directory for the default file manager
     public static var cachesDirectory: URL {
-        return FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first!
     }
 
     public static func directory(for directory: FileManager.SearchPathDirectory) -> URL {
-        return FileManager.default.urls(for: directory, in: .userDomainMask).first!
+        FileManager.default.urls(for: directory, in: .userDomainMask).first!
     }
 }
 
@@ -190,13 +190,13 @@ public func dispatch(_ qos: DispatchQoS.QoSClass = .default, closure: @escaping 
 extension CFTimeInterval {
     /// Returns the absolute current time.
     public static var currentTime: CFTimeInterval {
-        return CFAbsoluteTimeGetCurrent()
+        CFAbsoluteTimeGetCurrent()
     }
 
     /// The amount of time that has lapsed up to 3 decimal places
     /// using this value as an absolute time interval.
     public var timeLapsed: CFTimeInterval {
-        return (CFAbsoluteTimeGetCurrent() - self).roundTo(3)
+        (CFAbsoluteTimeGetCurrent() - self).roundTo(3)
     }
 }
 
@@ -231,12 +231,11 @@ extension Comparable {
 }
 
 extension Encodable {
-    
     /// Return the JSON encoded data for this object.
     public var jsonData: Data? {
         try? JSONEncoder().encode(self)
     }
-    
+
     /// Return a serialized JSON string representing this object.
     public var jsonString: String? {
         jsonData?.utf8String

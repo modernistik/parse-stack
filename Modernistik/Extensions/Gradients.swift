@@ -17,7 +17,7 @@ import UIKit
 open
 class GradientLayerView: ModernView {
     open override class var layerClass: AnyClass {
-        return CAGradientLayer.self
+        CAGradientLayer.self
     }
 
     /// Returns a simple linear CAGradientLayer that goes from the start color to the end color.
@@ -31,7 +31,7 @@ class GradientLayerView: ModernView {
 
     // Helper to return the main layer as CAGradientLayer
     public var gradientLayer: CAGradientLayer {
-        return layer as! CAGradientLayer
+        layer as! CAGradientLayer
     }
 
     public var startColor: UIColor = .clear {
@@ -152,11 +152,11 @@ open class SmoothGradientView: ModernView {
     }
 
     open override func draw(_ rect: CGRect) {
-        //// General Declarations
+        /// / General Declarations
         backgroundColor = .clear
         let context = UIGraphicsGetCurrentContext()!
         context.saveGState()
-        //// Gradient Declarations
+        /// / Gradient Declarations
         let gradient = CGGradient(colorsSpace: nil,
                                   colors: [startColor.cgColor, endColor.cgColor] as CFArray,
                                   locations: [startLocation, endLocation])!

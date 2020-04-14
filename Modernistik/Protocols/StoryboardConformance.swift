@@ -26,19 +26,19 @@ public protocol StoryboardInstantiable {
 
 extension StoryboardInstantiable where Self: UIViewController {
     /// The string of the name of the Storyboard file which contains this controller. Defaults to 'Main' (which maps to 'Main.storyboard').
-    public static var storyboardName: String { return "Main" }
+    public static var storyboardName: String { "Main" }
 
     /// Returns the string that is mapped as the "Storyboard Id" in the Storyboard that identifies this controller. The default
     /// value returns the name of the class. It is recommended that the "Storyboard Id" is the name of the
     /// controller class (ex. MyViewController). This will allow for the default implementation of
     /// this protocol to take advantage of matching classes with Storyboard controllers.
     public static var storyboardIdentifier: String {
-        return String(describing: Self.self)
+        String(describing: Self.self)
     }
 
     /// Get an instance of this view controller class instantiated from it's storyboard file.
     public static var storyboardController: Self? {
-        return storyboardController(storyboardName)
+        storyboardController(storyboardName)
     }
 
     /// Instantiate a new instance of this view controller class from a storyboard.
