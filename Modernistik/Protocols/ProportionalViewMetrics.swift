@@ -7,6 +7,7 @@
 
 import CoreGraphics
 import Foundation
+import UIKit
 
 /** Provides a standard interface to get recommended proportional heights based on
  different sized devices or viewports. The idea behind this pattern is in defining an aspect
