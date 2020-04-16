@@ -9,9 +9,9 @@ import Foundation
 
 @propertyWrapper
 public struct Defaults<Value> {
-    let key: String
-    let defaultValue: Value
-    var storage = UserDefaults.standard
+    public let key: String
+    public let defaultValue: Value
+    public var storage = UserDefaults.standard
 
 //    public init(wrappedValue: Value) {
 //        key = wrappedValue
@@ -40,7 +40,14 @@ extension Defaults where Value == Bool {
 }
 
 extension Defaults where Value: ExpressibleByNilLiteral {
-    public init(key: String) {
+    public init(_ key: String) {
         self.init(key, fallback: nil)
+    }
+}
+
+extension Defaults where Value == String {
+    public init(_ key: String) {
+        self.key = key
+        defaultValue = ""
     }
 }
