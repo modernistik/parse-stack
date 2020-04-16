@@ -100,6 +100,24 @@ extension CGSize {
 }
 
 extension CGRect {
+    /// Returns a new CGRect representing the largest aspect-fit inset rectangle, using the dimensions of this CGRect, that is centered inside the bounds of another CGRect.
+    ///
+    /// This effectively scales this CGRect into a target CGRect (bounding), while maintaining the aspect ratio.
+    ///
+    /// - Parameter boundedBy: The outer rectangle to be used as a bounding box.
+    /// - Returns: The aspect-fitted rectangle that fits into the bounding rectangle.
+    public func aspectFitInset(boundedBy rect: CGRect) -> CGRect {
+        let wRatio = rect.size.width / size.width
+        let hRatio = rect.size.height / size.height
+        let ratio = wRatio < hRatio ? wRatio : hRatio
+        let xOffset: CGFloat = (rect.size.width - size.width * ratio) / 2.0
+        let yOffset: CGFloat = (rect.size.height - size.height * ratio) / 2.0
+        return CGRect(x: xOffset + rect.origin.x,
+                      y: yOffset + rect.origin.y,
+                      width: size.width * ratio,
+                      height: size.height * ratio)
+    }
+
     /// Returns a new rect by swapping width and height value.
     ///
     ///     let rect:CGRect = CGRect(width: 100, height: 50).pivoted
@@ -124,6 +142,12 @@ extension CGRect {
     /// Returns true if `width == height`
     public var isSquare: Bool {
         width == height
+    }
+
+    /// Returns true if any dimension of this rectangle is larger than the same dimension of target rectangle.
+    /// - Parameter rect: The target rectangle to use for comparison.
+    public func isLargerThan(rect: CGRect) -> Bool {
+        size.width > rect.size.width || size.height > rect.size.height
     }
 
     /// Returns a square rect based on the provided size setting the coordinates to origin.
@@ -192,6 +216,18 @@ extension CGRect {
       the parent's position. A good example would be the circular badge display, where the parent view is circular,
       but the numeric badge (UILabel) is centered around that circle.
      */
+
+    /// Returns the rect of an inscribed square contained in the circle that circumscribes the source rect.
+    /// The diagonal of a square inscribed in a circle is sqrt(2) times the length of a side.
+    ///
+    /// From a bounds perspective, the shortest side will be used as the diameter of the circumscribing circle,
+    /// in order to calculate the inner inscribed square of that circle. The ratio of the outer square side
+    /// to the innser square is sqrt(2) for each side.
+    ///
+    /// This is useful if you have some type of icon or view that is circular, and you need to calculate
+    /// the largest frame (CGRect) that can comfortably fit inside the circular parent view, but centered around
+    /// the parent's position. A good example would be the circular badge display, where the parent view is circular,
+    /// but the numeric badge (UILabel) is centered around that circle.
     public var squareInscribedInCircle: CGRect {
         // get the inscribed square given the inscribed circle
         // M_SQRT1_2 == 1/sqrt(2)
@@ -228,7 +264,6 @@ extension CGRect {
      Alias access for `maxX`. However, it can also be modified to offset the
      rect based on where you want the right edge (maxX) to end up. Useful in repositioning views.
 
-     ### Disucssion ###
      Assume you want to position a view's `origin.x`, so that the right edge ends up in
      a specific spot.
 
@@ -260,7 +295,6 @@ extension CGRect {
      Alias access for `maxY`. However, it can also be modified to offset the
      rect based on where you want the bottom edge (maxY) to end up. Useful in repositioning views.
 
-     ### Disucssion ###
      Assume you want to position a view's `origin.y`, so that the bottom edge ends up in
      a specific spot.
 
