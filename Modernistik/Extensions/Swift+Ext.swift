@@ -350,8 +350,18 @@ extension Substring {
 }
 
 // MARK: Optional extensions
+public
+protocol OptionalType {
+    var wrappedType: Any.Type { get }
+    var hasValue: Bool { get }
+    var isNil: Bool { get }
+}
 
-extension Optional {
+extension Optional: OptionalType {
+    
+    /// Returns the optionally wrapped type
+    public var wrappedType: Any.Type { Wrapped.self }
+    
     /// Returns true if the optional can unwrap to a value
     public var hasValue: Bool {
         switch self {

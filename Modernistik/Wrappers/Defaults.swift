@@ -8,6 +8,7 @@
 import Foundation
 
 @propertyWrapper
+/// A property wrapper that proxies storage to UserDefaults.standard.
 public struct Defaults<Value> {
     public let key: String
     public let defaultValue: Value
@@ -27,7 +28,11 @@ public struct Defaults<Value> {
             storage.object(forKey: key) as? Value ?? defaultValue
         }
         set {
-            storage.set(newValue, forKey: key)
+            if let value = newValue as? OptionalType, value.isNil {
+                storage.removeObject(forKey: key)
+            } else {
+                storage.set(newValue, forKey: key)
+            }
         }
     }
 }
@@ -41,7 +46,8 @@ extension Defaults where Value == Bool {
 
 extension Defaults where Value: ExpressibleByNilLiteral {
     public init(_ key: String) {
-        self.init(key, fallback: nil)
+        self.key = key
+        defaultValue = nil
     }
 }
 
@@ -49,5 +55,19 @@ extension Defaults where Value == String {
     public init(_ key: String) {
         self.key = key
         defaultValue = ""
+    }
+}
+
+extension Defaults where Value == Int {
+    public init(_ key: String) {
+        self.key = key
+        defaultValue = 0
+    }
+}
+
+extension Defaults where Value == Double {
+    public init(_ key: String) {
+        self.key = key
+        defaultValue = 0.0
     }
 }
