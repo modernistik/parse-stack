@@ -1,15 +1,14 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'faraday'
-require 'faraday_middleware'
-require 'active_support'
-require 'active_support/core_ext'
+require "faraday"
+require "faraday_middleware"
+require "active_support"
+require "active_support/core_ext"
 
-require_relative 'protocol'
+require_relative "protocol"
 
 module Parse
-
   module Middleware
     # This middleware handles sending the proper authentication headers to the
     # Parse REST API endpoint.
@@ -53,38 +52,35 @@ module Parse
 
       # @!visibility private
       def call!(env)
-          # We add the main Parse protocol headers
-          headers = {}
-          raise ArgumentError, "No Parse Application Id specified for authentication." unless @application_id.present?
-          headers[APP_ID] = @application_id
-          headers[API_KEY] = @api_key unless @api_key.blank?
-          unless @master_key.blank? || env[:request_headers][DISABLE_MASTER_KEY].present?
-            headers[MASTER_KEY] = @master_key
-          end
+        # We add the main Parse protocol headers
+        headers = {}
+        raise ArgumentError, "No Parse Application Id specified for authentication." unless @application_id.present?
+        headers[APP_ID] = @application_id
+        headers[API_KEY] = @api_key unless @api_key.blank?
+        unless @master_key.blank? || env[:request_headers][DISABLE_MASTER_KEY].present?
+          headers[MASTER_KEY] = @master_key
+        end
 
-          env[:request_headers].delete(DISABLE_MASTER_KEY)
+        env[:request_headers].delete(DISABLE_MASTER_KEY)
 
-          # delete the use of master key if we are using session token.
-          if env[:request_headers].key?(Parse::Protocol::SESSION_TOKEN)
-            headers.delete(MASTER_KEY)
-          end
-          # merge the headers with the current provided headers
-          env[:request_headers].merge! headers
-          # set the content type of the request if it was not provided already.
-          env[:request_headers][CONTENT_TYPE] ||= @content_type
-          # only modify header
+        # delete the use of master key if we are using session token.
+        if env[:request_headers].key?(Parse::Protocol::SESSION_TOKEN)
+          headers.delete(MASTER_KEY)
+        end
+        # merge the headers with the current provided headers
+        env[:request_headers].merge! headers
+        # set the content type of the request if it was not provided already.
+        env[:request_headers][CONTENT_TYPE] ||= @content_type
+        # only modify header
 
-          @app.call(env).on_complete do |response_env|
-            # check for return code raise an error when authentication was a failure
-            # if response_env[:status] == 401
-            #   warn "Unauthorized Parse API Credentials for Application Id: #{@application_id}"
-            # end
+        @app.call(env).on_complete do |response_env|
+          # check for return code raise an error when authentication was a failure
+          # if response_env[:status] == 401
+          #   warn "Unauthorized Parse API Credentials for Application Id: #{@application_id}"
+          # end
 
-          end
+        end
       end
-
     end # Authenticator
-
   end
-
 end

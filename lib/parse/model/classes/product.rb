@@ -1,7 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
-require_relative '../object'
-require_relative 'user'
+require_relative "../object"
+require_relative "user"
 
 module Parse
   # This class represents the data and columns contained in the standard Parse `_Product` collection.
@@ -22,7 +22,6 @@ module Parse
   #   end
   # @see Parse::Object
   class Product < Parse::Object
-
     parse_class Parse::Model::CLASS_PRODUCT
     # @!attribute download
     # @return [String] the file payload for this product download.
@@ -56,7 +55,5 @@ module Parse
     # The title for this product. This field is required by Parse.
     # @return [String] the title for this product.
     property :title, required: true
-
   end
-
 end

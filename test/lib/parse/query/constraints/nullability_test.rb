@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestNullabilityConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -14,9 +14,9 @@ class TestNullabilityConstraint < Minitest::Test
   def build(value)
     value = Parse::Constraint.formatted_value(value)
     if value == true
-      {"field" => { @key => false } }
+      { "field" => { @key => false } }
     else
-      {"field" => { Parse::Constraint::NotEqualConstraint.key => nil } }
+      { "field" => { Parse::Constraint::NotEqualConstraint.key => nil } }
     end
   end
 
@@ -34,7 +34,5 @@ class TestNullabilityConstraint < Minitest::Test
         constraint.build.as_json
       end
     end
-
   end
-
 end

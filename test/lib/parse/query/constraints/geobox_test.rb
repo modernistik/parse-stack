@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestWithinGeoBoxQueryConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -13,8 +13,6 @@ class TestWithinGeoBoxQueryConstraint < Minitest::Test
   end
 
   def build(value)
-    {"field" => { @key => { :$box => value } } }
+    { "field" => { @key => { :$box => value } } }
   end
-
-
 end

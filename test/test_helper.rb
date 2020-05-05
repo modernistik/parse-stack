@@ -1,19 +1,18 @@
-require 'minitest/autorun'
-require 'minitest/pride'
-require 'byebug'
-require_relative '../lib/parse/stack.rb'
+require "minitest/autorun"
+require "minitest/pride"
+require "byebug"
+require_relative "../lib/parse/stack.rb"
 
 Parse.use_shortnames!
 
 module ConstraintTests
-
   TEST_VALUES = [
-    "v", [1,"test", :other, true],
-    nil, Parse::User.pointer(12345), true, false
+    "v", [1, "test", :other, true],
+    nil, Parse::User.pointer(12345), true, false,
   ]
 
   def build(value)
-    {"field" => { @key.to_s  => Parse::Constraint.formatted_value(value) } }
+    { "field" => { @key.to_s => Parse::Constraint.formatted_value(value) } }
   end
 
   def test_operator
@@ -27,21 +26,19 @@ module ConstraintTests
       assert_equal @key, @klass.key
     end
 
-
     @keys.each do |o|
       assert_respond_to(:field, o)
       op = :field.send(o)
       assert_instance_of(Parse::Operation, op)
-      assert_instance_of( @klass, op.constraint)
+      assert_instance_of(@klass, op.constraint)
       if @key.nil?
         assert_nil op.constraint.key
       else
         assert_equal @key, op.constraint.key
       end
-      value = {"operand"=>"field", "operator"=> o.to_s }
+      value = { "operand" => "field", "operator" => o.to_s }
       assert_equal value, op.as_json
     end
-
   end
 
   def test_scalar_values
@@ -51,14 +48,12 @@ module ConstraintTests
       expected = build(value).as_json
       assert_equal expected, constraint.build.as_json
     end
-
   end
-
 end
 
 module MiniTest
   module Assertions
-    def refute_raises *exp
+    def refute_raises(*exp)
       msg = "#{exp.pop}.\n" if String === exp.last
 
       begin
@@ -70,9 +65,9 @@ module MiniTest
         exp = exp.first if exp.size == 1
         flunk "unexpected exception raised: #{e}"
       end
-
     end
   end
+
   module Expectations
     infect_an_assertion :refute_raises, :wont_raise
   end

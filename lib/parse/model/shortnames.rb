@@ -1,5 +1,4 @@
-
-require_relative 'object'
+require_relative "object"
 
 # Simple include to use short verion of core class names
 ::Installation = Parse::Installation unless defined?(::Installation)

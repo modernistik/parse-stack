@@ -1,42 +1,41 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext'
-require 'active_support/core_ext/object'
-require 'active_support/core_ext/string'
-require 'active_model_serializers'
-require 'time'
-require 'open-uri'
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext"
+require "active_support/core_ext/object"
+require "active_support/core_ext/string"
+require "active_model_serializers"
+require "time"
+require "open-uri"
 
-require_relative '../client'
-require_relative 'model'
-require_relative 'pointer'
-require_relative 'geopoint'
-require_relative 'file'
-require_relative 'bytes'
-require_relative 'date'
-require_relative 'time_zone'
-require_relative 'acl'
-require_relative 'push'
-require_relative 'core/actions'
-require_relative 'core/fetching'
-require_relative 'core/querying'
-require_relative 'core/schema'
-require_relative 'core/properties'
-require_relative 'core/errors'
-require_relative 'core/builder'
-require_relative 'associations/has_one'
-require_relative 'associations/belongs_to'
-require_relative 'associations/has_many'
-
+require_relative "../client"
+require_relative "model"
+require_relative "pointer"
+require_relative "geopoint"
+require_relative "file"
+require_relative "bytes"
+require_relative "date"
+require_relative "time_zone"
+require_relative "acl"
+require_relative "push"
+require_relative "core/actions"
+require_relative "core/fetching"
+require_relative "core/querying"
+require_relative "core/schema"
+require_relative "core/properties"
+require_relative "core/errors"
+require_relative "core/builder"
+require_relative "associations/has_one"
+require_relative "associations/belongs_to"
+require_relative "associations/has_many"
 
 module Parse
   # @return [Array] an array of registered Parse::Object subclasses.
   def self.registered_classes
-      Parse::Object.descendants.map(&:parse_class).uniq
+    Parse::Object.descendants.map(&:parse_class).uniq
   end
 
   # @return [Array<Hash>] the list of all schemas for this application.
@@ -65,7 +64,7 @@ module Parse
   # Alias shorter names of core Parse class names.
   # Ex, alias Parse::User to User, Parse::Installation to Installation, etc.
   def self.use_shortnames!
-    require_relative 'shortnames'
+    require_relative "shortnames"
   end
 
   # This is the core class for all app specific Parse table subclasses. This class
@@ -139,7 +138,7 @@ module Parse
     BASE_OBJECT_CLASS = "Parse::Object".freeze
 
     # @return [Model::TYPE_OBJECT]
-    def __type; Parse::Model::TYPE_OBJECT; end;
+    def __type; Parse::Model::TYPE_OBJECT; end
 
     # Default ActiveModel::Callbacks
     # @!group Callbacks
@@ -183,7 +182,6 @@ module Parse
     # the remote Parse table is named 'Artist'. You may override this behavior by utilizing the `parse_class(<className>)` method
     # to set it to something different.
     class << self
-
       attr_accessor :parse_class
       attr_reader :default_acls
 
@@ -253,7 +251,6 @@ module Parse
       def acl(acls, owner: nil)
         raise "[#{self}.acl DEPRECATED] - Use `#{self}.default_acl` instead."
       end
-
     end # << self
 
     # @return [String] the Parse class for this object.
@@ -261,6 +258,7 @@ module Parse
     def parse_class
       self.class.parse_class
     end
+
     alias_method :className, :parse_class
 
     # @return [Hash] the schema structure for this Parse collection from the server.
@@ -347,7 +345,7 @@ module Parse
     # @param opts [Hash] a set of options to send to fetch!
     # @see Fetching#fetch!
     def reload!(opts = {})
-    # get the values from the persistence layer
+      # get the values from the persistence layer
       fetch!(opts)
       clear_changes!
     end
@@ -436,7 +434,7 @@ module Parse
     # @return [String] a pretty-formatted JSON string
     # @see JSON.pretty_generate
     def pretty
-      JSON.pretty_generate( as_json )
+      JSON.pretty_generate(as_json)
     end
 
     # clear all change and dirty tracking information.
@@ -483,10 +481,10 @@ module Parse
         o = Parse::Pointer.new className, (json[Parse::Model::OBJECT_ID] || json[:objectId])
       end
       return o
-    # rescue NameError => e
-    #   puts "Parse::Object.build constant class error: #{e}"
-    # rescue Exception => e
-    #   puts "Parse::Object.build error: #{e}"
+      # rescue NameError => e
+      #   puts "Parse::Object.build constant class error: #{e}"
+      # rescue Exception => e
+      #   puts "Parse::Object.build error: #{e}"
     end
 
     # @!attribute id
@@ -521,13 +519,11 @@ module Parse
     # @param key (see Parse::Object#[])
     # @param value [Object] the value to set this property.
     # @return [Object] the value passed in.
-    def []=(key,value)
+    def []=(key, value)
       return unless self.class.fields[key.to_sym].present?
-      send("#{key}=",value)
+      send("#{key}=", value)
     end
-
   end
-
 end
 
 class Hash
@@ -540,7 +536,6 @@ class Hash
   def parse_object
     Parse::Object.build(self)
   end
-
 end
 
 class Array
@@ -565,12 +560,11 @@ class Array
   def parse_ids
     parse_objects.map(&:id)
   end
-
 end
 
 # Load all the core classes.
-require_relative 'classes/installation'
-require_relative 'classes/product'
-require_relative 'classes/role'
-require_relative 'classes/session'
-require_relative 'classes/user'
+require_relative "classes/installation"
+require_relative "classes/product"
+require_relative "classes/role"
+require_relative "classes/session"
+require_relative "classes/user"

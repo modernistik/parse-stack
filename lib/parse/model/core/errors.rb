@@ -5,5 +5,4 @@
 module Parse
   # An abstract parent class for all Parse::Error types.
   class Error < StandardError; end
-
 end

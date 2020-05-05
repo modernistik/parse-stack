@@ -1,12 +1,12 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require 'active_model_serializers'
-require_relative '../client'
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require "active_model_serializers"
+require_relative "../client"
 
 module Parse
   # Find a corresponding Parse::Object subclass for this string or symbol
@@ -21,61 +21,59 @@ module Parse
   # serialization, dirty tracking, callbacks, etc.
   # @see ActiveModel
   class Model
-
     include Client::Connectable # allows easy default Parse::Client access
     include ::ActiveModel::Model
     include ::ActiveModel::Serializers::JSON # support for JSON Serializers
     include ::ActiveModel::Dirty # adds dirty tracking support
     include ::ActiveModel::Conversion
-    extend  ::ActiveModel::Callbacks # callback support on save, update, delete, etc.
-    extend  ::ActiveModel::Naming # provides the methods for getting class names from Model classes
+    extend ::ActiveModel::Callbacks # callback support on save, update, delete, etc.
+    extend ::ActiveModel::Naming # provides the methods for getting class names from Model classes
 
     # The name of the field in a hash that contains information about the type
     # of data the hash represents.
-    TYPE_FIELD = '__type'.freeze
+    TYPE_FIELD = "__type".freeze
 
     # The objectId field in Parse Objects.
-    OBJECT_ID   = 'objectId'.freeze
+    OBJECT_ID = "objectId".freeze
     # @see OBJECT_ID
     ID = "id".freeze
 
     # The key field for getting class information.
-    KEY_CLASS_NAME  = 'className'.freeze
+    KEY_CLASS_NAME = "className".freeze
     # @deprecated Use OBJECT_ID instead.
-    KEY_OBJECT_ID   = 'objectId'.freeze
+    KEY_OBJECT_ID = "objectId".freeze
     # The key field for getting the created at date of an object hash.
-    KEY_CREATED_AT  = 'createdAt'
+    KEY_CREATED_AT = "createdAt"
     # The key field for getting the updated at date of an object hash.
-    KEY_UPDATED_AT  = 'updatedAt'
+    KEY_UPDATED_AT = "updatedAt"
     # The collection for Users in Parse. Used by Parse::User.
-    CLASS_USER      = '_User'
+    CLASS_USER = "_User"
     # The collection for Installations in Parse. Used by Parse::Installation.
-    CLASS_INSTALLATION = '_Installation'
+    CLASS_INSTALLATION = "_Installation"
     # The collection for revocable Sessions in Parse. Used by Parse::Session.
-    CLASS_SESSION = '_Session'
+    CLASS_SESSION = "_Session"
     # The collection for Roles in Parse. Used by Parse::Role.
-    CLASS_ROLE = '_Role'
+    CLASS_ROLE = "_Role"
     # The collection for to store Products (in-App purchases) in Parse. Used by Parse::Product.
-    CLASS_PRODUCT = '_Product'
+    CLASS_PRODUCT = "_Product"
     # The type label for hashes containing file data. Used by Parse::File.
-    TYPE_FILE = 'File'
+    TYPE_FILE = "File"
     # The type label for hashes containing geopoints. Used by Parse::GeoPoint.
-    TYPE_GEOPOINT = 'GeoPoint'
+    TYPE_GEOPOINT = "GeoPoint"
     # The type label for hashes containing a Parse object. Used by Parse::Object and subclasses.
-    TYPE_OBJECT = 'Object'
+    TYPE_OBJECT = "Object"
     # The type label for hashes containing a Parse date object. Used by Parse::Date.
-    TYPE_DATE = 'Date'
+    TYPE_DATE = "Date"
     # The type label for hashes containing 'byte' data. Used by Parse::Bytes.
-    TYPE_BYTES = 'Bytes'
+    TYPE_BYTES = "Bytes"
     # The type label for hashes containing ACL data. Used by Parse::ACL
-    TYPE_ACL = 'ACL'
+    TYPE_ACL = "ACL"
     # The type label for hashes storing numeric data.
-    TYPE_NUMBER = 'Number'
+    TYPE_NUMBER = "Number"
     # The type label for hashes containing a Parse pointer.
-    TYPE_POINTER = 'Pointer'
+    TYPE_POINTER = "Pointer"
     # The type label for hashes representing relational data.
-    TYPE_RELATION = 'Relation'
-
+    TYPE_RELATION = "Relation"
 
     # To support being able to have different ruby class names from the 'table'
     # names used in Parse, we will need to have a dynamic lookup system where
@@ -115,7 +113,6 @@ module Parse
       def raise_on_save_failure=(bool)
         @global_raise_on_save_failure = bool
       end
-
     end
 
     # Find a Parse::Model subclass matching this type or Pares collection name.
@@ -149,11 +146,8 @@ module Parse
       @@model_cache[str] ||= Parse::Object.descendants.find do |f|
         f.parse_class == str || f.parse_class == "_#{str}"
       end
-
     end
-
   end
-
 end
 
 # Add extensions to the String class.
@@ -172,9 +166,9 @@ class String
   # @return [String]
   # @see Parse::Query.field_formatter
   def columnize
-     return Parse::Model::OBJECT_ID if self == Parse::Model::ID
-     u = '_'.freeze
-     (first == u ? sub(u,'') : self).camelize(:lower)
+    return Parse::Model::OBJECT_ID if self == Parse::Model::ID
+    u = "_".freeze
+    (first == u ? sub(u, "") : self).camelize(:lower)
   end
 
   # Convert a string to a Parse class name. This method tries to find a

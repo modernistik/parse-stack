@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 module Parse
-
   module API
     # Defines the Config interface for the Parse REST API
     module Config
@@ -44,9 +43,6 @@ module Parse
         @config.merge!(params) if result && @config.present?
         result
       end
-
     end
-
   end
-
 end

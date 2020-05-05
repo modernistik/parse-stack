@@ -1,7 +1,7 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative 'constraint'
+require_relative "constraint"
 
 # Each constraint type is a subclass of Parse::Constraint
 # We register each keyword (which is the Parse query operator)
@@ -60,7 +60,7 @@ module Parse
         value = formatted_value
         # if it is already a pointer value, just return the constraint. Allows for
         # supporting strings, symbols and pointers.
-        return { @operation.operand  => value } if value.is_a?(Parse::Pointer)
+        return { @operation.operand => value } if value.is_a?(Parse::Pointer)
 
         begin
           klass = className.constantize
@@ -79,9 +79,8 @@ module Parse
           raise ArgumentError, "#{self.class}: value must be of string type representing a Parse object id."
         end
         value.strip!
-        return { @operation.operand  => klass.pointer(value) }
+        return { @operation.operand => klass.pointer(value) }
       end
-
     end
 
     # Equivalent to the `$or` Parse query operation. This is useful if you want to
@@ -101,7 +100,6 @@ module Parse
         or_clauses = formatted_value
         return { :$or => Array.wrap(or_clauses) }
       end
-
     end
 
     # Equivalent to the `$lte` Parse query operation. The alias `on_or_before` is provided for readability.
@@ -154,6 +152,7 @@ module Parse
       register :less_than
       register :before
     end
+
     # Equivalent to the `$gt` Parse query operation. The alias `after` is provided for readability.
     #  q.where :field.gt => value
     #  q.where :field.after => date
@@ -252,13 +251,12 @@ module Parse
         end
 
         if value == true
-          return { @operation.operand => { key => false} }
+          return { @operation.operand => { key => false } }
         else
           #current bug in parse where if you want exists => true with geo queries
           # we should map it to a "not equal to null" constraint
           return { @operation.operand => { Parse::Constraint::NotEqualConstraint.key => nil } }
         end
-
       end
     end
 
@@ -319,7 +317,6 @@ module Parse
         val = [val].compact unless val.is_a?(Array)
         { @operation.operand => { key => val } }
       end
-
     end
 
     # Equivalent to the `$nin` Parse query operation. Checks whether the value in
@@ -357,7 +354,6 @@ module Parse
         val = [val].compact unless val.is_a?(Array)
         { @operation.operand => { key => val } }
       end
-
     end
 
     # Equivalent to the $all Parse query operation. Checks whether the value in
@@ -585,7 +581,6 @@ module Parse
       contraint_keyword :$notInQuery
       register :excludes
       register :not_in_query
-
     end
 
     # Equivalent to the `$nearSphere` Parse query operation. This is only applicable
@@ -631,7 +626,6 @@ module Parse
         end
         { @operation.operand => { key => point } }
       end
-
     end
 
     # Equivalent to the `$within` Parse query operation and `$box` geopoint
@@ -661,10 +655,10 @@ module Parse
       def build
         geopoint_values = formatted_value
         unless geopoint_values.is_a?(Array) && geopoint_values.count == 2 &&
-          geopoint_values.first.is_a?(Parse::GeoPoint) && geopoint_values.last.is_a?(Parse::GeoPoint)
-          raise(ArgumentError, '[Parse::Query] Invalid query value parameter passed to `within_box` constraint. ' +
-                  'Values in array must be `Parse::GeoPoint` objects and ' +
-                  'it should be in an array format: [southwestPoint, northeastPoint]' )
+               geopoint_values.first.is_a?(Parse::GeoPoint) && geopoint_values.last.is_a?(Parse::GeoPoint)
+          raise(ArgumentError, "[Parse::Query] Invalid query value parameter passed to `within_box` constraint. " +
+                               "Values in array must be `Parse::GeoPoint` objects and " +
+                               "it should be in an array format: [southwestPoint, northeastPoint]")
         end
         { @operation.operand => { :$within => { :$box => geopoint_values } } }
       end
@@ -703,11 +697,11 @@ module Parse
       def build
         geopoint_values = formatted_value
         unless geopoint_values.is_a?(Array) &&
-               geopoint_values.all? {|point| point.is_a?(Parse::GeoPoint) } &&
+               geopoint_values.all? { |point| point.is_a?(Parse::GeoPoint) } &&
                geopoint_values.count > 2
-          raise ArgumentError, '[Parse::Query] Invalid query value parameter passed to'\
-                      ' `within_polygon` constraint: Value must be an array with 3'\
-                      ' or more `Parse::GeoPoint` objects'
+          raise ArgumentError, "[Parse::Query] Invalid query value parameter passed to" \
+                " `within_polygon` constraint: Value must be an array with 3" \
+                " or more `Parse::GeoPoint` objects"
         end
 
         { @operation.operand => { :$geoWithin => { :$polygon => geopoint_values } } }
@@ -743,27 +737,25 @@ module Parse
         params = { :$term => params.to_s } if params.is_a?(String) || params.is_a?(Symbol)
 
         unless params.is_a?(Hash)
-          raise ArgumentError, '[Parse::Query] Invalid query value parameter passed to'\
-                      ' `text_search` constraint: Value must be a string or a hash of parameters.'
+          raise ArgumentError, "[Parse::Query] Invalid query value parameter passed to" \
+                " `text_search` constraint: Value must be a string or a hash of parameters."
         end
 
-        params = params.inject({}) do |h,(k,v)|
+        params = params.inject({}) do |h, (k, v)|
           u = k.to_s
-          u = u.columnize.prepend('$') unless u.start_with?('$')
+          u = u.columnize.prepend("$") unless u.start_with?("$")
           h[u] = v
           h
         end
 
         unless params["$term"].present?
-          raise ArgumentError, "[Parse::Query] Invalid query value parameter passed to"\
-                      " `text_search` constraint: Missing required `$term` subkey.\n"\
-                      "\tExample: #{@operation.operand}.text_search => { term: 'text to search' }"
+          raise ArgumentError, "[Parse::Query] Invalid query value parameter passed to" \
+                " `text_search` constraint: Missing required `$term` subkey.\n" \
+                "\tExample: #{@operation.operand}.text_search => { term: 'text to search' }"
         end
 
         { @operation.operand => { :$text => { :$search => params } } }
       end
     end
-
   end
-
 end

@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestNotEqualConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -10,5 +10,4 @@ class TestNotEqualConstraint < Minitest::Test
     @operand = :not
     @keys = [:not, :ne]
   end
-
 end

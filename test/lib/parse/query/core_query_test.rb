@@ -1,7 +1,6 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
 class TestParseCoreQuery < Minitest::Test
-
   def test_save_all_invalid_constraints
     # test passing :updated_at as a constraint
     assert_raises(ArgumentError) { Parse::User.save_all :updated_at => 123 }
@@ -27,7 +26,6 @@ class TestParseCoreQuery < Minitest::Test
     assert_raises(ArgumentError) { Parse::User.save_all :updatedAt.lt => DateTime.now }
     assert_raises(ArgumentError) { Parse::User.save_all :updatedAt.lte => DateTime.now }
     assert_raises(ArgumentError) { Parse::User.save_all :updatedAt.eq => DateTime.now }
-
   end
 
   def test_each_invalid_constraints
@@ -55,7 +53,5 @@ class TestParseCoreQuery < Minitest::Test
     assert_raises(ArgumentError) { Parse::User.each :createdAt.lt => DateTime.now }
     assert_raises(ArgumentError) { Parse::User.each :createdAt.lte => DateTime.now }
     assert_raises(ArgumentError) { Parse::User.each :createdAt.eq => DateTime.now }
-
   end
-
 end

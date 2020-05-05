@@ -1,9 +1,9 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative 'operation'
-require 'time'
-require 'date'
+require_relative "operation"
+require "time"
+require "date"
 
 module Parse
   # Constraints are the heart of the Parse::Query system.
@@ -39,12 +39,11 @@ module Parse
       # it most likely is just the field name, so let's assume they want
       # the default equality operation.
       if operation.is_a?(Operation) == false && operation.respond_to?(:to_sym)
-          operation = Operation.new(operation.to_sym, self.class.operand)
+        operation = Operation.new(operation.to_sym, self.class.operand)
       end
       @operation = operation
       @value = value
       yield(self) if block_given?
-
     end
 
     class << self
@@ -122,7 +121,6 @@ module Parse
         end
         d
       end
-
     end
 
     # @return [Integer] the precedence of this constraint

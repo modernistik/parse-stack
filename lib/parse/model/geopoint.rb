@@ -24,7 +24,7 @@ module Parse
   #
   class GeoPoint < Model
     # The default attributes in a Parse GeoPoint hash.
-    ATTRIBUTES = {  __type: :string, latitude: :float, longitude: :float }.freeze
+    ATTRIBUTES = { __type: :string, latitude: :float, longitude: :float }.freeze
 
     # @return [Float] latitude value between -90.0 and 90.0
     attr_accessor :latitude
@@ -47,9 +47,10 @@ module Parse
     alias_method :lat, :latitude
     alias_method :lng, :longitude
     # @return [Model::TYPE_GEOPOINT]
-    def self.parse_class; TYPE_GEOPOINT; end;
+    def self.parse_class; TYPE_GEOPOINT; end
     # @return [Model::TYPE_GEOPOINT]
-    def parse_class; self.class.parse_class; end;
+    def parse_class; self.class.parse_class; end
+
     alias_method :__type, :parse_class
 
     # The initializer can create a GeoPoint with a hash, array or values.
@@ -77,7 +78,6 @@ module Parse
 
     # @!visibility private
     def _validate_point
-
       unless @latitude.nil? || @latitude.between?(LAT_MIN, LAT_MAX)
         warn "[Parse::GeoPoint] Latitude (#{@latitude}) is not between #{LAT_MIN}, #{LAT_MAX}!"
         warn "Attempting to use GeoPoint’s with latitudes outside these ranges will raise an exception in a future release."
@@ -87,7 +87,6 @@ module Parse
         warn "[Parse::GeoPoint] Longitude (#{@longitude}) is not between #{LNG_MIN}, #{LNG_MAX}!"
         warn "Attempting to use GeoPoint’s with longitude outside these ranges will raise an exception in a future release."
       end
-
     end
 
     # @return [Hash] attributes for a Parse GeoPoint.
@@ -99,7 +98,7 @@ module Parse
     # @return [Array] containing [lat,lng,miles]
     def max_miles(m)
       m = 0 if m.nil?
-      [@latitude,@longitude,m]
+      [@latitude, @longitude, m]
     end
 
     def latitude=(l)
@@ -118,7 +117,7 @@ module Parse
       if h.is_a?(Hash)
         h = h.symbolize_keys
         @latitude = h[:latitude].to_f || h[:lat].to_f || @latitude
-        @longitude = h[:longitude].to_f || h[:lng].to_f ||  @longitude
+        @longitude = h[:longitude].to_f || h[:lng].to_f || @longitude
       elsif h.is_a?(Array) && h.count == 2
         @latitude = h.first.to_f
         @longitude = h.last.to_f
@@ -142,7 +141,7 @@ module Parse
     # Returns a tuple containing latitude and longitude
     # @return [Array]
     def to_a
-      [@latitude,@longitude]
+      [@latitude, @longitude]
     end
 
     # @!visibility private
@@ -161,7 +160,7 @@ module Parse
     # is longitude instead of a GeoPoint.
     # @return [Float] number of miles between geopoints.
     # @see #distance_in_km
-    def distance_in_miles(geopoint,lng = nil)
+    def distance_in_miles(geopoint, lng = nil)
       distance_in_km(geopoint, lng) * 0.621371
     end
 
@@ -175,12 +174,12 @@ module Parse
     # @param lng [Float] Longitude assuming that the first parameter is a latitude instead of a GeoPoint.
     # @return [Float] number of miles between geopoints.
     # @see #distance_in_miles
-    def distance_in_km(geopoint,lng = nil)
+    def distance_in_km(geopoint, lng = nil)
       unless geopoint.is_a?(Parse::GeoPoint)
         geopoint = Parse::GeoPoint.new(geopoint, lng)
       end
 
-      dtor = Math::PI/180
+      dtor = Math::PI / 180
       r = 6378.14
       r_lat1 = self.latitude * dtor
       r_lng1 = self.longitude * dtor
@@ -190,13 +189,10 @@ module Parse
       delta_lat = r_lat1 - r_lat2
       delta_lng = r_lng1 - r_lng2
 
-      a = (Math::sin(delta_lat/2.0) ** 2).to_f + (Math::cos(r_lat1) * Math::cos(r_lat2) * ( Math::sin(delta_lng/2.0) ** 2 ) )
-      c = 2.0 * Math::atan2(Math::sqrt(a), Math::sqrt(1.0-a))
+      a = (Math::sin(delta_lat / 2.0) ** 2).to_f + (Math::cos(r_lat1) * Math::cos(r_lat2) * (Math::sin(delta_lng / 2.0) ** 2))
+      c = 2.0 * Math::atan2(Math::sqrt(a), Math::sqrt(1.0 - a))
       d = r * c
       d
     end
-
-
   end
-
 end

@@ -1,11 +1,11 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/core_ext'
-require_relative './objects'
-module Parse
+require "active_support"
+require "active_support/core_ext"
+require_relative "./objects"
 
+module Parse
   module API
     # REST API methods for fetching CRUD operations on Parse objects.
     module Aggregate
@@ -33,7 +33,6 @@ module Parse
           end
           "#{PATH_PREFIX}#{className}"
         end
-
       end
 
       # Get the API path for this class.
@@ -55,8 +54,6 @@ module Parse
         response.parse_class = className if response.present?
         response
       end
-
     end #Aggregate
   end #API
-
 end

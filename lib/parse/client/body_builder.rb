@@ -1,13 +1,13 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'faraday'
-require 'faraday_middleware'
-require_relative 'response'
-require_relative 'protocol'
-require 'active_support'
-require 'active_support/core_ext'
-require 'active_model_serializers'
+require "faraday"
+require "faraday_middleware"
+require_relative "response"
+require_relative "protocol"
+require "active_support"
+require "active_support/core_ext"
+require "active_model_serializers"
 
 module Parse
 
@@ -30,7 +30,7 @@ module Parse
     class BodyBuilder < Faraday::Middleware
       include Parse::Protocol
       # Header sent when a GET requests exceeds the limit.
-      HTTP_METHOD_OVERRIDE = 'X-Http-Method-Override'
+      HTTP_METHOD_OVERRIDE = "X-Http-Method-Override"
       # Maximum url length for most server requests before HTTP Method Override is used.
       MAX_URL_LENGTH = 2_000.freeze
       class << self
@@ -53,28 +53,28 @@ module Parse
         # to be POST instead of GET and send the query parameters in the body of the POST request.
         # The standard maximum POST request (which is a server setting), is usually set to 20MBs
         if env[:method] == :get && env[:url].to_s.length >= MAX_URL_LENGTH
-          env[:request_headers][HTTP_METHOD_OVERRIDE] = 'GET'
-          env[:request_headers][CONTENT_TYPE] = 'application/x-www-form-urlencoded'
+          env[:request_headers][HTTP_METHOD_OVERRIDE] = "GET"
+          env[:request_headers][CONTENT_TYPE] = "application/x-www-form-urlencoded"
           # parse-sever looks for method overrides in the body under the `_method` param.
           # so we will add it to the query string, which will now go into the body.
           env[:body] = "_method=GET&" + env[:url].query
           env[:url].query = nil
           #override
           env[:method] = :post
-        # else if not a get, always make sure the request is JSON encoded if the content type matches
+          # else if not a get, always make sure the request is JSON encoded if the content type matches
         elsif env[:request_headers][CONTENT_TYPE] == CONTENT_TYPE_FORMAT &&
-           (env[:body].is_a?(Hash) || env[:body].is_a?(Array))
-           env[:body] = env[:body].to_json
+              (env[:body].is_a?(Hash) || env[:body].is_a?(Array))
+          env[:body] = env[:body].to_json
         end
 
         if self.class.logging
-            puts "[Request #{env.method.upcase}] #{env[:url]}"
-            env[:request_headers].each do |k,v|
-              next if k == Parse::Protocol::MASTER_KEY
-              puts "[Header] #{k} : #{v}"
-            end
+          puts "[Request #{env.method.upcase}] #{env[:url]}"
+          env[:request_headers].each do |k, v|
+            next if k == Parse::Protocol::MASTER_KEY
+            puts "[Header] #{k} : #{v}"
+          end
 
-            puts "[Request Body] #{env[:body]}"
+          puts "[Request Body] #{env[:body]}"
         end
         @app.call(env).on_complete do |response_env|
           # on a response, create a new Parse::Response and replace the :body
@@ -98,7 +98,6 @@ module Parse
           response_env[:body] = r
         end
       end
-
     end
   end #Middleware
 end

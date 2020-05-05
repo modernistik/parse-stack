@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 module Parse
-
   module API
     # Defines the CloudCode interface for the Parse REST API
     module CloudFunctions
@@ -22,8 +21,6 @@ module Parse
       def trigger_job(name, body = {})
         request :post, "jobs/#{name}", body: body
       end
-
     end
   end
-
 end

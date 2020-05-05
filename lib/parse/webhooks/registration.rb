@@ -1,11 +1,11 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require 'active_support/core_ext/string'
-require 'active_support/core_ext'
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require "active_support/core_ext/string"
+require "active_support/core_ext"
 
 module Parse
   # Interface to the CloudCode webhooks API.
@@ -17,39 +17,35 @@ module Parse
 
       # removes all registered webhook functions with Parse Server.
       def remove_all_functions!
-
-          client.functions.results.sort_by { |f| f['functionName'] }.each do |f|
-            next unless f["url"].present?
-            client.delete_function f['functionName']
-            yield(f['functionName']) if block_given?
-          end
+        client.functions.results.sort_by { |f| f["functionName"] }.each do |f|
+          next unless f["url"].present?
+          client.delete_function f["functionName"]
+          yield(f["functionName"]) if block_given?
+        end
       end
 
       # removes all registered webhook triggers with Parse Server.
       def remove_all_triggers!
-
-        client.triggers.results.sort_by { |f| [f['triggerName'],f['className']] }.each do |f|
+        client.triggers.results.sort_by { |f| [f["triggerName"], f["className"]] }.each do |f|
           next unless f["url"].present?
           triggerName = f["triggerName"]
           className = f[Parse::Model::KEY_CLASS_NAME]
           client.delete_trigger triggerName, className
-          yield(f['triggerName'], f[Parse::Model::KEY_CLASS_NAME]) if block_given?
+          yield(f["triggerName"], f[Parse::Model::KEY_CLASS_NAME]) if block_given?
         end
-
       end
 
       # Registers all webhook functions registered with Parse::Stack with Parse server.
       # @param endpoint [String] a https url that points to the webhook server.
       def register_functions!(endpoint)
-
-        unless endpoint.present? && (endpoint.starts_with?('http://') || endpoint.starts_with?('https://') )
+        unless endpoint.present? && (endpoint.starts_with?("http://") || endpoint.starts_with?("https://"))
           raise ArgumentError, "The HOOKS_URL must be http/s: '#{endpoint}''"
         end
-        endpoint += '/' unless endpoint.ends_with?('/')
+        endpoint += "/" unless endpoint.ends_with?("/")
         functionsMap = {}
         client.functions.results.each do |f|
           next unless f["url"].present?
-          functionsMap[ f['functionName'] ] = f["url"]
+          functionsMap[f["functionName"]] = f["url"]
         end
 
         routes.function.keys.sort.each do |functionName|
@@ -62,18 +58,16 @@ module Parse
           end
           yield(functionName) if block_given?
         end
-
       end
 
       # Registers all webhook triggers registered with Parse::Stack with Parse server.
       # @param endpoint [String] a https url that points to the webhook server.
       # @param include_wildcard [Boolean] Allow wildcard registrations
       def register_triggers!(endpoint, include_wildcard: false)
-
-        unless endpoint.present? && (endpoint.starts_with?('http://') || endpoint.starts_with?('https://') )
+        unless endpoint.present? && (endpoint.starts_with?("http://") || endpoint.starts_with?("https://"))
           raise ArgumentError, "The HOOKS_URL must be http/s: '#{endpoint}''"
         end
-        endpoint += '/' unless endpoint.ends_with?('/')
+        endpoint += "/" unless endpoint.ends_with?("/")
         all_triggers = Parse::API::Hooks::TRIGGER_NAMES_LOCAL
 
         current_triggers = {}
@@ -83,19 +77,19 @@ module Parse
           next unless t["url"].present?
           trigger_name = t["triggerName"].underscore.to_sym
           current_triggers[trigger_name] ||= {}
-          current_triggers[trigger_name][ t["className"] ] = t["url"]
+          current_triggers[trigger_name][t["className"]] = t["url"]
         end
 
         all_triggers.each do |trigger|
           classNames = routes[trigger].keys.dup
-          if include_wildcard && classNames.include?('*') #then create the list for all classes
-            classNames.delete '*' #delete the wildcard before we expand it
+          if include_wildcard && classNames.include?("*") #then create the list for all classes
+            classNames.delete "*" #delete the wildcard before we expand it
             classNames = classNames + Parse.registered_classes
             classNames.uniq!
           end
 
           classNames.sort.each do |className|
-            next if className == '*'
+            next if className == "*"
             url = endpoint + "#{trigger}/#{className}"
             if current_triggers[trigger][className].present? #then you may need to update
               next if current_triggers[trigger][className] == url
@@ -103,9 +97,8 @@ module Parse
             else
               client.create_trigger(trigger, className, url)
             end
-            yield(trigger.columnize,className) if block_given?
+            yield(trigger.columnize, className) if block_given?
           end
-
         end
       end
 
@@ -132,7 +125,6 @@ module Parse
           warn "Failed to register Cloud function #{name} with #{url}" if response.error?
           return response
         else # must be trigger
-
           response = client.fetch_trigger(trigger, name)
           # if it is either an error (which has no results) or there is a result but
           # no registered item with a URL (which implies either none registered or only cloud code registered)
@@ -148,7 +140,7 @@ module Parse
           warn "Webhook Registration warning: #{response.result["warning"]}" if response.result.has_key?("warning")
           warn "Webhook Registration error: #{response.error}" if response.error?
           return response
-          end
+        end
       end
     end
   end

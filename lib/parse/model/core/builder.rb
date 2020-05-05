@@ -1,10 +1,10 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext'
-require_relative '../object'
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext"
+require_relative "../object"
 
 module Parse
   # Create all Parse::Object subclasses, including their properties and inferred
@@ -60,9 +60,9 @@ module Parse
 
           data_type = type[:type].downcase.to_sym
           if data_type == :pointer
-            klass.belongs_to key, as: type[:targetClass],  field: field
+            klass.belongs_to key, as: type[:targetClass], field: field
           elsif data_type == :relation
-            klass.has_many key, through: :relation, as: type[:targetClass],  field: field
+            klass.has_many key, through: :relation, as: type[:targetClass], field: field
           else
             klass.property key, data_type, field: field
           end

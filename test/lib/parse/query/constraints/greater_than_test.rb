@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestGreaterThanConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -10,5 +10,4 @@ class TestGreaterThanConstraint < Minitest::Test
     @operand = :gt
     @keys = [:gt, :greater_than, :after]
   end
-
 end

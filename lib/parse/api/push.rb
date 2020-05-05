@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 module Parse
-
   module API
     # Defines the Parse Push notification service interface for the Parse REST API
     module Push
@@ -16,9 +15,6 @@ module Parse
       def push(payload = {})
         request :post, PUSH_PATH, body: payload.as_json
       end
-
     end
-
   end
-
 end

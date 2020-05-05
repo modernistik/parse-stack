@@ -1,15 +1,15 @@
-require 'faraday'
-require 'faraday_middleware'
-require 'active_support'
-require 'moneta'
-require 'active_model_serializers'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require 'active_support/core_ext/string'
-require 'active_support/core_ext/date/calculations'
-require 'active_support/core_ext/date_time/calculations'
-require 'active_support/core_ext/time/calculations'
-require 'active_support/core_ext'
+require "faraday"
+require "faraday_middleware"
+require "active_support"
+require "moneta"
+require "active_model_serializers"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require "active_support/core_ext/string"
+require "active_support/core_ext/date/calculations"
+require "active_support/core_ext/date_time/calculations"
+require "active_support/core_ext/time/calculations"
+require "active_support/core_ext"
 require_relative "client/request"
 require_relative "client/response"
 require_relative "client/batch"
@@ -21,21 +21,28 @@ require_relative "api/all"
 module Parse
   class Error < StandardError
     # An error when a general connection occurs.
-    class ConnectionError < Error; end;
+    class ConnectionError < Error; end
+
     # An error when a connection timeout occurs.
-    class TimeoutError < Error; end;
+    class TimeoutError < Error; end
+
     # An error when there is an Parse REST API protocol error.
-    class ProtocolError < Error; end;
+    class ProtocolError < Error; end
+
     # An error when the Parse server returned invalid code.
-    class ServerError < Error; end;
+    class ServerError < Error; end
+
     # An error when a Parse server responds with HTTP 500.
-    class ServiceUnavailableError < Error; end;
+    class ServiceUnavailableError < Error; end
+
     # An error when the authentication credentials in the request are invalid.
-    class AuthenticationError < Error; end;
+    class AuthenticationError < Error; end
+
     # An error when the burst limit has been exceeded.
-    class RequestLimitExceededError < Error; end;
+    class RequestLimitExceededError < Error; end
+
     # An error when the session token provided in the request is invalid.
-    class InvalidSessionTokenError < Error; end;
+    class InvalidSessionTokenError < Error; end
   end
 
   # Retrieve the App specific Parse configuration parameters. The configuration
@@ -129,7 +136,7 @@ module Parse
     RETRY_DELAY = 1.5
 
     # An error when a general response error occurs when communicating with Parse server.
-    class ResponseError < Parse::Error; end;
+    class ResponseError < Parse::Error; end
 
     # @!attribute cache
     #  The underlying cache store for caching API requests.
@@ -198,7 +205,6 @@ module Parse
       def setup(opts = {})
         @clients[:default] = self.new(opts, &Proc.new)
       end
-
     end
 
     # Create a new client connected to the Parse Server REST API endpoint.
@@ -242,16 +248,16 @@ module Parse
     # @see Parse::Middleware::Authentication
     # @see Parse::Protocol
     def initialize(opts = {})
-      @server_url     = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
-      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_SERVER_APPLICATION_ID"] || ENV['PARSE_APP_ID']
-      @api_key        = opts[:api_key] || opts[:rest_api_key]  || ENV["PARSE_SERVER_REST_API_KEY"] || ENV["PARSE_API_KEY"]
-      @master_key     = opts[:master_key] || ENV['PARSE_SERVER_MASTER_KEY'] || ENV["PARSE_MASTER_KEY"]
+      @server_url = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
+      @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_SERVER_APPLICATION_ID"] || ENV["PARSE_APP_ID"]
+      @api_key = opts[:api_key] || opts[:rest_api_key] || ENV["PARSE_SERVER_REST_API_KEY"] || ENV["PARSE_API_KEY"]
+      @master_key = opts[:master_key] || ENV["PARSE_SERVER_MASTER_KEY"] || ENV["PARSE_MASTER_KEY"]
       opts[:adapter] ||= Faraday.default_adapter
       opts[:expires] ||= 3
-      if @server_url.nil? || @application_id.nil? || ( @api_key.nil? && @master_key.nil? )
+      if @server_url.nil? || @application_id.nil? || (@api_key.nil? && @master_key.nil?)
         raise Parse::Error::ConnectionError, "Please call Parse.setup(server_url:, application_id:, api_key:) to setup a client"
       end
-      @server_url += '/' unless @server_url.ends_with?('/')
+      @server_url += "/" unless @server_url.ends_with?("/")
       #Configure Faraday
       opts[:faraday] ||= {}
       opts[:faraday].merge!(:url => @server_url)
@@ -267,9 +273,9 @@ module Parse
         # so that other middlewares have access to the env that is being set by
         # this middleware. First added is first to brocess.
         conn.use Parse::Middleware::Authentication,
-                    application_id: @application_id,
-                    master_key: @master_key,
-                    api_key: @api_key
+                 application_id: @application_id,
+                 master_key: @master_key,
+                 api_key: @api_key
         # This middleware turns the result from Parse into a Parse::Response object
         # and making sure request that are going out, follow the proper MIME format.
         # We place it after the Authentication middleware in case we need to use then
@@ -294,13 +300,12 @@ module Parse
             raise ArgumentError, "Parse::Client option :cache needs to be a type of Moneta store"
           end
           self.cache = opts[:cache]
-          conn.use Parse::Middleware::Caching, self.cache, {expires: opts[:expires].to_i }
+          conn.use Parse::Middleware::Caching, self.cache, { expires: opts[:expires].to_i }
         end
 
         yield(conn) if block_given?
 
         conn.adapter opts[:adapter]
-
       end
       Parse::Client.clients[:default] ||= self
     end
@@ -383,11 +388,11 @@ module Parse
       # if the first argument is a Parse::Request object, then construct it
       _request = nil
       if method.is_a?(Request)
-        _request     = method
-        method       = _request.method
-        uri        ||= _request.path
-        query      ||= _request.query
-        body       ||= _request.body
+        _request = method
+        method = _request.method
+        uri ||= _request.path
+        query ||= _request.query
+        body ||= _request.body
         headers.merge! _request.headers
       else
         _request = Parse::Request.new(method, uri, body: body, headers: headers, opts: opts)
@@ -471,7 +476,7 @@ module Parse
         warn "[Parse:Retry] Retries remaining #{_retry_count} : #{response.request}"
         _retry_count -= 1
         backoff_delay = RETRY_DELAY * (self.retry_limit - _retry_count)
-        _retry_delay = [0,RETRY_DELAY, backoff_delay].sample
+        _retry_delay = [0, RETRY_DELAY, backoff_delay].sample
         sleep _retry_delay if _retry_delay > 0
         retry
       end
@@ -481,7 +486,7 @@ module Parse
         warn "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
         _retry_count -= 1
         backoff_delay = RETRY_DELAY * (self.retry_limit - _retry_count)
-        _retry_delay = [0,RETRY_DELAY, backoff_delay].sample
+        _retry_delay = [0, RETRY_DELAY, backoff_delay].sample
         sleep _retry_delay if _retry_delay > 0
         retry
       end
@@ -502,7 +507,7 @@ module Parse
     # @param body [Hash] a hash that will be JSON encoded for the body of this request.
     # @param headers (see #get)
     # @return (see #request)
-    def post(uri, body = nil, headers = {} )
+    def post(uri, body = nil, headers = {})
       request :post, uri, body: body, headers: headers
     end
 
@@ -547,18 +552,18 @@ module Parse
       # a the default {Parse::Client} instance.
       module ClassMethods
 
-          # @return [Parse::Client] the current client for :default.
-          attr_accessor :client
-          def client
-            @client ||= Parse::Client.client #defaults to :default tag
-          end
+        # @return [Parse::Client] the current client for :default.
+        attr_accessor :client
+
+        def client
+          @client ||= Parse::Client.client #defaults to :default tag
+        end
       end
 
       # @return [Parse::Client] the current client defined for the class.
       def client
         self.class.client
       end
-
     end #Connectable
   end
 
@@ -588,7 +593,7 @@ module Parse
   # @param opts (see Parse.call_function)
   # @return (see Parse.call_function)
   def self.trigger_job(name, body = {}, **opts)
-    conn = opts[:session] || opts[:client] ||  :default
+    conn = opts[:session] || opts[:client] || :default
     response = Parse::Client.client(conn).trigger_job(name, body)
     return response if opts[:raw].present?
     response.error? ? nil : response.result["result"]
@@ -600,10 +605,9 @@ module Parse
   # @param opts [Hash] additional options.
   # @return [Object] the result data of the response. nil if there was an error.
   def self.call_function(name, body = {}, **opts)
-    conn = opts[:session] || opts[:client] ||  :default
+    conn = opts[:session] || opts[:client] || :default
     response = Parse::Client.client(conn).call_function(name, body)
     return response if opts[:raw].present?
     response.error? ? nil : response.result["result"]
   end
-
 end

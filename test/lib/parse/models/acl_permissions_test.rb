@@ -1,27 +1,27 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
 class TestACLPermissions < Minitest::Test
-  READ_ONLY = {read: true}
-  WRITE_ONLY = {write: true}
-  READ_AND_WRITE = {read: true, write: true}
+  READ_ONLY = { read: true }
+  WRITE_ONLY = { write: true }
+  READ_AND_WRITE = { read: true, write: true }
   MASTER_KEY_ONLY = {}
 
   def test_permissions
     no_permissions = Parse::ACL::Permission.new false, false
     assert_equal no_permissions, Parse::ACL::Permission.new
-    assert_equal no_permissions, Parse::ACL::Permission.new(false,false)
+    assert_equal no_permissions, Parse::ACL::Permission.new(false, false)
     assert_equal no_permissions, Parse::ACL::Permission.new(MASTER_KEY_ONLY)
     assert no_permissions
     refute no_permissions.read
     refute no_permissions.write
 
-    read_only = Parse::ACL::Permission.new true,false
+    read_only = Parse::ACL::Permission.new true, false
     assert_equal read_only, Parse::ACL::Permission.new(true, false)
     assert_equal read_only, Parse::ACL::Permission.new(READ_ONLY)
     assert read_only.read
     refute read_only.write
 
-    write_only = Parse::ACL::Permission.new false,true
+    write_only = Parse::ACL::Permission.new false, true
     assert_equal write_only, Parse::ACL::Permission.new(false, true)
     assert_equal write_only, Parse::ACL::Permission.new(WRITE_ONLY)
     refute write_only.read
@@ -47,5 +47,4 @@ class TestACLPermissions < Minitest::Test
     refute_equal read_and_write, write_only
     refute_equal read_and_write, read_only
   end
-
 end

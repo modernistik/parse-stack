@@ -1,13 +1,12 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
-class MyTestTimeZone < Parse::Object; end;
+class MyTestTimeZone < Parse::Object; end
 
 class TestTimeZone < Minitest::Test
-
   def setup
-    @la = 'America/Los_Angeles'
-    @paris = 'Europe/Paris'
-    @chicago = 'America/Chicago'
+    @la = "America/Los_Angeles"
+    @paris = "Europe/Paris"
+    @chicago = "America/Chicago"
   end
 
   def test_property_definition
@@ -16,7 +15,7 @@ class TestTimeZone < Minitest::Test
     refute_nil MyTestTimeZone.fields[:time_zone]
     refute_nil MyTestTimeZone.fields[:timeZone]
     assert_equal MyTestTimeZone.fields[:time_zone], :timezone
-    assert_equal MyTestTimeZone.fields[:timeZone],  :timezone
+    assert_equal MyTestTimeZone.fields[:timeZone], :timezone
     assert_equal MyTestTimeZone.attributes[:timeZone], :timezone
   end
 
@@ -51,7 +50,7 @@ class TestTimeZone < Minitest::Test
   def test_validation
     tz = Parse::TimeZone.new @la
     assert tz.valid?
-    tz = Parse::TimeZone.new 'Galaxy/Andromeda'
+    tz = Parse::TimeZone.new "Galaxy/Andromeda"
     refute tz.valid?
     tz.name = @chicago
     assert tz.valid?
@@ -62,5 +61,4 @@ class TestTimeZone < Minitest::Test
     assert_equal tz.name, tz.as_json
     assert_equal tz.name, tz.to_s
   end
-
 end

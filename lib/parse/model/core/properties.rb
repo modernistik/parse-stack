@@ -1,18 +1,17 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext'
-require 'active_support/core_ext/object'
-require 'active_support/inflector'
-require 'active_model_serializers'
-require 'active_support/inflector'
-require 'active_model_serializers'
-require 'active_support/hash_with_indifferent_access'
-require 'time'
-
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext"
+require "active_support/core_ext/object"
+require "active_support/inflector"
+require "active_model_serializers"
+require "active_support/inflector"
+require "active_model_serializers"
+require "active_support/hash_with_indifferent_access"
+require "time"
 
 module Parse
 
@@ -22,15 +21,15 @@ module Parse
     # These are the base types supported by Parse.
     TYPES = [:string, :relation, :integer, :float, :boolean, :date, :array, :file, :geopoint, :bytes, :object, :acl, :timezone].freeze
     # These are the base mappings of the remote field name types.
-    BASE = {objectId: :string, createdAt: :date, updatedAt: :date, ACL: :acl}.freeze
+    BASE = { objectId: :string, createdAt: :date, updatedAt: :date, ACL: :acl }.freeze
     # The list of properties that are part of all objects
     BASE_KEYS = [:id, :created_at, :updated_at].freeze
     # Default hash map of local attribute name to remote column name
-    BASE_FIELD_MAP = {id: :objectId, created_at: :createdAt, updated_at: :updatedAt, acl: :ACL}.freeze
+    BASE_FIELD_MAP = { id: :objectId, created_at: :createdAt, updated_at: :updatedAt, acl: :ACL }.freeze
     # The delete operation hash.
-    CORE_FIELDS = {id: :string, created_at: :date, updated_at: :date, acl: :acl}.freeze
+    CORE_FIELDS = { id: :string, created_at: :date, updated_at: :date, acl: :acl }.freeze
     # The delete operation hash.
-    DELETE_OP = {"__op"=>"Delete"}.freeze
+    DELETE_OP = { "__op" => "Delete" }.freeze
     # @!visibility private
     def self.included(base)
       base.extend(ClassMethods)
@@ -49,7 +48,7 @@ module Parse
         @fields ||= (self == Parse::Object ? CORE_FIELDS : Parse::Object.fields).dup
         if type.present?
           type = type.to_sym
-          return @fields.select { |k,v| v == type }
+          return @fields.select { |k, v| v == type }
         end
         @fields
       end
@@ -101,7 +100,6 @@ module Parse
       # "myDate" (lower-first-camelcase) with a Parse data type of Date.
       # You can override the implicit naming behavior by passing the option :field to override.
       def property(key, data_type = :string, **opts)
-
         key = key.to_sym
         ivar = :"@#{key}"
         will_change_method = :"#{key}_will_change!"
@@ -125,25 +123,24 @@ module Parse
 
         # set defaults
         opts = { required: false,
-                 alias: true,
-                 symbolize: false,
-                 enum: nil,
-                 scopes: true,
-                 _prefix: nil,
-                 _suffix: false,
-                 field: key.to_s.camelize(:lower)
-               }.merge( opts )
+                alias: true,
+                symbolize: false,
+                enum: nil,
+                scopes: true,
+                _prefix: nil,
+                _suffix: false,
+                field: key.to_s.camelize(:lower) }.merge(opts)
         #By default, the remote field name is a lower-first-camelcase version of the key
         # it can be overriden by the :field parameter
         parse_field = opts[:field].to_sym
         # if this is a custom property that is already defined, OR it is a subclass trying to define a core property
         # then warn and exit.
-        if (self.fields[key].present? && BASE_FIELD_MAP[key].nil?) || ( self < Parse::Object && BASE_FIELD_MAP.has_key?(key) )
+        if (self.fields[key].present? && BASE_FIELD_MAP[key].nil?) || (self < Parse::Object && BASE_FIELD_MAP.has_key?(key))
           warn "Property #{self}##{key} already defined with data type :#{data_type}. Will be ignored."
           return false
         end
         # We keep the list of fields that are on the remote Parse store
-        if self.fields[parse_field].present? || ( self < Parse::Object && BASE.has_key?(parse_field) )
+        if self.fields[parse_field].present? || (self < Parse::Object && BASE.has_key?(parse_field))
           warn "Alias property #{self}##{parse_field} conflicts with previously defined property. Will be ignored."
           return false
           # raise ArgumentError
@@ -152,13 +149,13 @@ module Parse
         define_attribute_methods key
 
         # this hash keeps list of attributes (based on remote fields) and their data types
-        self.attributes.merge!( parse_field => data_type )
+        self.attributes.merge!(parse_field => data_type)
         # this maps all the possible attribute fields and their data types. We use both local
         # keys and remote keys because when we receive a remote object that has the remote field name
         # we need to know what the data type conversion should be.
-        self.fields.merge!( key => data_type, parse_field => data_type )
+        self.fields.merge!(key => data_type, parse_field => data_type)
         # This creates a mapping between the local field and the remote field name.
-        self.field_map.merge!( key => parse_field )
+        self.field_map.merge!(key => parse_field)
 
         # if the field is marked as required, then add validations
         if opts[:required]
@@ -183,7 +180,6 @@ module Parse
         is_enum_type = opts[:enum].nil? == false
 
         if is_enum_type
-
           unless data_type == :string
             raise ArgumentError, "Property #{self}##{parse_field} :enum option is only supported on :string data types."
           end
@@ -196,7 +192,7 @@ module Parse
 
           enum_values = enum_values.dup.map(&:to_sym).freeze
 
-          self.enums.merge!( key => enum_values )
+          self.enums.merge!(key => enum_values)
           allow_nil = opts[:required] == false
           validates key, inclusion: { in: enum_values }, allow_nil: allow_nil
 
@@ -217,9 +213,7 @@ module Parse
 
             class_method_name = prefix_or_key.to_s.pluralize.to_sym
             if singleton_class.method_defined?(class_method_name)
-              raise ArgumentError, "You tried to define an enum named `#{key}` for #{self} " + \
-              "but this will generate a method  `#{self}.#{class_method_name}` " + \
-              " which is already defined. Try using :_suffix or :_prefix options."
+              raise ArgumentError, "You tried to define an enum named `#{key}` for #{self} " + "but this will generate a method  `#{self}.#{class_method_name}` " + " which is already defined. Try using :_suffix or :_prefix options."
             end
 
             define_singleton_method(class_method_name) { enum_values }
@@ -239,17 +233,13 @@ module Parse
               elsif prefix.present?
                 method_name = :"#{prefix}_#{enum}"
               end
-              self.scope method_name, ->(ex = {}){ ex.merge!(key => enum); query( ex )  }
-
+              self.scope method_name, ->(ex = {}) { ex.merge!(key => enum); query(ex) }
 
               define_method("#{method_name}!") { send set_attribute_method, enum, true }
               define_method("#{method_name}?") { enum == send(key).to_s.to_sym }
             end
           end # unless scopes
-
         end # if is enum
-
-
 
         symbolize_value = opts[:symbolize]
 
@@ -271,7 +261,6 @@ module Parse
             # we'll assume it's just a plain literal value
             default_value.is_a?(Proc) ? default_value.call(self) : default_value
           end
-
         end
 
         # We define a getter with the key
@@ -295,12 +284,11 @@ module Parse
           # if value is nil (even after fetching), then lets see if the developer
           # set a default value for this attribute.
           if value.nil? && respond_to?("#{key}_default")
-
-             value = send("#{key}_default")
-             value = format_value(key, value, data_type)
+            value = send("#{key}_default")
+            value = format_value(key, value, data_type)
             # lets set the variable with the updated value
-             instance_variable_set ivar, value
-             send will_change_method
+            instance_variable_set ivar, value
+            send will_change_method
           elsif value.nil? && data_type == :array
             value = Parse::CollectionProxy.new [], delegate: self, key: key
             instance_variable_set ivar, value
@@ -318,12 +306,12 @@ module Parse
           end
           # finally return the value
           if symbolize_value
-              if data_type == :string
-                return value.respond_to?(:to_sym) ? value.to_sym : value
-              elsif data_type == :array && value.is_a?(Array)
-                # value.map(&:to_sym)
-                return value.compact.map { |m| m.respond_to?(:to_sym) ? m.to_sym : m }
-              end
+            if data_type == :string
+              return value.respond_to?(:to_sym) ? value.to_sym : value
+            elsif data_type == :array && value.is_a?(Array)
+              # value.map(&:to_sym)
+              return value.compact.map { |m| m.respond_to?(:to_sym) ? m.to_sym : m }
+            end
           end
 
           value
@@ -338,7 +326,7 @@ module Parse
           # returns true if set to true, false otherwise
           define_method("#{key}?") { (send(key) == true) }
           unless opts[:scopes] == false
-            scope key, ->(opts = {}){ query( opts.merge(key => true) ) }
+            scope key, ->(opts = {}) { query(opts.merge(key => true)) }
           end
         elsif data_type == :integer || data_type == :float
           if self.method_defined?("#{key}_increment!")
@@ -369,7 +357,6 @@ module Parse
             amount = -amount if amount > 0
             send("#{key}_increment!", amount)
           end
-
         end
 
         # The second method to be defined is a setter method. This is done by
@@ -393,7 +380,7 @@ module Parse
           # this will grab the current value and keep a copy of it - but we only do this if
           # the new value being set is different from the current value stored.
           if track == true
-            send will_change_method unless val == instance_variable_get( ivar )
+            send will_change_method unless val == instance_variable_get(ivar)
           end
 
           if symbolize_value
@@ -435,7 +422,6 @@ module Parse
         end
         true
       end # property
-
     end #ClassMethods
 
     # @return [Hash] a hash mapping of all property fields and their types.
@@ -451,7 +437,7 @@ module Parse
     # TODO: We can optimize
     # @return [Hash] returns the list of property attributes for this class.
     def attributes
-      {__type: :string, :className => :string}.merge!(self.class.attributes)
+      { __type: :string, :className => :string }.merge!(self.class.attributes)
     end
 
     # support for setting a hash of attributes on the object with a given dirty tracking value
@@ -466,7 +452,7 @@ module Parse
       @id ||= hash[Parse::Model::ID] || hash[Parse::Model::OBJECT_ID] || hash[:objectId]
       hash.each do |key, value|
         method = "#{key}_set_attribute!".freeze
-        send(method, value, dirty_track) if respond_to?( method )
+        send(method, value, dirty_track) if respond_to?(method)
       end
     end
 
@@ -494,7 +480,7 @@ module Parse
         next unless fields[key].present?
         remote_field = self.field_map[key] || key
         h[remote_field] = send key
-        h[remote_field] = {__op: :Delete} if h[remote_field].nil?
+        h[remote_field] = { __op: :Delete } if h[remote_field].nil?
         # in the case that the field is a Parse object, generate a pointer
         # if it is a Parse::PointerCollectionProxy, then make sure we get a list of pointers.
         h[remote_field] = h[remote_field].parse_pointers if h[remote_field].is_a?(Parse::PointerCollectionProxy)
@@ -509,6 +495,7 @@ module Parse
         fields[key.to_sym].present?
       end
     end
+
     # Returns a formatted value based on the operation hash and data_type of the property.
     # For some values in Parse, they are specified as operation hashes which could include
     # Add, Remove, Delete, AddUnique and Increment.
@@ -585,7 +572,7 @@ module Parse
         val = val.to_f unless val.blank?
       when :acl
         # ACL types go through a special conversion
-          val = ACL.typecast(val, self)
+        val = ACL.typecast(val, self)
       when :date
         # if it respond to parse_date, then use that as the conversion.
         if val.respond_to?(:parse_date) && val.is_a?(Parse::Date) == false
@@ -596,9 +583,9 @@ module Parse
         elsif val.is_a?(String)
           # if it's a string, try parsing the date
           val = Parse::Date.parse val
-        #elsif val.present?
-        #  pus "[Parse::Stack] Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
-        #   raise ValueError, "Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
+          #elsif val.present?
+          #  pus "[Parse::Stack] Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
+          #   raise ValueError, "Invalid date value '#{val}' assigned to #{self.class}##{key}, it should be a Parse::Date or DateTime."
         end
       when :timezone
         val = Parse::TimeZone.new(val) if val.present?
@@ -613,7 +600,5 @@ module Parse
       end
       val
     end
-
   end # Properties
-
 end # Parse

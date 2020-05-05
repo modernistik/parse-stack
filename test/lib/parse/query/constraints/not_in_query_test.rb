@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestNotInQueryConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -11,5 +11,4 @@ class TestNotInQueryConstraint < Minitest::Test
     @keys = [:excludes, :not_in_query]
     @skip_scalar_values_test = true
   end
-
 end

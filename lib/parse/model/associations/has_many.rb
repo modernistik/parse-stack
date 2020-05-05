@@ -1,13 +1,12 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative '../pointer'
-require_relative 'collection_proxy'
-require_relative 'pointer_collection_proxy'
-require_relative 'relation_collection_proxy'
+require_relative "../pointer"
+require_relative "collection_proxy"
+require_relative "pointer_collection_proxy"
+require_relative "relation_collection_proxy"
 
 module Parse
-
   module Associations
 
     # Parse has many ways to implement one-to-many and many-to-many
@@ -325,9 +324,11 @@ module Parse
       # @!visibility private
       module ClassMethods
         attr_accessor :relations
+
         def relations
           @relations ||= {}
         end
+
         # Examples:
         # has_many :fans, as: :users, through: :relation, field: "awesomeFans"
         # has_many :songs
@@ -353,7 +354,7 @@ module Parse
           # the remote class is either key or as.
           opts[:scope_only] ||= false
           klassName = (opts[:as] || key).to_parse_class singularize: true
-          foreign_field = (opts[:field] || parse_class.columnize ).to_sym
+          foreign_field = (opts[:field] || parse_class.columnize).to_sym
 
           define_method(key) do |*args, &block|
             return [] if @id.nil?
@@ -372,7 +373,7 @@ module Parse
                 query.instance_exec(&scope)
                 query.conditions(*args) if args.present?
               else
-                query.instance_exec(*args,&scope)
+                query.instance_exec(*args, &scope)
               end
               instance = nil # help clean up ruby gc
             elsif args.present?
@@ -383,11 +384,10 @@ module Parse
               klass = Parse::Model.find_class klassName
 
               if klass.present? && klass.respond_to?(m)
-
                 klass_scope = klass.send(m, *args) # blocks only passed to final result set
                 return klass_scope unless klass_scope.is_a?(Parse::Query)
                 # merge constraints
-                add_constraints( klass_scope.constraints )
+                add_constraints(klass_scope.constraints)
                 # if a block was passed, execute the query, otherwise return the query
                 return chained_block.present? ? results(&chained_block) : self
               end
@@ -399,7 +399,6 @@ module Parse
             return query if block.nil?
             query.results(&block)
           end
-
         end
 
         # Define a one-to-many or many-to-many association between the local model and a foreign class.
@@ -412,9 +411,10 @@ module Parse
 
           # below this is the same
           opts.reverse_merge!({
-                  field: key.to_s.camelize(:lower),
-                  required: false,
-                  as: key})
+            field: key.to_s.camelize(:lower),
+            required: false,
+            as: key,
+          })
 
           klassName = opts[:as].to_parse_class singularize: true
           parse_field = opts[:field].to_sym # name of the column (local or remote)
@@ -446,12 +446,12 @@ module Parse
             proxyKlass = Parse::RelationCollectionProxy
             self.relations[key] = klassName
           else
-            self.attributes.merge!( parse_field => :array )
+            self.attributes.merge!(parse_field => :array)
             # Add them to the list of fields in our class model
-            self.fields.merge!( key => :array, parse_field => :array )
+            self.fields.merge!(key => :array, parse_field => :array)
           end
 
-          self.field_map.merge!( key => parse_field )
+          self.field_map.merge!(key => parse_field)
           # dirty tracking
           define_attribute_methods key
 
@@ -476,7 +476,7 @@ module Parse
 
           # proxy setter that forwards with dirty tracking
           define_method("#{key}=") do |val|
-              send set_attribute_method, val, true
+            send set_attribute_method, val, true
           end
 
           # This will set the content of the proxy.
@@ -510,7 +510,7 @@ module Parse
 
             # send dirty tracking if set
             if track == true
-              send will_change_method unless val == instance_variable_get( ivar )
+              send will_change_method unless val == instance_variable_get(ivar)
             end
             # TODO: Only allow empty proxy collection class as a value or nil.
             if val.is_a?(Parse::CollectionProxy)
@@ -518,7 +518,6 @@ module Parse
             else
               warn "[#{self.class}] Invalid value #{val} for :has_many field #{key}. Should be an Array or a CollectionProxy"
             end
-
           end
 
           data_type = opts[:through]
@@ -535,7 +534,6 @@ module Parse
               q = self.send :"#{key}_relation_query"
               q.results || []
             end
-
           end
 
           # if the remote field name and the local field name are the same
@@ -549,8 +547,6 @@ module Parse
           elsif parse_field.to_sym != :objectId
             warn "Alias has_many method #{self}##{parse_field} already defined."
           end
-
-
         end # has_many_array
       end #ClassMethods
 
@@ -578,9 +574,6 @@ module Parse
       def relation_changes?
         changed.any? { |key| relations[key.to_sym] }
       end
-
     end # HasMany
   end #Associations
-
-
 end # Parse

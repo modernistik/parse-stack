@@ -2,8 +2,6 @@
 # frozen_string_literal: true
 
 module Parse
-
-
   module API
     # Defines the Parse webhooks interface for the Parse REST API
     module Hooks
@@ -23,7 +21,7 @@ module Parse
       # Fetch all defined cloud code functions.
       # @return [Parse::Response]
       def functions
-        opts = {cache: false}
+        opts = { cache: false }
         request :get, "#{HOOKS_PREFIX}functions", opts: opts
       end
 
@@ -39,7 +37,7 @@ module Parse
       # @param url [String] the url endpoint for this cloud code function.
       # @return [Parse::Response]
       def create_function(functionName, url)
-        request :post, "#{HOOKS_PREFIX}functions", body: {functionName: functionName, url: url}
+        request :post, "#{HOOKS_PREFIX}functions", body: { functionName: functionName, url: url }
       end
 
       # Updated the endpoint url for a registered cloud code webhook function.
@@ -62,7 +60,7 @@ module Parse
       # Get the set of registered triggers.
       # @return [Parse::Response]
       def triggers
-        opts = {cache: false}
+        opts = { cache: false }
         request :get, "#{HOOKS_PREFIX}triggers", opts: opts
       end
 
@@ -84,7 +82,7 @@ module Parse
       # @see Parse::API::Hooks::TRIGGER_NAMES
       def create_trigger(triggerName, className, url)
         triggerName = _verify_trigger(triggerName)
-        body = {className: className, triggerName: triggerName, url: url }
+        body = { className: className, triggerName: triggerName, url: url }
         request :post, "#{HOOKS_PREFIX}triggers", body: body
       end
 
@@ -108,8 +106,6 @@ module Parse
         triggerName = _verify_trigger(triggerName)
         request :put, "#{HOOKS_PREFIX}triggers/#{className}/#{triggerName}", body: { __op: "Delete" }
       end
-
     end
   end
-
 end

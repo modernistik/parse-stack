@@ -1,12 +1,11 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require_relative 'collection_proxy'
-
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require_relative "collection_proxy"
 
 module Parse
   # A PointerCollectionProxy is a collection proxy that only allows Parse Pointers (Objects)
@@ -101,7 +100,5 @@ module Parse
     def as_json(opts = nil)
       parse_pointers.as_json(opts)
     end
-
   end
-
 end

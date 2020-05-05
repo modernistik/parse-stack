@@ -1,8 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/values/time_zone'
+require "active_support"
+require "active_support/values/time_zone"
 require_relative "model"
 
 module Parse
@@ -118,7 +118,7 @@ module Parse
         @name = timezone
         @zone = nil
       else
-        raise ArgumentError, 'Invalid value passed to Parse::TimeZone#zone.'
+        raise ArgumentError, "Invalid value passed to Parse::TimeZone#zone."
       end
     end
 
@@ -137,7 +137,5 @@ module Parse
     def valid?
       ActiveSupport::TimeZone[to_s].present?
     end
-
   end
-
 end

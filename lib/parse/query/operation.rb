@@ -1,9 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/inflector'
-
+require "active_support"
+require "active_support/inflector"
 
 module Parse
 
@@ -36,7 +35,7 @@ module Parse
 
     # Whether this operation is defined properly.
     def valid?
-      ! (@operand.nil? || @operator.nil? || handler.nil?)
+      !(@operand.nil? || @operator.nil? || handler.nil?)
     end
 
     # @return [Parse::Constraint] the constraint class designed to handle
@@ -69,13 +68,11 @@ module Parse
 
     # Register a new symbol operator method mapped to a specific {Parse::Constraint}.
     def self.register(op, klass)
-        Operation.operators[op.to_sym] = klass
-        Symbol.send :define_method, op do |value = nil|
-          operation = Operation.new self, op
-          value.nil? ? operation : operation.constraint(value)
-        end
+      Operation.operators[op.to_sym] = klass
+      Symbol.send :define_method, op do |value = nil|
+        operation = Operation.new self, op
+        value.nil? ? operation : operation.constraint(value)
+      end
     end
-
   end
-
 end

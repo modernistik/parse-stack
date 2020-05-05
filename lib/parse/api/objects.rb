@@ -1,11 +1,10 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/core_ext'
+require "active_support"
+require "active_support/core_ext"
 
 module Parse
-
   module API
     # REST API methods for fetching CRUD operations on Parse objects.
     module Objects
@@ -15,10 +14,9 @@ module Parse
 
       # @!visibility private
       PREFIX_MAP = { installation: "installations", _installation: "installations",
-        user: "users", _user: "users",
-        role: "roles", _role: "roles",
-        session: "sessions", _session: "sessions"
-      }.freeze
+                    user: "users", _user: "users",
+                    role: "roles", _role: "roles",
+                    session: "sessions", _session: "sessions" }.freeze
 
       # @!visibility private
       def self.included(base)
@@ -43,7 +41,6 @@ module Parse
           end
           id.present? ? "#{uri}/#{id}" : "#{uri}/"
         end
-
       end
 
       # Get the API path for this class.
@@ -61,7 +58,7 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def create_object(className, body = {}, headers: {}, **opts)
-        response = request :post, uri_path(className) , body: body, headers: headers, opts: opts
+        response = request :post, uri_path(className), body: body, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
@@ -111,12 +108,10 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def update_object(className, id, body = {}, headers: {}, **opts)
-        response = request :put, uri_path(className,id) , body: body, headers: headers, opts: opts
+        response = request :put, uri_path(className, id), body: body, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
       end
-
     end #Objects
   end #API
-
 end

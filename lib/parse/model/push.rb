@@ -1,9 +1,10 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative '../query.rb'
-require_relative '../client.rb'
-require 'active_model_serializers'
+require_relative "../query.rb"
+require_relative "../client.rb"
+require "active_model_serializers"
+
 module Parse
   # This class represents the API to send push notification to devices that are
   # available in the Installation table. Push notifications are implemented
@@ -68,7 +69,7 @@ module Parse
     # @!attribute [rw] channels
     #   @return [Array] an array of strings for subscribed channels.
     attr_accessor :query, :alert, :badge, :sound, :title, :data,
-    :expiration_time, :expiration_interval, :push_time, :channels
+                  :expiration_time, :expiration_interval, :push_time, :channels
 
     alias_method :message, :alert
     alias_method :message=, :alert=
@@ -134,13 +135,12 @@ module Parse
       msg = {
         data: {
           alert: alert,
-          badge: badge || "Increment"
-        }
+          badge: badge || "Increment",
+        },
       }
       msg[:data][:sound] = sound if sound.present?
       msg[:data][:title] = title if title.present?
       msg[:data].merge! @data if @data.is_a?(Hash)
-
 
       if @expiration_time.present?
         msg[:expiration_time] = @expiration_time.respond_to?(:iso8601) ? @expiration_time.iso8601(3) : @expiration_time
@@ -170,9 +170,7 @@ module Parse
     def send(message = nil)
       @alert = message if message.is_a?(String)
       @data = message if message.is_a?(Hash)
-      client.push( payload.as_json )
+      client.push(payload.as_json)
     end
-
   end
-
 end

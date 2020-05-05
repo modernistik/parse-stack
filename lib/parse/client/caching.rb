@@ -1,10 +1,10 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'faraday'
-require 'faraday_middleware'
-require 'moneta'
-require_relative 'protocol'
+require "faraday"
+require "faraday_middleware"
+require "moneta"
+require_relative "protocol"
 
 module Parse
   module Middleware
@@ -28,13 +28,13 @@ module Parse
       # * 410 - 'Gone' - removed
       CACHEABLE_HTTP_CODES = [200, 203, 300, 301, 302].freeze
       # Cache control header
-      CACHE_CONTROL = 'Cache-Control'
+      CACHE_CONTROL = "Cache-Control"
       # Request env key for the content length
-      CONTENT_LENGTH_KEY = 'content-length'
+      CONTENT_LENGTH_KEY = "content-length"
       # Header in response that is sent if this is a cached result
-      CACHE_RESPONSE_HEADER = 'X-Cache-Response'
+      CACHE_RESPONSE_HEADER = "X-Cache-Response"
       # Header in request to set caching information for the middleware.
-      CACHE_EXPIRES_DURATION = 'X-Parse-Stack-Cache-Expires'
+      CACHE_EXPIRES_DURATION = "X-Parse-Stack-Cache-Expires"
 
       class << self
         # @!attribute enabled
@@ -46,15 +46,14 @@ module Parse
         attr_accessor :logging
 
         def enabled
-           @enabled = true if @enabled.nil?
-           @enabled
+          @enabled = true if @enabled.nil?
+          @enabled
         end
 
         # @return [Boolean] whether caching is enabled.
         def caching?
           @enabled
         end
-
       end
 
       # @!attribute [rw] store
@@ -77,14 +76,13 @@ module Parse
       def initialize(adapter, store, opts = {})
         super(adapter)
         @store = store
-        @opts = {expires: 0}
+        @opts = { expires: 0 }
         @opts.merge!(opts) if opts.is_a?(Hash)
         @expires = @opts[:expires]
 
         unless [:key?, :[], :delete, :store].all? { |method| @store.respond_to?(method) }
           raise ArgumentError, "Caching store object must a Moneta key/value store."
         end
-
       end
 
       # Thread-safety
@@ -95,7 +93,7 @@ module Parse
 
       # @!visibility private
       def call!(env)
-        @request_headers =  env[:request_headers]
+        @request_headers = env[:request_headers]
 
         # get default caching state
         @enabled = self.class.enabled
@@ -151,8 +149,8 @@ module Parse
             end
 
             if cache_data.present? && body.present?
-              response_headers[CACHE_RESPONSE_HEADER] = 'true'
-              response.finish({status: 200, response_headers: response_headers, body: body })
+              response_headers[CACHE_RESPONSE_HEADER] = "true"
+              response.finish({ status: 200, response_headers: response_headers, body: body })
               return response
             else
               @store.delete @cache_key
@@ -177,23 +175,20 @@ module Parse
           # Only cache GET requests with valid HTTP status codes whose content-length
           # is between 20 bytes and 1MB. Otherwise they could be errors, successes and empty result sets.
 
-          if @enabled && method == :get &&  CACHEABLE_HTTP_CODES.include?(response_env.status) &&
-              response_env.body.present? && response_env.response_headers[CONTENT_LENGTH_KEY].to_i.between?(20,1_250_000)
-              begin
-                @store.store(@cache_key,
-                            { headers: response_env.response_headers, body: response_env.body },
-                            expires: @expires)
-              rescue => e
-                puts "[Parse::Cache] Store Error: #{e}"
-              end
+          if @enabled && method == :get && CACHEABLE_HTTP_CODES.include?(response_env.status) &&
+             response_env.body.present? && response_env.response_headers[CONTENT_LENGTH_KEY].to_i.between?(20, 1_250_000)
+            begin
+              @store.store(@cache_key,
+                           { headers: response_env.response_headers, body: response_env.body },
+                           expires: @expires)
+            rescue => e
+              puts "[Parse::Cache] Store Error: #{e}"
+            end
           end # if
           # do something with the response
           # response_env[:response_headers].merge!(...)
         end
       end
-
     end #Caching
-
   end #Middleware
-
 end

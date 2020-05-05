@@ -1,8 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/json'
+require "active_support"
+require "active_support/json"
 
 module Parse
 
@@ -86,7 +86,6 @@ module Parse
       end
       #if none match, set pure result
       @result = res if @result.nil?
-
     end
 
     # true if this was a batch response.
@@ -98,7 +97,6 @@ module Parse
     # of the ones in the batch.
     # @return [Array] an array of Response objects.
     def batch_responses
-
       return [@result] unless @batch_response
       # if batch response, generate array based on the response hash.
       @result.map do |r|
@@ -123,8 +121,8 @@ module Parse
         @result = h
         @count = 1
       end
-
     end
+
     alias_method :parse_results!, :parse_result!
 
     # true if the response is successful.
@@ -136,7 +134,7 @@ module Parse
     # true if the response has an error code.
     # @see #success?
     def error?
-      ! success?
+      !success?
     end
 
     # true if the response has an error code of 'object not found'
@@ -155,6 +153,7 @@ module Parse
     def first
       @result.is_a?(Array) ? @result.first : @result
     end
+
     # Iterate through each result item.
     # @yieldparam [Object] a result entry.
     def each
@@ -177,6 +176,5 @@ module Parse
       return "[E-#{@code}] #{@request} : #{@error} (#{@http_status})" if error?
       @result.to_json
     end
-
   end
 end

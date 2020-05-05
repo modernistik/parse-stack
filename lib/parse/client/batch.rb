@@ -1,9 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative 'request'
-require_relative 'response'
-
+require_relative "request"
+require_relative "response"
 
 module Parse
   # Create a new batch operation.
@@ -43,7 +42,6 @@ module Parse
     # @!attribute responses
     #  @return [Array] the set of responses from this batch.
     attr_accessor :requests, :responses
-
 
     # @return [Parse::Client] the client to be used for the request.
     def client
@@ -94,7 +92,7 @@ module Parse
 
     # @return [Hash] a formatted payload for the batch request.
     def as_json(*args)
-      { requests:  requests }.as_json
+      { requests: requests }.as_json
     end
 
     # @return [Integer] the number of requests in the batch.
@@ -117,7 +115,7 @@ module Parse
     # @return [Boolean] true if the request had an error.
     def error?
       return false if @responses.empty?
-      ! success?
+      !success?
     end
 
     # Submit the batch operation in chunks until they are all complete. In general,
@@ -131,16 +129,15 @@ module Parse
       @responses = []
       @requests.uniq!(&:signature)
       @responses = @requests.each_slice(segment).to_a.threaded_map(2) do |slice|
-         client.batch_request( BatchOperation.new(slice) )
+        client.batch_request(BatchOperation.new(slice))
       end
       @responses.flatten!
       #puts "Requests: #{@requests.count} == Response: #{@responses.count}"
       @requests.zip(@responses).each(&Proc.new) if block_given?
       @responses
     end
+
     alias_method :save, :submit
-
-
   end
 end
 
@@ -164,6 +161,7 @@ class Array
     batch.submit
     batch
   end
+
   # Do not alias method as :delete is already part of array.
   # alias_method :delete, :destroy
 
@@ -204,11 +202,10 @@ class Array
       o = objects[request.tag]
       next unless o.is_a?(Parse::Object)
       result = response.result
-      o.id = result['objectId'] if o.id.blank?
+      o.id = result["objectId"] if o.id.blank?
       o.set_attributes!(result)
       o.clear_changes!
     end
     batch
   end #save!
-
 end

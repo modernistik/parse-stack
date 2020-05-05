@@ -1,10 +1,10 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative '../pointer'
-require_relative 'collection_proxy'
-require_relative 'pointer_collection_proxy'
-require_relative 'relation_collection_proxy'
+require_relative "../pointer"
+require_relative "collection_proxy"
+require_relative "pointer_collection_proxy"
+require_relative "relation_collection_proxy"
 
 module Parse
   module Associations
@@ -115,8 +115,7 @@ module Parse
 
         # has one are not property but instance scope methods
         def has_one(key, scope = nil, **opts)
-
-          opts.reverse_merge!({as: key, field: parse_class.columnize, scope_only: false})
+          opts.reverse_merge!({ as: key, field: parse_class.columnize, scope_only: false })
           klassName = opts[:as].to_parse_class
           foreign_field = opts[:field].to_sym
           ivar = :"@_has_one_#{key}"
@@ -140,7 +139,7 @@ module Parse
                 query.instance_exec(&scope)
                 query.conditions(*args) if args.present?
               else
-                query.instance_exec(*args,&scope)
+                query.instance_exec(*args, &scope)
               end
               instance = nil # help clean up ruby gc
             elsif args.present?
@@ -152,12 +151,8 @@ module Parse
             return query.first if block.nil?
             block.call(query.first)
           end
-
         end
-
       end
-
     end
-
   end
 end

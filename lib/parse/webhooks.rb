@@ -1,21 +1,20 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require 'active_support/core_ext'
-require 'active_model_serializers'
-require 'rack'
-require_relative 'client'
-require_relative 'stack'
-require_relative 'model/object'
-require_relative 'webhooks/payload'
-require_relative 'webhooks/registration'
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require "active_support/core_ext"
+require "active_model_serializers"
+require "rack"
+require_relative "client"
+require_relative "stack"
+require_relative "model/object"
+require_relative "webhooks/payload"
+require_relative "webhooks/registration"
 
 module Parse
-
   class Object
 
     # Register a webhook function for this subclass.
@@ -55,7 +54,6 @@ module Parse
     # @param block [Symbol] the name of the method to call, if no block is passed.
     # @return (see Parse::Webhooks.route)
     def self.webhook(type, block = nil)
-
       if type == :function
         unless block.is_a?(String) || block.is_a?(Symbol)
           raise ArgumentError, "Invalid Cloud Code function name: #{block}"
@@ -72,7 +70,6 @@ module Parse
       #if block
 
     end
-
   end
 
   # A Rack-based application middlware to handle incoming Parse cloud code webhook
@@ -80,7 +77,7 @@ module Parse
   class Webhooks
     # The error to be raised in registered trigger or function webhook blocks that
     # will trigger the Parse::Webhooks application to return the proper error response.
-    class ResponseError < StandardError; end;
+    class ResponseError < StandardError; end
 
     include Client::Connectable
     extend Parse::Webhooks::Registration
@@ -90,7 +87,6 @@ module Parse
     HTTP_PARSE_APPLICATION_ID = "HTTP_X_PARSE_APPLICATION_ID"
     # The content type that needs to be sent back to Parse server.
     CONTENT_TYPE = "application/json"
-
 
     # The Parse Webhook Key to be used for authenticating webhook requests.
     # See {Parse::Webhooks.key} on setting this value.
@@ -117,7 +113,7 @@ module Parse
       def routes
         return @routes unless @routes.nil?
         r = Parse::API::Hooks::TRIGGER_NAMES_LOCAL + [:function]
-        @routes = OpenStruct.new( r.reduce({}) { |h,t| h[t] = {}; h; } )
+        @routes = OpenStruct.new(r.reduce({}) { |h, t| h[t] = {}; h })
       end
 
       # Internally registers a route for a specific webhook trigger or function.
@@ -142,7 +138,6 @@ module Parse
 
         # AfterSave/AfterDelete hooks support more than one
         if type == :after_save || type == :after_delete
-
           routes[type][className] ||= []
           routes[type][className].push block
         else
@@ -192,7 +187,7 @@ module Parse
             result.run_callbacks(:destroy) { false }
             result = true
           end
-        elsif type == :before_save && ( result == true || result.nil? )
+        elsif type == :before_save && (result == true || result.nil?)
           # Open Source Parse server does not accept true results on before_save hooks.
           result = {}
         end
@@ -219,8 +214,9 @@ module Parse
       # the value of ENV['PARSE_SERVER_WEBHOOK_KEY'] if not configured.
       # @return [String]
       attr_accessor :key
+
       def key
-        @key ||= ENV['PARSE_SERVER_WEBHOOK_KEY'] || ENV['PARSE_WEBHOOK_KEY']
+        @key ||= ENV["PARSE_SERVER_WEBHOOK_KEY"] || ENV["PARSE_WEBHOOK_KEY"]
       end
 
       # Standard Rack call method. This method processes an incoming cloud code
@@ -238,7 +234,6 @@ module Parse
 
       # @!visibility private
       def call!(env)
-
         request = Rack::Request.new env
         response = Rack::Response.new
 
@@ -304,16 +299,14 @@ module Parse
           elsif payload.function?
             puts "[Webhooks::ResponseError] >> #{payload.function_name}: #{e}"
           end
-          response.write error( e.to_s )
+          response.write error(e.to_s)
           return response.finish
         end
 
         #check if we can handle the type trigger/functionName
-        response.write( success )
+        response.write(success)
         response.finish
       end # call
-
     end #class << self
   end # Webhooks
-
 end # Parse

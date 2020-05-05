@@ -1,23 +1,30 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require_relative '../object'
+require_relative "../object"
+
 module Parse
   class Error
     # 200	Error code indicating that the username is missing or empty.
-    class UsernameMissingError < Error; end;
+    class UsernameMissingError < Error; end
+
     # 201	Error code indicating that the password is missing or empty.
-    class PasswordMissingError < Error; end;
+    class PasswordMissingError < Error; end
+
     # Error code 202: indicating that the username has already been taken.
-    class UsernameTakenError < Error; end;
+    class UsernameTakenError < Error; end
+
     # 203	Error code indicating that the email has already been taken.
-    class EmailTakenError < Error; end;
+    class EmailTakenError < Error; end
+
     # 204	Error code indicating that the email is missing, but must be specified.
-    class EmailMissing < Error; end;
+    class EmailMissing < Error; end
+
     # 205	Error code indicating that a user with the specified email was not found.
-    class EmailNotFound < Error; end;
+    class EmailNotFound < Error; end
+
     # 125	Error code indicating that the email address was invalid.
-    class InvalidEmailAddress < Error; end;
+    class InvalidEmailAddress < Error; end
   end
 
   # The main class representing the _User table in Parse. A user can either be signed up or anonymous.
@@ -137,7 +144,6 @@ module Parse
   #
   # @see Parse::Object
   class User < Parse::Object
-
     parse_class Parse::Model::CLASS_USER
     # @return [String] The session token if this user is logged in.
     attr_accessor :session_token
@@ -189,7 +195,7 @@ module Parse
     # @see #anonymous?
     # @return [String] The anonymous identifier for this anonymous user.
     def anonymous_id
-      auth_data['anonymous']['id'] if auth_data.present? && auth_data["anonymous"].is_a?(Hash)
+      auth_data["anonymous"]["id"] if auth_data.present? && auth_data["anonymous"].is_a?(Hash)
     end
 
     # Adds the third-party authentication data to for a given service.
@@ -212,12 +218,12 @@ module Parse
       apply_attributes!(response.result)
     end
 
-
     # @!visibility private
     # So that apply_attributes! works with session_token for login
     def session_token_set_attribute!(token, track = false)
       @session_token = token.to_s
     end
+
     alias_method :sessionToken_set_attribute!, :session_token_set_attribute!
 
     # @return [Boolean] true if this user has a session token.
@@ -341,7 +347,7 @@ module Parse
       when Parse::Response::ERROR_EMAIL_TAKEN
         raise Parse::Error::EmailTakenError, response
       end
-      raise  Parse::Client::ResponseError, response
+      raise Parse::Client::ResponseError, response
     end
 
     # Automatically and implicitly signup a user if it did not already exists and
@@ -353,7 +359,7 @@ module Parse
     # @return [User] a logged in user, or nil.
     # @see User.create
     def self.autologin_service(service_name, auth_data, body: {})
-      body = body.merge({authData: {service_name => auth_data} })
+      body = body.merge({ authData: { service_name => auth_data } })
       self.create(body)
     end
 
@@ -364,7 +370,7 @@ module Parse
     # This method will raise all the exceptions from the similar `create` method.
     # @see User.create
     def self.signup(username, password, email = nil, body: {})
-      body = body.merge({username: username, password: password })
+      body = body.merge({ username: username, password: password })
       body[:email] = email if email.present?
       self.create(body)
     end
@@ -427,7 +433,5 @@ module Parse
       end
       @session_token
     end
-
   end
-
 end

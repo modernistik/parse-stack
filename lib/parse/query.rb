@@ -5,11 +5,11 @@ require_relative "client"
 require_relative "query/operation"
 require_relative "query/constraints"
 require_relative "query/ordering"
-require 'active_model'
-require 'active_model_serializers'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext'
+require "active_model"
+require "active_model_serializers"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext"
 
 module Parse
   # The {Parse::Query} class provides the lower-level querying interface for
@@ -62,7 +62,7 @@ module Parse
   # You can build your own custom query constraints by creating a `Parse::Constraint`
   # subclass. For all these `where` clauses assume `q` is a `Parse::Query` object.
   class Query
-    extend  ::ActiveModel::Callbacks
+    extend ::ActiveModel::Callbacks
     include Parse::Client::Connectable
     include Enumerable
     # @!group Callbacks
@@ -196,8 +196,8 @@ module Parse
       # @param table [String] the name of the Parse collection to query. (ex. "_User")
       # @param constraints [Hash] a set of query constraints.
       # @return [Query] a new query for the Parse collection with the passed in constraints.
-      def all(table, constraints = {limit: :max})
-        self.new(table, constraints.reverse_merge({limit: :max}))
+      def all(table, constraints = { limit: :max })
+        self.new(table, constraints.reverse_merge({ limit: :max }))
       end
 
       # This methods takes a set of constraints and merges them to build a final
@@ -205,7 +205,7 @@ module Parse
       # @param where [Array] an array of {Parse::Constraint} objects.
       # @return [Hash] a hash representing the compiled query
       def compile_where(where)
-        constraint_reduce( where )
+        constraint_reduce(where)
       end
 
       # @!visibility private
@@ -214,7 +214,7 @@ module Parse
         clauses.reduce({}) do |clause, subclause|
           #puts "Merging Subclause: #{subclause.as_json}"
 
-          clause.deep_merge!( subclause.as_json || {} )
+          clause.deep_merge!(subclause.as_json || {})
           clause
         end
       end
@@ -228,7 +228,6 @@ module Parse
           query.define_singleton_method(:inspect) { self.results.to_a.inspect }
         end
       end
-
     end
 
     # @!attribute [r] client
@@ -334,6 +333,7 @@ module Parse
       end # each
       self #chaining
     end
+
     alias_method :query, :conditions
     alias_method :append, :conditions
 
@@ -418,7 +418,7 @@ module Parse
     # @param amount [Integer] The number of records to skip.
     # @return [self]
     def skip(amount)
-      @skip = [0,amount.to_i].max
+      @skip = [0, amount.to_i].max
       @results = nil
       self #chaining
     end
@@ -438,7 +438,7 @@ module Parse
     # @return [self]
     def limit(count)
       if count.is_a?(Numeric)
-        @limit = [ 0, count.to_i ].max
+        @limit = [0, count.to_i].max
       elsif count == :max
         @limit = :max
       else
@@ -584,7 +584,7 @@ module Parse
     # @return [Query] the combined query with an OR clause.
     def or_where(where_clauses = [])
       where_clauses = where_clauses.where if where_clauses.is_a?(Parse::Query)
-      where_clauses = Parse::Query.new(@table, where_clauses ).where if where_clauses.is_a?(Hash)
+      where_clauses = Parse::Query.new(@table, where_clauses).where if where_clauses.is_a?(Hash)
       return self if where_clauses.blank?
       # we can only have one compound query constraint. If we need to add another OR clause
       # let's find the one we have (if any)
@@ -594,7 +594,7 @@ module Parse
       # if we don't have a OR clause to reuse, then create a new one with then
       # current set of constraints
       if compound.blank?
-        compound = Parse::Constraint::CompoundQueryConstraint.new :or, [ Parse::Query.compile_where(remaining_clauses) ]
+        compound = Parse::Constraint::CompoundQueryConstraint.new :or, [Parse::Query.compile_where(remaining_clauses)]
       end
       # then take the where clauses from the second query and append them.
       compound.value.push Parse::Query.compile_where(where_clauses)
@@ -606,10 +606,10 @@ module Parse
     # @see #or_where
     # @return [Query] the combined query with an OR clause.
     def |(other_query)
-        raise ArgumentError, "Parse queries must be of the same class #{@table}." unless @table == other_query.table
-        copy_query = self.clone
-        copy_query.or_where other_query.where
-        copy_query
+      raise ArgumentError, "Parse queries must be of the same class #{@table}." unless @table == other_query.table
+      copy_query = self.clone
+      copy_query.or_where other_query.where
+      copy_query
     end
 
     # Queries can be made using distinct, allowing you find unique values for a specified field.
@@ -635,7 +635,7 @@ module Parse
         compile_query[:distinct] = Query.format_field(field).to_sym
         @count = old_count_value
         # perform aggregation
-        return client.aggregate_objects(@table, compile_query.as_json, _opts ).result
+        return client.aggregate_objects(@table, compile_query.as_json, _opts).result
       else
         raise ArgumentError, "Invalid field name passed to `distinct`."
       end
@@ -654,7 +654,7 @@ module Parse
     def count
       old_value = @count
       @count = 1
-      res = client.find_objects(@table, compile.as_json, _opts ).count
+      res = client.find_objects(@table, compile.as_json, _opts).count
       @count = old_value
       res
     end
@@ -663,8 +663,8 @@ module Parse
     # @return [Array]
     # @see Array#each
     def each
-       return results.enum_for(:each) unless block_given? # Sparkling magic!
-       results.each(&Proc.new)
+      return results.enum_for(:each) unless block_given? # Sparkling magic!
+      results.each(&Proc.new)
     end
 
     # @yield a block yield for each object in the result
@@ -718,7 +718,7 @@ module Parse
           compiled_query[:limit] = _limit if _limit < batch_size
         end
 
-        response = fetch!( compiled_query )
+        response = fetch!(compiled_query)
         break if response.error? || response.results.empty?
 
         items = response.results
@@ -766,13 +766,13 @@ module Parse
     # @param compiled_query [Hash] the compiled query
     # @return [Parse::Response] a response for a query request.
     def fetch!(compiled_query)
-
-      response = client.find_objects(@table, compiled_query.as_json, _opts )
+      response = client.find_objects(@table, compiled_query.as_json, _opts)
       if response.error?
         puts "[ParseQuery] #{response.error}"
       end
       response
     end
+
     alias_method :execute!, :fetch!
 
     # Executes the query and builds the result set of Parse::Objects that matched.
@@ -801,7 +801,7 @@ module Parse
         if block_given?
           max_results(raw: raw, &Proc.new)
         elsif @limit.is_a?(Numeric)
-          response = fetch!( compile )
+          response = fetch!(compile)
           return [] if response.error?
           items = raw ? response.results : decode(response.results)
           return items.each(&Proc.new) if block_given?
@@ -812,6 +812,7 @@ module Parse
       end
       @results
     end
+
     alias_method :result, :results
 
     # Similar to {#results} but takes an additional set of conditions to apply. This
@@ -821,7 +822,7 @@ module Parse
     # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
     # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
     # @see #results
-    def all(expressions = {limit: :max})
+    def all(expressions = { limit: :max })
       conditions(expressions)
       return results(&Proc.new) if block_given?
       results
@@ -859,9 +860,9 @@ module Parse
         q[:limit] = @limit if @limit.is_a?(Numeric) && @limit > 0
         q[:skip] = @skip if @skip > 0
 
-        q[:include] = @includes.join(',') unless @includes.empty?
-        q[:keys] = @keys.join(',')  unless @keys.empty?
-        q[:order] = @order.join(',') unless @order.empty?
+        q[:include] = @includes.join(",") unless @includes.empty?
+        q[:keys] = @keys.join(",") unless @keys.empty?
+        q[:order] = @order.join(",") unless @order.empty?
         unless @where.empty?
           q[:where] = Parse::Query.compile_where(@where)
           q[:where] = q[:where].to_json if encode
@@ -881,15 +882,13 @@ module Parse
 
     # @return [Hash] a hash representing just the `where` clause of this query.
     def compile_where
-      self.class.compile_where( @where || [] )
+      self.class.compile_where(@where || [])
     end
 
     # Retruns a formatted JSON string representing the query, useful for debugging.
     # @return [String]
     def pretty
-      JSON.pretty_generate( as_json )
+      JSON.pretty_generate(as_json)
     end
-
   end # Query
-
 end # Parse

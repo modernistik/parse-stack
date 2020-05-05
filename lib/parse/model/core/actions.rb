@@ -1,24 +1,21 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext'
-require 'time'
-require 'parallel'
-require_relative '../../client/request'
-require_relative 'fetching'
-
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext"
+require "time"
+require "parallel"
+require_relative "../../client/request"
+require_relative "fetching"
 
 module Parse
-
   class Query
-
 
     # Supporting the `all` class method to be used in scope chaining with queries.
     # @!visibility private
-    def all(expressions = {limit: :max})
+    def all(expressions = { limit: :max })
       conditions(expressions)
       return results(&Proc.new) if block_given?
       results
@@ -49,7 +46,6 @@ module Parse
       klass.save_all(hash_constraints, &Proc.new) if block_given?
       klass.save_all(hash_constraints)
     end
-
   end
 
   # A Parse::RelationAction is special operation that adds one object to a relational
@@ -80,16 +76,12 @@ module Parse
 
     # @return [Hash] a hash representing a relation operation.
     def as_json(*args)
-      { @key =>
-        {
-          "__op" => ( @polarity == true ? ADD : REMOVE ),
-          "objects" => objects.parse_pointers
-        }
-      }.as_json
+      { @key => {
+        "__op" => (@polarity == true ? ADD : REMOVE),
+        "objects" => objects.parse_pointers,
+      } }.as_json
     end
-
   end
-
 end
 
 # This module is mainly all the basic orm operations. To support batching actions,
@@ -132,7 +124,7 @@ module Parse
         # @example
         #  # globally across all models
         #  Parse::Model.raise_on_save_failure = true
-  	    #  Song.raise_on_save_failure = true # per-model
+        #  Song.raise_on_save_failure = true # per-model
         #
         #  # or per-instance raise on failure
         #  song.save!
@@ -156,7 +148,6 @@ module Parse
         # @param resource_attrs [Hash] a set of attribute values to be applied if an object was not found.
         # @return [Parse::Object] a Parse::Object, whether found by the query or newly created.
         def first_or_create(query_attrs = {}, resource_attrs = {})
-
           query_attrs = query_attrs.symbolize_keys
           resource_attrs = resource_attrs.symbolize_keys
           obj = query(query_attrs).first
@@ -205,7 +196,7 @@ module Parse
         def save_all(constraints = {})
           invalid_constraints = constraints.keys.any? do |k|
             (k == :updated_at || k == :updatedAt) ||
-            ( k.is_a?(Parse::Operation) && (k.operand == :updated_at || k.operand == :updatedAt) )
+            (k.is_a?(Parse::Operation) && (k.operand == :updated_at || k.operand == :updatedAt))
           end
           if invalid_constraints
             raise ArgumentError,
@@ -267,14 +258,12 @@ module Parse
                 warn "[#{self}.save_all] Reached anchor date  #{anchor_date} < #{cursor.updated_at}"
                 break cursor
               end
-
             end
 
             has_errors ||= batch.error?
           end
           not has_errors
         end
-
       end # ClassMethods
 
       # Perform an atomic operation on this field. This operation is done on the
@@ -295,7 +284,7 @@ module Parse
           op_hash = { field => op_hash }.as_json
         end
 
-        response = client.update_object(parse_class, id, op_hash, session_token: _session_token )
+        response = client.update_object(parse_class, id, op_hash, session_token: _session_token)
         if response.error?
           puts "[#{parse_class}:#{field} Operation] #{response.error}"
         end
@@ -307,7 +296,7 @@ module Parse
       # @param objects [Array] the set of items to add to this field.
       # @return [Boolean] whether it was successful
       # @see #operate_field!
-      def op_add!(field,objects)
+      def op_add!(field, objects)
         operate_field! field, { __op: :Add, objects: objects }
       end
 
@@ -317,7 +306,7 @@ module Parse
       # @param objects [Array] the set of items to add uniquely to this field.
       # @return [Boolean] whether it was successful
       # @see #operate_field!
-      def op_add_unique!(field,objects)
+      def op_add_unique!(field, objects)
         operate_field! field, { __op: :AddUnique, objects: objects }
       end
 
@@ -377,7 +366,7 @@ module Parse
       def destroy_request
         return nil unless @id.present?
         uri = self.uri_path
-        r = Request.new( :delete, uri )
+        r = Request.new(:delete, uri)
         r.tag = object_id
         r
       end
@@ -401,7 +390,7 @@ module Parse
         if attribute_changes? || force
           # if it's new, then we should call :post for creating the object.
           method = new? ? :post : :put
-          r = Request.new( method, uri, body: attribute_updates)
+          r = Request.new(method, uri, body: attribute_updates)
           r.tag = object_id
           requests << r
         end
@@ -411,7 +400,7 @@ module Parse
         if @id.present? && relation_changes?
           relation_change_operations.each do |ops|
             next if ops.empty?
-            r = Request.new( :put, uri, body: ops)
+            r = Request.new(:put, uri, body: ops)
             r.tag = object_id
             requests << r
           end
@@ -515,7 +504,7 @@ module Parse
             if relation_changes?
               # get the list of changed keys
               changed_attribute_keys = changed - relations.keys.map(&:to_s)
-              clear_attribute_changes( changed_attribute_keys )
+              clear_attribute_changes(changed_attribute_keys)
               success = update_relations
               if success
                 changes_applied!
@@ -528,7 +517,6 @@ module Parse
           elsif self.class.raise_on_save_failure || autoraise.present?
             raise Parse::RecordNotSaved.new(self), "Failed to create or save attributes. #{self.parse_class} was not saved."
           end
-
         end #callbacks
         @_session_token = nil
         success
@@ -542,7 +530,6 @@ module Parse
       def save!(session: nil)
         save(autoraise: true, session: session)
       end
-
 
       # Delete this record from the Parse collection. Only valid if this object has an `id`.
       # This will run all the `destroy` callbacks.
@@ -577,12 +564,13 @@ module Parse
       def changes_payload
         h = attribute_updates
         if relation_changes?
-          r =  relation_change_operations.select { |s| s.present? }.first
+          r = relation_change_operations.select { |s| s.present? }.first
           h.merge!(r) if r.present?
         end
         #h.merge!(className: parse_class) unless h.empty?
         h.as_json
       end
+
       alias_method :update_payload, :changes_payload
 
       # Generates an array with two entries for addition and removal operations. The first entry
@@ -592,12 +580,12 @@ module Parse
       # @return [Array] an array with two hashes; the first is a hash of all the addition operations and
       #  the second hash, all the remove operations.
       def relation_change_operations
-        return [{},{}] unless relation_changes?
+        return [{}, {}] unless relation_changes?
 
         additions = []
         removals = []
         # go through all the additions of a collection and generate an action to add.
-        relation_updates.each do |field,collection|
+        relation_updates.each do |field, collection|
           if collection.additions.count > 0
             additions.push Parse::RelationAction.new(field, objects: collection.additions, polarity: true)
           end
@@ -607,8 +595,8 @@ module Parse
           end
         end
         # merge all additions and removals into one large hash
-        additions = additions.reduce({}) { |m,v| m.merge! v.as_json }
-        removals = removals.reduce({}) { |m,v| m.merge! v.as_json }
+        additions = additions.reduce({}) { |m, v| m.merge! v.as_json }
+        removals = removals.reduce({}) { |m, v| m.merge! v.as_json }
         [additions, removals]
       end
 
@@ -656,7 +644,7 @@ module Parse
       # @return [Hash]
       def set_attributes!(hash, dirty_track = false)
         return unless hash.is_a?(Hash)
-        hash.each do |k,v|
+        hash.each do |k, v|
           next if k == Parse::Model::OBJECT_ID || k == Parse::Model::ID
           method = "#{k}_set_attribute!"
           send(method, v, dirty_track) if respond_to?(method)
@@ -667,23 +655,20 @@ module Parse
       # local attributes.
       def changes_applied!
         # find all fields that are of type :array
-        fields(:array) do |key,v|
+        fields(:array) do |key, v|
           proxy = send(key)
           # clear changes
           proxy.changes_applied! if proxy.respond_to?(:changes_applied!)
         end
 
         # for all relational fields,
-        relations.each do |key,v|
+        relations.each do |key, v|
           proxy = send(key)
           # clear changes if they support the method.
           proxy.changes_applied! if proxy.respond_to?(:changes_applied!)
         end
         changes_applied
       end
-
-
     end
   end
-
 end

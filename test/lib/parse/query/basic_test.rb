@@ -1,16 +1,16 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
 class TestQueryObject < Parse::Object
   parse_class "TestQueryObjectTableName"
 end
 
-class CommentObject < Parse::Object; end;
+class CommentObject < Parse::Object; end
 
 class TestParseQuery < Minitest::Test
   extend Minitest::Spec::DSL
 
   def setup
-   @query = Parse::Query.new("Song")
+    @query = Parse::Query.new("Song")
   end
 
   def test_columnize
@@ -27,17 +27,17 @@ class TestParseQuery < Minitest::Test
   def test_field_formatter
     @query.clear :where
     @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
-    clause = {"fanCount"=>0, "playCount"=>0, "shareCount"=>0, "testName" => 1}
+    clause = { "fanCount" => 0, "playCount" => 0, "shareCount" => 0, "testName" => 1 }
     assert_equal clause, @query.compile_where
     Parse::Query.field_formatter = nil
     @query.clear :where
     @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
-    clause = {"fan_count"=>0, "playCount"=>0, "ShareCount"=>0, "test_name" => 1}
+    clause = { "fan_count" => 0, "playCount" => 0, "ShareCount" => 0, "test_name" => 1 }
     assert_equal clause, @query.compile_where
     Parse::Query.field_formatter = :camelize
     @query.clear :where
     @query.where :fan_count => 0, :playCount => 0, :ShareCount => 0, :' test_name ' => 1
-    clause = {"FanCount"=>0, "PlayCount"=>0, "ShareCount"=>0, "TestName" => 1}
+    clause = { "FanCount" => 0, "PlayCount" => 0, "ShareCount" => 0, "TestName" => 1 }
     assert_equal clause, @query.compile_where
     Parse::Query.field_formatter = :columnize
   end
@@ -48,6 +48,4 @@ class TestParseQuery < Minitest::Test
     assert_equal TestQueryObject.query.table, TestQueryObject.parse_class
     assert_equal CommentObject.query.table, CommentObject.parse_class
   end
-
-
 end

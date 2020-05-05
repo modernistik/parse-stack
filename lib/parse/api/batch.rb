@@ -1,12 +1,11 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'parallel'
-require 'active_support'
-require 'active_support/core_ext'
+require "parallel"
+require "active_support"
+require "active_support/core_ext"
 
 module Parse
-
   module API
     # Defines the Batch interface for the Parse REST API
     # @see Parse::BatchOperation
@@ -30,7 +29,6 @@ module Parse
         response = request(:post, "batch", body: batch_operations.as_json)
         response.success? && response.batch? ? response.batch_responses : response
       end
-
     end
   end
 end

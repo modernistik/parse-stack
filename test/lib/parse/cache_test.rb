@@ -1,11 +1,11 @@
-require_relative '../../test_helper'
+require_relative "../../test_helper"
 
 class TestCache < Minitest::Test
   def setup
     @init_object = {
-      server_url: 'http://b.com/parse',
-      app_id: 'abc',
-      api_key: 'def'
+      server_url: "http://b.com/parse",
+      app_id: "abc",
+      api_key: "def",
     }
   end
 
@@ -26,7 +26,7 @@ class TestCache < Minitest::Test
   end
 
   def test_bad_cache_type_rejected
-    init = @init_object.merge(cache: 'hamster')
+    init = @init_object.merge(cache: "hamster")
     assert_raises(ArgumentError) { Parse.setup(init) }
   end
 end

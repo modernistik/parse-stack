@@ -1,4 +1,3 @@
-
 class Parse::User < Parse::Object
   # add additional properties
 

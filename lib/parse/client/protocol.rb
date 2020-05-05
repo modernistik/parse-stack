@@ -1,32 +1,31 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-
 module Parse
   # Set of Parse protocol constants.
   module Protocol
     # The default server url, based on the hosted Parse platform.
-    SERVER_URL        = 'http://localhost:1337/parse'.freeze
+    SERVER_URL = "http://localhost:1337/parse".freeze
     # The request header field to send the application Id.
-    APP_ID            = 'X-Parse-Application-Id'
+    APP_ID = "X-Parse-Application-Id"
     # The request header field to send the REST API key.
-    API_KEY           = 'X-Parse-REST-API-Key'
+    API_KEY = "X-Parse-REST-API-Key"
     # The request header field to send the Master key.
-    MASTER_KEY        = 'X-Parse-Master-Key'
+    MASTER_KEY = "X-Parse-Master-Key"
     # The request header field to send the revocable Session key.
-    SESSION_TOKEN     = 'X-Parse-Session-Token'
+    SESSION_TOKEN = "X-Parse-Session-Token"
     # The request header field to request a revocable session token.
-    REVOCABLE_SESSION = 'X-Parse-Revocable-Session'
+    REVOCABLE_SESSION = "X-Parse-Revocable-Session"
     # The request header field to send the installation id.
-    INSTALLATION_ID   = 'Parse-Installation-Id'
+    INSTALLATION_ID = "Parse-Installation-Id"
     # The request header field to send an email when authenticating with Parse hosted platform.
-    EMAIL             = 'X-Parse-Email'
+    EMAIL = "X-Parse-Email"
     # The request header field to send the password when authenticating with the Parse hosted platform.
-    PASSWORD          = 'X-Parse-Password'
+    PASSWORD = "X-Parse-Password"
     # The request header field for the Content type.
-    CONTENT_TYPE      = 'Content-Type'
+    CONTENT_TYPE = "Content-Type"
     # The default content type format for sending API requests.
-    CONTENT_TYPE_FORMAT = 'application/json; charset=utf-8'
+    CONTENT_TYPE_FORMAT = "application/json; charset=utf-8"
   end
 
   # All Parse error codes.

@@ -1,7 +1,6 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
 class TestSubclassing < Minitest::Test
-
   def setup
     Parse.use_shortnames!
   end
@@ -15,5 +14,4 @@ class TestSubclassing < Minitest::Test
     assert_equal Parse::Object.superclass, Parse::Pointer
     assert_equal Parse::Pointer.superclass, Parse::Model
   end
-
 end

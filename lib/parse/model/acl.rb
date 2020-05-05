@@ -1,7 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-
 module Parse
 
   # This class allows you to define custom data types for your model fields. You
@@ -33,7 +32,6 @@ module Parse
     def as_json(*args)
       {}.as_json
     end
-
   end
 
   # An ACL represents the dirty-trackable Parse Permissions object used for
@@ -131,6 +129,7 @@ module Parse
     def permissions
       @permissions ||= {}
     end
+
     # The key field value for public permissions.
     PUBLIC = "*".freeze
 
@@ -162,7 +161,7 @@ module Parse
     # @return [ACL::Permission]
     # @see ACL::Permission
     def self.permission(read, write = nil)
-        ACL::Permission.new(read, write)
+      ACL::Permission.new(read, write)
     end
     # Determines whether two ACLs or a Parse-ACL hash is equivalent to this object.
     # @example
@@ -195,6 +194,7 @@ module Parse
       apply(PUBLIC, read, write)
       permissions[PUBLIC]
     end
+
     alias_method :world, :everyone
 
     # Calls `acl_will_change!` on the delegate when the permissions have changed.
@@ -236,7 +236,7 @@ module Parse
     # @return [Hash] the current set of permissions.
     # @see #apply_role
     def apply(id, read = nil, write = nil)
-      return apply_role(id,read,write) if id.is_a?(Parse::Role)
+      return apply_role(id, read, write) if id.is_a?(Parse::Role)
       id = id.id if id.is_a?(Parse::Pointer)
       unless id.present?
         raise ArgumentError, "Invalid argument applying ACLs: must be either objectId, role or :public"
@@ -254,7 +254,8 @@ module Parse
       end
 
       permissions
-    end; alias_method :add, :apply
+    end; 
+    alias_method :add, :apply
 
     # Apply a {Parse::Role} to this ACL.
     # @overload apply_role(role, read = nil, write = nil)
@@ -268,7 +269,8 @@ module Parse
     def apply_role(name, read = nil, write = nil)
       name = name.name if name.is_a?(Parse::Role)
       apply("role:#{name}", read, write)
-    end; alias_method :add_role, :apply_role
+    end; 
+    alias_method :add_role, :apply_role
 
     # Used for object conversion when formatting the input/output value in
     # Parse::Object properties
@@ -286,7 +288,7 @@ module Parse
     # all privileges
     # @return [Hash]
     def attributes
-      permissions.select {|k,v| v.present? }.as_json
+      permissions.select { |k, v| v.present? }.as_json
     end
 
     # @!visibility private
@@ -294,8 +296,8 @@ module Parse
       return unless h.is_a?(Hash)
       will_change!
       @permissions ||= {}
-      h.each do |k,v|
-        apply(k,v)
+      h.each do |k, v|
+        apply(k, v)
       end
     end
 
@@ -306,7 +308,7 @@ module Parse
 
     # @return [Hash]
     def as_json(*args)
-      permissions.select {|k,v| v.present? }.as_json
+      permissions.select { |k, v| v.present? }.as_json
     end
 
     # @return [Boolean] true if there are any permissions.
@@ -330,7 +332,8 @@ module Parse
     def master_key_only!
       will_change!
       @permissions = {}
-    end; alias_method :clear!, :master_key_only!
+    end; 
+    alias_method :clear!, :master_key_only!
 
     # Grants read permission on all existing users and roles attached to this object.
     # @example
@@ -530,7 +533,6 @@ module Parse
       def no_write!
         @write = false
       end
-
     end
   end
 end

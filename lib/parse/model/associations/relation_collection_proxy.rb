@@ -1,10 +1,10 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require_relative 'pointer_collection_proxy'
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require_relative "pointer_collection_proxy"
 
 module Parse
   # The RelationCollectionProxy is similar to a PointerCollectionProxy except that
@@ -36,7 +36,6 @@ module Parse
   # clearing out the change information for the collection if saved successfully.
   # @see PointerCollectionProxy
   class RelationCollectionProxy < PointerCollectionProxy
-
     define_attribute_methods :additions, :removals
     # @!attribute [r] removals
     #  The objects that have been newly removed to this collection
@@ -55,7 +54,7 @@ module Parse
     # You can get items within the collection relation filtered by a specific set
     # of query constraints.
     def all(constraints = {})
-      q = query( {limit: :max}.merge(constraints) )
+      q = query({ limit: :max }.merge(constraints))
       if block_given?
         # if we have a query, then use the Proc with it (more efficient)
         return q.present? ? q.results(&Proc.new) : collection.each(&Proc.new)
@@ -68,7 +67,6 @@ module Parse
     def query(constraints = {})
       q = forward :"#{@key}_relation_query"
     end
-
 
     # Add Parse::Objects to the relation.
     # @overload add(parse_object)
@@ -157,7 +155,5 @@ module Parse
       list.each { |d| add(d) }
       @collection
     end
-
   end
-
 end

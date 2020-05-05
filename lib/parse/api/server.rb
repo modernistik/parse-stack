@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 module Parse
-
   module API
     # APIs related to the open source Parse Server.
     module Server
@@ -12,9 +11,9 @@ module Parse
       attr_accessor :server_info
 
       # @!visibility private
-      SERVER_INFO_PATH = 'serverInfo'
+      SERVER_INFO_PATH = "serverInfo"
       # @!visibility private
-      SERVER_HEALTH_PATH = 'health'
+      SERVER_HEALTH_PATH = "health"
       # Fetch and cache information about the Parse server configuration. This
       # hash contains information specifically to the configuration of the running
       # parse server.
@@ -23,13 +22,13 @@ module Parse
         return @server_info if @server_info.present?
         response = request :get, SERVER_INFO_PATH
         @server_info = response.error? ? nil :
-                       response.result.with_indifferent_access
+          response.result.with_indifferent_access
       end
 
       # Fetches the status of the server based on the health check.
       # @return [Boolean] whether the server is 'OK'.
       def server_health
-        opts = {cache: false}
+        opts = { cache: false }
         response = request :get, SERVER_HEALTH_PATH, opts: opts
         response.success?
       end
@@ -46,8 +45,6 @@ module Parse
       def server_version
         server_info.present? ? @server_info[:parseServerVersion] : nil
       end
-
     end
   end
-
 end

@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestNearSphereQueryConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -13,8 +13,6 @@ class TestNearSphereQueryConstraint < Minitest::Test
   end
 
   def build(value)
-    {"field" => { @key.to_s => value } }
+    { "field" => { @key.to_s => value } }
   end
-
-
 end

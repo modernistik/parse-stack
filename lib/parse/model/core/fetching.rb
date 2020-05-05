@@ -1,8 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'time'
-require 'parallel'
+require "time"
+require "parallel"
 
 module Parse
   # Combines a set of core functionality for {Parse::Object} and its subclasses.
@@ -48,62 +48,57 @@ module Parse
           send :fetch
           @fetch_lock = false
         end
-
       end
-
     end
   end
 end
 
-
-
 class Array
 
-    # Perform a threaded each iteration on a set of array items.
-    # @param threads [Integer] the maximum number of threads to spawn/
-    # @yield the block for the each iteration.
-    # @return [self]
-    # @see Array#each
-    # @see https://github.com/grosser/parallel Parallel
-    def threaded_each(threads = 2, &block)
-      Parallel.each(self, {in_threads: threads}, &block)
-    end
+  # Perform a threaded each iteration on a set of array items.
+  # @param threads [Integer] the maximum number of threads to spawn/
+  # @yield the block for the each iteration.
+  # @return [self]
+  # @see Array#each
+  # @see https://github.com/grosser/parallel Parallel
+  def threaded_each(threads = 2, &block)
+    Parallel.each(self, { in_threads: threads }, &block)
+  end
 
-    # Perform a threaded map operation on a set of array items.
-    # @param threads [Integer] the maximum number of threads to spawn
-    # @yield the block for the map iteration.
-    # @return [Array] the resultant array from the map.
-    # @see Array#map
-    # @see https://github.com/grosser/parallel Parallel
-    def threaded_map(threads = 2, &block)
-      Parallel.map(self, {in_threads: threads}, &block)
-    end
+  # Perform a threaded map operation on a set of array items.
+  # @param threads [Integer] the maximum number of threads to spawn
+  # @yield the block for the map iteration.
+  # @return [Array] the resultant array from the map.
+  # @see Array#map
+  # @see https://github.com/grosser/parallel Parallel
+  def threaded_map(threads = 2, &block)
+    Parallel.map(self, { in_threads: threads }, &block)
+  end
 
-    # Fetches all the objects in the array even if they are not in a Pointer state.
-    # @param lookup [Symbol] The methodology to use for HTTP requests. Use :parallel
-    #  to fetch all objects in parallel HTTP requests. Set to anything else to
-    #  perform requests serially.
-    # @return [Array<Parse::Object>] an array of fetched Parse::Objects.
-    # @see Array#fetch_objects
-    def fetch_objects!(lookup = :parallel)
-      # this gets all valid parse objects from the array
-      items = valid_parse_objects
-      lookup == :parallel ? items.threaded_each(2,&:fetch!) : items.each(&:fetch!)
-      #self.replace items
-      self #return for chaining.
-    end
+  # Fetches all the objects in the array even if they are not in a Pointer state.
+  # @param lookup [Symbol] The methodology to use for HTTP requests. Use :parallel
+  #  to fetch all objects in parallel HTTP requests. Set to anything else to
+  #  perform requests serially.
+  # @return [Array<Parse::Object>] an array of fetched Parse::Objects.
+  # @see Array#fetch_objects
+  def fetch_objects!(lookup = :parallel)
+    # this gets all valid parse objects from the array
+    items = valid_parse_objects
+    lookup == :parallel ? items.threaded_each(2, &:fetch!) : items.each(&:fetch!)
+    #self.replace items
+    self #return for chaining.
+  end
 
-    # Fetches all the objects in the array that are in Pointer state.
-    # @param lookup [Symbol] The methodology to use for HTTP requests. Use :parallel
-    #  to fetch all objects in parallel HTTP requests. Set to anything else to
-    #  perform requests serially.
-    # @return [Array<Parse::Object>] an array of fetched Parse::Objects.
-    # @see Array#fetch_objects!
-    def fetch_objects(lookup = :parallel)
-      items = valid_parse_objects
-      lookup == :parallel ? items.threaded_each(2,&:fetch) : items.each(&:fetch)
-      #self.replace items
-      self
-    end
-
+  # Fetches all the objects in the array that are in Pointer state.
+  # @param lookup [Symbol] The methodology to use for HTTP requests. Use :parallel
+  #  to fetch all objects in parallel HTTP requests. Set to anything else to
+  #  perform requests serially.
+  # @return [Array<Parse::Object>] an array of fetched Parse::Objects.
+  # @see Array#fetch_objects!
+  def fetch_objects(lookup = :parallel)
+    items = valid_parse_objects
+    lookup == :parallel ? items.threaded_each(2, &:fetch) : items.each(&:fetch)
+    #self.replace items
+    self
+  end
 end

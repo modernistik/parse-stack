@@ -1,31 +1,31 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_model'
-require 'active_support'
-require 'active_support/inflector'
-require 'active_support/core_ext/object'
-require 'active_support/core_ext/string'
-require 'active_support/core_ext'
-require 'active_model_serializers'
+require "active_model"
+require "active_support"
+require "active_support/inflector"
+require "active_support/core_ext/object"
+require "active_support/core_ext/string"
+require "active_support/core_ext"
+require "active_model_serializers"
 
 module Parse
-    class Webhooks
-      # Represents the data structure that Parse server sends to a registered webhook.
-      # Parse Parse allows you to receive Cloud Code webhooks on your own hosted
-      # server. The `Parse::Webhooks` class is a lightweight Rack application that
-      # routes incoming Cloud Code webhook requests and payloads to locally
-      # registered handlers. The payloads are {Parse::Webhooks::Payload} type of objects that
-      # represent that data that Parse sends webhook handlers.
-      class Payload
+  class Webhooks
+    # Represents the data structure that Parse server sends to a registered webhook.
+    # Parse Parse allows you to receive Cloud Code webhooks on your own hosted
+    # server. The `Parse::Webhooks` class is a lightweight Rack application that
+    # routes incoming Cloud Code webhook requests and payloads to locally
+    # registered handlers. The payloads are {Parse::Webhooks::Payload} type of objects that
+    # represent that data that Parse sends webhook handlers.
+    class Payload
       # The set of keys that can be contained in a Parse hash payload for a webhook.
       ATTRIBUTES = { master: nil, user: nil,
-             installationId: nil, params: nil,
-               functionName: nil, object: nil,
-                   original: nil, update: nil,
-                      query: nil, log: nil,
-                      objects: nil,
-                   triggerName: nil }.freeze
+                     installationId: nil, params: nil,
+                     functionName: nil, object: nil,
+                     original: nil, update: nil,
+                     query: nil, log: nil,
+                     objects: nil,
+                     triggerName: nil }.freeze
       include ::ActiveModel::Serializers::JSON
       # @!attribute [rw] master
       #   @return [Boolean] whether the master key was used for this request.
@@ -75,7 +75,7 @@ module Parse
       # @see Parse::Webhooks
       def initialize(hash = {})
         hash = JSON.parse(hash) if hash.is_a?(String)
-        hash = Hash[hash.map{ |k, v| [k.to_s.underscore.to_sym, v] }]
+        hash = Hash[hash.map { |k, v| [k.to_s.underscore.to_sym, v] }]
         @raw = hash
         @master = hash[:master]
         @user = Parse::User.new hash[:user] if hash[:user].present?
@@ -125,7 +125,8 @@ module Parse
       def parse_id
         return nil unless @object.present?
         @object[Parse::Model::OBJECT_ID] || @object[:objectId]
-      end; alias_method :objectId, :parse_id
+      end; 
+      alias_method :objectId, :parse_id
 
       # true if this is a webhook trigger request.
       def trigger?
@@ -218,7 +219,6 @@ module Parse
               return o
             end # if klass.present?
           end # if we have original
-
         end # if before_trigger?
         Parse::Object.build(@object)
       end
@@ -234,13 +234,11 @@ module Parse
         raise Parse::Webhooks::ResponseError, msg
       end
 
-
       # @return [Parse::Query] the Parse query for a beforeFind trigger.
       def parse_query
         return nil unless parse_class.present? && @query.is_a?(Hash)
         Parse::Query.new parse_class, @query
       end
-
-      end # Payload
-    end
+    end # Payload
+  end
 end

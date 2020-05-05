@@ -1,14 +1,12 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
 class TestGeoPoint < Minitest::Test
-  SD = {lat: 32.8233, lng: -117.6542}
-  LA = {lat: 34.0192341, lng: -118.970792}
-
+  SD = { lat: 32.8233, lng: -117.6542 }
+  LA = { lat: 34.0192341, lng: -118.970792 }
 
   def setup
     @san_diego = Parse::GeoPoint.new(SD[:lat], SD[:lng])
     @los_angeles = Parse::GeoPoint.new [LA[:lat], LA[:lng]]
-
   end
 
   def test_constants
@@ -28,13 +26,13 @@ class TestGeoPoint < Minitest::Test
     assert_equal loc.longitude, 0
 
     # standard
-    loc = Parse::GeoPoint.new SD[:lat],  SD[:lng]
+    loc = Parse::GeoPoint.new SD[:lat], SD[:lng]
     assert_equal loc.parse_class, Parse::GeoPoint.parse_class
     assert_equal loc.latitude, SD[:lat]
     assert_equal loc.longitude, SD[:lng]
 
     # hash version
-    loc = Parse::GeoPoint.new({latitude: SD[:lat], longitude: SD[:lng] })
+    loc = Parse::GeoPoint.new({ latitude: SD[:lat], longitude: SD[:lng] })
     assert_equal loc.parse_class, Parse::GeoPoint.parse_class
     assert_instance_of Parse::GeoPoint, loc
     assert_equal loc.latitude, SD[:lat]
@@ -44,27 +42,26 @@ class TestGeoPoint < Minitest::Test
     assert_equal loc.lng, SD[:lng]
 
     # array
-    loc = Parse::GeoPoint.new [LA[:lat],  LA[:lng]]
+    loc = Parse::GeoPoint.new [LA[:lat], LA[:lng]]
     assert_equal loc.parse_class, Parse::GeoPoint.parse_class
     assert_instance_of Parse::GeoPoint, loc
     assert_equal loc.latitude, LA[:lat]
-    assert_equal loc.longitude,  LA[:lng]
+    assert_equal loc.longitude, LA[:lng]
 
     # geopoint
     loc2 = Parse::GeoPoint.new loc
     assert_instance_of Parse::GeoPoint, loc2
     assert_equal loc2.parse_class, Parse::GeoPoint.parse_class
     assert_equal loc2.latitude, loc.latitude
-    assert_equal loc2.longitude,  loc.longitude
+    assert_equal loc2.longitude, loc.longitude
 
     assert_equal loc2.lat, loc.latitude
-    assert_equal loc2.lng,  loc.longitude
+    assert_equal loc2.lng, loc.longitude
 
     # zero on non-numeric
-    loc = Parse::GeoPoint.new "false",  true
+    loc = Parse::GeoPoint.new "false", true
     assert_equal loc.latitude, 0
     assert_equal loc.longitude, 0
-
   end
 
   def test_equality
@@ -123,8 +120,6 @@ class TestGeoPoint < Minitest::Test
     lng = @san_diego.longitude.to_f.round(0)
     assert_equal @san_diego_estimated.lat, lat
     assert_equal @san_diego_estimated.lng, lng
-    assert_equal @san_diego.estimated(0).max_miles(50), [lat,lng,50]
-
+    assert_equal @san_diego.estimated(0).max_miles(50), [lat, lng, 50]
   end
-
 end

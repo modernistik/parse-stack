@@ -5,12 +5,11 @@ class <%= class_name %> < Parse::Object
   # You can change the inferred Parse table/collection name below
   # parse_class "<%= class_name.to_s.to_parse_class %>"
 <% attributes.each do |attr|
-  parse_type = attr.type.to_s.downcase.to_sym
-  unless @allowed_types.include?(parse_type)
-    puts "\n[Warning] Skipping property `#{attr.name}` with type `#{parse_type}`. Type should be one of #{@allowed_types}."
-    next
-  end
-%>
+     parse_type = attr.type.to_s.downcase.to_sym
+     unless @allowed_types.include?(parse_type)
+       puts "\n[Warning] Skipping property `#{attr.name}` with type `#{parse_type}`. Type should be one of #{@allowed_types}."
+       next
+     end %>
   property :<%= attr.name %>, :<%= parse_type -%>
 <% end %>
 

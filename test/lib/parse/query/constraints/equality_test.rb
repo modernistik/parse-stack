@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestEqualityConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -12,7 +12,6 @@ class TestEqualityConstraint < Minitest::Test
   end
 
   def build(value)
-    {"field" => Parse::Constraint.formatted_value(value) }
+    { "field" => Parse::Constraint.formatted_value(value) }
   end
-
 end

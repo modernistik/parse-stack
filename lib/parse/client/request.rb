@@ -1,8 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/json'
+require "active_support"
+require "active_support/json"
 
 module Parse
   #This class represents a Parse request.
@@ -68,19 +68,17 @@ module Parse
     # Two requests objects are the same if they have the same signature.
     # @return [Hash] A hash representing this request.
     def signature
-      {method: @method.upcase, path: @path, body: @body}
+      { method: @method.upcase, path: @path, body: @body }
     end
 
     # @!visibility private
     def inspect
-        "#<#{self.class} @method=#{@method} @path='#{@path}'>"
+      "#<#{self.class} @method=#{@method} @path='#{@path}'>"
     end
 
     # @return [String]
     def to_s
       "#{@method.to_s.upcase} #{@path}"
     end
-
   end
-
 end

@@ -1,24 +1,24 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'active_support'
-require 'active_support/core_ext/object'
+require "active_support"
+require "active_support/core_ext/object"
 require_relative "model"
-require 'base64'
-
+require "base64"
 
 module Parse
 
   # Support for the Bytes type in Parse
   class Bytes < Model
     # The default attributes in a Parse Bytes hash.
-    ATTRIBUTES = {__type: :string, base64: :string }.freeze
+    ATTRIBUTES = { __type: :string, base64: :string }.freeze
     # @return [String] the base64 string representing the content
     attr_accessor :base64
     # @return [TYPE_BYTES]
-    def self.parse_class; TYPE_BYTES; end;
+    def self.parse_class; TYPE_BYTES; end
     # @return [TYPE_BYTES]
-    def parse_class; self.class.parse_class; end;
+    def parse_class; self.class.parse_class; end
+
     alias_method :__type, :parse_class
 
     # initialize with a base64 string or a Bytes object
@@ -47,7 +47,7 @@ module Parse
 
     def attributes=(a)
       if a.is_a?(String)
-      @bytes = a
+        @bytes = a
       elsif a.is_a?(Hash)
         @bytes = a["base64"] || @bytes
       end
@@ -58,7 +58,5 @@ module Parse
       return false unless u.is_a?(self.class)
       @base64 == u.base64
     end
-
   end
-
 end

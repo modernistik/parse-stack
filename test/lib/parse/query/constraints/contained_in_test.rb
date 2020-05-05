@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestContainedInConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -12,7 +12,6 @@ class TestContainedInConstraint < Minitest::Test
   end
 
   def build(value)
-    {"field" =>  { @key.to_s  => [Parse::Constraint.formatted_value(value)].flatten.compact } }
+    { "field" => { @key.to_s => [Parse::Constraint.formatted_value(value)].flatten.compact } }
   end
-
 end

@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 module Parse
-
   module API
     # Defines the Schema interface for the Parse REST API
     module Schema
@@ -12,7 +11,7 @@ module Parse
       # Get all the schemas for the application.
       # @return [Parse::Response]
       def schemas
-        opts = {cache: false}
+        opts = { cache: false }
         request :get, SCHEMAS_PATH, opts: opts
       end
 
@@ -20,7 +19,7 @@ module Parse
       # @param className [String] the name of the remote Parse collection.
       # @return [Parse::Response]
       def schema(className)
-        opts = {cache: false}
+        opts = { cache: false }
         request :get, "#{SCHEMAS_PATH}/#{className}", opts: opts
       end
 
@@ -41,9 +40,6 @@ module Parse
       def update_schema(className, schema)
         request :put, "#{SCHEMAS_PATH}/#{className}", body: schema
       end
-
     end #Schema
-
   end #API
-
 end

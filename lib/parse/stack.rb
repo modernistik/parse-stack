@@ -2,18 +2,17 @@
 # frozen_string_literal: true
 
 require_relative "stack/version"
-require_relative 'client'
-require_relative 'query'
-require_relative 'model/object'
-require_relative 'webhooks'
-
+require_relative "client"
+require_relative "query"
+require_relative "model/object"
+require_relative "webhooks"
 
 module Parse
-  class Error < StandardError; end;
-  module Stack
+  class Error < StandardError; end
 
+  module Stack
   end
-  
+
   # Special class to support Modernistik Hyperdrive server.
   class Hyperdrive
     # Applies a remote JSON hash containing the ENV keys and values from a remote
@@ -23,11 +22,11 @@ module Parse
     # @param url [String] the remote url that responds with the JSON body.
     # @return [Boolean] true if the JSON hash was found and applied successfully.
     def self.config!(url = nil)
-      url ||= ENV["HYPERDRIVE_URL"] || ENV['CONFIG_URL']
+      url ||= ENV["HYPERDRIVE_URL"] || ENV["CONFIG_URL"]
       if url.present?
         begin
-          remote_config = JSON.load open( url )
-          remote_config.each do |key,value|
+          remote_config = JSON.load open(url)
+          remote_config.each do |key, value|
             k = key.upcase
             next unless ENV[k].nil?
             ENV[k] ||= value.to_s
@@ -42,4 +41,4 @@ module Parse
   end
 end
 
-require_relative 'stack/railtie' if defined?(::Rails)
+require_relative "stack/railtie" if defined?(::Rails)

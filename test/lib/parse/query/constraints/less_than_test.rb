@@ -1,4 +1,4 @@
-require_relative '../../../../test_helper'
+require_relative "../../../../test_helper"
 
 class TestLessThanConstraint < Minitest::Test
   extend Minitest::Spec::DSL
@@ -10,5 +10,4 @@ class TestLessThanConstraint < Minitest::Test
     @operand = :lt
     @keys = [:lt, :less_than, :before]
   end
-
 end

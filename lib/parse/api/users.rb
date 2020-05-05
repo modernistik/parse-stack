@@ -1,10 +1,9 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
-require 'open-uri'
+require "open-uri"
 
 module Parse
-
   module API
     # Defines the User class interface for the Parse REST API
     module Users
@@ -42,7 +41,7 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def current_user(session_token, headers: {}, **opts)
-        headers.merge!({Parse::Protocol::SESSION_TOKEN => session_token})
+        headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token })
         response = request :get, "#{USER_PATH_PREFIX}/me", headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
@@ -54,9 +53,9 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def create_user(body, headers: {}, **opts)
-        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => '1'})
+        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => "1" })
         if opts[:session_token].present?
-          headers.merge!({ Parse::Protocol::SESSION_TOKEN => opts[:session_token]})
+          headers.merge!({ Parse::Protocol::SESSION_TOKEN => opts[:session_token] })
         end
         response = request :post, USER_PATH_PREFIX, body: body, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
@@ -102,8 +101,8 @@ module Parse
       # @param opts [Hash] additional options to pass to the {Parse::Client} request.
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
-      def request_password_reset(email,  headers: {}, **opts)
-        body = {email: email}
+      def request_password_reset(email, headers: {}, **opts)
+        body = { email: email }
         request :post, REQUEST_PASSWORD_RESET, body: body, opts: opts, headers: headers
       end
 
@@ -116,7 +115,7 @@ module Parse
       def login(username, password, headers: {}, **opts)
         # Probably pass Installation-ID as header
         query = { username: username, password: password }
-        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => '1'})
+        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => "1" })
         # headers.merge!( { Parse::Protocol::INSTALLATION_ID => ''} )
         response = request :get, LOGIN_PATH, query: query, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
@@ -129,8 +128,8 @@ module Parse
       # @param opts [Hash] additional options to pass to the {Parse::Client} request.
       # @return [Parse::Response]
       def logout(session_token, headers: {}, **opts)
-        headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token})
-        opts.merge!({use_master_key: false, session_token: session_token})
+        headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token })
+        opts.merge!({ use_master_key: false, session_token: session_token })
         request :post, LOGOUT_PATH, headers: headers, opts: opts
       end
 
@@ -146,10 +145,6 @@ module Parse
         body[:email] = email || body[:email]
         create_user(body, opts)
       end
-
-
     end # Users
-
   end #API
-
 end #Parse

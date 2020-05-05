@@ -1,7 +1,6 @@
-require_relative '../../../test_helper'
+require_relative "../../../test_helper"
 
 class TestParseQueryExpressions < Minitest::Test
-
   def setup
     @query = Parse::Query.new("Song")
     Parse::Query.field_formatter = :columnize
@@ -12,7 +11,7 @@ class TestParseQueryExpressions < Minitest::Test
     @query.where :fan_count => 0
     # interal way of setting count query without executing
     @query.instance_variable_set :@count, 1
-    clause = {:where=>{"fanCount"=>0}, :limit=>0, :count=>1}
+    clause = { :where => { "fanCount" => 0 }, :limit => 0, :count => 1 }
     assert_equal clause, @query.prepared
     @query.limit 1_000 # should be ignored
     assert_equal clause, @query.prepared
@@ -20,45 +19,44 @@ class TestParseQueryExpressions < Minitest::Test
 
   def test_exp_order
     assert_empty @query.clause(:order)
-
   end
 
   def test_exp_keys
     assert_empty @query.clause(:keys)
-    simple_query = {"keys"=>"test"}
-    compound_query = {"keys"=>"test,field"}
+    simple_query = { "keys" => "test" }
+    compound_query = { "keys" => "test,field" }
 
     q = User.query(:key => "test")
     assert_equal q.compile.as_json, simple_query
     q = User.query(:key => ["test"])
     assert_equal q.compile.as_json, simple_query
-    q = User.query(:key => ["test","field"])
+    q = User.query(:key => ["test", "field"])
     assert_equal q.compile.as_json, compound_query
     q = User.query(:key => :test)
     assert_equal q.compile.as_json, simple_query
-    q = User.query(:key => [:test,:field])
+    q = User.query(:key => [:test, :field])
     assert_equal q.compile.as_json, compound_query
 
     q = User.query(:keys => "test")
     assert_equal q.compile.as_json, simple_query
     q = User.query(:keys => ["test"])
     assert_equal q.compile.as_json, simple_query
-    q = User.query(:keys => ["test","field"])
+    q = User.query(:keys => ["test", "field"])
     assert_equal q.compile.as_json, compound_query
     q = User.query(:keys => :test)
     assert_equal q.compile.as_json, simple_query
-    q = User.query(:keys => [:test,:field])
+    q = User.query(:keys => [:test, :field])
     assert_equal q.compile.as_json, compound_query
   end
 
   def test_exp_includes
     assert_empty @query.clause(:includes)
     @query.includes(:field)
-    assert_equal @query.compile.as_json, {"include" => "field"}
+    assert_equal @query.compile.as_json, { "include" => "field" }
     @query.includes(:field, :name)
-    assert_equal @query.compile.as_json, {"include" => "field,name"}
+    assert_equal @query.compile.as_json, { "include" => "field,name" }
     @query.where(:field.eq => "text")
-    assert_equal @query.compile.as_json, {"include"=> "field,name", "where"=>"{\"field\":\"text\"}"}
+    assert_equal @query.compile.as_json, { "include" => "field,name", "where" => "{\"field\":\"text\"}" }
   end
 
   def test_exp_skip
@@ -101,7 +99,6 @@ class TestParseQueryExpressions < Minitest::Test
     refute_raises(ArgumentError) { @query.conditions(session: nil) }
     refute_raises(ArgumentError) { @query.conditions(session: user) }
     refute_raises(ArgumentError) { @query.conditions(session: session) }
-
   end
 
   def test_exp_options
@@ -109,6 +106,4 @@ class TestParseQueryExpressions < Minitest::Test
     # session token
     # use_master_key
   end
-
-
 end

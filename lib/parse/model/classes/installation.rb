@@ -1,6 +1,6 @@
 # encoding: UTF-8
 # frozen_string_literal: true
-require_relative '../object'
+require_relative "../object"
 
 module Parse
   # This class represents the data and columns contained in the standard Parse
@@ -36,7 +36,6 @@ module Parse
   # @see Push
   # @see Parse::Object
   class Installation < Parse::Object
-
     parse_class Parse::Model::CLASS_INSTALLATION
     # @!attribute gcm_sender_id
     # This field only has meaning for Android installations that use the GCM
@@ -126,7 +125,6 @@ module Parse
     # This is implemented as a has_one association to the Session class using the {installation_id}.
     # @version 1.7.1
     # @return [Parse::Session] The associated {Parse::Session} that might be tied to this installation
-    has_one :session, ->{ where(installation_id: i.installation_id) }, scope_only: true
+    has_one :session, -> { where(installation_id: i.installation_id) }, scope_only: true
   end
-
 end

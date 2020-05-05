@@ -1,7 +1,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
-require_relative '../object'
-require_relative 'user'
+require_relative "../object"
+require_relative "user"
+
 module Parse
   # This class represents the data and columns contained in the standard Parse `_Role` collection.
   # Roles allow the an application to group a set of {Parse::User} records with the same set of
@@ -23,7 +24,6 @@ module Parse
   #   end
   # @see Parse::Object
   class Role < Parse::Object
-
     parse_class Parse::Model::CLASS_ROLE
     # @!attribute name
     # @return [String] the name of this role.
@@ -37,7 +37,5 @@ module Parse
     # This attribute is mapped as a `has_many` Parse relation association with the {Parse::User} class.
     # @return [RelationCollectionProxy<User>] a Parse relation of users belonging to this role.
     has_many :users, through: :relation
-
   end
-
 end
