@@ -1,0 +1,23 @@
+---
+include:
+  - "**/*.rb"
+exclude:
+  - spec/**/*
+  - test/**/*
+  - vendor/**/*
+  - ".bundle/**/*"
+domains: []
+reporters:
+  - rubocop
+  - require_not_found
+require_paths: []
+max_files: 5000
+require:
+  - activemodel
+  - faraday
+  - faraday_middleware
+  - moneta
+  - activesupport
+  - rack
+  - active_model_serializers
+  - parallel

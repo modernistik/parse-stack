@@ -14,5 +14,6 @@ group :test, :development do
   gem 'pry-nav'
   gem 'yard', '>= 0.9.11'
   gem 'redcarpet'
+  gem 'solargraph'
   gem 'thin' # for yard server
 end
