@@ -41,7 +41,7 @@ class TestWithinPolygonQueryConstraint < Minitest::Test
       { :__type => "GeoPoint", :latitude => 18.3848232, :longitude => -66.0933608 },
     ] } } }
     query = User.query(:location.within_polygon => [@bermuda, @miami, @san_juan])
-    assert_equal query.compile_where.as_json, compiled_query
+    assert_equal query.compile_where.as_json, compiled_query.as_json
 
     compiled_query = { "location" => { "$geoWithin" => { "$polygon" => [
       { :__type => "GeoPoint", :latitude => 32.9201332, :longitude => -117.1088263 },
@@ -50,6 +50,6 @@ class TestWithinPolygonQueryConstraint < Minitest::Test
       { :__type => "GeoPoint", :latitude => 32.3078, :longitude => -64.7504999 },
     ] } } }
     query = User.query(:location.within_polygon => [@san_diego, @miami, @san_juan, @bermuda])
-    assert_equal query.compile_where.as_json, compiled_query
+    assert_equal query.compile_where.as_json, compiled_query.as_json
   end
 end

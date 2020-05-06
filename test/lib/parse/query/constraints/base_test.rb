@@ -43,7 +43,7 @@ class TestConstraintEquality < Minitest::Test
     constraint = Parse::Constraint.new(:field, value)
     assert_instance_of Parse::Pointer, constraint.formatted_value
     assert_equal expected_value, constraint.formatted_value
-    expected_value = { "field" => { :__type => "Pointer", :className => "_User", :objectId => "123456" } }
+    expected_value = { "field" => { :__type => "Pointer", :className => "_User", :objectId => "123456" } }.as_json
     assert_equal expected_value, constraint.build.as_json
 
     # Parse::Query Test

@@ -29,7 +29,7 @@ class TestPointer < Minitest::Test
   end
 
   def test_json
-    assert_equal @pointer.as_json, { :__type => Parse::Model::TYPE_POINTER, className: @theClass, objectId: @id }
+    assert_equal @pointer.as_json, { :__type => Parse::Model::TYPE_POINTER, className: @theClass, objectId: @id }.as_json
   end
 
   def test_sig
