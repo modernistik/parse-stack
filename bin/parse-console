@@ -62,6 +62,7 @@ opt_parser = OptionParser.new do |o|
       file = File.read(filepath)
       config = JSON.parse file
       app = config["apps"].is_a?(Array) ?  config["apps"].first : config["apps"]
+      app = config if app.nil? # uses parse-server config.json
       opts[:server_url] ||= app["serverURL"]
       opts[:app_id] ||= app["appId"]
       opts[:api_key] ||= app["restAPIKey"]
