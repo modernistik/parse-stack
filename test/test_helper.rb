@@ -1,6 +1,5 @@
-
 require "minitest/pride"
-require 'minitest/reporters'
+require "minitest/reporters"
 Minitest::Reporters.use!(Minitest::Reporters::SpecReporter.new)
 require_relative "../lib/parse/stack.rb"
 require "minitest/autorun"

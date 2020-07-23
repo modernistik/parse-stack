@@ -1,5 +1,9 @@
 ## Parse-Stack Changelog
 
+### 2.0.0
+- Support for routing beforeFind and afterFind Cloud Code Webhooks.
+- parse-console now supports a parse-dashboard config.js or a parse-server config.js file.
+
 ### 1.9.0
 
 - Support for ActiveModel and ActiveSupport 6.0.

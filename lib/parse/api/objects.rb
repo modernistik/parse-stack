@@ -14,9 +14,9 @@ module Parse
 
       # @!visibility private
       PREFIX_MAP = { installation: "installations", _installation: "installations",
-                    user: "users", _user: "users",
-                    role: "roles", _role: "roles",
-                    session: "sessions", _session: "sessions" }.freeze
+                     user: "users", _user: "users",
+                     role: "roles", _role: "roles",
+                     session: "sessions", _session: "sessions" }.freeze
 
       # @!visibility private
       def self.included(base)

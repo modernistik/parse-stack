@@ -546,7 +546,6 @@ class Hash
   def pretty_json(options = {})
     JSON.pretty_generate as_json(options)
   end
-  
 end
 
 class Array
@@ -572,7 +571,7 @@ class Array
     parse_objects.map(&:id)
   end
 
-    #
+  #
   # Returns a whitespace-indented JSON string.
   #
   # @param [Hash] options Same options you could pass to {as_json}

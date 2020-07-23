@@ -116,7 +116,8 @@ module Parse
       #  Parse::Object subclass.
       def query(constraints = {})
         Parse::Query.new self.parse_class, constraints
-      end; 
+      end
+
       alias_method :where, :query
 
       # @param conditions (see Parse::Query#where)
@@ -323,7 +324,8 @@ module Parse
         results.compact! if compact
 
         as_array ? results : results.first
-      end; 
+      end
+
       alias_method :get, :find
     end # Querying
   end

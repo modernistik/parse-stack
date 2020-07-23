@@ -119,7 +119,7 @@ module Parse
       # Internally registers a route for a specific webhook trigger or function.
       # @param type [Symbol] The type of cloud code webhook to register. This can be any
       #  of the supported routes. These are `:before_save`, `:after_save`,
-      # `:before_delete`, `:after_delete` or `:function`.
+      # `:before_delete`, `:after_delete`, `:before_find`, `:after_find`, or `:function`.
       # @param className [String] if `type` is not `:function`, then this registers
       #  a trigger for the given className. Otherwise, className is treated to be the function
       #  name to register with Parse server.
@@ -137,7 +137,7 @@ module Parse
         end
 
         # AfterSave/AfterDelete hooks support more than one
-        if type == :after_save || type == :after_delete
+        if type == :after_save || type == :after_delete || type == :after_find
           routes[type][className] ||= []
           routes[type][className].push block
         else
@@ -260,7 +260,7 @@ module Parse
         # For beforeFind and afterFind, the class names don't show up. We take them from the incoming
         # route URL if it is missing.
         if payload.parse_class.nil?
-          webhook_class = request&.path&.split('/')&.last
+          webhook_class = request&.path&.split("/")&.last
           payload.webhook_class = Parse::Model.find_class(webhook_class).to_s.presence
         end
 

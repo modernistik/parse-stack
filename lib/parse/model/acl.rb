@@ -254,7 +254,8 @@ module Parse
       end
 
       permissions
-    end; 
+    end
+
     alias_method :add, :apply
 
     # Apply a {Parse::Role} to this ACL.
@@ -269,7 +270,8 @@ module Parse
     def apply_role(name, read = nil, write = nil)
       name = name.name if name.is_a?(Parse::Role)
       apply("role:#{name}", read, write)
-    end; 
+    end
+
     alias_method :add_role, :apply_role
 
     # Used for object conversion when formatting the input/output value in
@@ -332,7 +334,8 @@ module Parse
     def master_key_only!
       will_change!
       @permissions = {}
-    end; 
+    end
+
     alias_method :clear!, :master_key_only!
 
     # Grants read permission on all existing users and roles attached to this object.

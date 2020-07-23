@@ -123,13 +123,13 @@ module Parse
 
         # set defaults
         opts = { required: false,
-                alias: true,
-                symbolize: false,
-                enum: nil,
-                scopes: true,
-                _prefix: nil,
-                _suffix: false,
-                field: key.to_s.camelize(:lower) }.merge(opts)
+                 alias: true,
+                 symbolize: false,
+                 enum: nil,
+                 scopes: true,
+                 _prefix: nil,
+                 _suffix: false,
+                 field: key.to_s.camelize(:lower) }.merge(opts)
         #By default, the remote field name is a lower-first-camelcase version of the key
         # it can be overriden by the :field parameter
         parse_field = opts[:field].to_sym

@@ -2462,8 +2462,8 @@ Parse::Webhooks.route :function, :mySongFunction do
 end
 ```
 
-### Cloud Code Triggers
-You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete` and `:after_delete`. The `payload` object, which is an instance of `Parse::Webhooks::Payload`, contains several properties that represent the payload. One of the most important ones is `parse_object`, which will provide you with the instance of your specific Parse object. In `:before_save` triggers, this object already contains dirty tracking information of what has been changed.
+### Cloud Code Webhooks
+You can register webhooks to handle the different object triggers: `:before_save`, `:after_save`, `:before_delete`, `:after_delete`, `:before_find` and `:after_find`. The `payload` object, which is an instance of `Parse::Webhooks::Payload`, contains several properties that represent the payload. One of the most important ones is `parse_object`, which will provide you with the instance of your specific Parse object. In `:before_save` triggers, this object already contains dirty tracking information of what has been changed.
 
 ```ruby
   # recommended way
@@ -2484,6 +2484,13 @@ You can register webhooks to handle the different object triggers: `:before_save
     puts "User: #{user.username}" if user.present? # Parse::User
     artist = parse_object # Artist
     # no need for return in after save
+  end
+
+    # or the explicit way
+  Parse::Webhooks.route :after_find, :Artist do
+    # The query being executed
+    puts query
+    # no need for return in after trigger
   end
 ```
 

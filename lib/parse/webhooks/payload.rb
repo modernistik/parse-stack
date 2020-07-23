@@ -126,7 +126,8 @@ module Parse
       def parse_id
         return nil unless @object.present?
         @object[Parse::Model::OBJECT_ID] || @object[:objectId]
-      end; 
+      end
+
       alias_method :objectId, :parse_id
 
       # true if this is a webhook trigger request.
@@ -243,7 +244,6 @@ module Parse
       def pretty_json
         @raw.pretty_json
       end
-
     end # Payload
   end
 end
