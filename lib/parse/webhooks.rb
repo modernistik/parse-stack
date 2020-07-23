@@ -257,15 +257,22 @@ module Parse
           return response.finish
         end
 
+        # For beforeFind and afterFind, the class names don't show up. We take them from the incoming
+        # route URL if it is missing.
+        if payload.parse_class.nil?
+          webhook_class = request&.path&.split('/')&.last
+          payload.webhook_class = Parse::Model.find_class(webhook_class).to_s.presence
+        end
+
         if self.logging.present?
           if payload.trigger?
-            puts "[Webhooks::Request] --> #{payload.trigger_name} #{payload.parse_class}:#{payload.parse_id}"
+            puts "[Webhooks::Request] --> #{payload.trigger_name} #{payload.parse_class} #{payload.parse_id}"
           elsif payload.function?
             puts "[ParseWebhooks Request] --> Function #{payload.function_name}"
           end
           if self.logging == :debug
             puts "[Webhooks::Payload] ----------------------------"
-            puts payload.as_json
+            puts payload.pretty_json
             puts "----------------------------------------------------\n"
           end
         end
@@ -277,12 +284,11 @@ module Parse
           elsif payload.trigger? && payload.parse_class.present? && payload.trigger_name.present?
             # call hooks subscribed to the specific class
             result = Parse::Webhooks.call_route(payload.trigger_name, payload.parse_class, payload)
-
             # call hooks subscribed to any class route
             generic_result = Parse::Webhooks.call_route(payload.trigger_name, "*", payload)
             result = generic_result if generic_result.present? && result.nil?
           else
-            puts "[Webhooks] --> Could not find mapping route for #{payload.to_json}"
+            puts "[Webhooks] --> Could not find mapping route for #{request.path}:\n#{payload.pretty_json}"
           end
 
           result = true if result.nil?

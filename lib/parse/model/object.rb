@@ -536,6 +536,17 @@ class Hash
   def parse_object
     Parse::Object.build(self)
   end
+
+  #
+  # Returns a whitespace-indented JSON string.
+  #
+  # @param [Hash] options Same options you could pass to {as_json}
+  # @return [String] A json string.
+  #
+  def pretty_json(options = {})
+    JSON.pretty_generate as_json(options)
+  end
+  
 end
 
 class Array
@@ -559,6 +570,16 @@ class Array
   # @return [Array<String>] an array of objectIds for all objects that are Parse::Objects.
   def parse_ids
     parse_objects.map(&:id)
+  end
+
+    #
+  # Returns a whitespace-indented JSON string.
+  #
+  # @param [Hash] options Same options you could pass to {as_json}
+  # @return [String] A json string.
+  #
+  def pretty_json(options = {})
+    JSON.pretty_generate as_json(options)
   end
 end
 

@@ -89,6 +89,7 @@ module Parse
         @update = hash[:update] || {} #it comes as an update hash
         # Added for beforeFind and afterFind triggers
         @query = hash[:query]
+        @query = @query.with_indifferent_access if @query.is_a?(Hash)
         @objects = hash[:objects] || []
         @log = hash[:log]
       end
@@ -234,11 +235,15 @@ module Parse
         raise Parse::Webhooks::ResponseError, msg
       end
 
-      # @return [Parse::Query] the Parse query for a beforeFind trigger.
-      def parse_query
-        return nil unless parse_class.present? && @query.is_a?(Hash)
-        Parse::Query.new parse_class, @query
+      #
+      # Returns a whitespace-indented JSON string.
+      #
+      # @return [String] A json string.
+      #
+      def pretty_json
+        @raw.pretty_json
       end
+
     end # Payload
   end
 end

@@ -46,7 +46,7 @@ module Parse
         begin
           klass = Parse::Model.find_class className
           klass = ::Object.const_get(className.to_parse_class) if klass.nil?
-        rescue => e
+        rescue
           klass = ::Class.new(Parse::Object)
           ::Object.const_set(className, klass)
         end
