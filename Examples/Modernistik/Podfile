@@ -1,5 +1,5 @@
 
-platform :ios, '10.0'
+platform :ios, '13.0'
 use_frameworks!
 
 target 'Modernistik_Example' do

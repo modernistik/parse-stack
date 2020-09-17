@@ -1,11 +1,10 @@
-// swift-tools-version:5.1
+// swift-tools-version:5.2
 import PackageDescription
 
 let package = Package(
     name: "Modernistik",
-    // exclude: ["Examples"],
     platforms: [
-      .iOS(.v10),
+      .iOS(.v12),
       .tvOS(.v11),
     ],
     products: [
@@ -24,8 +23,9 @@ let package = Package(
         .target(
             name: "Modernistik",
             dependencies: [],
-            path: "Modernistik"
+            path: "Modernistik",
+            exclude: ["Examples", "modernistik.png", "setup.sh"]
             ),
     ],
-    swiftLanguageVersions: [.v4, .v5]
+    swiftLanguageVersions: [.v5]
 )

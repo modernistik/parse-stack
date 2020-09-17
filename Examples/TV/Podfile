@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :tvos, '11.0'
+platform :tvos, '13.0'
 use_frameworks!
 
 target 'TV' do
