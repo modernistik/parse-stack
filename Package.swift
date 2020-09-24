@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.3
 import PackageDescription
 
 let package = Package(
@@ -9,9 +9,9 @@ let package = Package(
     ],
     products: [
         // Products define the executables and libraries produced by a package, and make them visible to other packages.
-        .library(
-            name: "Modernistik",
-            targets: ["Modernistik"]),
+        .library(name: "Modernistik",targets: ["Modernistik"]),
+        .library(name: "Modernistik-Static", type: .static, targets: ["Modernistik"]),
+        .library(name: "Modernistik-Dynamic", type: .dynamic, targets: ["Modernistik"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -24,7 +24,7 @@ let package = Package(
             name: "Modernistik",
             dependencies: [],
             path: "Modernistik",
-            exclude: ["Examples", "modernistik.png", "setup.sh"]
+            exclude: ["Examples", "modernistik.png", "setup.sh", "README.md"]
             ),
     ],
     swiftLanguageVersions: [.v5]

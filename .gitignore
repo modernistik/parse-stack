@@ -32,3 +32,4 @@ Carthage
 #
 # Pods/
 /Examples/Hyperdrive/Pods
+/.swiftpm
