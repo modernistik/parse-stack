@@ -1,4 +1,6 @@
 // swift-tools-version:5.3
+// The swift-tools-version declares the minimum version of Swift required to build this package.
+
 import PackageDescription
 
 let package = Package(
@@ -8,7 +10,7 @@ let package = Package(
       .tvOS(.v11),
     ],
     products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
+        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(name: "Modernistik",targets: ["Modernistik"]),
         .library(name: "Modernistik-Static", type: .static, targets: ["Modernistik"]),
         .library(name: "Modernistik-Dynamic", type: .dynamic, targets: ["Modernistik"])
@@ -19,13 +21,14 @@ let package = Package(
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
+        // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "Modernistik",
             dependencies: [],
-            path: "Modernistik",
-            exclude: ["Examples", "modernistik.png", "setup.sh", "README.md"]
-            ),
-    ],
-    swiftLanguageVersions: [.v5]
+            path: "Sources",
+            exclude: ["Examples", "modernistik.png", "README.md"]),
+        .testTarget(
+            name: "ModernistikTests",
+            dependencies: ["Modernistik"]),
+    ]
 )

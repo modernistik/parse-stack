@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Modernistik'
-  s.version          = '0.6.2'
+  s.version          = '0.7.0'
   s.summary          = 'Swift design patterns, sugars and extensions for Modernistik development.'
 
 # This description is used to generate tags and improve search results.
@@ -30,10 +30,10 @@ Pod::Spec.new do |s|
   s.social_media_url = 'https://www.modernistik.com'
 
 
-  s.swift_version = ['5.0','5.1', '5.2']
+  s.swift_version = ['5.0','5.1', '5.2', '5.3']
   s.ios.deployment_target = '12.0'
   s.tvos.deployment_target = '12.0'
-  s.source_files = 'Modernistik/**/*'
+  s.source_files = 'Sources/**/*'
 
 #  s.default_subspec = 'Core'
 #  s.subspec 'Core' do |cs|

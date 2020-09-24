@@ -3,7 +3,7 @@
 //  Copyright © Modernistik LLC. All rights reserved.
 //
 import CoreGraphics
-import UIKit.UIColor
+import UIKit
 
 extension CGColor {
     /// Converts a CGColor to a UIColor instance.
