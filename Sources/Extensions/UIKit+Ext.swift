@@ -81,6 +81,22 @@ extension UIApplication {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
+
+    /// Returns the current window that is in focus.
+    var keyWindow: UIWindow? {
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.windows.first(where: \.isKeyWindow)
+        } else {
+            return UIApplication.shared.keyWindow
+        }
+    }
+
+    /// Returns the scene of the key window that is in focus.
+    @available(iOS 13.0, *)
+    @available(tvOS 13.0, *)
+    var keyScene: UIWindowScene? {
+        keyWindow?.windowScene
+    }
 }
 
 extension UIEdgeInsets {

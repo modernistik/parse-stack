@@ -11,8 +11,7 @@ let package = Package(
     ],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
-        .library(name: "Modernistik",targets: ["Modernistik"]),
-        .library(name: "Modernistik-Static", type: .static, targets: ["Modernistik"]),
+        .library(name: "Modernistik", targets: ["Modernistik"]),
         .library(name: "Modernistik-Dynamic", type: .dynamic, targets: ["Modernistik"])
     ],
     dependencies: [
