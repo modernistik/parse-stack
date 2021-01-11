@@ -104,7 +104,7 @@ GEM
       loofah (~> 2.3)
     rainbow (3.0.0)
     rake (13.0.1)
-    redcarpet (3.5.0)
+    redcarpet (3.5.1)
     redis (4.2.5)
     regexp_parser (2.0.0)
     reverse_markdown (2.0.0)
