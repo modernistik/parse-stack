@@ -125,13 +125,12 @@ module Parse
       #  name to register with Parse server.
       # @yield the block that will handle of the webhook trigger or function.
       # @return (see routes)
-      def route(type, className, block = nil)
+      def route(type, className, &block)
         type = type.to_s.underscore.to_sym #support camelcase
         if type != :function && className.respond_to?(:parse_class)
           className = className.parse_class
         end
         className = className.to_s
-        block = Proc.new if block_given?
         if routes[type].nil? || block.respond_to?(:call) == false
           raise ArgumentError, "Invalid Webhook registration trigger #{type} #{className}"
         end

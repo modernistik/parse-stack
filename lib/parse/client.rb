@@ -202,8 +202,8 @@ module Parse
       # @see Parse::Middleware::Caching
       # @see Parse::Middleware::Authentication
       # @see Parse::Protocol
-      def setup(opts = {})
-        @clients[:default] = self.new(opts, &Proc.new)
+      def setup(opts = {}, &block)
+        @clients[:default] = self.new(opts, &block)
       end
     end
 
@@ -579,9 +579,9 @@ module Parse
   # @yield (see Parse::Client.setup)
   # @return (see Parse::Client.setup)
   # @see Parse::Client.setup
-  def self.setup(opts = {})
+  def self.setup(opts = {}, &block)
     if block_given?
-      Parse::Client.new(opts, &Proc.new)
+      Parse::Client.new(opts, &block)
     else
       Parse::Client.new(opts)
     end

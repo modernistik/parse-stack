@@ -662,25 +662,25 @@ module Parse
     # @yield a block yield for each object in the result
     # @return [Array]
     # @see Array#each
-    def each
+    def each(&block)
       return results.enum_for(:each) unless block_given? # Sparkling magic!
-      results.each(&Proc.new)
+      results.each(&block)
     end
 
     # @yield a block yield for each object in the result
     # @return [Array]
     # @see Array#map
-    def map
+    def map(&block)
       return results.enum_for(:map) unless block_given? # Sparkling magic!
-      results.map(&Proc.new)
+      results.map(&block)
     end
 
     # @yield a block yield for each object in the result
     # @return [Array]
     # @see Array#select
-    def select
+    def select(&block)
       return results.enum_for(:select) unless block_given? # Sparkling magic!
-      results.select(&Proc.new)
+      results.select(&block)
     end
 
     # @return [Array]
@@ -700,7 +700,7 @@ module Parse
     # max_results is used to iterate through as many API requests as possible using
     # :skip and :limit paramter.
     # @!visibility private
-    def max_results(raw: false, on_batch: nil, discard_results: false)
+    def max_results(raw: false, on_batch: nil, discard_results: false, &block)
       compiled_query = compile
       batch_size = 1_000
       results = []
@@ -725,7 +725,7 @@ module Parse
         items = decode(items) unless raw
         # if a block is provided, we do not keep the results after processing.
         if block_given?
-          items.each(&Proc.new)
+          items.each(&block)
         else
           # concat results unless discard_results is true
           results += items unless discard_results
@@ -796,15 +796,15 @@ module Parse
     # @yield a block to iterate for each object that matched the query.
     # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
     # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
-    def results(raw: false)
+    def results(raw: false, &block)
       if @results.nil?
         if block_given?
-          max_results(raw: raw, &Proc.new)
+          max_results(raw: raw, &block)
         elsif @limit.is_a?(Numeric)
           response = fetch!(compile)
           return [] if response.error?
           items = raw ? response.results : decode(response.results)
-          return items.each(&Proc.new) if block_given?
+          return items.each(&block) if block_given?
           @results = items
         else
           @results = max_results(raw: raw)
@@ -822,9 +822,9 @@ module Parse
     # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
     # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
     # @see #results
-    def all(expressions = { limit: :max })
+    def all(expressions = { limit: :max }, &block)
       conditions(expressions)
-      return results(&Proc.new) if block_given?
+      return results(&block) if block_given?
       results
     end
 

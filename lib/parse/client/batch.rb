@@ -85,9 +85,9 @@ module Parse
     end
 
     # @return [Array]
-    def each
+    def each(&block)
       return enum_for(:each) unless block_given?
-      @requests.each(&Proc.new)
+      @requests.each(&block)
     end
 
     # @return [Hash] a formatted payload for the batch request.
@@ -125,7 +125,7 @@ module Parse
     # @param segment [Integer] the number of requests to send in each batch. Default 50.
     # @return [Array<Parse::Response>] the corresponding set of responses for
     #  each request in the batch.
-    def submit(segment = 50)
+    def submit(segment = 50, &block)
       @responses = []
       @requests.uniq!(&:signature)
       @responses = @requests.each_slice(segment).to_a.threaded_map(2) do |slice|
@@ -133,7 +133,7 @@ module Parse
       end
       @responses.flatten!
       #puts "Requests: #{@requests.count} == Response: #{@responses.count}"
-      @requests.zip(@responses).each(&Proc.new) if block_given?
+      @requests.zip(@responses).each(&block) if block_given?
       @responses
     end
 
