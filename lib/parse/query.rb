@@ -766,7 +766,7 @@ module Parse
     # @param compiled_query [Hash] the compiled query
     # @return [Parse::Response] a response for a query request.
     def fetch!(compiled_query)
-      response = client.find_objects(@table, compiled_query.as_json, _opts)
+      response = client.find_objects(@table, compiled_query.as_json, **_opts)
       if response.error?
         puts "[ParseQuery] #{response.error}"
       end
