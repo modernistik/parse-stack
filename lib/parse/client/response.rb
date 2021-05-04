@@ -156,9 +156,9 @@ module Parse
 
     # Iterate through each result item.
     # @yieldparam [Object] a result entry.
-    def each
+    def each(&block)
       return enum_for(:each) unless block_given?
-      results.each(&Proc.new)
+      results.each(&block)
       self
     end
 

@@ -207,10 +207,10 @@ module Parse
       #   by the server.
       # @return [Array<Parse::Object>] an array of matching objects. If a block is passed,
       #  an empty array is returned.
-      def all(constraints = { limit: :max })
+      def all(constraints = { limit: :max }, &block)
         constraints = constraints.reverse_merge({ limit: :max })
         prepared_query = query(constraints)
-        return prepared_query.results(&Proc.new) if block_given?
+        return prepared_query.results(&block) if block_given?
         prepared_query.results
       end
 

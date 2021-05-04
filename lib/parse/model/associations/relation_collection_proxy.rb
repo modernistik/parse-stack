@@ -53,11 +53,11 @@ module Parse
 
     # You can get items within the collection relation filtered by a specific set
     # of query constraints.
-    def all(constraints = {})
+    def all(constraints = {}, &block)
       q = query({ limit: :max }.merge(constraints))
       if block_given?
         # if we have a query, then use the Proc with it (more efficient)
-        return q.present? ? q.results(&Proc.new) : collection.each(&Proc.new)
+        return q.present? ? q.results(&block) : collection.each(&block)
       end
       # if no block given, get all the results
       q.present? ? q.results : collection

@@ -15,7 +15,7 @@ module Parse
       # @param opts [Hash] a set of options to pass to the client request.
       # @return [self] the current object, useful for chaining.
       def fetch!(opts = {})
-        response = client.fetch_object(parse_class, id, opts)
+        response = client.fetch_object(parse_class, id, **opts)
         if response.error?
           puts "[Fetch Error] #{response.code}: #{response.error}"
         end
