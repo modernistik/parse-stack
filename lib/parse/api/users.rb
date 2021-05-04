@@ -84,7 +84,7 @@ module Parse
       # @return [Parse::Response]
       def set_service_auth_data(id, service_name, auth_data, headers: {}, **opts)
         body = { authData: { service_name => auth_data } }
-        update_user(id, body, opts)
+        update_user(id, body, **opts)
       end
 
       # Delete a {Parse::User} record given an objectId.
@@ -143,7 +143,7 @@ module Parse
       def signup(username, password, email = nil, body: {}, **opts)
         body = body.merge({ username: username, password: password })
         body[:email] = email || body[:email]
-        create_user(body, opts)
+        create_user(body, **opts)
       end
     end # Users
   end #API

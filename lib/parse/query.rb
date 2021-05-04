@@ -635,7 +635,7 @@ module Parse
         compile_query[:distinct] = Query.format_field(field).to_sym
         @count = old_count_value
         # perform aggregation
-        return client.aggregate_objects(@table, compile_query.as_json, _opts).result
+        return client.aggregate_objects(@table, compile_query.as_json, **_opts).result
       else
         raise ArgumentError, "Invalid field name passed to `distinct`."
       end
@@ -654,7 +654,7 @@ module Parse
     def count
       old_value = @count
       @count = 1
-      res = client.find_objects(@table, compile.as_json, _opts).count
+      res = client.find_objects(@table, compile.as_json, **_opts).count
       @count = old_value
       res
     end
@@ -766,7 +766,7 @@ module Parse
     # @param compiled_query [Hash] the compiled query
     # @return [Parse::Response] a response for a query request.
     def fetch!(compiled_query)
-      response = client.find_objects(@table, compiled_query.as_json, _opts)
+      response = client.find_objects(@table, compiled_query.as_json, **_opts)
       if response.error?
         puts "[ParseQuery] #{response.error}"
       end
