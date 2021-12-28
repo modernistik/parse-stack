@@ -7,7 +7,7 @@ require "active_support/inflector"
 require "active_support/core_ext"
 require "active_support/core_ext/object"
 require "active_support/core_ext/string"
-require "active_model_serializers"
+
 require "time"
 require "open-uri"
 

@@ -7,7 +7,7 @@ require "active_support/inflector"
 require "active_support/core_ext/object"
 require "active_support/core_ext/string"
 require "active_support/core_ext"
-require "active_model_serializers"
+
 
 module Parse
   class Webhooks
@@ -125,7 +125,7 @@ module Parse
       def parse_id
         return nil unless @object.present?
         @object[Parse::Model::OBJECT_ID] || @object[:objectId]
-      end; 
+      end;
       alias_method :objectId, :parse_id
 
       # true if this is a webhook trigger request.
