@@ -27,14 +27,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = ">= 2.5.0"
 
-  spec.add_runtime_dependency "activemodel", [">= 5", "< 7"]
-  spec.add_runtime_dependency "active_model_serializers", [">= 0.9", "< 1"]
-  spec.add_runtime_dependency "activesupport", [">= 5", "< 7"]
-  spec.add_runtime_dependency "parallel", [">= 1.6", "< 2"]
-  spec.add_runtime_dependency "faraday", "< 1"
-  spec.add_runtime_dependency "faraday_middleware", [">= 0.9", "< 2"]
-  spec.add_runtime_dependency "moneta", "< 2"
-  spec.add_runtime_dependency "rack", ">= 2.0.6", "< 3"
+  spec.add_runtime_dependency "activemodel", [">= 5"]
+  spec.add_runtime_dependency "active_model_serializers", [">= 0.9"]
+  spec.add_runtime_dependency "activesupport", [">= 5"]
+  spec.add_runtime_dependency "parallel", [">= 1.6"]
+  spec.add_runtime_dependency "faraday"
+  spec.add_runtime_dependency "faraday_middleware", [">= 0.9"]
+  spec.add_runtime_dependency "moneta",
+  spec.add_runtime_dependency "rack", ">= 2.0.6"
 
   #   spec.post_install_message = <<UPGRADE
   #
