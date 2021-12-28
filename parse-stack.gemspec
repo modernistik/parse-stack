@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "parallel", [">= 1.6"]
   spec.add_runtime_dependency "faraday"
   spec.add_runtime_dependency "faraday_middleware", [">= 0.9"]
-  spec.add_runtime_dependency "moneta",
+  spec.add_runtime_dependency "moneta"
   spec.add_runtime_dependency "rack", ">= 2.0.6"
 
   #   spec.post_install_message = <<UPGRADE
