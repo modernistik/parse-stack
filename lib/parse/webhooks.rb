@@ -53,18 +53,18 @@ module Parse
     # @yield the body of the function to be evaluated in the scope of a {Parse::Webhooks::Payload} instance.
     # @param block [Symbol] the name of the method to call, if no block is passed.
     # @return (see Parse::Webhooks.route)
-    def self.webhook(type, block = nil)
+    def self.webhook(type, function=nil, &block)
       if type == :function
-        unless block.is_a?(String) || block.is_a?(Symbol)
-          raise ArgumentError, "Invalid Cloud Code function name: #{block}"
+        unless function.is_a?(String) || function.is_a?(Symbol)
+          raise ArgumentError, "Invalid Cloud Code function name: #{function}"
         end
-        Parse::Webhooks.route(:function, block, &Proc.new)
+        Parse::Webhooks.route(:function, function, block)
         # then block must be a symbol or a string
       else
-        if block_given?
-          Parse::Webhooks.route(type, self, &Proc.new)
-        else
+        if block
           Parse::Webhooks.route(type, self, block)
+        else
+          Parse::Webhooks.route(type, self, function)
         end
       end
       #if block
@@ -125,7 +125,7 @@ module Parse
       #  name to register with Parse server.
       # @yield the block that will handle of the webhook trigger or function.
       # @return (see routes)
-      def route(type, className, &block)
+      def route(type, className, block)
         type = type.to_s.underscore.to_sym #support camelcase
         if type != :function && className.respond_to?(:parse_class)
           className = className.parse_class
