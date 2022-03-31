@@ -117,7 +117,7 @@ module Parse
 
               task :triggers => :verify_env do
                 endpoint = ENV["HOOKS_URL"]
-                Parse::Webhooks.register_triggers!(endpoint, { include_wildcard: true }) do |trigger, name|
+                Parse::Webhooks.register_triggers!(endpoint, include_wildcard: true) do |trigger, name|
                   puts "[+] #{trigger.to_s.ljust(12, " ")} - #{name}"
                 end
               end
