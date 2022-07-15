@@ -481,7 +481,7 @@ module Parse
         retry
       end
       raise
-    rescue Faraday::Error::ClientError, Net::OpenTimeout => e
+    rescue Faraday::ClientError, Net::OpenTimeout => e
       if _retry_count > 0
         warn "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
         _retry_count -= 1
