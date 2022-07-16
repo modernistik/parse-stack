@@ -16,11 +16,11 @@ module ParseStack
     # @!visibility private
     def generate_initializer
       copy_file "parse.rb", "config/initializers/parse.rb"
-      copy_file "model_user.rb", File.join("app/models", "user.rb")
-      copy_file "model_role.rb", File.join("app/models", "role.rb")
-      copy_file "model_session.rb", File.join("app/models", "session.rb")
-      copy_file "model_installation.rb", File.join("app/models", "installation.rb")
-      copy_file "webhooks.rb", File.join("app/models", "webhooks.rb")
+      #copy_file "model_user.rb", File.join("app/models", "user.rb")
+      #copy_file "model_role.rb", File.join("app/models", "role.rb")
+      #copy_file "model_session.rb", File.join("app/models", "session.rb")
+      #copy_file "model_installation.rb", File.join("app/models", "installation.rb")
+      #copy_file "webhooks.rb", File.join("app/models", "webhooks.rb")
     end
   end
 
