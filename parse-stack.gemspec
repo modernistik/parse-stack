@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.executables = ["parse-console"] #spec.files.grep(%r{^bin/pstack/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 2.5.0"
+  spec.required_ruby_version = ">= 2.6"
 
   spec.add_runtime_dependency "activemodel", [">= 5", "< 7"]
   spec.add_runtime_dependency "active_model_serializers", [">= 0.9", "< 1"]
