@@ -2,7 +2,7 @@ require "faraday"
 require "faraday_middleware"
 require "active_support"
 require "moneta"
-require "active_model_serializers"
+
 require "active_support/inflector"
 require "active_support/core_ext/object"
 require "active_support/core_ext/string"
@@ -481,7 +481,7 @@ module Parse
         retry
       end
       raise
-    rescue Faraday::Error::ClientError, Net::OpenTimeout => e
+    rescue Faraday::ClientError, Net::OpenTimeout => e
       if _retry_count > 0
         warn "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
         _retry_count -= 1

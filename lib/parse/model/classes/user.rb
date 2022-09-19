@@ -29,7 +29,7 @@ module Parse
 
   # The main class representing the _User table in Parse. A user can either be signed up or anonymous.
   # All users need to have a username and a password, with email being optional but globally unique if set.
-  # You may add additional properties by redeclaring the class to match your specific schema.
+  # You may add additional properties by reopening the class to match your specific schema.
   #
   # The default schema for the {User} class is as follows:
   #

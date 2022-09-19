@@ -10,7 +10,7 @@ require "active_support/core_ext/object"
 require "active_support/core_ext/date/calculations"
 require "active_support/core_ext/date_time/calculations"
 require "active_support/core_ext/time/calculations"
-require "active_model_serializers"
+
 require_relative "model"
 
 module Parse

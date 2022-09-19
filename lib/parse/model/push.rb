@@ -3,7 +3,7 @@
 
 require_relative "../query.rb"
 require_relative "../client.rb"
-require "active_model_serializers"
+
 
 module Parse
   # This class represents the API to send push notification to devices that are

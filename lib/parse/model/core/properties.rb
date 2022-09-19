@@ -7,9 +7,9 @@ require "active_support/inflector"
 require "active_support/core_ext"
 require "active_support/core_ext/object"
 require "active_support/inflector"
-require "active_model_serializers"
+
 require "active_support/inflector"
-require "active_model_serializers"
+
 require "active_support/hash_with_indifferent_access"
 require "time"
 

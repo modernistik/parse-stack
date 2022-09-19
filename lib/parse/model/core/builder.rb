@@ -43,6 +43,10 @@ module Parse
           raise ArgumentError, "No valid className provided for schema hash"
         end
 
+        # Remove leading underscore, as ruby constants have to start with an uppercase letter
+
+        className = className[1..] if className[0] == '_'
+
         begin
           klass = Parse::Model.find_class className
           klass = ::Object.const_get(className.to_parse_class) if klass.nil?

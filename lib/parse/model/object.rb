@@ -7,7 +7,7 @@ require "active_support/inflector"
 require "active_support/core_ext"
 require "active_support/core_ext/object"
 require "active_support/core_ext/string"
-require "active_model_serializers"
+
 require "time"
 require "open-uri"
 
@@ -298,11 +298,12 @@ module Parse
     def initialize(opts = {})
       if opts.is_a?(String) #then it's the objectId
         @id = opts.to_s
-      elsif opts.is_a?(Hash)
+      elsif opts.respond_to?(:to_h)
         #if the objectId is provided we will consider the object pristine
         #and not track dirty items
-        dirty_track = opts[Parse::Model::OBJECT_ID] || opts[:objectId] || opts[:id]
-        apply_attributes!(opts, dirty_track: !dirty_track)
+        _attributes = opts.to_h
+        dirty_track = _attributes[Parse::Model::OBJECT_ID] || _attributes[:objectId] || _attributes[:id]
+        apply_attributes!(_attributes, dirty_track: !dirty_track)
       end
 
       # if no ACLs, then apply the class default acls

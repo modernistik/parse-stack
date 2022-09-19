@@ -647,6 +647,39 @@ data.acl # => ACL({"role:Admin"=>{"read"=>true, "write"=>true}})
 
 For more information about Parse record ACLs, see the documentation at  [Security](http://docs.parseplatform.org/rest/guide/#security)
 
+## Builtin parse collections
+
+These classes match parse builtin collections. Do not redeclare them as rails autoloader don't support multiple class declarations. To add properties and methods to these classes, properly reopen them with overrides, using this class_eval method.
+
+First, append this to config/application.rb
+
+```ruby
+##
+# Don't autoload overrides but preload them instead
+    overrides = "#{Rails.root}/app/overrides"
+    Rails.autoloaders.main.ignore(overrides)
+
+    config.to_prepare do
+      Dir.glob("#{overrides}/**/*_override.rb").each do |override|
+        load override
+      end
+    end
+```
+
+Then, create the folder app/overrides/models. Create a file named [collection]_override.rb in this folder to reopen one of these classes. Example with the _User collection:
+
+```ruby
+# app/overrides/models/user_override.rb
+Parse::User.class_eval do
+  has_many :created_articles, as: :articles, field: :creator
+
+  property :first_name
+  property :last_name
+  property :picture
+end
+```
+
+
 ### [Parse::Session](https://www.modernistik.com/gems/parse-stack/Parse/Session.html)
 This class represents the data and columns contained in the standard Parse `_Session` collection. You may add additional properties and methods to this class. See [Session API Reference](https://www.modernistik.com/gems/parse-stack/Parse/Session.html). You may call `Parse.use_shortnames!` to use `Session` in addition to `Parse::Session`.
 
