@@ -417,7 +417,7 @@ module Parse
     def self.session!(token, opts = {})
       # support Parse::Session objects
       token = token.session_token if token.respond_to?(:session_token)
-      response = client.current_user(token, opts)
+      response = client.current_user(token, **opts)
       response.success? ? Parse::User.build(response.result) : nil
     end
 

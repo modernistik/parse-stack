@@ -406,7 +406,7 @@ module Parse
           opts[:through] ||= :query
 
           if opts[:through] == :query
-            return has_many_queried(key, scope, opts)
+            return has_many_queried(key, scope, **opts)
           end
 
           # below this is the same
