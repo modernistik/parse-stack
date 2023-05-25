@@ -1,5 +1,4 @@
 require "faraday"
-require "faraday_middleware"
 require "active_support"
 require "moneta"
 

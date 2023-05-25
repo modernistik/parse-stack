@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require "faraday"
-require "faraday_middleware"
 require_relative "response"
 require_relative "protocol"
 require "active_support"
