@@ -17,7 +17,7 @@ module Parse
     # The request header field to request a revocable session token.
     REVOCABLE_SESSION = "X-Parse-Revocable-Session"
     # The request header field to send the installation id.
-    INSTALLATION_ID = "Parse-Installation-Id"
+    INSTALLATION_ID = "X-Parse-Installation-Id"
     # The request header field to send an email when authenticating with Parse hosted platform.
     EMAIL = "X-Parse-Email"
     # The request header field to send the password when authenticating with the Parse hosted platform.

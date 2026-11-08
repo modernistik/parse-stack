@@ -40,6 +40,12 @@ module Parse
       def update_schema(className, schema)
         request :put, "#{SCHEMAS_PATH}/#{className}", body: schema
       end
+
+      # Delete an empty class schema. The server enforces master-key access.
+      def delete_schema(className, headers: {}, **opts)
+        className = className.parse_class if className.respond_to?(:parse_class)
+        request :delete, "#{SCHEMAS_PATH}/#{className}", headers: headers, opts: opts
+      end
     end #Schema
   end #API
 end

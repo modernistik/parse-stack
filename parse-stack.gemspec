@@ -25,16 +25,28 @@ Gem::Specification.new do |spec|
   spec.bindir = "bin"
   spec.executables = ["parse-console"] #spec.files.grep(%r{^bin/pstack/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
-  spec.required_ruby_version = ">= 2.6"
+  spec.required_ruby_version = ">= 3.0"
 
-  spec.add_runtime_dependency "activemodel", [">= 5", "< 7"]
-  spec.add_runtime_dependency "active_model_serializers", [">= 0.9", "< 1"]
-  spec.add_runtime_dependency "activesupport", [">= 5", "< 7"]
+  spec.add_runtime_dependency "activemodel", [">= 7.1", "< 9"]
+  spec.add_runtime_dependency "activesupport", [">= 7.1", "< 9"]
+  spec.add_runtime_dependency "base64", ">= 0.2"
+  spec.add_runtime_dependency "benchmark", ">= 0.3"
+  spec.add_runtime_dependency "bigdecimal", ">= 3.1"
+  spec.add_runtime_dependency "date", ">= 3.3"
+  spec.add_runtime_dependency "irb", ">= 1.13"
+  # ActiveSupport 7.1 passes JSON options removed in JSON 3.
+  spec.add_runtime_dependency "json", [">= 2.7", "< 3"]
+  spec.add_runtime_dependency "logger", ">= 1.6"
+  spec.add_runtime_dependency "open-uri", ">= 0.4"
+  spec.add_runtime_dependency "optparse", ">= 0.5"
+  spec.add_runtime_dependency "ostruct", ">= 0.6"
+  spec.add_runtime_dependency "securerandom", ">= 0.3"
+  spec.add_runtime_dependency "time", ">= 0.3"
   spec.add_runtime_dependency "parallel", [">= 1.6", "< 2"]
-  spec.add_runtime_dependency "faraday", "< 1"
-  spec.add_runtime_dependency "faraday_middleware", [">= 0.9", "< 2"]
+  spec.add_runtime_dependency "faraday", "~> 2.0"
+  spec.add_runtime_dependency "faraday-net_http", [">= 3", "< 4"]
   spec.add_runtime_dependency "moneta", "< 2"
-  spec.add_runtime_dependency "rack", ">= 2.0.6", "< 3"
+  spec.add_runtime_dependency "rack", [">= 3.1", "< 4"]
 
   #   spec.post_install_message = <<UPGRADE
   #

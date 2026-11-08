@@ -23,6 +23,12 @@ module Parse
         response.parse_class = Parse::Model::TYPE_FILE
         response
       end
+
+      # Delete the stored file by its server-assigned name. Requires a master key.
+      def delete_file(file_name, headers: {}, **opts)
+        file_name = file_name.name if file_name.is_a?(Parse::File)
+        request :delete, "#{FILES_PATH}/#{file_name}", headers: headers, opts: opts
+      end
     end
   end
 end

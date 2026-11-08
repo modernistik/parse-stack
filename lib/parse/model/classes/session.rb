@@ -68,7 +68,7 @@ module Parse
     # @param token [String] the session token
     # @return [Session] the session for this token, otherwise nil.
     def self.session(token, **opts)
-      response = client.fetch_session(token, opts)
+      response = client.fetch_session(token, **opts)
       if response.success?
         return Parse::Session.build response.result
       end

@@ -27,10 +27,7 @@ module Parse
         # @param className [String] the name of the Parse collection.
         # @return [String] the API uri path
         def aggregate_uri_path(className)
-          if className.is_a?(Parse::Pointer)
-            id = className.id
-            className = className.parse_class
-          end
+          className = className.parse_class if className.respond_to?(:parse_class)
           "#{PATH_PREFIX}#{className}"
         end
       end
@@ -53,6 +50,13 @@ module Parse
         response = request :get, aggregate_uri_path(className), query: query, headers: headers, opts: opts
         response.parse_class = className if response.present?
         response
+      end
+
+      # Run a server-side aggregation pipeline. Operators and field paths are
+      # sent unchanged; the server validates support and master-key access.
+      def aggregate_pipeline(className, pipeline, headers: {}, **opts)
+        raise ArgumentError, "pipeline must be an array" unless pipeline.is_a?(Array)
+        aggregate_objects(className, { pipeline: pipeline.to_json }, headers: headers, **opts)
       end
     end #Aggregate
   end #API

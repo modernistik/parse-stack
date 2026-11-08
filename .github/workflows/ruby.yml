@@ -18,19 +18,57 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest]
-        ruby: [2.5, 2.6, 2.7]
+        # Keep stable runner images for the older Ruby versions.
+        os: [ubuntu-24.04, macos-15]
+        ruby: ["3.0", "3.1", "3.2", "3.3", "3.4", "4.0"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Ruby
-        # To automatically get bug fixes and new Ruby versions for ruby/setup-ruby,
-        # change this to (see https://github.com/ruby/setup-ruby#versioning):
         uses: ruby/setup-ruby@v1
-        # uses: ruby/setup-ruby@ec106b438a1ff6ff109590de34ddc62c540232e0
         with:
           ruby-version: ${{ matrix.ruby }}
-      - name: Install dependencies
-        run: bundle install
+          bundler-cache: true
       - name: Run tests
         run: bundle exec rake
+
+  latest-dependencies:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.4", "4.0"]
+    env:
+      BUNDLE_GEMFILE: ${{ github.workspace }}/gemfiles/latest.gemfile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler: latest
+          bundler-cache: true
+      - run: bundle exec rake
+
+  rest-integration:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        ruby: ["3.0", "4.0"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.11.0"
+          cache: npm
+          cache-dependency-path: test/integration/package-lock.json
+      - uses: actions/cache@v4
+        with:
+          path: /tmp/parse-stack-mongodb-binaries
+          key: mongodb-${{ runner.os }}-${{ runner.arch }}-8.0.17
+      - run: npm ci --prefix test/integration --no-audit --no-fund
+      - run: bundle exec rake integration

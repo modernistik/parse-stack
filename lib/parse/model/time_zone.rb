@@ -45,8 +45,8 @@ module Parse
     # Basically sets up sending forwarding calls to the `zone` object for a Parse::TimeZone object.
     (ActiveSupport::TimeZone.public_instance_methods(false) - [:to_s, :name, :as_json]).each do |meth|
       Parse::TimeZone.class_eval do
-        define_method meth do |*args|
-          zone.send meth, *args
+        define_method meth do |*args, **kwargs, &block|
+          zone.public_send(meth, *args, **kwargs, &block)
         end
       end
     end

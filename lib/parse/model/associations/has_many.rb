@@ -356,7 +356,7 @@ module Parse
           klassName = (opts[:as] || key).to_parse_class singularize: true
           foreign_field = (opts[:field] || parse_class.columnize).to_sym
 
-          define_method(key) do |*args, &block|
+          define_method(key) do |*args, **kwargs, &block|
             return [] if @id.nil?
             query = Parse::Query.new(klassName, limit: :max)
 
@@ -366,32 +366,32 @@ module Parse
               # magic, override the singleton method_missing with accessing object level methods
               # that don't collide with Parse::Query instance. Still accessible under :i
               instance = self
-              query.define_singleton_method(:method_missing) { |m, *args, &block| instance.send(m, *args, &block) }
+              query.define_singleton_method(:method_missing) { |m, *args, **kwargs, &block| instance.send(m, *args, **kwargs, &block) }
               query.define_singleton_method(:i) { instance }
               # if the scope takes no arguments, assume arguments are additional conditions
               if scope.arity.zero?
                 query.instance_exec(&scope)
-                query.conditions(*args) if args.present?
+                query.conditions(*args, **kwargs) if args.present? || kwargs.present?
               else
-                query.instance_exec(*args, &scope)
+                query.instance_exec(*args, **kwargs, &scope)
               end
               instance = nil # help clean up ruby gc
-            elsif args.present?
-              query.conditions(*args)
+            elsif args.present? || kwargs.present?
+              query.conditions(*args, **kwargs)
             end
 
-            query.define_singleton_method(:method_missing) do |m, *args, &chained_block|
+            query.define_singleton_method(:method_missing) do |m, *args, **kwargs, &chained_block|
               klass = Parse::Model.find_class klassName
 
               if klass.present? && klass.respond_to?(m)
-                klass_scope = klass.send(m, *args) # blocks only passed to final result set
+                klass_scope = klass.send(m, *args, **kwargs) # blocks only passed to final result set
                 return klass_scope unless klass_scope.is_a?(Parse::Query)
                 # merge constraints
                 add_constraints(klass_scope.constraints)
                 # if a block was passed, execute the query, otherwise return the query
                 return chained_block.present? ? results(&chained_block) : self
               end
-              results.send(m, *args, &chained_block)
+              results.send(m, *args, **kwargs, &chained_block)
             end
 
             Parse::Query.apply_auto_introspection!(query)
@@ -406,7 +406,7 @@ module Parse
           opts[:through] ||= :query
 
           if opts[:through] == :query
-            return has_many_queried(key, scope, opts)
+            return has_many_queried(key, scope, **opts)
           end
 
           # below this is the same

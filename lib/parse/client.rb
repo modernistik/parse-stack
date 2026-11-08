@@ -1,8 +1,7 @@
 require "faraday"
-require "faraday_middleware"
 require "active_support"
 require "moneta"
-require "active_model_serializers"
+require "active_model"
 require "active_support/inflector"
 require "active_support/core_ext/object"
 require "active_support/core_ext/string"
@@ -161,6 +160,7 @@ module Parse
     #  the service is unavailable. Defaults to {DEFAULT_RETRIES}.
     #  @return [String]
     attr_accessor :cache, :retry_limit
+    attr_reader :batch_size
     attr_reader :application_id, :api_key, :master_key, :server_url
     alias_method :app_id, :application_id
     # The client can support multiple sessions. The first session created, will be placed
@@ -202,8 +202,8 @@ module Parse
       # @see Parse::Middleware::Caching
       # @see Parse::Middleware::Authentication
       # @see Parse::Protocol
-      def setup(opts = {})
-        @clients[:default] = self.new(opts, &Proc.new)
+      def setup(opts = {}, &block)
+        @clients[:default] = self.new(opts, &block)
       end
     end
 
@@ -241,6 +241,7 @@ module Parse
     #    cache using the clear_cache! method on your Parse::Client instance.
     # @option opts [Hash] :faraday You may pass a hash of options that will be
     #    passed to the Faraday constructor.
+    # @option opts [Integer] :batch_size Maximum operations per SDK batch (default 20).
     # @raise Parse::Error::ConnectionError if the client was not properly configured with required keys or url.
     # @raise ArgumentError if the cache instance passed to the :cache option is not of Moneta::Transformer or Moneta::Expires
     # @see Parse::Middleware::BodyBuilder
@@ -248,6 +249,8 @@ module Parse
     # @see Parse::Middleware::Authentication
     # @see Parse::Protocol
     def initialize(opts = {})
+      opts = opts.dup
+      self.batch_size = opts.fetch(:batch_size, 20)
       @server_url = opts[:server_url] || ENV["PARSE_SERVER_URL"] || Parse::Protocol::SERVER_URL
       @application_id = opts[:application_id] || opts[:app_id] || ENV["PARSE_SERVER_APPLICATION_ID"] || ENV["PARSE_APP_ID"]
       @api_key = opts[:api_key] || opts[:rest_api_key] || ENV["PARSE_SERVER_REST_API_KEY"] || ENV["PARSE_API_KEY"]
@@ -259,8 +262,7 @@ module Parse
       end
       @server_url += "/" unless @server_url.ends_with?("/")
       #Configure Faraday
-      opts[:faraday] ||= {}
-      opts[:faraday].merge!(:url => @server_url)
+      opts[:faraday] = (opts[:faraday] || {}).merge(url: @server_url)
       @conn = Faraday.new(opts[:faraday]) do |conn|
         #conn.request :json
 
@@ -303,9 +305,9 @@ module Parse
           conn.use Parse::Middleware::Caching, self.cache, { expires: opts[:expires].to_i }
         end
 
-        yield(conn) if block_given?
-
         conn.adapter opts[:adapter]
+
+        yield(conn) if block_given?
       end
       Parse::Client.clients[:default] ||= self
     end
@@ -316,6 +318,14 @@ module Parse
     def retry_limit
       return DEFAULT_RETRIES if @retry_limit.nil?
       @retry_limit
+    end
+
+    # Maximum operations sent per SDK batch. Match a lower server limit here.
+    def batch_size=(value)
+      unless value.is_a?(Integer) && value.positive?
+        raise ArgumentError, "batch_size must be a positive integer"
+      end
+      @batch_size = value
     end
 
     # @return [String] the url prefix of the Parse Server url.
@@ -384,7 +394,7 @@ module Parse
         _retry_count = opts[:retry]
       end
 
-      headers ||= {}
+      headers = (headers || {}).dup
       # if the first argument is a Parse::Request object, then construct it
       _request = nil
       if method.is_a?(Request)
@@ -420,12 +430,17 @@ module Parse
         headers[Parse::Middleware::Authentication::DISABLE_MASTER_KEY] = "true"
         headers[Parse::Protocol::SESSION_TOKEN] = token
       end
+      if opts[:installation_id].present?
+        headers[Parse::Protocol::INSTALLATION_ID] = opts[:installation_id].to_s
+      end
 
       #if it is a :get request, then use query params, otherwise body.
       params = (method == :get ? query : body) || {}
       # if the path does not start with the '/1/' prefix, then add it to be nice.
       # actually send the request and return the body
-      response_env = @conn.send(method, uri, params, headers)
+      response_env = @conn.public_send(method, uri, params, headers) do |request|
+        request.params.update(query) if method != :get && query
+      end
       response = response_env.body
       response.request = _request
 
@@ -481,7 +496,7 @@ module Parse
         retry
       end
       raise
-    rescue Faraday::Error::ClientError, Net::OpenTimeout => e
+    rescue Faraday::Error, Net::OpenTimeout => e
       if _retry_count > 0
         warn "[Parse:Retry] Retries remaining #{_retry_count} : #{_request}"
         _retry_count -= 1
@@ -535,7 +550,7 @@ module Parse
     # @return (see #request)
     def send_request(req) #Parse::Request object
       raise ArgumentError, "Object not of Parse::Request type." unless req.is_a?(Parse::Request)
-      request req.method, req.path, req.body, req.headers
+      request req, opts: req.opts
     end
 
     # The connectable  module adds methods to objects so that they can get a default
@@ -579,12 +594,8 @@ module Parse
   # @yield (see Parse::Client.setup)
   # @return (see Parse::Client.setup)
   # @see Parse::Client.setup
-  def self.setup(opts = {})
-    if block_given?
-      Parse::Client.new(opts, &Proc.new)
-    else
-      Parse::Client.new(opts)
-    end
+  def self.setup(opts = {}, &block)
+    Parse::Client.new(opts, &block)
   end
 
   # Helper method to trigger cloud jobs and get results.
@@ -593,10 +604,13 @@ module Parse
   # @param opts (see Parse.call_function)
   # @return (see Parse.call_function)
   def self.trigger_job(name, body = {}, **opts)
-    conn = opts[:session] || opts[:client] || :default
-    response = Parse::Client.client(conn).trigger_job(name, body)
-    return response if opts[:raw].present?
-    response.error? ? nil : response.result["result"]
+    session, client = opts.delete(:session), opts.delete(:client)
+    conn = session || client || :default
+    raw = opts.delete(:raw)
+    response = Parse::Client.client(conn).trigger_job(name, body, **opts)
+    return response if raw.present?
+    return nil if response.error?
+    response.job_status_id || response.result["result"]
   end
 
   # Helper method to call cloud functions and get results.
@@ -605,9 +619,11 @@ module Parse
   # @param opts [Hash] additional options.
   # @return [Object] the result data of the response. nil if there was an error.
   def self.call_function(name, body = {}, **opts)
-    conn = opts[:session] || opts[:client] || :default
-    response = Parse::Client.client(conn).call_function(name, body)
-    return response if opts[:raw].present?
+    session, client = opts.delete(:session), opts.delete(:client)
+    conn = session || client || :default
+    raw = opts.delete(:raw)
+    response = Parse::Client.client(conn).call_function(name, body, **opts)
+    return response if raw.present?
     response.error? ? nil : response.result["result"]
   end
 end

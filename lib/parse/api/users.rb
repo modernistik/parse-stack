@@ -41,7 +41,7 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def current_user(session_token, headers: {}, **opts)
-        headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token })
+        headers = headers.merge({ Parse::Protocol::SESSION_TOKEN => session_token })
         response = request :get, "#{USER_PATH_PREFIX}/me", headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
@@ -53,9 +53,9 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def create_user(body, headers: {}, **opts)
-        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => "1" })
+        headers = headers.merge({ Parse::Protocol::REVOCABLE_SESSION => "1" })
         if opts[:session_token].present?
-          headers.merge!({ Parse::Protocol::SESSION_TOKEN => opts[:session_token] })
+          headers = headers.merge({ Parse::Protocol::SESSION_TOKEN => opts[:session_token] })
         end
         response = request :post, USER_PATH_PREFIX, body: body, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
@@ -69,7 +69,7 @@ module Parse
       # @param headers [Hash] additional HTTP headers to send with the request.
       # @return [Parse::Response]
       def update_user(id, body = {}, headers: {}, **opts)
-        response = request :put, "#{USER_PATH_PREFIX}/#{id}", body: body, opts: opts
+        response = request :put, "#{USER_PATH_PREFIX}/#{id}", body: body, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
       end
@@ -84,7 +84,7 @@ module Parse
       # @return [Parse::Response]
       def set_service_auth_data(id, service_name, auth_data, headers: {}, **opts)
         body = { authData: { service_name => auth_data } }
-        update_user(id, body, opts)
+        update_user(id, body, headers: headers, **opts)
       end
 
       # Delete a {Parse::User} record given an objectId.
@@ -113,11 +113,18 @@ module Parse
       # @param opts [Hash] additional options to pass to the {Parse::Client} request.
       # @return [Parse::Response]
       def login(username, password, headers: {}, **opts)
-        # Probably pass Installation-ID as header
         query = { username: username, password: password }
-        headers.merge!({ Parse::Protocol::REVOCABLE_SESSION => "1" })
-        # headers.merge!( { Parse::Protocol::INSTALLATION_ID => ''} )
+        headers = headers.merge({ Parse::Protocol::REVOCABLE_SESSION => "1" })
         response = request :get, LOGIN_PATH, query: query, headers: headers, opts: opts
+        response.parse_class = Parse::Model::CLASS_USER
+        response
+      end
+
+      # Create a session for an existing user without their password. Requires
+      # a master key. Keep the returned session token on the server.
+      def login_as(user_id, headers: {}, **opts)
+        user_id = user_id.id if user_id.respond_to?(:id)
+        response = request :post, "loginAs", query: { userId: user_id }, body: {}, headers: headers, opts: opts
         response.parse_class = Parse::Model::CLASS_USER
         response
       end
@@ -128,7 +135,7 @@ module Parse
       # @param opts [Hash] additional options to pass to the {Parse::Client} request.
       # @return [Parse::Response]
       def logout(session_token, headers: {}, **opts)
-        headers.merge!({ Parse::Protocol::SESSION_TOKEN => session_token })
+        headers = headers.merge({ Parse::Protocol::SESSION_TOKEN => session_token })
         opts.merge!({ use_master_key: false, session_token: session_token })
         request :post, LOGOUT_PATH, headers: headers, opts: opts
       end
@@ -143,7 +150,7 @@ module Parse
       def signup(username, password, email = nil, body: {}, **opts)
         body = body.merge({ username: username, password: password })
         body[:email] = email || body[:email]
-        create_user(body, opts)
+        create_user(body, **opts)
       end
     end # Users
   end #API

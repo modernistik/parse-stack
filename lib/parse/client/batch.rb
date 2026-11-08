@@ -18,7 +18,7 @@ module Parse
   # Batch requests are supported implicitly and intelligently through an
   # extension of array. When an array of Parse::Object subclasses is saved,
   # Parse-Stack will batch all possible save operations for the objects in the
-  # array that have changed. It will also batch save 50 at a time until all items
+  # array that have changed. It will also batch save in configured chunks until all items
   # in the array are saved. Note: Parse does not allow batch saving Parse::User objects.
   #
   #  songs = Songs.first 1000 #first 1000 songs
@@ -26,7 +26,7 @@ module Parse
   #   # ... modify song ...
   #  end
   #
-  #  # will batch save 50 items at a time until all are saved.
+  #  # will batch save 20 items at a time by default until all are saved.
   #  songs.save
   #
   # The objects do not have to be of the same collection in order to be supported in the
@@ -85,9 +85,9 @@ module Parse
     end
 
     # @return [Array]
-    def each
+    def each(&block)
       return enum_for(:each) unless block_given?
-      @requests.each(&Proc.new)
+      @requests.each(&block)
     end
 
     # @return [Hash] a formatted payload for the batch request.
@@ -119,13 +119,17 @@ module Parse
     end
 
     # Submit the batch operation in chunks until they are all complete. In general,
-    # Parse limits requests in each batch to 50 and it is possible that a {BatchOperation}
-    # instance contains more than 50 requests. This method will slice up the array of
+    # The server's limit is configurable. This method will slice up the array of
     # request and send them based on the `segment` amount until they have all been submitted.
-    # @param segment [Integer] the number of requests to send in each batch. Default 50.
+    # @param segment [Integer] the number of requests per batch. Defaults to the client's batch_size (20).
     # @return [Array<Parse::Response>] the corresponding set of responses for
     #  each request in the batch.
-    def submit(segment = 50)
+    def submit(segment = nil, &block)
+      return @responses = [] if @requests.empty?
+      segment ||= client.batch_size
+      unless segment.is_a?(Integer) && segment.positive?
+        raise ArgumentError, "batch segment must be a positive integer"
+      end
       @responses = []
       @requests.uniq!(&:signature)
       @responses = @requests.each_slice(segment).to_a.threaded_map(2) do |slice|
@@ -133,7 +137,7 @@ module Parse
       end
       @responses.flatten!
       #puts "Requests: #{@requests.count} == Response: #{@responses.count}"
-      @requests.zip(@responses).each(&Proc.new) if block_given?
+      @requests.zip(@responses).each(&block) if block_given?
       @responses
     end
 
@@ -169,7 +173,7 @@ class Array
   # Batch requests are supported implicitly and intelligently through an
   # extension of array. When an array of Parse::Object subclasses is saved,
   # Parse-Stack will batch all possible save operations for the objects in the
-  # array that have changed. It will also batch save 50 at a time until all items
+  # array that have changed. It will also batch save in configured chunks until all items
   # in the array are saved. Note: Parse does not allow batch saving Parse::User objects.
   # @note The objects of the array to be saved do not all have to be of the same collection.
   # @param merge [Boolean] whether to merge the updated changes to the series of

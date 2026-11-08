@@ -328,33 +328,33 @@ module Parse
     end
 
     # Alias for Array#each
-    def each
+    def each(&block)
       return collection.enum_for(:each) unless block_given?
-      collection.each &Proc.new
+      collection.each &block
     end
 
     # Alias for Array#map
-    def map
+    def map(&block)
       return collection.enum_for(:map) unless block_given?
-      collection.map &Proc.new
+      collection.map &block
     end
 
     # Alias for Array#select
-    def select
+    def select(&block)
       return collection.enum_for(:select) unless block_given?
-      collection.select &Proc.new
+      collection.select &block
     end
 
     # Alias for Array#uniq
-    def uniq
-      return collection.uniq(&Proc.new) if block_given?
+    def uniq(&block)
+      return collection.uniq(&block) if block_given?
       return collection.uniq
     end
 
     # Alias for Array#uniq!
-    def uniq!
+    def uniq!(&block)
       notify_will_change!
-      return collection.uniq!(&Proc.new) if block_given?
+      return collection.uniq!(&block) if block_given?
       return collection.uniq!
     end
 

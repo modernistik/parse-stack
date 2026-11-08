@@ -78,7 +78,7 @@ module Parse
         unless value.is_a?(String) && value.strip.present?
           raise ArgumentError, "#{self.class}: value must be of string type representing a Parse object id."
         end
-        value.strip!
+        value = value.strip
         return { @operation.operand => klass.pointer(value) }
       end
     end

@@ -25,7 +25,7 @@ module Parse
       url ||= ENV["HYPERDRIVE_URL"] || ENV["CONFIG_URL"]
       if url.present?
         begin
-          remote_config = JSON.load open(url)
+          remote_config = URI.open(url) { |io| JSON.parse(io.read) }
           remote_config.each do |key, value|
             k = key.upcase
             next unless ENV[k].nil?

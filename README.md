@@ -11,7 +11,7 @@ Interested in our work? You can find us here: [https://www.modernistik.com](http
 ### Code Status
 [![Gem Version](https://img.shields.io/gem/v/parse-stack.svg)](https://github.com/modernistik/parse-stack)
 [![Downloads](https://img.shields.io/gem/dt/parse-stack.svg)](https://rubygems.org/gems/parse-stack)
-[![Build Status](https://travis-ci.org/modernistik/parse-stack.svg?branch=master)](https://travis-ci.org/modernistik/parse-stack)
+[![Gem Tests](https://github.com/modernistik/parse-stack/actions/workflows/ruby.yml/badge.svg)](https://github.com/modernistik/parse-stack/actions/workflows/ruby.yml)
 [![API Reference](http://img.shields.io/badge/api-docs-blue.svg)](https://www.modernistik.com/gems/parse-stack/index.html)
 
 #### Tutorial Videos
@@ -22,6 +22,29 @@ Interested in our work? You can find us here: [https://www.modernistik.com](http
 Any other questions, please post them on StackOverflow with the proper parse-stack / parse-server / ruby tags.
 
 ## Installation
+
+Requires **Ruby 3.0 or later**. The test matrix covers Ruby 3.0–3.4 and 4.0.
+This branch supports ActiveModel/ActiveSupport 7.1–8.x, Faraday 2, and Rack 3.
+Bundler selects dependency versions compatible with your Ruby version.
+The development lockfile supports Ruby 3.0; CI also tests newer dependencies
+with `gemfiles/latest.gemfile` on newer Rubies.
+JSON remains on version 2.x for compatibility with ActiveSupport 7.1.
+
+Compatibility checks and remaining API work are documented in
+[compatibility-findings.md](compatibility-findings.md). The live REST baseline is
+Parse Server 9.10.7 with MongoDB 8.0.17; this does not certify every server version
+or database adapter. See [rest-api-support.md](rest-api-support.md) for new query
+options, deletion/impersonation helpers, aggregation pipelines, and the support plan.
+
+If you are upgrading an existing application:
+
+- Upgrade Ruby and resolve the updated gem dependencies together.
+- Replace custom Faraday 0.x middleware and adapters with Faraday 2 equivalents.
+  Parse Stack's configuration block can select an adapter with `conn.adapter`.
+- Use `rackup` and `Rackup::Server` to host webhooks with Rack 3. `bin/server`
+  starts the development webhook server with Puma.
+- Add `active_model_serializers` to your application's Gemfile if your app uses
+  it directly. Parse Stack now uses ActiveModel's built-in JSON serialization.
 
 Add this line to your application's `Gemfile`:
 ```ruby
@@ -54,7 +77,7 @@ $ parse-console -v -a myAppId -m myMasterKey http://localhost:1337/parse
 Server : http://localhost:1337/parse
 App Id : myAppId
 Master : true
-2.4.0 > Parse::User.first
+3.4.1 > Parse::User.first
 ```
 
 ## Overview
@@ -1561,7 +1584,7 @@ The `has_many` Parse Relation associations are handled similarly as in the array
 ```
 
 ### Batch Requests
-Batch requests are supported implicitly and intelligently through an extension of Array. When an array of `Parse::Object` subclasses is saved, Parse-Stack will batch all possible save operations for the objects in the array that have changed. It will also batch save 50 at a time until all items in the array are saved. The objects do not have to be of the same collection in order to be supported in the batch request. *Note: Parse does not allow batch saving Parse::User objects.*
+Batch requests are supported implicitly and intelligently through an extension of Array. When an array of `Parse::Object` subclasses is saved, Parse-Stack will batch all possible save operations for the objects in the array that have changed. It saves 20 operations per request by default. Set `batch_size:` during client setup, `client.batch_size = n`, or pass a segment to `BatchOperation#submit(n)` to match your server's configured limit. The objects do not have to be of the same collection in order to be supported in the batch request. *Note: Parse does not allow batch saving Parse::User objects.*
 
 ```ruby
 songs = Songs.first 1000 #first 1000 songs
@@ -1569,7 +1592,7 @@ songs.each do |song|
   .... modify them ...
 end
 
-# will batch save 50 items at a time until all are saved.
+# will batch save 20 items at a time by default until all are saved.
 songs.save
 
 # you can also destroy a set of objects
@@ -2657,6 +2680,15 @@ end
 ```
 
 ## Contributing
+
+Use Bundler 2.5.23 to install the development dependencies and run the tests
+on any supported Ruby version:
+
+```bash
+gem install bundler -v 2.5.23
+bundle _2.5.23_ install
+bundle _2.5.23_ exec rake test
+```
 
 Bug reports and pull requests are welcome on GitHub at [https://github.com/modernistik/parse-stack](https://github.com/modernistik/parse-stack).
 

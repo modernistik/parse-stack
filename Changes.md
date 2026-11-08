@@ -1,5 +1,32 @@
 ## Parse-Stack Changelog
 
+### 2.0.0 (unreleased)
+
+- Require Ruby 3.0 or later; test Ruby 3.0–3.4 and 4.0 on Linux and macOS.
+- Support ActiveModel/ActiveSupport 7.1–8.x, Faraday 2, and Rack 3.
+- Use ActiveModel's built-in JSON serialization instead of the separate
+  `active_model_serializers` gem. Remove the obsolete `faraday_middleware` dependency.
+- Declare the standard-library gems required by recent Ruby versions.
+- Fix block forwarding for setup, queries, collections, batch operations, and webhooks.
+- Preserve keyword arguments through queries, scopes, associations, fetching,
+  user authentication, session lookup, and explicit request objects.
+- Fix URL loading with `URI.open`, close downloaded file streams, and replace
+  the console's removed `File.exists?` call.
+- Allow custom adapters in the setup block without mutating the caller's options.
+- Accept frozen object ID strings in pointer constraints.
+- Support non-rewindable webhook request bodies and update `bin/server` for Rackup.
+- Replace obsolete development debugger and server dependencies.
+- Use Bundler 2.5.23 for development compatibility with Ruby 3.0 and later.
+- Keep JSON on 2.x to support the ActiveSupport 7.1 releases available to Ruby 3.0.
+- Fix Ruby 3 keyword forwarding for distinct/aggregate queries; add a request regression test.
+- Send advanced query options outside `where`; add `Query#server_options` for future REST parameters.
+- Correct `X-Parse-Installation-Id` and forward installation IDs from signup/login.
+- Preserve response headers and return the job-status ID from `Parse.trigger_job`.
+- Add file/schema deletion, user impersonation, and aggregation pipeline helpers.
+- Use configurable batch chunks with a default of 20 operations.
+- Preserve query parameters on non-GET requests and accept empty successful responses.
+- Add contract tests and disposable Parse Server 9.10.7 / MongoDB 8.0.17 integration tests.
+
 ### 1.9.0
 
 - Support for ActiveModel and ActiveSupport 6.0.

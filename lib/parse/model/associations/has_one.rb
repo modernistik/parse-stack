@@ -124,7 +124,7 @@ module Parse
             warn "Creating has_one :#{key} association. Will overwrite existing method #{self}##{key}."
           end
 
-          define_method(key) do |*args, &block|
+          define_method(key) do |*args, **kwargs, &block|
             return nil if @id.nil?
             query = Parse::Query.new(klassName, limit: 1)
             query.where(foreign_field => self) unless opts[:scope_only] == true
@@ -132,18 +132,18 @@ module Parse
             if scope.is_a?(Proc)
               # any method not part of Query, gets delegated to the instance object
               instance = self
-              query.define_singleton_method(:method_missing) { |m, *args, &block| instance.send(m, *args, &block) }
+              query.define_singleton_method(:method_missing) { |m, *args, **kwargs, &block| instance.send(m, *args, **kwargs, &block) }
               query.define_singleton_method(:i) { instance }
 
               if scope.arity.zero?
                 query.instance_exec(&scope)
-                query.conditions(*args) if args.present?
+                query.conditions(*args, **kwargs) if args.present? || kwargs.present?
               else
-                query.instance_exec(*args, &scope)
+                query.instance_exec(*args, **kwargs, &scope)
               end
               instance = nil # help clean up ruby gc
-            elsif args.present?
-              query.conditions(*args)
+            elsif args.present? || kwargs.present?
+              query.conditions(*args, **kwargs)
             end
             # query.define_singleton_method(:method_missing) do |m, *args, &block|
             #   self.first.send(m, *args, &block)

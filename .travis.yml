@@ -1,9 +1,10 @@
 language: ruby
 rvm:
-  - 2.6
-  - 2.7
-  - 3.1.2
+  - "3.0"
+  - "3.1"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "4.0"
 before_install:
-  - yes | gem update --system --force
-  - gem install bundler
-  - bundle update --bundler
+  - gem install bundler -v 2.5.23

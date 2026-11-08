@@ -52,7 +52,7 @@ opt_parser = OptionParser.new do |o|
     exit 1
   end
   o.on('-c','--config CONFIG_JSON', "Load config from a parse-dashboard.json compatible file.") do |filepath|
-    unless File.exists?(filepath)
+    unless File.exist?(filepath)
       $stderr.puts "File #{filepath} does not exist."
       exit 1
     end
@@ -76,7 +76,7 @@ opt_parser = OptionParser.new do |o|
   o.on('--url URL', 'Load the env config from a url.') do |url|
     begin
       puts "Loading config: #{url}"
-      json = JSON.load open(url)
+      json = URI.open(url) { |io| JSON.parse(io.read) }
       raise "Contents not a JSON hash." unless json.is_a?(Hash)
       json.each { |k,v| ENV[k.upcase] = v }
       opts[:server_url] ||= ENV['PARSE_SERVER_URL']

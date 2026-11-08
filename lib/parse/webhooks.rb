@@ -6,8 +6,8 @@ require "active_support"
 require "active_support/inflector"
 require "active_support/core_ext/object"
 require "active_support/core_ext"
-require "active_model_serializers"
 require "rack"
+require "ostruct"
 require_relative "client"
 require_relative "stack"
 require_relative "model/object"
@@ -29,9 +29,9 @@ module Parse
     # @yield (see Parse::Object.webhook)
     # @param block (see Parse::Object.webhook)
     # @return (see Parse::Object.webhook)
-    def self.webhook_function(functionName, block = nil)
+    def self.webhook_function(functionName, block = nil, &handler)
       if block_given?
-        Parse::Webhooks.route(:function, functionName, &Proc.new)
+        Parse::Webhooks.route(:function, functionName, &handler)
       else
         block = functionName.to_s.underscore.to_sym if block.blank?
         block = method(block.to_sym) if block.is_a?(Symbol)
@@ -53,16 +53,16 @@ module Parse
     # @yield the body of the function to be evaluated in the scope of a {Parse::Webhooks::Payload} instance.
     # @param block [Symbol] the name of the method to call, if no block is passed.
     # @return (see Parse::Webhooks.route)
-    def self.webhook(type, block = nil)
+    def self.webhook(type, block = nil, &handler)
       if type == :function
         unless block.is_a?(String) || block.is_a?(Symbol)
           raise ArgumentError, "Invalid Cloud Code function name: #{block}"
         end
-        Parse::Webhooks.route(:function, block, &Proc.new)
+        Parse::Webhooks.route(:function, block, &handler)
         # then block must be a symbol or a string
       else
         if block_given?
-          Parse::Webhooks.route(type, self, &Proc.new)
+          Parse::Webhooks.route(type, self, &handler)
         else
           Parse::Webhooks.route(type, self, block)
         end
@@ -125,13 +125,13 @@ module Parse
       #  name to register with Parse server.
       # @yield the block that will handle of the webhook trigger or function.
       # @return (see routes)
-      def route(type, className, block = nil)
+      def route(type, className, block = nil, &handler)
         type = type.to_s.underscore.to_sym #support camelcase
         if type != :function && className.respond_to?(:parse_class)
           className = className.parse_class
         end
         className = className.to_s
-        block = Proc.new if block_given?
+        block = handler if handler
         if routes[type].nil? || block.respond_to?(:call) == false
           raise ArgumentError, "Invalid Webhook registration trigger #{type} #{className}"
         end
@@ -248,7 +248,7 @@ module Parse
           return response.finish
         end
 
-        request.body.rewind
+        request.body.rewind if request.body.respond_to?(:rewind)
         begin
           payload = Parse::Webhooks::Payload.new request.body.read
         rescue => e

@@ -4,6 +4,7 @@ require 'minitest/reporters'
 Minitest::Reporters.use!(Minitest::Reporters::SpecReporter.new)
 require_relative "../lib/parse/stack.rb"
 require "minitest/autorun"
+require "minitest/mock"
 
 Parse.use_shortnames!
 
@@ -53,15 +54,15 @@ module ConstraintTests
   end
 end
 
-module MiniTest
+module Minitest
   module Assertions
     def refute_raises(*exp)
       msg = "#{exp.pop}.\n" if String === exp.last
 
       begin
         yield
-      rescue MiniTest::Skip => e
-        return e if exp.include? MiniTest::Skip
+      rescue Minitest::Skip => e
+        return e if exp.include? Minitest::Skip
         raise e
       rescue Exception => e
         exp = exp.first if exp.size == 1

@@ -81,10 +81,11 @@ module Parse
       mime_type ||= Parse::File.default_mime_type
 
       if name.is_a?(String) && name.start_with?("http") #could be url string
-        file = open(name)
-        @contents = file.read
-        @name = File.basename file.base_uri.to_s
-        @mime_type = file.content_type
+        URI.open(name) do |file|
+          @contents = file.read
+          @name = File.basename file.base_uri.to_s
+          @mime_type = file.content_type
+        end
       elsif name.is_a?(Hash)
         self.attributes = name
       elsif name.is_a?(::File)

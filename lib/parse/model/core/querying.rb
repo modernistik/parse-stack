@@ -71,22 +71,22 @@ module Parse
           puts "Creating scope :#{name}. Will overwrite existing method #{self}.#{name}."
         end
 
-        define_singleton_method(name) do |*args, &block|
+        define_singleton_method(name) do |*args, **kwargs, &block|
           if body.arity.zero?
             res = body.call
-            res.conditions(*args) if args.present?
+            res.conditions(*args, **kwargs) if args.present? || kwargs.present?
           else
-            res = body.call(*args)
+            res = body.call(*args, **kwargs)
           end
 
           _q = res || query
 
           if _q.is_a?(Parse::Query)
             klass = self
-            _q.define_singleton_method(:method_missing) do |m, *args, &chained_block|
+            _q.define_singleton_method(:method_missing) do |m, *args, **kwargs, &chained_block|
               if klass.respond_to?(m, true)
                 # must be a scope
-                klass_scope = klass.send(m, *args)
+                klass_scope = klass.send(m, *args, **kwargs)
                 if klass_scope.is_a?(Parse::Query)
                   # merge constraints
                   add_constraints(klass_scope.constraints)
@@ -97,7 +97,7 @@ module Parse
                 return klass_scope
               end
               klass = nil # help clean up ruby gc
-              return results.send(m, *args, &chained_block)
+              return results.send(m, *args, **kwargs, &chained_block)
             end
           end
 
@@ -207,10 +207,10 @@ module Parse
       #   by the server.
       # @return [Array<Parse::Object>] an array of matching objects. If a block is passed,
       #  an empty array is returned.
-      def all(constraints = { limit: :max })
+      def all(constraints = { limit: :max }, &block)
         constraints = constraints.reverse_merge({ limit: :max })
         prepared_query = query(constraints)
-        return prepared_query.results(&Proc.new) if block_given?
+        return prepared_query.results(&block) if block_given?
         prepared_query.results
       end
 
@@ -268,7 +268,7 @@ module Parse
       def newest(constraints = {})
         constraints.merge!(order: :created_at.desc)
         _q = query(constraints)
-        _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+        _q.define_singleton_method(:method_missing) { |m, *args, **kwargs, &block| self.results.send(m, *args, **kwargs, &block) }
         _q
       end
 
@@ -278,7 +278,7 @@ module Parse
       def oldest(constraints = {})
         constraints.merge!(order: :created_at.asc)
         _q = query(constraints)
-        _q.define_singleton_method(:method_missing) { |m, *args, &block| self.results.send(m, *args, &block) }
+        _q.define_singleton_method(:method_missing) { |m, *args, **kwargs, &block| self.results.send(m, *args, **kwargs, &block) }
         _q
       end
 

@@ -2,12 +2,11 @@
 # frozen_string_literal: true
 
 require "faraday"
-require "faraday_middleware"
 require_relative "response"
 require_relative "protocol"
 require "active_support"
 require "active_support/core_ext"
-require "active_model_serializers"
+require "active_model"
 
 module Parse
 
@@ -87,13 +86,16 @@ module Parse
           end
 
           begin
-            r = Parse::Response.new(response_env.body)
+            body = response_env.body
+            body = {} if response_env.status.between?(200, 299) && (body.nil? || body == "")
+            r = Parse::Response.new(body)
           rescue => e
             r = Parse::Response.new
             r.code = response_env.status
             r.error = "Invalid response for #{env[:method]} #{env[:url]}: #{e}"
           end
           r.http_status = response_env[:status]
+          r.headers = (response_env.response_headers || {}).dup
           r.code ||= response_env[:status] if r.error.present?
           response_env[:body] = r
         end

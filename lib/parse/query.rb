@@ -6,7 +6,6 @@ require_relative "query/operation"
 require_relative "query/constraints"
 require_relative "query/ordering"
 require "active_model"
-require "active_model_serializers"
 require "active_support"
 require "active_support/inflector"
 require "active_support/core_ext"
@@ -151,6 +150,18 @@ module Parse
     #  @return [String] the session token to send with this API request.
     attr_accessor :table, :client, :key, :cache, :use_master_key, :session_token
 
+    # REST options are distinct from object-field constraints. Unknown options
+    # remain available through the explicit server_options interface.
+    SERVER_OPTION_ALIASES = {
+      read_preference: :readPreference, readPreference: :readPreference,
+      include_read_preference: :includeReadPreference, includeReadPreference: :includeReadPreference,
+      subquery_read_preference: :subqueryReadPreference, subqueryReadPreference: :subqueryReadPreference,
+      exclude_keys: :excludeKeys, excludeKeys: :excludeKeys,
+      hint: :hint, explain: :explain,
+    }.freeze
+    READ_PREFERENCES = %w[PRIMARY PRIMARY_PREFERRED SECONDARY SECONDARY_PREFERRED NEAREST].freeze
+    RESERVED_SERVER_OPTIONS = %i[where keys include order limit skip count className cache session use_master_key].freeze
+
     # We have a special class method to handle field formatting. This turns
     # the symbol keys in an operand from one key to another. For example, we can
     # have the keys like :cost_rate in a query be translated to "costRate" when we
@@ -260,6 +271,10 @@ module Parse
         @count = 0
       when :keys
         @keys = []
+      when :server_options
+        @server_options = {}
+      else
+        @server_options.delete(SERVER_OPTION_ALIASES[item.to_sym]) if SERVER_OPTION_ALIASES.key?(item.to_sym)
       end
       @results = nil
       self # chaining
@@ -292,6 +307,7 @@ module Parse
       @order = []
       @keys = []
       @includes = []
+      @server_options = {}
       @limit = nil
       @skip = 0
       @table = table
@@ -308,7 +324,10 @@ module Parse
     # @return [self]
     def conditions(expressions = {})
       expressions.each do |expression, value|
-        if expression == :order
+        option = expression.respond_to?(:to_sym) ? SERVER_OPTION_ALIASES[expression.to_sym] : nil
+        if option
+          server_options(option => value)
+        elsif expression == :order
           order value
         elsif expression == :keys
           keys value
@@ -332,6 +351,38 @@ module Parse
         end
       end # each
       self #chaining
+    end
+
+    # Set additional REST query parameters, including parameters added by newer
+    # Parse Servers. Unknown field names in conditions remain field constraints.
+    # Core query clauses must be set with their normal methods.
+    # @return [self, Hash] self when setting, or a copy of the options when reading.
+    def server_options(values = nil)
+      return @server_options.deep_dup if values.nil?
+      raise ArgumentError, "server_options must be a hash" unless values.is_a?(Hash)
+
+      values.each do |key, value|
+        unless key.is_a?(String) || key.is_a?(Symbol)
+          raise ArgumentError, "server option names must be strings or symbols"
+        end
+        key = SERVER_OPTION_ALIASES.fetch(key.to_sym, key.to_sym)
+        if RESERVED_SERVER_OPTIONS.include?(key)
+          raise ArgumentError, "Use the query's #{key} method instead of server_options"
+        end
+        if value.nil?
+          @server_options.delete(key)
+          next
+        end
+        if [:readPreference, :includeReadPreference, :subqueryReadPreference].include?(key)
+          value = value.to_s.underscore.upcase
+          raise ArgumentError, "Invalid read preference: #{value}" unless READ_PREFERENCES.include?(value)
+        elsif key == :excludeKeys
+          value = Array(value).flat_map { |field| field.to_s.split(",") }.map { |field| Query.format_field(field.strip).to_s }.uniq
+        end
+        @server_options[key] = value.deep_dup
+      end
+      @results = nil
+      self
     end
 
     alias_method :query, :conditions
@@ -635,7 +686,7 @@ module Parse
         compile_query[:distinct] = Query.format_field(field).to_sym
         @count = old_count_value
         # perform aggregation
-        return client.aggregate_objects(@table, compile_query.as_json, _opts).result
+        return client.aggregate_objects(@table, compile_query.as_json, **_opts).result
       else
         raise ArgumentError, "Invalid field name passed to `distinct`."
       end
@@ -654,7 +705,7 @@ module Parse
     def count
       old_value = @count
       @count = 1
-      res = client.find_objects(@table, compile.as_json, _opts).count
+      res = client.find_objects(@table, compile.as_json, **_opts).count
       @count = old_value
       res
     end
@@ -662,25 +713,25 @@ module Parse
     # @yield a block yield for each object in the result
     # @return [Array]
     # @see Array#each
-    def each
+    def each(&block)
       return results.enum_for(:each) unless block_given? # Sparkling magic!
-      results.each(&Proc.new)
+      results.each(&block)
     end
 
     # @yield a block yield for each object in the result
     # @return [Array]
     # @see Array#map
-    def map
+    def map(&block)
       return results.enum_for(:map) unless block_given? # Sparkling magic!
-      results.map(&Proc.new)
+      results.map(&block)
     end
 
     # @yield a block yield for each object in the result
     # @return [Array]
     # @see Array#select
-    def select
+    def select(&block)
       return results.enum_for(:select) unless block_given? # Sparkling magic!
-      results.select(&Proc.new)
+      results.select(&block)
     end
 
     # @return [Array]
@@ -700,7 +751,7 @@ module Parse
     # max_results is used to iterate through as many API requests as possible using
     # :skip and :limit paramter.
     # @!visibility private
-    def max_results(raw: false, on_batch: nil, discard_results: false)
+    def max_results(raw: false, on_batch: nil, discard_results: false, &block)
       compiled_query = compile
       batch_size = 1_000
       results = []
@@ -725,7 +776,7 @@ module Parse
         items = decode(items) unless raw
         # if a block is provided, we do not keep the results after processing.
         if block_given?
-          items.each(&Proc.new)
+          items.each(&block)
         else
           # concat results unless discard_results is true
           results += items unless discard_results
@@ -766,7 +817,7 @@ module Parse
     # @param compiled_query [Hash] the compiled query
     # @return [Parse::Response] a response for a query request.
     def fetch!(compiled_query)
-      response = client.find_objects(@table, compiled_query.as_json, _opts)
+      response = client.find_objects(@table, compiled_query.as_json, **_opts)
       if response.error?
         puts "[ParseQuery] #{response.error}"
       end
@@ -796,15 +847,15 @@ module Parse
     # @yield a block to iterate for each object that matched the query.
     # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
     # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
-    def results(raw: false)
+    def results(raw: false, &block)
       if @results.nil?
         if block_given?
-          max_results(raw: raw, &Proc.new)
+          max_results(raw: raw, &block)
         elsif @limit.is_a?(Numeric)
           response = fetch!(compile)
           return [] if response.error?
           items = raw ? response.results : decode(response.results)
-          return items.each(&Proc.new) if block_given?
+          return items.each(&block) if block_given?
           @results = items
         else
           @results = max_results(raw: raw)
@@ -822,9 +873,9 @@ module Parse
     # @return [Array<Hash>] if raw is set to true, a set of Parse JSON hashes.
     # @return [Array<Parse::Object>] if raw is set to false, a list of matching Parse::Object subclasses.
     # @see #results
-    def all(expressions = { limit: :max })
+    def all(expressions = { limit: :max }, &block)
       conditions(expressions)
-      return results(&Proc.new) if block_given?
+      return results(&block) if block_given?
       results
     end
 
@@ -875,6 +926,15 @@ module Parse
         end
         if includeClassName
           q[:className] = @table
+        end
+        @server_options.each do |key, value|
+          q[key] = if key == :excludeKeys
+                     value.join(",")
+                   elsif encode && (value.is_a?(Array) || value.is_a?(Hash))
+                     value.to_json
+                   else
+                     value.deep_dup
+                   end
         end
         q
       end

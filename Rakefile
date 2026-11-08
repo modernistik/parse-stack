@@ -12,6 +12,12 @@ end
 
 task :default => :test
 
+desc "Run against a disposable local Parse Server and MongoDB (npm ci --prefix test/integration first)"
+task :integration do
+  require "rbconfig"
+  sh({ "RUBY" => RbConfig.ruby }, ENV.fetch("NODE", "node"), "test/integration/run.js")
+end
+
 task :console do
   exec "./bin/console"
 end

@@ -331,7 +331,7 @@ module Parse
     # @raise [Parse::Client::ResponseError] An unknown error occurred.
     # @return [User] Returns a successfully created Parse::User.
     def self.create(body, **opts)
-      response = client.create_user(body, opts: opts)
+      response = client.create_user(body, **opts)
       if response.success?
         body.delete :password # clear password before merging
         return Parse::User.build body.merge(response.result)
@@ -369,18 +369,24 @@ module Parse
     # a query using the supplied _username_ first to verify do not already have an account with that username.
     # This method will raise all the exceptions from the similar `create` method.
     # @see User.create
-    def self.signup(username, password, email = nil, body: {})
+    def self.signup(username, password, email = nil, body: {}, **opts)
       body = body.merge({ username: username, password: password })
       body[:email] = email if email.present?
-      self.create(body)
+      self.create(body, **opts)
     end
 
     # Login and return a Parse::User with this username/password combination.
     # @param username [String] the user's username
     # @param password [String] the user's password
     # @return [User] a logged in user for the provided username. Returns nil otherwise.
-    def self.login(username, password)
-      response = client.login(username.to_s, password.to_s)
+    def self.login(username, password, **opts)
+      response = client.login(username.to_s, password.to_s, **opts)
+      response.success? ? Parse::User.build(response.result) : nil
+    end
+
+    # Authenticate as a user with the master key; returns a new user session.
+    def self.login_as(user_id, **opts)
+      response = client.login_as(user_id, **opts)
       response.success? ? Parse::User.build(response.result) : nil
     end
 
@@ -417,7 +423,7 @@ module Parse
     def self.session!(token, opts = {})
       # support Parse::Session objects
       token = token.session_token if token.respond_to?(:session_token)
-      response = client.current_user(token, opts)
+      response = client.current_user(token, **opts)
       response.success? ? Parse::User.build(response.result) : nil
     end
 

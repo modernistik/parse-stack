@@ -1,0 +1,4 @@
+eval_gemfile File.expand_path("../Gemfile", __dir__)
+
+# Exercise the newest supported ActiveModel independently of the Ruby 3.0 lockfile.
+gem "activemodel", ">= 8.1"

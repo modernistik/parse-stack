@@ -59,7 +59,7 @@ module Parse
     #  @return [Integer] the Parse::Request that generated this response.
     #  @see Parse::Request
     attr_accessor :parse_class, :code, :error, :result, :http_status,
-                  :request
+                  :request, :headers
     # You can query Parse for counting objects, which may not actually have
     # results.
     # @return [Integer] the count result from a count query request.
@@ -69,6 +69,7 @@ module Parse
     # @param res [Hash] the JSON hash
     def initialize(res = {})
       @http_status = 0
+      @headers = {}
       @count = 0
       @batch_response = false # by default, not a batch response
       @result = nil
@@ -91,6 +92,19 @@ module Parse
     # true if this was a batch response.
     def batch?
       @batch_response
+    end
+
+    # Read a response header without depending on its capitalization.
+    # @return [String, nil]
+    def header(name)
+      pair = headers.find { |key, _value| key.to_s.casecmp?(name.to_s) }
+      pair&.last
+    end
+
+    # The identifier returned when a background job starts.
+    # @return [String, nil]
+    def job_status_id
+      header("X-Parse-Job-Status-Id")
     end
 
     # If it is a batch respnose, we'll create an array of Response objects for each
@@ -156,9 +170,9 @@ module Parse
 
     # Iterate through each result item.
     # @yieldparam [Object] a result entry.
-    def each
+    def each(&block)
       return enum_for(:each) unless block_given?
-      results.each(&Proc.new)
+      results.each(&block)
       self
     end
 
